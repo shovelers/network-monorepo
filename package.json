@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "DCN protocol",
   "main": "index.js",
+  "workspaces":["./protocol", "./packages/*", "./apps/*"],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
