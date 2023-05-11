@@ -4,7 +4,7 @@ const Database = require("@replit/database");
 const { v4: uuidv4 } = require('uuid');
 
 const path = require("path");
-const port = 3000;
+const port = 3001;
 
 const server = express();
 const db = new Database();
