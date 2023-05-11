@@ -4,6 +4,9 @@ const { Parser } = require('json2csv');
 const zip = require('adm-zip');
 const fs = require('fs');
 
+const c = require('client');
+console.log(c);
+
 const path = require("path");
 const port = 3000;
 const client = new Client(process.env.BEARER_TOKEN);
