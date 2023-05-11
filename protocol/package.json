@@ -1,20 +1,25 @@
 {
-  "name": "monorepo",
+  "name": "protocol",
   "version": "0.0.0",
-  "description": "DCN protocol",
+  "description": "DCN protocol prototype",
   "main": "index.js",
-  "workspaces":["./protocol", "./packages/*", "./apps/*"],
+  "devDependencies": {},
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shovelers/protocol.git"
   },
-  "author": "SinisterLight",
-  "license": "UNLICENSED",
+  "author": "Sinister Light",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/shovelers/protocol/issues"
+  },
+  "dependencies": {
+    "ejs": "^3.1.8",
+    "express": "^4.18.2"
   },
   "homepage": "https://github.com/shovelers/protocol#readme"
 }
