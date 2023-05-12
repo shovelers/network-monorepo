@@ -32,7 +32,7 @@ server.post("/user", (req, res) => {
 })
 
 server.get("/graph", (req, res) => {
-  res.status(200).json({})
+  res.status(200).json(RelationshipTuple)
 })
 
 /*
