@@ -18,6 +18,13 @@ server.get("/", (req, res) => {
 const UserRegistry = {}
 const RelationshipTuple = []
 
+/*
+  sample req.body = {
+    "did": "did:ion:z6MkkMKvnc3vJfQp8Sr8dYVjc6zrTQaxcDBbtYqW3wMJW2hY",
+    "doc": "qwertyuiolpasdfghjkjhgfdsasdfghjmknbvcxcvbnbvcxzfghudsdfyuy"
+  }
+  TODO: Validate DID data
+*/
 server.post("/user", (req, res) => {
   UserRegistry[req.body.did] = req.body.doc
   console.log(UserRegistry)
@@ -28,7 +35,19 @@ server.get("/graph", (req, res) => {
   res.status(200).json({})
 })
 
+/*
+  sample req.body = {
+    "from": "did:ion:z6MkkMKvnc3vJfQp8Sr8dYVjc6zrTQaxcDBbtYqW3wMJW2hY",
+    "to": "did:web:z6MkkMKvnc3vJfQp8Sr8dYVjc6zrTQaxcDBbtYqW3wMJW2hY",
+    "timestamp": 1683879632177
+  }
+  TODO: Think through how/if to handle duplicate enteries
+  TODO: Validate Tuple
+  TODO: Define timestamp format
+*/
 server.post("/graph", (req, res) => {
+  RelationshipTuple.push(req.body)
+  console.log(RelationshipTuple)
   res.status(200).json({})
 })
 
