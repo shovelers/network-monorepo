@@ -3,6 +3,7 @@ const { Client } = require("twitter-api-sdk");
 const { Parser } = require('json2csv');
 const zip = require('adm-zip');
 const fs = require('fs');
+const DIDKit = require('@spruceid/didkit-wasm-node');
 
 const c = require('client');
 console.log(c);
@@ -25,6 +26,9 @@ server.get("/", (req, res) => {
 
 server.post("/social_graph", async (req, res) => {
   var handle = req.body.fhandle;
+  //currently generates a newkeypair on each call, would have to add check for user exitence based on twitter handle
+  var key = await keyGen();
+  //call client.generate_did(key) to create a did for the user
   var result = await handleGraph(handle.toLowerCase());
   
   if (typeof result === "undefined" || typeof result["followers"] === "undefined" || typeof result["followings"] === "undefined") {
@@ -38,6 +42,7 @@ server.post("/social_graph", async (req, res) => {
   
   res.render('pages/social_graph', {
     profile: result["profile"],
+    keypair: key,
     followers: result["followers"],
     followings: result["followings"]
   });
@@ -94,4 +99,10 @@ function createCSV(data) {
   const json2csvParser = new Parser({ fields });
   const csv = json2csvParser.parse(data);
   return csv
+}
+
+async function keyGen(){
+  var key = DIDKit.generateEd25519Key();
+  console.log(key);
+  return key;
 }
