@@ -12,11 +12,13 @@ server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
 
 const UserRegistry = {}
+const GraphRegistry = {}
 const RelationshipTuple = []
 
 server.get("/", (req, res) => {
   res.render('pages/index', {
     users: Object.keys(UserRegistry).length,
+    graphs: Object.keys(GraphRegistry).length,
     relationships: RelationshipTuple.length
   })
 });
