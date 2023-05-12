@@ -36,7 +36,17 @@ server.post("/user", (req, res) => {
   res.status(200).json({})
 })
 
-server.get("/graph", (req, res) => {
+server.post("/graph", (req, res) => {
+  GraphRegistry[req.body.did] = {
+    doc: req.body.doc,
+    relationships: []
+  }
+  console.log(GraphRegistry)
+  res.status(200).json({})
+})
+
+
+server.get("/graph/:did", (req, res) => {
   res.status(200).json(RelationshipTuple)
 })
 
@@ -50,7 +60,7 @@ server.get("/graph", (req, res) => {
   TODO: Validate Tuple
   TODO: Define timestamp format
 */
-server.post("/graph", (req, res) => {
+server.post("/graph/:did", (req, res) => {
   RelationshipTuple.push(req.body)
   console.log(RelationshipTuple)
   res.status(200).json({})
