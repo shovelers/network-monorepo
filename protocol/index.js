@@ -67,9 +67,13 @@ server.get("/graph/:did", (req, res) => {
   TODO: Define timestamp format
 */
 server.post("/graph/:did", (req, res) => {
-  RelationshipTuple.push(req.body)
-  console.log(RelationshipTuple)
-  res.status(200).json({})
+  if (GraphRegistry[req.params.did] !== undefined) {
+    GraphRegistry[req.params.did].relationships.push(req.body)
+    console.log(GraphRegistry[req.params.did])
+    res.status(200).json({})
+  } else {
+    res.status(404).json({})
+  }
 })
 
 server.listen(port, (err) => {
