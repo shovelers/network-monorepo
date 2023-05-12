@@ -14,6 +14,18 @@ server.get("/", (req, res) => {
   res.render('pages/index')
 });
 
+server.post("/user", (req, res) => {
+  res.status(200).json({})
+})
+
+server.get("/graph", (req, res) => {
+  res.status(200).json({})
+})
+
+server.post("/graph", (req, res) => {
+  res.status(200).json({})
+})
+
 server.listen(port, (err) => {
   if (err) throw err;
   console.log(
