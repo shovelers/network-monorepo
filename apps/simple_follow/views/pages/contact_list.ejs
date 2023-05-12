@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <base href="/">
+    <script type="text/javascript" src="../index.js" defer></script>
+    <link rel="stylesheet" href="./styles/style.css" />
+  </head>
+  
+  <%- include('../partials/google_analytics.ejs') %>
+  
+  <body class="antialiased">
+    <div class="container mx-auto px-4 flex flex-col justify-center items-center">
+      <%- include('../partials/navbar.ejs') %>
+      <div class="w-2/3 md:w-1/2 flex flex-col items-center space-y-4">
+        <div class="text-lg">Contact List</div>
+        <div class="flex flex-row space-x-4 h-72 w-full">
+          <div class="w-1/2 border-2 rounded-md p-2 overflow-auto">
+            <table class="text-left">
+                <thead>
+                  <tr class="sticky top-0">
+                    <th>Followers</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% followers.forEach(function(follower) { %>
+                  <tr class="bg-gray-100">
+                    <td><%= JSON.parse(follower).credentialSubject["id"] %></td>
+                  </tr>
+                  <% }); 
+                  %> 
+                </tbody>
+              </table>
+          </div>
+          <div class="w-1/2 border-2 rounded-md p-2 overflow-auto">
+            <table class="text-left">
+              <thead>
+                <tr class="sticky top-0">
+                  <th>Following</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% following.forEach(function(follow) { %>
+                <tr class="bg-gray-100">
+                  <td><%= JSON.parse(follow).issuer %></td>
+                </tr>
+                <% }); 
+                %> 
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="flex flex-row space-x-4 items-center">
+          <form id="form1" method="post" action="/request_follow" class="space-y-1">
+            <label>Send Request</label>
+            <label for="team_name" class="font-bold">@</label>
+            <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+            <input type="hidden" name="subjectDID" value= <%= did %> />
+            <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200">Follow</button>
+          </form>
+        </div>
+        <div class="h-28 md:h-36 w-full p-2 border-2 rounded-md overflow-auto">
+          <table class="text-left w-full">
+            <thead>
+              <tr class="sticky top-0">
+                <th>Follow Requests</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% inbox.forEach(function(message) { %>
+              <tr class="bg-gray-100">
+                <td><%= message %></td>
+                <td>
+                  <form id="accept_form" method="post" action="/accept_follow" class="space-y-1">
+                    <input type="hidden" name="issuerDID" value= <%= did %> />
+                    <input type="hidden" name="subjectDID" value= <%= message %> />
+                    <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200">Accept</button>
+                  </form>
+                </td>
+              </tr>
+              <% }); 
+              %> 
+            </tbody>
+          </table>
+        </div>
+        <div class="h-28 md:h-36 w-full p-2 border-2 rounded-md overflow-auto">
+          <table class="text-left w-full">
+            <thead>
+              <tr class="sticky top-0">
+                <th>Pending Requests</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% pendingRequests.forEach(function(user) { %>
+              <tr class="bg-gray-100">
+                <td><%= user %></td>
+              </tr>
+              <% }); 
+              %> 
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <%- include('../partials/shovel.ejs') %>
+    </div>
+  </body>
+</html>

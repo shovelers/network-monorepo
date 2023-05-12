@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <base href="/">
+    <script type="text/javascript" src="../index.js" defer></script>
+    <link rel="stylesheet" href="./styles/style.css" />
+  </head>
+  
+  <%- include('../partials/google_analytics.ejs') %>
+  
+  <body class="antialiased">
+    <div class="container mx-auto px-4 h-screen w-4/5 flex flex-col justify-center items-center prose prose-slate">
+      <div class="flex flex-row">
+        <div class="flex flex-col w-1/2 items-left justify-center">
+          <div class="text-lg md:text-xl font-semibold text-blue-500">Handle:<span class="text-sm text-gray-800"><%= handle %></span></div>
+          <div class="text-sm md:text-lg font-semibold text-blue-500">DID:<span class="text-sm text-gray-800"><%= did %></span></div>
+          <div class="text-sm md:text-lg font-semibold text-blue-500">Key:<span class="text-xs break-all text-gray-800"><%= key %></span></div>
+          <form id="form1" method="post" action="/request_follow" class="space-y-1">
+            <label>Send Request</label>
+            <label for="team_name" class="font-bold">@</label>
+            <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+            <input type="hidden" name="subjectDID" value= <%= did %> />
+            <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200">Request Follow</button>
+          </form>
+          <div class="font-semibold"> Follow Requests</div>
+          <div class="flex flex-col overflow-y-scroll h-64 w-full">
+            <table class="text-left">
+              <thead>
+                <tr class="sticky top-0 bg-gray-400 text-gray-100">
+                  <th>User</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% inbox.forEach(function(message) { %>
+                <tr class="bg-gray-100">
+                  <td><%= message %></td>
+                  <td>
+                    <form id="accept_form" method="post" action="/accept_follow" class="space-y-1">
+                      <input type="hidden" name="issuerDID" value= <%= did %> />
+                      <input type="hidden" name="subjectDID" value= <%= message %> />
+                      <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200">Accept</button>
+                    </form>
+                  </td>
+                </tr>
+                <% }); 
+                %> 
+              </tbody>
+            </table>
+          </div>
+          <div class="font-semibold"> Pending Requests </div>
+          <div>
+            <table class="text-left">
+                <thead>
+                  <tr class="sticky top-0 bg-gray-400 text-gray-100">
+                    <th>Users</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% pendingRequests.forEach(function(user) { %>
+                  <tr class="bg-gray-100">
+                    <td><%= user %></td>
+                  </tr>
+                  <% }); 
+                  %> 
+                </tbody>
+              </table>
+          </div>
+        </div>
+        <div class="w-1/2 overflow-hidden flex flex-col justify-center">
+          <pre class="text-left text-sm h-1/2">DID Doc: <code><%= doc %></code> </pre>
+          <div class="flex flex-row">
+            <div class="w-1/2">
+              <table class="text-left">
+                <thead>
+                  <tr class="sticky top-0 bg-gray-400 text-gray-100">
+                    <th>Followers</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% followers.forEach(function(follower) { %>
+                  <tr class="bg-gray-100">
+                    <td><%= JSON.parse(follower).credentialSubject["id"] %></td>
+                  </tr>
+                  <% }); 
+                  %> 
+                </tbody>
+              </table>
+            </div>
+            <div class="w-1/2">
+              <table class="text-left">
+              <thead>
+                <tr class="sticky top-0 bg-gray-400 text-gray-100">
+                  <th>Following</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% following.forEach(function(follow) { %>
+                <tr class="bg-gray-100">
+                  <td><%= JSON.parse(follow).issuer %></td>
+                </tr>
+                <% }); 
+                %> 
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <%- include('../partials/shovel.ejs') %>
+    </div>
+  </body>
+</html>
