@@ -15,12 +15,12 @@ server.get("/", (req, res) => {
   res.render('pages/index')
 });
 
-
 const UserRegistry = {}
 const RelationshipTuple = []
 
 server.post("/user", (req, res) => {
-  console.log(req.body)
+  UserRegistry[req.body.did] = req.body.doc
+  console.log(UserRegistry)
   res.status(200).json({})
 })
 
