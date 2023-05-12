@@ -16,10 +16,15 @@ const GraphRegistry = {}
 const RelationshipTuple = []
 
 server.get("/", (req, res) => {
+  relationships = 0
+  Object.values(GraphRegistry).forEach(val => {
+    relationships += val.relationships.length
+  });
+
   res.render('pages/index', {
     users: Object.keys(UserRegistry).length,
     graphs: Object.keys(GraphRegistry).length,
-    relationships: RelationshipTuple.length
+    relationships: relationships
   })
 });
 
