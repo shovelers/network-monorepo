@@ -36,6 +36,7 @@ server.post("/user", (req, res) => {
   res.status(200).json({})
 })
 
+// TODO: Handle overwrite scenario, ideally this method should return a did rather than accept it
 server.post("/graph", (req, res) => {
   GraphRegistry[req.body.did] = {
     doc: req.body.doc,
@@ -45,9 +46,14 @@ server.post("/graph", (req, res) => {
   res.status(200).json({})
 })
 
-
+/*
+  TODO: Validate presence of Graph
+*/
 server.get("/graph/:did", (req, res) => {
-  res.status(200).json(RelationshipTuple)
+  if (GraphRegistry[req.params.did] !== undefined)
+    res.status(200).json(GraphRegistry[req.params.did].relationships)
+  else
+    res.status(404).json({})
 })
 
 /*
