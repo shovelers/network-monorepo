@@ -4,6 +4,7 @@ class Protocol {
   }
 
   registerUser() {
+    console.log("registerUser")
 
   }
 
