@@ -20,6 +20,8 @@ server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')))
 
 var handleToDID = {}
+var graph_did = "did:dcn:rolodex"
+c.registerGraph(graph_did,"qwertyuiolpasdfghjkjhgfdsasdfghjmknbvcxcvbnbvcxzfghudsdfyuy")
 
 server.get("/", (req, res) => {
   res.render('pages/index')
