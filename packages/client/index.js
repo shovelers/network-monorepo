@@ -12,7 +12,6 @@ class Protocol {
     var did = DIDKit.keyToDID('key', key);
     var doc = await DIDKit.resolveDID(did, "{}");
 
-    console.log("generateDID for given key & return DID & DID doc")
     return {did: did, doc: doc}
   }
 

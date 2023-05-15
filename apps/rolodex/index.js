@@ -19,7 +19,7 @@ server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')))
 
-var handleToDID = {}
+const HandleToDID = {}
 var graph_did = "did:dcn:rolodex"
 c.registerGraph(graph_did,"qwertyuiolpasdfghjkjhgfdsasdfghjmknbvcxcvbnbvcxzfghudsdfyuy")
 
@@ -117,18 +117,22 @@ function createCSV(data) {
 }
 
 async function getDIDforHandle(handle) {
-  if (handleToDID[handle] !== undefined)
-    return handleToDID[handle], "key"
+  if (HandleToDID[handle] !== undefined){
+    console.log("hit", handle)
+    return HandleToDID[handle], "key"
+  }
+  // TODO - use promise instead, so that if given to a caller they can get the correct final value
+  HandleToDID[handle] = "placeholder"
 
   var key = await DIDKit.generateEd25519Key();
   var result = await c.generateDID(key);
-  console.log(result);
 
   var did = result["did"];
   var doc = result["doc"];
   c.registerUser(did, doc);
 
-  handleToDID[handle] = did
+  HandleToDID[handle] = did
+  console.log(handle, did, Object.keys(HandleToDID).length)
 
   return did, key
 }
