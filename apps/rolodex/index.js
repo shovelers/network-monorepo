@@ -19,6 +19,8 @@ server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')))
 
+var handleToDID = {}
+
 server.get("/", (req, res) => {
   res.render('pages/index')
 });
@@ -26,14 +28,7 @@ server.get("/", (req, res) => {
 
 server.post("/social_graph", async (req, res) => {
   var handle = req.body.fhandle;
-  //currently generates a newkeypair on each call, would have to add check for user exitence based on twitter handle
-  var key = await keyGen();
-  //call client.generate_did(key) to create a did for the user
-  var result = await c.generateDID(key);
-  console.log(result);
-  var did = result["did"];
-  var doc = result["doc"];
-  c.registerUser(did, doc);
+  var did, key = getDIDforHandle(handle);
 
   var result = await handleGraph(handle.toLowerCase());
 
@@ -107,8 +102,19 @@ function createCSV(data) {
   return csv
 }
 
-async function keyGen(){
-  var key = DIDKit.generateEd25519Key();
-  console.log(key);
-  return key;
+async function getDIDforHandle(handle) {
+  if (handleToDID[handle] !== undefined)
+    return handleToDID[handle]
+
+  var key = await DIDKit.generateEd25519Key();
+  var result = await c.generateDID(key);
+  console.log(result);
+
+  var did = result["did"];
+  var doc = result["doc"];
+  c.registerUser(did, doc);
+
+  handleToDID[handle] = did
+
+  return did, key
 }
