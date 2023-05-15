@@ -18,7 +18,6 @@ server.use(express.static(path.join(__dirname, 'public')));
 
 const UserRegistry = {}
 const GraphRegistry = {}
-const RelationshipTuple = []
 
 server.get("/", (req, res) => {
   relationships = 0
@@ -42,7 +41,6 @@ server.get("/", (req, res) => {
 */
 server.post("/user", (req, res) => {
   UserRegistry[req.body.did] = req.body.doc
-  console.log(UserRegistry)
   res.status(200).json({})
 })
 
@@ -52,7 +50,6 @@ server.post("/graph", (req, res) => {
     doc: req.body.doc,
     relationships: []
   }
-  console.log(GraphRegistry)
   res.status(200).json({})
 })
 
@@ -79,7 +76,6 @@ server.get("/graph/:did", (req, res) => {
 server.post("/graph/:did", (req, res) => {
   if (GraphRegistry[req.params.did] !== undefined) {
     GraphRegistry[req.params.did].relationships.push(req.body)
-    console.log(GraphRegistry[req.params.did])
     res.status(200).json({})
   } else {
     res.status(404).json({})
