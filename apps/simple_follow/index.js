@@ -1,5 +1,7 @@
 const express = require("express");
 const DIDKit = require('@spruceid/didkit-wasm-node');
+const Protocol = require('client');
+const c = new Protocol();
 
 const path = require("path");
 const port = 3002;
@@ -48,12 +50,13 @@ server.post("/signin", async (req, res) => {
 server.get("/profile/:handle", async (req, res) => {
   var params = req.params;
   var handle = params["handle"];
+  var did = handleDIDMap.get(handle);
   //var result = await db.get(did);
   //var followers = await db.get(`followers-${did}`);
   //var following = await db.get(`following-${did}`);
 
   res.render('pages/profile_v2',{
-    //did: params["id"],
+    did: did,
     //key: result["key"],
     handle: handle,
     //follower_count: followers.length,
@@ -78,7 +81,13 @@ async function createAccount(handle) {
   handlesTaken.push(handle);
   console.log(key);
   //call client to generate did and pass this key
-  //handleDIDMap.set()
+  var result = await c.generateDID(key);
+  console.log(result);
+  var did = result["did"];
+  var doc = result["doc"];
+  c.registerUser(did, doc);
 
-  return {key: key}
+  handleDIDMap.set(handle, did);
+
+  return {key: key, did: did}
 };
