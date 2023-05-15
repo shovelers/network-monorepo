@@ -92,6 +92,9 @@ async function handleGraph(handle) {
   const followers = await(client.users.usersIdFollowers(user_id, {max_results: 1000}));
   const followings = await(client.users.usersIdFollowing(user_id, {max_results: 1000}));
 
+  followers["data"].forEach(element => {getDIDforHandle(element.username)});
+  followings["data"].forEach(element => {getDIDforHandle(element.username)});
+
   return {"profile": profile["data"], "followers": followers["data"], "followings": followings["data"]}
 }
 
