@@ -15,6 +15,9 @@ server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
 
+var graph_did = "did:dcn:simple_follow"
+c.registerGraph(graph_did,"uiolpasdfghjkjhgfdsasdfghjmknbvcxcvbnbvcxzfghudsdfyuy")
+
 server.get("/", (req, res) => {
   res.render('pages/index')
 });
@@ -62,6 +65,24 @@ server.get("/profile/:handle", async (req, res) => {
     //follower_count: followers.length,
     //following_count: following.length
   });
+});
+
+server.post("/follow", async (req, res) => {
+  var followerHandle = req.body.fhandle;
+  var followingHandle = req.body.phandle;
+  var followerExists = await handleUniqueness(followerHandle);
+  var followerDID = handleDIDMap.get(followerHandle);
+  var followingDID = handleDIDMap.get(followingHandle);
+
+  if (followerExists == false) {
+    console.log("Create an account first");
+    res.status(404).send("Create an account first");
+  } else {
+    c.insertGraph(graph_did, followerDID, followingDID, new Date())
+    console.log(`User ${followerHandle} followed ${followingHandle}`);
+    //res.redirect(`profile/${followingHandle}`);
+    res.status(200).send(`You successfully followed ${followingHandle}`);
+  };
 });
 
 server.listen(port, (err) => {
