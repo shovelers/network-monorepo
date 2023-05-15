@@ -20,16 +20,16 @@ class Protocol {
     await this.axios_client.post('/user', {did: did, doc: doc})
   }
 
-  registerGraph() {
-
+  async registerGraph(did, doc) {
+    await this.axios_client.post('/graph', {did: did, doc: doc})
   }
 
-  insertGraph() {
-
+  async readGraph(graph_did) {
+    await this.axios_client.get('/graph/' + graph_did)
   }
 
-  readGraph () {
-
+  async insertGraph(graph_did, from, to, timestamp) {
+    await this.axios_client.post('/graph/' + graph_did , {from: from, to: to, timestamp: timestamp})
   }
 }
 
