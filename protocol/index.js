@@ -1,11 +1,16 @@
 const express = require("express");
+const cors = require('cors');
+const morgan = require('morgan')
 
 const path = require("path");
 const port = 4000;
 
 const server = express();
 
-server.use(express.json())
+server.use(express.json());
+server.use(cors());
+server.use(morgan('tiny'));
+
 server.use(express.urlencoded({ extended: true }));
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
