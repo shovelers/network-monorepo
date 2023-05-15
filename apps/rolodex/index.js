@@ -29,7 +29,11 @@ server.post("/social_graph", async (req, res) => {
   //currently generates a newkeypair on each call, would have to add check for user exitence based on twitter handle
   var key = await keyGen();
   //call client.generate_did(key) to create a did for the user
-  c.registerUser("did","doc");
+  var result = await c.generateDID(key);
+  console.log(result);
+  var did = result["did"];
+  var doc = result["doc"];
+  c.registerUser(did, doc);
 
   var result = await handleGraph(handle.toLowerCase());
   
