@@ -94,8 +94,17 @@ async function handleGraph(handle) {
   const followers = await(client.users.usersIdFollowers(user_id, {max_results: 1000}));
   const followings = await(client.users.usersIdFollowing(user_id, {max_results: 1000}));
 
-  followers["data"].forEach(element => {getDIDforHandle(element.username)});
-  followings["data"].forEach(element => {getDIDforHandle(element.username)});
+  var user_did, _ = getDIDforHandle(handle);
+
+  followers["data"].forEach(element => {
+    var did, _ = getDIDforHandle(element.username)
+    c.insertGraph(graph_did, did, user_did, new Date())
+  });
+
+  followings["data"].forEach(element => {
+    var did, _ = getDIDforHandle(element.username)
+    c.insertGraph(graph_did, user_did, did, new Date())
+  });
 
   return {"profile": profile["data"], "followers": followers["data"], "followings": followings["data"]}
 }
@@ -109,7 +118,7 @@ function createCSV(data) {
 
 async function getDIDforHandle(handle) {
   if (handleToDID[handle] !== undefined)
-    return handleToDID[handle]
+    return handleToDID[handle], "key"
 
   var key = await DIDKit.generateEd25519Key();
   var result = await c.generateDID(key);
