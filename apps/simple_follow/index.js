@@ -54,7 +54,8 @@ server.get("/profile/:handle", async (req, res) => {
   var params = req.params;
   var handle = params["handle"];
   var did = handleDIDMap.get(handle);
-  //var result = await db.get(did);
+  var graphData = await c.readGraph(graph_did);
+  console.log(graphData);
   //var followers = await db.get(`followers-${did}`);
   //var following = await db.get(`following-${did}`);
 
@@ -80,7 +81,6 @@ server.post("/follow", async (req, res) => {
   } else {
     c.insertGraph(graph_did, followerDID, followingDID, new Date())
     console.log(`User ${followerHandle} followed ${followingHandle}`);
-    //res.redirect(`profile/${followingHandle}`);
     res.status(200).send(`You successfully followed ${followingHandle}`);
   };
 });

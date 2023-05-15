@@ -24,7 +24,16 @@ class Protocol {
   }
 
   async readGraph(graph_did) {
-    await this.axios_client.get('/graph/' + graph_did)
+    const response = await this.axios_client.get('/graph/' + graph_did)
+      .then(function (response) {
+        return response;
+      })
+      .catch(function (error) {
+        console.log(error);
+        return error
+      });
+
+    return response.data;
   }
 
   async insertGraph(graph_did, from, to, timestamp) {
