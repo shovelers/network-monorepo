@@ -67,7 +67,7 @@ server.get("/profile/:handle", async (req, res) => {
 server.listen(port, (err) => {
   if (err) throw err;
   console.log(
-    `> Ready on ${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
+    `> Ready on ${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co port ${port}`
   );
 });
 
