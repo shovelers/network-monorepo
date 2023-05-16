@@ -56,24 +56,26 @@ server.get("/profile/:handle", async (req, res) => {
   var did = handleDIDMap.get(handle);
   var graphData = await c.readGraph(graph_did);
   console.log(graphData);
-  //var followers = await db.get(`followers-${did}`);
-  //var following = await db.get(`following-${did}`);
+  var followers = await followerListFor(did, graphData);
+  var following = await followingListFor(did, graphData);
+
+  console.log(`followers: ${followers}, count: ${followers.length}`);
+  console.log(`following: ${following}, count: ${following.length}`);
 
   res.render('pages/profile_v2',{
     did: did,
-    //key: result["key"],
     handle: handle,
-    //follower_count: followers.length,
-    //following_count: following.length
+    follower_list: followers,
+    following_list: following
   });
 });
 
 server.post("/follow", async (req, res) => {
   var followerHandle = req.body.fhandle;
   var followingHandle = req.body.phandle;
-  var followerExists = await handleUniqueness(followerHandle);
   var followerDID = handleDIDMap.get(followerHandle);
   var followingDID = handleDIDMap.get(followingHandle);
+  var followerExists = await handleUniqueness(followerHandle);
 
   if (followerExists == false) {
     console.log("Create an account first");
@@ -112,3 +114,25 @@ async function createAccount(handle) {
 
   return {key: key, did: did}
 };
+
+async function followerListFor(did, graphData) {
+  //hashes where did == to
+  var followerList = [];
+  graphData.forEach(function (item, index) {
+    if (item['to'] == did) {
+      followerList.push(item['from']);
+    }
+  });
+  return followerList;
+}
+
+async function followingListFor(did, graphData) {
+  //hashes where did == from
+  var followingList = [];
+  graphData.forEach(function (item, index) {
+    if (item['from'] == did) {
+      followingList.push(item['to']);
+    }
+  });
+  return followingList;
+}
