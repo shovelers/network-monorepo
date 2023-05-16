@@ -10,13 +10,17 @@
 
   <body class="antialiased bg-gray-300">
     <div class="container mx-auto px-4 h-screen flex flex-col justify-center items-center">
-      <div class="text-2xl pb-4 font-bold">Save Your Social Graph</div>
-      <form id="form1" method="post" action="/social_graph" class="space-y-1 text-center">
-        <label>Twitter Handle</label><br>
-        <label for="team_name" class="font-bold">@</label>
-        <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg"><br>
-        <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200">Submit</button>
-      </form>
+      <div class="grid grid-cols-2 divide-x-2">
+        <div class="text-2xl p-12 font-bold">Save Your Social Graph</div>
+        <div>
+          <form id="form1" method="post" action="/social_graph" class="space-y-1 text-center">
+            <label>Twitter Handle</label><br>
+            <label for="team_name" class="font-bold">@</label>
+            <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg"><br>
+            <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200">Submit</button>
+          </form>
+        </div>
+      </div>
     <%- include('../partials/shovel.ejs') %>
     </div>
   </body>

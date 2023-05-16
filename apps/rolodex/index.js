@@ -45,7 +45,6 @@ server.post("/social_graph", async (req, res) => {
 
   res.render('pages/social_graph', {
     profile: result["profile"],
-    keypair: key,
     followers: result["followers"],
     followings: result["followings"]
   });
