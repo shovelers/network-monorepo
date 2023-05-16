@@ -55,12 +55,8 @@ server.get("/profile/:handle", async (req, res) => {
   var handle = params["handle"];
   var did = handleDIDMap.get(handle);
   var graphData = await c.readGraph(graph_did);
-  console.log(graphData);
   var followers = await followerListFor(did, graphData);
   var followings = await followingListFor(did, graphData);
-
-  console.log(`followers: ${followers}, count: ${followers.length}`);
-  console.log(`followings: ${followings}, count: ${followings.length}`);
 
   res.render('pages/profile_v2',{
     did: did,

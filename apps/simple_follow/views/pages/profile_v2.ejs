@@ -10,6 +10,7 @@
 
   <body class="antialiased">
     <div class="container mx-auto px-4 flex flex-col justify-center items-center">
+      <%- include('../partials/navbar.ejs') %>
       <div class="w-2/3 md:w-1/2 flex flex-col items-center space-y-4 pt-4">
         <div class="w-32 h-32 md:w-48 md:h-48 rounded-full border-2 flex items-center justify-center">Profile Pic</div>
         <div class="flex flex-col items-center text-center">
@@ -32,9 +33,6 @@
           <div class="flex flex-col overflow-y-scroll w-full">
             <table class="text-left">
               <thead>
-                <tr class="sticky top-0 bg-gray-700 text-gray-200">
-                  <th>Handle</th>
-                </tr>
               </thead>
               <tbody>
                 <% followings.forEach(function(following) { %>
@@ -53,9 +51,6 @@
           <div class="flex flex-col overflow-y-scroll w-full">
             <table class="text-left">
               <thead>
-                <tr class="sticky top-0 bg-gray-700 text-gray-200">
-                  <th>Handle</th>
-                </tr>
               </thead>
               <tbody>
                 <% followers.forEach(function(follower) { %>
