@@ -66,7 +66,9 @@ server.get("/profile/:handle", async (req, res) => {
     did: did,
     handle: handle,
     followers: followers,
-    followings: followings
+    followings: followings,
+    followersCount: followers.length,
+    followingsCount: followings.length,
   });
 });
 
@@ -120,7 +122,7 @@ async function followerListFor(did, graphData) {
   var followerList = [];
   graphData.forEach(function (item, index) {
     if (item['to'] == did) {
-      followerList.push(item['from']);
+      followerList.push(findHandleByDID(item['from']));
     }
   });
   return followerList;
@@ -131,8 +133,15 @@ async function followingListFor(did, graphData) {
   var followingList = [];
   graphData.forEach(function (item, index) {
     if (item['from'] == did) {
-      followingList.push(item['to']);
+      followingList.push(findHandleByDID(item['to']));
     }
   });
   return followingList;
+}
+
+function findHandleByDID(searchDID) {
+  for (let [key, value] of handleDIDMap.entries()) {
+    if (value === searchDID)
+      return key;
+  }
 }
