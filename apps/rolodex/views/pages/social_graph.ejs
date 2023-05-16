@@ -4,10 +4,11 @@
     <link href="./styles/style.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
   </head>
-  
+
   <%- include('../partials/google_analytics') %>
-  
-  <body class="antialiased">
+  <%- include('../partials/navbar.ejs') %>
+
+  <body class="antialiased bg-gray-300">
     <div class="container mx-auto px-4 h-screen flex flex-col justify-center items-center">
       <div class="w-1/2 flex flex-col justify-center text-center md-8">
         <div class="text-lg md:text-xl font-semibold"><%= profile["name"] %> </div>
