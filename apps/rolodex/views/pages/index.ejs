@@ -6,26 +6,27 @@
   </head>
 
   <%- include('../partials/google_analytics.ejs') %>
-  <%- include('../partials/navbar.ejs') %>
 
-  <body class="antialiased bg-gray-300">
-    <div class="container mx-auto px-4 h-screen flex flex-col justify-center items-center">    
-      <div class="grid grid-cols-2 divide-x-2">
-        <div class="text-2xl p-12 font-bold">
-          Twitter was magnificent. <br/>
-          We could peek into the brilliant minds. <br/>
+  <body class="antialiased bg-gray-300 text-gray-800">
+    <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
+      <h1 class="text-5xl font-extrabold tracking-tight leading-none">Rolodex</h1>
+      <div class="p-4 text-center">
+        <div class="mb-3 text-3xl font-bold tracking-tight leading-none">Twitter was magnificent.</div>
+        <div class="text-lg text-gray-600">
+          We could peek into the brilliant minds.
           All of us were “punchline comedian", doing “build-in-public”. <br/>
-          But it is withering away, something else must come in its place. <br/>
-          Save Your Social Graph
+          <span class="font-semibold p-y-2 text-gray-800"> But <br/> </span>
+          It is withering away, something else must come in its place. <br/>
         </div>
-        <div>
-          <form id="form1" method="post" action="/social_graph" class="space-y-1 text-center">
-            <label>Twitter Handle</label><br>
-            <label for="team_name" class="font-bold">@</label>
-            <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg"><br>
-            <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200">Submit</button>
-          </form>
-        </div>
+        <div class="text-2xl font-bold text-red-600 mt-4">Save Your Social Graph</div>
+      </div>
+      <div>
+        <form id="form1" method="post" action="/social_graph" class="space-y-1 text-center">
+          <label>Twitter Handle</label><br>
+          <label for="team_name" class="font-bold">@</label>
+          <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg"><br>
+          <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200">Submit</button>
+        </form>
       </div>
     <%- include('../partials/shovel.ejs') %>
     </div>
