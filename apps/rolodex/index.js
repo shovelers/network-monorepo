@@ -2,7 +2,6 @@ const express = require("express");
 const { Client } = require("twitter-api-sdk");
 const { Parser } = require('json2csv');
 const zip = require('adm-zip');
-const fs = require('fs');
 const DIDKit = require('@spruceid/didkit-wasm-node');
 
 const Protocol = require('client');
@@ -38,11 +37,6 @@ server.post("/social_graph", async (req, res) => {
     res.status(404).send("Wrong Twitter Handle or Protected Account!")
   };
 
-  fs.appendFile('graph_check_count.txt', handle + "\n" , function (err) {
-  if (err) throw err;
-  console.log('graph check!');
-  });
-
   res.render('pages/social_graph', {
     profile: result["profile"],
     followers: result["followers"],
@@ -53,11 +47,6 @@ server.post("/social_graph", async (req, res) => {
 server.post("/download", async (req, res) => {
   var handle = req.body.handle;
   var result = await handleGraph(handle.toLowerCase());
-
-  fs.appendFile('download_count.txt', handle + "\n", function (err) {
-  if (err) throw err;
-  console.log('data downloaded!');
-  });
 
   var follower_csv = createCSV(result["followers"]);
   var following_csv = createCSV(result["followings"]);
