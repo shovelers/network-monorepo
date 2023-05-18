@@ -22,21 +22,28 @@
         <div class="text-2xl font-semibold mt-4">Your <span class="underline decoration-4 decoration-sky-500">Portable Social Graph</span></div>
       </div>
       <div class="flex flex-row items-center space-x-10">
-        <form id="form1" method="post" action="/account" class="space-y-1 text-center">
-          <label><span class="font-semibold">If you don't have a DID</span><br/> enter handle to claim account</label><br>
-          <label for="team_name" class="font-bold">Handle @</label>
-          <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
-          <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Create Account</button>
-        </form>
         <form id="form1" method="post" action="/signin" class="space-y-1 text-center">
-          <label><span class="font-semibold">If you already have a DID</span> <br/>enter DID & desired Handle</label><br>
-          <label for="team_name" class="font-bold">DID</label>
-          <input type="text" name="fDID" class="border border-gray-300 px-2 py-1 rounded-lg">
-          </br>
-          <label for="team_name" class="font-bold">Handle</label>
+          <label><span class="font-semibold">If you already have a Username</span><br/>Enter Username to signin</label><br>
+          <label for="team_name" class="font-bold">Username</label>
           <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
           <button type="submit" class="rounded-lg bg-green-600 px-2 py-2 text-gray-200 font-medium">Sign in</button>
         </form>
+        <div class="flex flex-col space-y-4">
+          <form id="form1" method="post" action="/account" class="space-y-1 text-center">
+            <label><span class="font-semibold">If you already have a DID</span><br/>Enter DID & choose desired Username</label><br>
+            <label for="team_name" class="font-bold">DID</label>
+            <input type="text" name="fdid" class="border border-gray-300 px-2 py-1 rounded-lg">
+            <label for="team_name" class="font-bold">Username</label>
+            <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+            <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Create Account</button>
+          </form>
+          <form id="form1" method="post" action="/account" class="space-y-1 text-center">
+            <label><span class="font-semibold">If you don't have a DID</span><br/>choose a username</label><br>
+            <label for="team_name" class="font-bold">Username</label>
+            <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+            <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Create Account</button>
+          </form>
+        </div>
       </div>
       <%- include('../partials/shovel.ejs') %>
     </div>
