@@ -15,8 +15,8 @@ class Protocol {
     return {did: did, doc: doc}
   }
 
-  async registerUser(did, doc, app_did, profile) {
-    await this.axios_client.post('/user', {did: did, doc: doc, app_did: app_did, profile: profile})
+  async registerUser(did, doc, profile) {
+    await this.axios_client.post('/user', {did: did, doc: doc, profile: profile})
   }
 
   async registerApp(did, doc) {

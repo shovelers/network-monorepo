@@ -119,8 +119,8 @@ async function getDIDforHandle(handle) {
 
   var did = result["did"];
   var doc = result["doc"];
-  var profile = {twitter_handle: handle}
-  c.registerUser(did, doc, app_did, profile);
+  var profile = {app_did: app_did, twitter_handle: handle}
+  c.registerUser(did, doc, profile);
 
   HandleToDID[handle] = did
   console.log(handle, did, Object.keys(HandleToDID).length)

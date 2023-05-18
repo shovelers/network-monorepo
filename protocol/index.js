@@ -37,18 +37,25 @@ server.get("/", (req, res) => {
 /*
   sample req.body = {
     "did": "did:ion:z6MkkMKvnc3vJfQp8Sr8dYVjc6zrTQaxcDBbtYqW3wMJW2hY",
-    "doc": "qwertyuiolpasdfghjkjhgfdsasdfghjmknbvcxcvbnbvcxzfghudsdfyuy"
+    "doc": "qwertyuiolpasdfghjkjhgfdsasdfghjmknbvcxcvbnbvcxzfghudsdfyuy",
+    "profile": {
+      "app_did": "did:dcn:rolodex",
+      "foo": "bar"
+    }
   }
   TODO: Validate DID data
 */
 server.post("/user", (req, res) => {
-  var profiles = {}
-  profiles[req.body.app_did] = req.body.profiles
-  UserRegistry[req.body.did] = {
-    did: req.body.doc,
-    profiles: profiles
+  if (UserRegistry[req.body.did] !== undefined) {
+    UserRegistry[req.body.did].profiles.push[req.body.profile]
+  } else {
+    UserRegistry[req.body.did] = {
+      doc: req.body.doc,
+      profiles: [req.body.profile]
+    }
   }
-  res.status(200).json({})
+
+  res.status(200).json(UserRegistry[req.body.did])
 })
 
 server.post("/app", (req, res) => {
