@@ -25,3 +25,40 @@ DCN Protocol MonoRepo
 "assertionMethod":["did:key:z6MkgnFNPcaT9v6BrXTPFJhoYkgVtmSxJvovJpFDZji4xSfi#z6MkgnFNPcaT9v6BrXTPFJhoYkgVtmSxJvovJpFDZji4xSfi"]
 }
 ```
+### Demo Instructions
+
+Requirements: 
+1. This demo requires node.js to run. 
+2. Create a copy of this folder on your local device. 
+
+Steps:
+
+1. Power up the protocol from the protocol repo from terminal
+```
+npm start -w protocol
+```
+Protocol dashboard can be viewed at localhost:4000
+
+2. Start the "Rolodex" application on the protocol, providing the required Twt API token
+```
+BEARER_TOKEN= <replace_with_token> npm start -w rolodex
+```
+App can be accessed at localhost:3000
+
+3. Import your social graph of followers and following by entering your Twt handle
+  a. Your profile should be displayed along with a list of followers and following, your social graph
+  b. You should be able to download a .csv file of the social graph for your storage
+
+4. Start the "Simple Follow" application on the protocol
+```
+npm start -w simple_follow
+```
+App can be accessed at localhost:3002
+
+5. Create a user on Simple Follow app by entering a desired handle
+  a. Search for the handle of a profile you want to follow
+  b. Enter your handle on their profile to follow them
+  c. View your profile to see updated follow list
+  
+6. The protocol dashboard should display at all steps all the unique users, apps and relationships available on the protocol
+
