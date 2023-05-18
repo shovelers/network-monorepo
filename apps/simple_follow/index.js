@@ -110,8 +110,8 @@ async function handleUniqueness(handle) {
 
 async function createAccount(handle, did) {
   var profile = {app_did: app_did, handle: handle};
-  if (did === undefined ) {
-    console.log("creating did as not passed")
+  if (!did) {
+    console.log(`got did ${did}`)
     var key = DIDKit.generateEd25519Key();
     handlesTaken.push(handle);
     console.log(key);
@@ -130,7 +130,9 @@ async function createAccount(handle, did) {
     var doc = ""
     c.registerUser(did, doc, profile);
 
+    handlesTaken.push(handle);
     handleDIDMap.set(handle, did);
+    console.log(handleDIDMap);
 
     return {key: key, did: did}
   }
