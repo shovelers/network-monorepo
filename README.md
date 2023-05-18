@@ -33,27 +33,24 @@ Requirements:
 
 Steps:
 
-1. Power up the protocol from the protocol repo from terminal
+1. Power up the protocol from the protocol repo from terminal. Protocol dashboard can be viewed at localhost:4000
 ```
 npm start -w protocol
 ```
-Protocol dashboard can be viewed at localhost:4000
 
-2. Start the "Rolodex" application on the protocol, providing the required Twt API token
+2. Start the "Rolodex" application on the protocol, providing the required Twt API token. App can be accessed at localhost:3000
 ```
 BEARER_TOKEN= <replace_with_token> npm start -w rolodex
 ```
-App can be accessed at localhost:3000
 
 3. Import your social graph of followers and following by entering your Twt handle
   a. Your profile should be displayed along with a list of followers and following, your social graph
   b. You should be able to download a .csv file of the social graph for your storage
 
-4. Start the "Simple Follow" application on the protocol
+4. Start the "Simple Follow" application on the protocol. App can be accessed at localhost:3002
 ```
 npm start -w simple_follow
 ```
-App can be accessed at localhost:3002
 
 5. Create a user on Simple Follow app by entering a desired handle
   a. Search for the handle of a profile you want to follow
