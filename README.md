@@ -58,4 +58,10 @@ npm start -w simple_follow
   c. View your profile to see updated follow list
   
 6. The protocol dashboard should display at all steps all the unique users, apps and relationships available on the protocol
+  a. Restarting the protocol refreshes the dashboard. 
+  b. Restarting applications does not refresh the dashboard. 
 
+Notes:
+1. Users are uniquely mapped from app <> protocol
+2. Each app's graph is stored independently
+3. Relationships are stored based on the app context
