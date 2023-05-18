@@ -17,6 +17,7 @@ server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
 
 const UserRegistry = {}
+const AppRegistry = {}
 const GraphRegistry = {}
 
 server.get("/", (req, res) => {
@@ -27,6 +28,7 @@ server.get("/", (req, res) => {
 
   res.render('pages/index', {
     users: Object.keys(UserRegistry).length,
+    apps: Object.keys(AppRegistry).length,
     graphs: Object.keys(GraphRegistry).length,
     relationships: relationships
   })
@@ -44,9 +46,15 @@ server.post("/user", (req, res) => {
   res.status(200).json({})
 })
 
+server.post("/app", (req, res) => {
+  AppRegistry[req.body.did] = req.body.doc
+  res.status(200).json({})
+})
+
 // TODO: Handle overwrite scenario, ideally this method should return a did rather than accept it
 server.post("/graph", (req, res) => {
   GraphRegistry[req.body.did] = {
+    app_did: req.body.app_did,
     doc: req.body.doc,
     relationships: []
   }

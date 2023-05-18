@@ -19,8 +19,12 @@ class Protocol {
     await this.axios_client.post('/user', {did: did, doc: doc})
   }
 
-  async registerGraph(did, doc) {
-    await this.axios_client.post('/graph', {did: did, doc: doc})
+  async registerApp(did, doc) {
+    await this.axios_client.post('/app', {did: did, doc: doc})
+  }
+
+  async registerGraph(did, doc, app_did) {
+    await this.axios_client.post('/graph', {did: did, doc: doc, app_did: app_did})
   }
 
   async readGraph(graph_did) {

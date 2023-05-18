@@ -19,8 +19,10 @@ server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')))
 
 const HandleToDID = {}
-var graph_did = "did:dcn:rolodex"
-c.registerGraph(graph_did,"qwertyuiolpasdfghjkjhgfdsasdfghjmknbvcxcvbnbvcxzfghudsdfyuy")
+var app_did = "did:dcn:rolodex"
+var graph_did = "did:graph:rolodex"
+c.registerApp(app_did,"qwerdsfasdfasfasdfsafasfdfghjkjhgfdsasdfghjmknbvcxcvbnbvcuy")
+c.registerGraph(graph_did,"qwertyuiolpasdfghjkjhgfdsasdfghjmknbvcxcvbnbvcxzfghudsdfyuy", app_did)
 
 server.get("/", (req, res) => {
   res.render('pages/index')
