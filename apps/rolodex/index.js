@@ -31,8 +31,6 @@ server.get("/", (req, res) => {
 
 server.post("/social_graph", async (req, res) => {
   var handle = req.body.fhandle;
-  var did, key = getDIDforHandle(handle);
-
   var result = await handleGraph(handle.toLowerCase());
 
   if (typeof result === "undefined" || typeof result["followers"] === "undefined" || typeof result["followings"] === "undefined") {
@@ -74,6 +72,8 @@ server.listen(port, (err) => {
 });
 
 async function handleGraph(handle) {
+  var user_did, _ = getDIDforHandle(handle);
+
   var user = await(client.users.findUserByUsername(handle));
   var user_id = user["data"]["id"];
   var profile = await(client.users.findUserById(
@@ -83,8 +83,6 @@ async function handleGraph(handle) {
     }));
   const followers = await(client.users.usersIdFollowers(user_id, {max_results: 1000}));
   const followings = await(client.users.usersIdFollowing(user_id, {max_results: 1000}));
-
-  var user_did, _ = getDIDforHandle(handle);
 
   followers["data"].forEach(element => {
     var did, _ = getDIDforHandle(element.username)
