@@ -26,10 +26,11 @@ server.get("/", (req, res) => {
 
 server.post("/account", async (req, res) => {
   var handle = req.body.fhandle;
+  var did = req.body.fdid;
   var handleAlreadyTaken = await handleUniqueness(handle);
 
   if (handleAlreadyTaken == false) {
-    var result = await createAccount(handle);
+    var result = await createAccount(handle, did);
     console.log(`Account created for handle:${handle}, did:${result["did"]}`);
     res.redirect(`profile/${handle}`);
   } else {
@@ -99,20 +100,32 @@ async function handleUniqueness(handle) {
   console.log(handlesTaken.includes(handle));
 };
 
-async function createAccount(handle) {
-  var key = DIDKit.generateEd25519Key();
-  handlesTaken.push(handle);
-  console.log(key);
-  //call client to generate did and pass this key
-  var result = await c.generateDID(key);
-  console.log(result);
-  var did = result["did"];
-  var doc = result["doc"];
-  c.registerUser(did, doc);
+async function createAccount(handle, did) {
+  var profile = {app_did: app_did, handle: handle};
+  if (did === undefined ) {
+    console.log("creating did as not passed")
+    var key = DIDKit.generateEd25519Key();
+    handlesTaken.push(handle);
+    console.log(key);
+    //call client to generate did and pass this key
+    var result = await c.generateDID(key);
+    console.log(result);
+    var did = result["did"];
+    var doc = result["doc"];
+    c.registerUser(did, doc, profile);
 
-  handleDIDMap.set(handle, did);
+    handleDIDMap.set(handle, did);
 
-  return {key: key, did: did}
+    return {key: key, did: did}
+  } else {
+    // temp entry
+    var doc = ""
+    c.registerUser(did, doc, profile);
+
+    handleDIDMap.set(handle, did);
+
+    return {key: key, did: did}
+  }
 };
 
 async function followerListFor(did, graphData) {
