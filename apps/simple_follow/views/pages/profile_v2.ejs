@@ -16,12 +16,13 @@
         <div class="flex flex-col items-center text-center">
           <div class="font-semibold"><%= handle %></div>
           <div class="font-semibold text-red-500"><%= did %></div>
+          <div>You have <%= rolodexFollowersCount %> Followers & <%= rolodexFollowingsCount %> Following on Rolodex </div>
           <div class="h-8"></div>
           <form id="form1" method="post" action="/follow" class="space-y-1 text-center">
             <label>Put your handle to follow this profile</label></br>
             <label for="team_name" class="font-bold">@</label>
             <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
-            <input type="hidden" name="phandle" value= <%= handle %> />
+            <input type="hidden" name="phandle" value= <%= handle %> >
             <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200">Follow</button>
           </form>
         </div>

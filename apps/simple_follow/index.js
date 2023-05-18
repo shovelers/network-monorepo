@@ -20,6 +20,9 @@ var graph_did = "did:graph:simple_follow"
 c.registerApp(app_did,"qwerdsfasdfasfasdfsafasfdfghjkjhgfdsasdfghjmknbvcxcvbnbvcuy")
 c.registerGraph(graph_did,"uiolpasdfghjkjhgfdsasdfghjmknbvcxcvbnbvcxzfghudsdfyuy", app_did)
 
+var rolodex_did = "did:dcn:rolodex"
+var rolodex_graph_did = "did:graph:rolodex"
+
 server.get("/", (req, res) => {
   res.render('pages/index')
 });
@@ -58,8 +61,11 @@ server.get("/profile/:handle", async (req, res) => {
   var handle = params["handle"];
   var did = handleDIDMap.get(handle);
   var graphData = await c.readGraph(graph_did);
+  var rolodexData = await c.readGraph(rolodex_graph_did);
   var followers = await followerListFor(did, graphData);
   var followings = await followingListFor(did, graphData);
+  var rolodexFollowers = await followerListFor(did, rolodexData);
+  var rolodexFollowings = await followingListFor(did, rolodexData);
 
   res.render('pages/profile_v2',{
     did: did,
@@ -68,6 +74,8 @@ server.get("/profile/:handle", async (req, res) => {
     followings: followings,
     followersCount: followers.length,
     followingsCount: followings.length,
+    rolodexFollowersCount: rolodexFollowers.length,
+    rolodexFollowingsCount: rolodexFollowings.length,
   });
 });
 
