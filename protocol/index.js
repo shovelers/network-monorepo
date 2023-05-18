@@ -44,6 +44,7 @@ server.get("/", (req, res) => {
     }
   }
   TODO: Validate DID data
+  TODO: Profile tuple should have a Schema
 */
 server.post("/user", (req, res) => {
   if (UserRegistry[req.body.did] !== undefined) {
