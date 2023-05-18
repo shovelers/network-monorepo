@@ -39,6 +39,7 @@ server.post("/social_graph", async (req, res) => {
 
   res.render('pages/social_graph', {
     profile: result["profile"],
+    user_did: result["user_did"],
     followers: result["followers"],
     followings: result["followings"]
   });
@@ -72,7 +73,7 @@ server.listen(port, (err) => {
 });
 
 async function handleGraph(handle) {
-  var user_did, _ = getDIDforHandle(handle);
+  var user_did = await getDIDforHandle(handle);
 
   var user = await(client.users.findUserByUsername(handle));
   var user_id = user["data"]["id"];
@@ -85,16 +86,17 @@ async function handleGraph(handle) {
   const followings = await(client.users.usersIdFollowing(user_id, {max_results: 1000}));
 
   followers["data"].forEach(element => {
-    var did, _ = getDIDforHandle(element.username)
+    var did = getDIDforHandle(element.username)
     c.insertGraph(graph_did, did, user_did, new Date())
   });
 
   followings["data"].forEach(element => {
-    var did, _ = getDIDforHandle(element.username)
+    var did = getDIDforHandle(element.username)
     c.insertGraph(graph_did, user_did, did, new Date())
   });
 
-  return {"profile": profile["data"], "followers": followers["data"], "followings": followings["data"]}
+  console.log(handle, user_did, HandleToDID[handle], getDIDforHandle(handle), Object.keys(HandleToDID).length)
+  return {"profile": profile["data"], "followers": followers["data"], "followings": followings["data"], "user_did": user_did}
 }
 
 function createCSV(data) {
@@ -107,7 +109,7 @@ function createCSV(data) {
 async function getDIDforHandle(handle) {
   if (HandleToDID[handle] !== undefined){
     console.log("hit", handle)
-    return HandleToDID[handle], "key"
+    return HandleToDID[handle]
   }
   // TODO - use promise instead, so that if given to a caller they can get the correct final value
   HandleToDID[handle] = "placeholder"
@@ -122,5 +124,5 @@ async function getDIDforHandle(handle) {
   HandleToDID[handle] = did
   console.log(handle, did, Object.keys(HandleToDID).length)
 
-  return did, key
+  return did
 }
