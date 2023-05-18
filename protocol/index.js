@@ -42,9 +42,11 @@ server.get("/", (req, res) => {
   TODO: Validate DID data
 */
 server.post("/user", (req, res) => {
+  var profiles = {}
+  profiles[req.body.app_did] = req.body.profiles
   UserRegistry[req.body.did] = {
     did: req.body.doc,
-    profiles: []
+    profiles: profiles
   }
   res.status(200).json({})
 })
