@@ -56,7 +56,7 @@ server.post("/signin", async (req, res) => {
 });
 
 server.get("/profiles", async (req, res) => {
-  res.render('pages/profiles')
+  res.render('pages/profiles', { handleDIDMap: handleDIDMap})
 });
 
 server.get("/profiles/:handle", async (req, res) => {
