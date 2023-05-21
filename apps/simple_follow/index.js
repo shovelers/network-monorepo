@@ -83,8 +83,10 @@ server.get("/profiles/:handle", async (req, res) => {
   var rolodexData = await c.readGraph(rolodex_graph_did);
   var followers = await followerListFor(did, graphData);
   var followings = await followingListFor(did, graphData);
-  var rolodexFollowers = await followerListFor(did, rolodexData);
-  var rolodexFollowings = await followingListFor(did, rolodexData);
+  
+  var rolodexFollowers = await followerDIDsFor(did, rolodexData);
+  var current_user_did = handleDIDMap.get(req.query["session"])
+  var isRolodexFollower = rolodexFollowers.includes(current_user_did)
 
   res.render('pages/profile_v2',{
     did: did,
@@ -94,8 +96,7 @@ server.get("/profiles/:handle", async (req, res) => {
     followings: followings,
     followersCount: followers.length,
     followingsCount: followings.length,
-    rolodexFollowersCount: rolodexFollowers.length,
-    rolodexFollowingsCount: rolodexFollowings.length,
+    isRolodexFollower: isRolodexFollower,
   });
 });
 
@@ -175,6 +176,17 @@ async function followingListFor(did, graphData) {
   graphData.forEach(function (item, index) {
     if (item['from'] == did) {
       followingList.push(findHandleByDID(item['to']));
+    }
+  });
+  return followingList;
+}
+
+async function followerDIDsFor(did, graphData) {
+  //hashes where did == from
+  var followingList = [];
+  graphData.forEach(function (item, index) {
+    if (item['to'] == did) {
+      followingList.push(item['from']);
     }
   });
   return followingList;

@@ -20,7 +20,9 @@
         <div class="flex flex-col items-center text-center">
           <div class="font-semibold"><%= handle %></div>
           <div class="font-medium text-red-600 break-all"><%= did %></div>
-          <div class="text-sm">You have <%= rolodexFollowersCount %> Followers & <%= rolodexFollowingsCount %> Following on Rolodex </div>
+          <% if (isRolodexFollower) { %>
+            <div class="text-sm">You also follow them on Rolodex.</div>
+          <% } %>
           <% if (current_user !== handle) { %>
             <% if (followers.includes(current_user)) { %>
               <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 opacity-50 cursor-not-allowed">Following</button>
