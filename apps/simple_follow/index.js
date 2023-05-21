@@ -26,6 +26,7 @@ var rolodex_graph_did = "did:graph:rolodex"
 const Alerts = {
   missingAccount: "Create an account first",
   handleTaken: "Handle is already taken",
+  requireLogin: "Please login or sign up before you proceed"
 }
 
 
@@ -62,6 +63,9 @@ server.post("/signin", async (req, res) => {
 });
 
 server.get("/profiles", async (req, res) => {
+  if (!req.query["session"])
+    res.redirect("/?alert=requireLogin")
+
   res.render('pages/profiles', { 
     handleDIDMap: handleDIDMap,
     current_user: req.query["session"],
@@ -69,6 +73,9 @@ server.get("/profiles", async (req, res) => {
 });
 
 server.get("/profiles/:handle", async (req, res) => {
+  if (!req.query["session"])
+    res.redirect("/?alert=requireLogin")
+
   var params = req.params;
   var handle = params["handle"];
   var did = handleDIDMap.get(handle);
