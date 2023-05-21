@@ -19,6 +19,9 @@ Components
 * Graph Registy
 * Relationship Tuple Store
 
-Why Decentralised Identity?
-How is key given to the User?
-Can any any DID method be used for Users?
+Cover
+* Why Decentralised Identity?
+* How is key given to the User?
+* Can any any DID method be used for Users?
+* What all type of social relationships can be modelled?
+* How does relationship confirm-request flow work?

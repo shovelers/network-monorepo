@@ -24,12 +24,13 @@ var rolodex_did = "did:dcn:rolodex"
 var rolodex_graph_did = "did:graph:rolodex"
 
 const Alerts = {
-  sample: "Testing alerts"
+  missingAccount: "Create an account first",
+  handleTaken: "Handle is already taken",
 }
 
 
 server.get("/", (req, res) => {
-  res.render('pages/index', { alert: req.query.alert })
+  res.render('pages/index', { alert: Alerts[req.query.alert] })
 });
 
 server.post("/account", async (req, res) => {
@@ -43,7 +44,7 @@ server.post("/account", async (req, res) => {
     res.redirect(`profiles?session=${handle}`);
   } else {
     console.log(`Handle: ${handle} already taken`);
-    res.status(404).send(`Handle: ${handle} already taken`);
+    res.redirect(`/?alert=handleTaken`);
   };
 });
 
@@ -53,7 +54,7 @@ server.post("/signin", async (req, res) => {
 
   if (handleAlreadyTaken == false) {
     console.log("Create an account first");
-    res.status(404).send("Create an account first");
+    res.redirect(`/?alert=missingAccount`);
   } else {
     console.log(`Profile lookup for handle:${handle}`);
     res.redirect(`profiles?session=${handle}`);
