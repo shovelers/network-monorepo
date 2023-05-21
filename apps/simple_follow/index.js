@@ -23,8 +23,13 @@ c.registerGraph(graph_did,"uiolpasdfghjkjhgfdsasdfghjmknbvcxcvbnbvcxzfghudsdfyuy
 var rolodex_did = "did:dcn:rolodex"
 var rolodex_graph_did = "did:graph:rolodex"
 
+const Alerts = {
+  sample: "Testing alerts"
+}
+
+
 server.get("/", (req, res) => {
-  res.render('pages/index')
+  res.render('pages/index', { alert: req.query.alert })
 });
 
 server.post("/account", async (req, res) => {
