@@ -112,7 +112,7 @@ server.post("/follow", async (req, res) => {
   } else {
     c.insertGraph(graph_did, followerDID, followingDID, new Date())
     console.log(`User ${followerHandle} followed ${followingHandle}`);
-    res.status(200).send(`You successfully followed ${followingHandle}`);
+    res.redirect(`profiles/${followingHandle}?session=${followerHandle}`);
   };
 });
 
