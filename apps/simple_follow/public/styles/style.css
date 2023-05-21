@@ -679,6 +679,10 @@ video {
   animation: blob 7s infinite;
 }
 
+.cursor-not-allowed {
+  cursor: not-allowed;
+}
+
 .flex-row {
   flex-direction: row;
 }

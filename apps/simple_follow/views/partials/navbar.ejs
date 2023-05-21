@@ -1,9 +1,7 @@
 <div class="flex flex-row w-screen h-12 text-gray-300 bg-gray-800 items-center justify-center space-x-8 py-4">
   <% if (current_user) { %>
     <a href="/profiles/<%= current_user %>?session=<%= current_user %>"><%= current_user %></a>
-  <% } %>
-  <div class="p-2 rounded-lg font-semibold text-2xl">Simple Follow</div>
-  <% if (current_user) { %>
+    <a href="/profiles?session=<%= current_user %>"class="p-2 rounded-lg font-semibold text-2xl">Simple Follow</a>
     <a href="/" class="item-right">Logout</a>
   <% } %>
 </div>
