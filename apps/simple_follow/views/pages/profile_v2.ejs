@@ -22,9 +22,13 @@
           <div class="font-medium text-red-600 break-all"><%= did %></div>
           <div class="text-sm">You have <%= rolodexFollowersCount %> Followers & <%= rolodexFollowingsCount %> Following on Rolodex </div>
           <form id="form1" method="post" action="/follow" class="space-y-1 text-center">
-            <label>Put your handle to follow this profile</label></br>
-            <label for="team_name" class="font-bold">@</label>
-            <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+            <% if (current_user) { %>
+              <input type="hidden" name="fhandle" value=<%= current_user %>>
+            <% } else { %>
+              <label>Put your handle to follow this profile</label></br>
+              <label for="team_name" class="font-bold">@</label>
+              <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+            <% } %>
             <input type="hidden" name="phandle" value= <%= handle %> >
             <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200">Follow</button>
           </form>

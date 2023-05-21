@@ -35,7 +35,7 @@ server.post("/account", async (req, res) => {
   if (handleAlreadyTaken == false) {
     var result = await createAccount(handle, did);
     console.log(`Account created for handle:${handle}, did:${result["did"]}`);
-    res.redirect(`profiles/${handle}`);
+    res.redirect(`profiles?session=${handle}`);
   } else {
     console.log(`Handle: ${handle} already taken`);
     res.status(404).send(`Handle: ${handle} already taken`);
@@ -51,12 +51,15 @@ server.post("/signin", async (req, res) => {
     res.status(404).send("Create an account first");
   } else {
     console.log(`Profile lookup for handle:${handle}`);
-    res.redirect(`profiles/${handle}`);
+    res.redirect(`profiles?session=${handle}`);
   };
 });
 
 server.get("/profiles", async (req, res) => {
-  res.render('pages/profiles', { handleDIDMap: handleDIDMap})
+  res.render('pages/profiles', { 
+    handleDIDMap: handleDIDMap,
+    current_user: req.query["session"],
+  })
 });
 
 server.get("/profiles/:handle", async (req, res) => {
@@ -72,6 +75,7 @@ server.get("/profiles/:handle", async (req, res) => {
 
   res.render('pages/profile_v2',{
     did: did,
+    current_user: req.query["session"],
     handle: handle,
     followers: followers,
     followings: followings,
