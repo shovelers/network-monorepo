@@ -85,15 +85,15 @@ async function handleGraph(handle) {
   const followers = await(client.users.usersIdFollowers(user_id, {max_results: 1000}));
   const followings = await(client.users.usersIdFollowing(user_id, {max_results: 1000}));
 
-  followers["data"].forEach(element => {
-    var did = getDIDforHandle(element.username)
+  for (const element of followers["data"]) {
+    var did = await getDIDforHandle(element.username)
     c.insertGraph(graph_did, did, user_did, new Date())
-  });
+  }
 
-  followings["data"].forEach(element => {
-    var did = getDIDforHandle(element.username)
+  for (const element of followings["data"]) {
+    var did = await getDIDforHandle(element.username)
     c.insertGraph(graph_did, user_did, did, new Date())
-  });
+  }
 
   console.log(handle, user_did, HandleToDID[handle], getDIDforHandle(handle), Object.keys(HandleToDID).length)
   return {"profile": profile["data"], "followers": followers["data"], "followings": followings["data"], "user_did": user_did}

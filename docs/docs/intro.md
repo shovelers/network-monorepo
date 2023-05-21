@@ -22,6 +22,7 @@ Components
 Cover
 * Why Decentralised Identity?
 * How is key given to the User?
-* Can any any DID method be used for Users?
+* Can any DID method be used for Users?
+* How does user find their DID?
 * What all type of social relationships can be modelled?
 * How does relationship confirm-request flow work?
