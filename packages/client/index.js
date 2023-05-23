@@ -15,8 +15,7 @@ class Protocol {
     return {did: did, doc: doc}
   }
 
-
-  async  validateKey(handle, did, key) {
+  async validateKey(handle, did, key) {
     //create verificationMethod using key amd did method
     try {
       var verificationMethod = await DIDKit.keyToVerificationMethod("key", key);

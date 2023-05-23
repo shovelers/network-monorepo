@@ -1924,9 +1924,9 @@ html {
   overflow-x: auto;
 }
 
-.bg-neutral {
+.bg-error-content {
   --tw-bg-opacity: 1;
-  background-color: hsl(var(--n) / var(--tw-bg-opacity));
+  background-color: hsl(var(--erc, var(--nc)) / var(--tw-bg-opacity));
 }
 
 .text-5xl {
@@ -1940,20 +1940,4 @@ html {
 
 .tracking-tight {
   letter-spacing: -0.025em;
-}
-
-.underline {
-  text-decoration-line: underline;
-}
-
-.decoration-accent {
-  text-decoration-color: hsl(var(--a));
-}
-
-.decoration-4 {
-  text-decoration-thickness: 4px;
-}
-
-.underline-offset-4 {
-  text-underline-offset: 4px;
 }
