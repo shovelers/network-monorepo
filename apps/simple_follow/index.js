@@ -28,6 +28,7 @@ const Alerts = {
   missingAccount: "Create an account first",
   handleTaken: "Handle is already taken",
   requireLogin: "Please login or sign up before you proceed",
+  wrongKey: "Sigin Failed!! The key & handle do not match",
 }
 
 
@@ -52,11 +53,17 @@ server.post("/account", async (req, res) => {
 
 server.post("/signin", async (req, res) => {
   var handle = req.body.fhandle;
+  var key = req.body.fkey;
+
   var handleAlreadyTaken = await handleUniqueness(handle);
+  var validated = await validateKey(handle, key);
+  console.log(validated);
 
   if (handleAlreadyTaken == false) {
     console.log("Create an account first");
     res.redirect(`/?alert=missingAccount`);
+  } else if (validated == false) {
+    res.redirect(`/?alert=wrongKey`);
   } else {
     console.log(`Profile lookup for handle:${handle}`);
     res.redirect(`profiles?session=${handle}`);
@@ -162,6 +169,34 @@ async function createAccount(handle, did) {
     return {key: key, did: did}
   }
 };
+
+async function validateKey(handle, key) {
+  //sign handle with key & call verify method in client with data
+  var did = handleDIDMap.get(handle);
+  var verificationMethod = await DIDKit.keyToVerificationMethod("key", key);
+  var proofOptions = {
+    proofPurpose: "authentication",
+    challenge: `${handle}`,
+    verificationMethod: `${verificationMethod}`,
+  };
+  var vp = await DIDKit.DIDAuth(did, JSON.stringify(proofOptions), key);
+
+  var verifyOptions = {
+    proofPurpose: "authentication",
+    challenge: `${handle}`,
+  };
+
+  var response = await DIDKit.verifyPresentation(vp, JSON.stringify(verifyOptions));
+  var result = JSON.parse(response);
+  console.log(result);
+  console.log(result["checks"]);
+
+  if (result["checks"][0] === "proof") {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 async function followerListFor(did, graphData) {
   //hashes where did == to
