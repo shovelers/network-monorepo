@@ -15,6 +15,49 @@ class Protocol {
     return {did: did, doc: doc}
   }
 
+
+  async  validateKey(handle, did, key) {
+    //create verificationMethod using key amd did method
+    try {
+      var verificationMethod = await DIDKit.keyToVerificationMethod("key", key);
+    } catch(e) {
+      console.log(e);
+      return false;
+    }
+
+    //vp is the signed version of proofOptions which has the challenge string
+    var proofOptions = {
+      proofPurpose: "authentication",
+      challenge: `${handle}`,
+      verificationMethod: `${verificationMethod}`,
+    };
+    try {
+      var vp = await DIDKit.DIDAuth(did, JSON.stringify(proofOptions), key);
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+
+    //verify the signature in vp
+    var verifyOptions = {
+      proofPurpose: "authentication",
+      challenge: `${handle}`,
+    };
+    try {
+      var response = await DIDKit.verifyPresentation(vp, JSON.stringify(verifyOptions));
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+    var result = JSON.parse(response);
+
+    if (result["checks"][0] === "proof") {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   async registerUser(did, doc, profile) {
     await this.axios_client.post('/user', {did: did, doc: doc, profile: profile})
   }

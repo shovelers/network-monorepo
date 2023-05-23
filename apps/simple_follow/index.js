@@ -53,11 +53,11 @@ server.post("/account", async (req, res) => {
 
 server.post("/signin", async (req, res) => {
   var handle = req.body.fhandle;
+  var did = handleDIDMap.get(handle);
   var key = req.body.fkey;
 
   var handleAlreadyTaken = await handleUniqueness(handle);
-  var validated = await validateKey(handle, key);
-  console.log(validated);
+  var validated = await c.validateKey(handle, did, key);
 
   if (handleAlreadyTaken == false) {
     console.log("Create an account first");
@@ -169,49 +169,6 @@ async function createAccount(handle, did) {
     return {key: key, did: did}
   }
 };
-
-async function validateKey(handle, key) {
-  //sign handle with key & call verify method in client with data
-  var did = handleDIDMap.get(handle);
-  try {
-    var verificationMethod = await DIDKit.keyToVerificationMethod("key", key);
-  } catch(e) {
-    console.log(e);
-    return false;
-  }
-  var proofOptions = {
-    proofPurpose: "authentication",
-    challenge: `${handle}`,
-    verificationMethod: `${verificationMethod}`,
-  };
-  try {
-    var vp = await DIDKit.DIDAuth(did, JSON.stringify(proofOptions), key);
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-
-  var verifyOptions = {
-    proofPurpose: "authentication",
-    challenge: `${handle}`,
-  };
-
-  try {
-    var response = await DIDKit.verifyPresentation(vp, JSON.stringify(verifyOptions));
-  } catch (e) {
-    console.log(e);
-    return false;
-  }
-  var result = JSON.parse(response);
-  console.log(result);
-  console.log(result["checks"]);
-
-  if (result["checks"][0] === "proof") {
-    return true;
-  } else {
-    return false;
-  }
-}
 
 async function followerListFor(did, graphData) {
   //hashes where did == to
