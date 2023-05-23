@@ -173,20 +173,35 @@ async function createAccount(handle, did) {
 async function validateKey(handle, key) {
   //sign handle with key & call verify method in client with data
   var did = handleDIDMap.get(handle);
-  var verificationMethod = await DIDKit.keyToVerificationMethod("key", key);
+  try {
+    var verificationMethod = await DIDKit.keyToVerificationMethod("key", key);
+  } catch(e) {
+    console.log(e);
+    return false;
+  }
   var proofOptions = {
     proofPurpose: "authentication",
     challenge: `${handle}`,
     verificationMethod: `${verificationMethod}`,
   };
-  var vp = await DIDKit.DIDAuth(did, JSON.stringify(proofOptions), key);
+  try {
+    var vp = await DIDKit.DIDAuth(did, JSON.stringify(proofOptions), key);
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 
   var verifyOptions = {
     proofPurpose: "authentication",
     challenge: `${handle}`,
   };
 
-  var response = await DIDKit.verifyPresentation(vp, JSON.stringify(verifyOptions));
+  try {
+    var response = await DIDKit.verifyPresentation(vp, JSON.stringify(verifyOptions));
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
   var result = JSON.parse(response);
   console.log(result);
   console.log(result["checks"]);
