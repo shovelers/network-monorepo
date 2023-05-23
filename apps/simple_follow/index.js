@@ -9,6 +9,7 @@ const port = 3002;
 const server = express();
 const handlesTaken = [];
 const handleDIDMap = new Map();
+const handleKeyMap = new Map();
 
 server.use(express.urlencoded({ extended: true }));
 server.set('views', path.join(__dirname, 'views'));
@@ -26,7 +27,7 @@ var rolodex_graph_did = "did:graph:rolodex"
 const Alerts = {
   missingAccount: "Create an account first",
   handleTaken: "Handle is already taken",
-  requireLogin: "Please login or sign up before you proceed"
+  requireLogin: "Please login or sign up before you proceed",
 }
 
 
@@ -66,7 +67,7 @@ server.get("/profiles", async (req, res) => {
   if (!req.query["session"])
     res.redirect("/?alert=requireLogin")
 
-  res.render('pages/profiles', { 
+  res.render('pages/profiles', {
     handleDIDMap: handleDIDMap,
     current_user: req.query["session"],
   })
@@ -79,11 +80,12 @@ server.get("/profiles/:handle", async (req, res) => {
   var params = req.params;
   var handle = params["handle"];
   var did = handleDIDMap.get(handle);
+  var key = handleKeyMap.get(handle);
   var graphData = await c.readGraph(graph_did);
   var rolodexData = await c.readGraph(rolodex_graph_did);
   var followers = await followerListFor(did, graphData);
   var followings = await followingListFor(did, graphData);
-  
+
   var rolodexFollowers = await followerDIDsFor(did, rolodexData);
   var current_user_did = handleDIDMap.get(req.query["session"])
   var isRolodexFollower = rolodexFollowers.includes(current_user_did)
@@ -92,6 +94,7 @@ server.get("/profiles/:handle", async (req, res) => {
     did: did,
     current_user: req.query["session"],
     handle: handle,
+    key: key,
     followers: followers,
     followings: followings,
     followersCount: followers.length,
@@ -144,6 +147,7 @@ async function createAccount(handle, did) {
     c.registerUser(did, doc, profile);
 
     handleDIDMap.set(handle, did);
+    handleKeyMap.set(handle, key);
 
     return {key: key, did: did}
   } else {
