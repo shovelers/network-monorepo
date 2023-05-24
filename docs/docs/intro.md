@@ -12,12 +12,25 @@ Concepts
 * Glossary
 * API Docs
 
-
 Components
 * User Registry
 * App Registry
 * Graph Registy
 * Relationship Tuple Store
+
+Identity System
+* User
+* Account
+* Profile
+  * Public Profile
+  * Per app profile
+* Private Date Storage
+* Data Presentation Layer
+* Wallet
+  * Key Management
+  * Signing Capabilties
+* Authentication
+  * Signing Challenge
 
 Cover
 * Why Decentralised Identity?
