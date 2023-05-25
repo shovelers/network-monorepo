@@ -46,6 +46,16 @@
           </form>
         </div>
       </div>
+
+      <script type="module">
+        import init, { generateEd25519Key } from "/javascript/didkit_wasm.js";
+          (async () => {
+            await init();
+            const k = JSON.parse(generateEd25519Key());
+            console.log(k);
+          })();
+      </script>
+
       <%- include('../partials/shovel.ejs') %>
     </div>
   </body>
