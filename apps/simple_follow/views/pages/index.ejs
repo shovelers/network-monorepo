@@ -14,11 +14,14 @@
       async function generateKeyAndDID(form) {
         await init();
         const key = JSON.parse(generateEd25519Key());
-        const did = keyToDID('key', JSON.stringify(key));
+        var did = document.getElementById('gdid').value;
+        if (did.length == 0) {
+          did = keyToDID('key', JSON.stringify(key));
+          document.getElementById('gdid').value = did;
+        }
         const doc = await resolveDID(did, "{}");
-        console.log(`did: ${did}, key:${JSON.stringify(key)}`);
-        document.getElementById('gdid').value = did;
         document.getElementById('gdoc').value = doc;
+        console.log(`did: ${did}, key:${JSON.stringify(key)}`);
 
         form.submit();
       }
