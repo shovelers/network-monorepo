@@ -56,9 +56,10 @@ server.post("/signin", async (req, res) => {
   var handle = req.body.fhandle;
   var did = handleDIDMap.get(handle);
   var key = req.body.fkey;
+  var vp = req.body.fvp;
 
   var handleAlreadyTaken = await handleUniqueness(handle);
-  var validated = await c.validateKey(handle, did, key);
+  var validated = await c.validateSign(vp, handle);
 
   if (handleAlreadyTaken == false) {
     console.log("Create an account first");

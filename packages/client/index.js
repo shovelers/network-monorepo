@@ -15,28 +15,7 @@ class Protocol {
     return {did: did, doc: doc}
   }
 
-  async validateKey(handle, did, key) {
-    //create verificationMethod using key amd did method
-    try {
-      var verificationMethod = await DIDKit.keyToVerificationMethod("key", key);
-    } catch(e) {
-      console.log(e);
-      return false;
-    }
-
-    //vp is the signed version of proofOptions which has the challenge string
-    var proofOptions = {
-      proofPurpose: "authentication",
-      challenge: `${handle}`,
-      verificationMethod: `${verificationMethod}`,
-    };
-    try {
-      var vp = await DIDKit.DIDAuth(did, JSON.stringify(proofOptions), key);
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
-
+  async validateSign(vp, handle) {
     //verify the signature in vp
     var verifyOptions = {
       proofPurpose: "authentication",
