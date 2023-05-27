@@ -142,32 +142,14 @@ async function handleUniqueness(handle) {
 
 async function createAccount(handle, did, doc) {
   var profile = {app_did: app_did, handle: handle};
-  if (!did) {
-    console.log(`got did ${did}`)
-    var key = DIDKit.generateEd25519Key();
-    handlesTaken.push(handle);
-    console.log(key);
-    //call client to generate did and pass this key
-    var result = await c.generateDID(key);
-    console.log(result);
-    var did = result["did"];
-    var doc = result["doc"];
-    c.registerUser(did, doc, profile);
+  console.log(did);
+  c.registerUser(did, doc, profile);
 
-    handleDIDMap.set(handle, did);
-    handleKeyMap.set(handle, key);
+  handlesTaken.push(handle);
+  handleDIDMap.set(handle, did);
+  console.log(handleDIDMap);
 
-    return {key: key, did: did}
-  } else {
-    console.log(did);
-    c.registerUser(did, doc, profile);
-
-    handlesTaken.push(handle);
-    handleDIDMap.set(handle, did);
-    console.log(handleDIDMap);
-
-    return {key: key, did: did}
-  }
+  return {did: did}
 };
 
 async function followerListFor(did, graphData) {
