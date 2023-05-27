@@ -39,10 +39,11 @@ server.get("/", (req, res) => {
 server.post("/account", async (req, res) => {
   var handle = req.body.fhandle;
   var did = req.body.fdid;
+  var doc = req.body.fdoc;
   var handleAlreadyTaken = await handleUniqueness(handle);
 
   if (handleAlreadyTaken == false) {
-    var result = await createAccount(handle, did);
+    var result = await createAccount(handle, did, doc);
     console.log(`Account created for handle:${handle}, did:${result["did"]}`);
     res.redirect(`profiles?session=${handle}`);
   } else {
@@ -139,7 +140,7 @@ async function handleUniqueness(handle) {
   console.log(handlesTaken.includes(handle));
 };
 
-async function createAccount(handle, did) {
+async function createAccount(handle, did, doc) {
   var profile = {app_did: app_did, handle: handle};
   if (!did) {
     console.log(`got did ${did}`)
@@ -158,8 +159,7 @@ async function createAccount(handle, did) {
 
     return {key: key, did: did}
   } else {
-    // temp entry
-    var doc = ""
+    console.log(did);
     c.registerUser(did, doc, profile);
 
     handlesTaken.push(handle);
