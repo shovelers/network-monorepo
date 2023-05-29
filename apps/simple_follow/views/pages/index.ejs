@@ -2,6 +2,8 @@
 <html lang="en">
   <head>
     <script type = "text/javascript" src="../index.js" defer></script>
+    <script src="/javascript/cbor.js" type="text/javascript"></script>
+    <script src="/javascript/helper.js" type="text/javascript"></script>
     <link rel="stylesheet" href="./styles/style.css" />
   </head>
 
@@ -9,9 +11,11 @@
 
   <body class="antialiased">
     <script type="module">
-      import { generateKeyAndDID, signChallenge } from "/javascript/crypto_utils.js";
+      import { generateKeyAndDID, signChallenge, createPasskey, assertPasskey } from "/javascript/crypto_utils.js";
       window.generateKeyAndDID = generateKeyAndDID;
       window.signChallenge = signChallenge;
+      window.createPasskey = createPasskey;
+      window.assertPasskey = assertPasskey;
     </script>
 
 
@@ -55,6 +59,10 @@
           </form>
         </div>
       </div>
+      <button type="submit" onclick="createPasskey()" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Create passkeys</button>
+      <label for="credID" class="font-bold">Cred ID</label>
+      <input type="text" name="fcredid" id="gcredid" class="border border-gray-300 px-2 py-1 rounded-lg">
+      <button type="submit" onclick="assertPasskey(document.getElementById('gcredid').value)" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Assert Passkey</button>
 
       <%- include('../partials/shovel.ejs') %>
     </div>

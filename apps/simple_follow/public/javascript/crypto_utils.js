@@ -45,4 +45,71 @@ async function signChallenge(form) {
   form.submit();
 }
 
-export { generateKeyAndDID, signChallenge };
+function createPasskey() {
+  var challenge = "handle";
+  var challenge = Uint8Array.from(window.atob(challenge), c=>c.charCodeAt(0))
+
+  var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
+  var id = Uint8Array.from(window.atob(userID), c=>c.charCodeAt(0))
+
+  var publicKey = {
+    'challenge': challenge,
+
+    'rp': {
+      'name': 'Example Inc.',
+    },
+
+    'user': {
+      'id': id,
+      'name': 'alice@example.com',
+      'displayName': 'Alice Liddell'
+    },
+
+    'pubKeyCredParams': [
+      { 'type': 'public-key', 'alg': -8  },
+      { 'type': 'public-key', 'alg': -7  },
+      { 'type': 'public-key', 'alg': -257  },
+    ]
+  }
+
+  navigator.credentials.create({ 'publicKey': publicKey })
+    .then((newCredentialInfo) => {
+      console.log('SUCCESS', newCredentialInfo);
+      let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
+      console.log('AttestationObject: ', attestationObject);
+      let authData = parseAuthData(attestationObject.authData);
+      console.log('AuthData: ', authData);
+      console.log('AuthData: ', authData);
+      const credID = bufToHex(authData.credID);
+      console.log('CredID: ', credID);
+      console.log('AAGUID: ', bufToHex(authData.aaguid));
+      console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+    })
+    .catch((error) => {
+      console.log('FAIL', error)
+    })
+}
+
+function assertPasskey(){
+  var cha = "handle";
+  var chall = Uint8Array.from(window.atob(cha), c=>c.charCodeAt(0))
+  var publicKey = {
+    challenge: chall,
+    rpId: "localhost",
+    allowCredentials: [
+    ],
+  }
+
+  navigator.credentials.get({ 'publicKey': publicKey })
+  .then((getAssertionResponse) => {
+      alert('SUCCESSFULLY GOT AN ASSERTION! Open your browser console!')
+      console.log('SUCCESSFULLY GOT AN ASSERTION!', getAssertionResponse)
+  })
+  .catch((error) => {
+      alert('Open your browser console!')
+      console.log('FAIL', error)
+  })
+}
+
+
+export { generateKeyAndDID, signChallenge, createPasskey, assertPasskey };

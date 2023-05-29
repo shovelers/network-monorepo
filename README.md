@@ -25,6 +25,13 @@ DCN Protocol MonoRepo
 "assertionMethod":["did:key:z6MkgnFNPcaT9v6BrXTPFJhoYkgVtmSxJvovJpFDZji4xSfi#z6MkgnFNPcaT9v6BrXTPFJhoYkgVtmSxJvovJpFDZji4xSfi"]
 }
 ```
+
+### Passkeys/Webauthn resources
+* https://medium.com/webauthnworks/verifying-fido2-responses-4691288c8770
+* https://webauthnworks.github.io/FIDO2WebAuthnSeries/WebAuthnIntro/makeCredExample.html
+* https://github.com/WebauthnWorks/FIDO2WebAuthnSeries/blob/master/WebAuthnIntro/makeCredExample.html
+* https://simplewebauthn.dev/docs/packages/server#registration
+
 ### Demo Instructions
 
 Requirements: 
