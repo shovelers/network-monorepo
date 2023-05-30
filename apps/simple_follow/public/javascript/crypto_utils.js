@@ -45,7 +45,7 @@ async function signChallenge(form) {
   form.submit();
 }
 
-function createPasskey() {
+async function createPasskey() {
   var challenge = "handle";
   var challenge = Uint8Array.from(window.atob(challenge), c=>c.charCodeAt(0))
 
@@ -68,22 +68,24 @@ function createPasskey() {
     'pubKeyCredParams': [
       { 'type': 'public-key', 'alg': -8  },
       { 'type': 'public-key', 'alg': -7  },
-      { 'type': 'public-key', 'alg': -257  },
+      // { 'type': 'public-key', 'alg': -257  },
     ]
   }
 
   navigator.credentials.create({ 'publicKey': publicKey })
     .then((newCredentialInfo) => {
       console.log('SUCCESS', newCredentialInfo);
-      let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-      console.log('AttestationObject: ', attestationObject);
-      let authData = parseAuthData(attestationObject.authData);
-      console.log('AuthData: ', authData);
-      console.log('AuthData: ', authData);
-      const credID = bufToHex(authData.credID);
-      console.log('CredID: ', credID);
-      console.log('AAGUID: ', bufToHex(authData.aaguid));
-      console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+      const publicK = newCredentialInfo.response.getPublicKey();
+      console.log('publicK', publicK);
+      console.log('alg', newCredentialInfo.response.getPublicKeyAlgorithm());
+      (async () => {
+        const ek = await window.crypto.subtle.importKey("spki", publicK, {name: 'ECDSA', namedCurve: 'P-256'}, true, ['verify']);
+        const ke = await window.crypto.subtle.exportKey('jwk', ek);
+        console.log('ek', ek);
+        console.log('ke', ke);
+        const did = keyToDID('key', JSON.stringify(ke));
+        console.log('did:', did);
+      })()
     })
     .catch((error) => {
       console.log('FAIL', error)
@@ -111,5 +113,9 @@ function assertPasskey(){
   })
 }
 
+function base64urlEncode(array) {
+  const base64 = btoa(String.fromCharCode(...array));
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
 
 export { generateKeyAndDID, signChallenge, createPasskey, assertPasskey };

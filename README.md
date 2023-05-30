@@ -27,6 +27,7 @@ DCN Protocol MonoRepo
 ```
 
 ### Passkeys/Webauthn resources
+* https://medium.com/webauthnworks/introduction-to-webauthn-api-5fd1fb46c285
 * https://medium.com/webauthnworks/verifying-fido2-responses-4691288c8770
 * https://webauthnworks.github.io/FIDO2WebAuthnSeries/WebAuthnIntro/makeCredExample.html
 * https://github.com/WebauthnWorks/FIDO2WebAuthnSeries/blob/master/WebAuthnIntro/makeCredExample.html

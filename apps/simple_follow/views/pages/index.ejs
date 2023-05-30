@@ -60,9 +60,7 @@
         </div>
       </div>
       <button type="submit" onclick="createPasskey()" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Create passkeys</button>
-      <label for="credID" class="font-bold">Cred ID</label>
-      <input type="text" name="fcredid" id="gcredid" class="border border-gray-300 px-2 py-1 rounded-lg">
-      <button type="submit" onclick="assertPasskey(document.getElementById('gcredid').value)" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Assert Passkey</button>
+      <button type="submit" onclick="assertPasskey()" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Assert Passkey</button>
 
       <%- include('../partials/shovel.ejs') %>
     </div>

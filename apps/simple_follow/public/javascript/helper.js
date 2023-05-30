@@ -126,3 +126,26 @@ var preformatGetAssertReq = (getAssert) => {
 
     return getAssert
 }
+
+const base64url = {
+  // Base64url Encoding
+  encode: (input) => {
+    let base64 = btoa(String.fromCharCode.apply(null, input));
+    base64 = base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    return base64;
+  },
+
+  // Base64url Decoding
+  decode: (input) => {
+    input = input.replace(/-/g, "+").replace(/_/g, "/");
+    while (input.length % 4 !== 0) {
+      input += "=";
+    }
+    const utf8String = atob(input);
+    const result = new Uint8Array(utf8String.length);
+    for (let i = 0; i < utf8String.length; i++) {
+      result[i] = utf8String.charCodeAt(i);
+    }
+    return result;
+  }
+};
