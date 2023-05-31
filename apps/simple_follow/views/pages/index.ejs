@@ -59,7 +59,12 @@
           </form>
         </div>
       </div>
-      <button type="submit" onclick="createPasskey()" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Create passkeys</button>
+      <form id="passkey-create-form" method="post" action="/account" onsubmit="event.preventDefault(); createPasskey(this); return false" class="space-y-1 text-center">
+        <input type="text" id="phandle" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+        <input type="hidden" id="pdid" name="fdid" value="">
+        <input type="hidden" id="pdoc" name="fdid" value="">
+        <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Create passkeys</button>
+      </form>
       <button type="submit" onclick="assertPasskey()" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Assert Passkey</button>
 
       <%- include('../partials/shovel.ejs') %>

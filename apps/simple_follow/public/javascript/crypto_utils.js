@@ -45,30 +45,30 @@ async function signChallenge(form) {
   form.submit();
 }
 
-async function createPasskey() {
-  var challenge = "handle";
-  var challenge = Uint8Array.from(window.atob(challenge), c=>c.charCodeAt(0))
+async function createPasskey(form) {
+  var handle = document.getElementById('phandle').value;
+  console.log('handle:', handle)
+  var challenge = Uint8Array.from(window.atob(handle), c=>c.charCodeAt(0))
 
-  var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
-  var id = Uint8Array.from(window.atob(userID), c=>c.charCodeAt(0))
+  var id = Uint8Array.from(window.atob(handle), c=>c.charCodeAt(0))
 
   var publicKey = {
     'challenge': challenge,
 
     'rp': {
-      'name': 'Example Inc.',
+      'name': 'Simple Follow',
     },
 
     'user': {
       'id': id,
-      'name': 'alice@example.com',
-      'displayName': 'Alice Liddell'
+      'name': handle,
+      'displayName': handle,
     },
 
     'pubKeyCredParams': [
       { 'type': 'public-key', 'alg': -8  },
       { 'type': 'public-key', 'alg': -7  },
-      // { 'type': 'public-key', 'alg': -257  },
+      { 'type': 'public-key', 'alg': -257  },
     ]
   }
 
@@ -85,6 +85,10 @@ async function createPasskey() {
         console.log('ke', ke);
         const did = keyToDID('key', JSON.stringify(ke));
         console.log('did:', did);
+        document.getElementById('pdid').value = did;
+        const doc = await resolveDID(did, "{}");
+        document.getElementById('gdoc').value = doc;
+        form.submit();
       })()
     })
     .catch((error) => {
