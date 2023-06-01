@@ -77,7 +77,9 @@ async function createPasskey(form) {
   navigator.credentials.create({ 'publicKey': publicKey })
     .then((newCredentialInfo) => {
       const publicK = newCredentialInfo.response.getPublicKey();
+
       (async () => {
+        console.log('SUCCESSFULLY GOT A CREDENTIAL!', newCredentialInfo.response);
         const ek = await window.crypto.subtle.importKey("spki", publicK, {name: 'ECDSA', namedCurve: 'P-256'}, true, ['verify']);
         const ke = await window.crypto.subtle.exportKey('jwk', ek);
         const did = keyToDID('key', JSON.stringify(ke));
@@ -92,24 +94,31 @@ async function createPasskey(form) {
     })
 }
 
-function assertPasskey(){
-  var cha = "handle";
-  var chall = Uint8Array.from(window.atob(cha), c=>c.charCodeAt(0))
+async function assertPasskey(){
+  var res = await fetch('/auth/login_challenge')
+  var response = await res.json()
+  var challenge = new Uint8Array(response.challenge)
+
   var publicKey = {
-    challenge: chall,
-    rpId: "localhost",
-    allowCredentials: [
-    ],
+    challenge: challenge,
+    allowCredentials: [],
   }
 
   navigator.credentials.get({ 'publicKey': publicKey })
   .then((getAssertionResponse) => {
-      alert('SUCCESSFULLY GOT AN ASSERTION! Open your browser console!')
-      console.log('SUCCESSFULLY GOT AN ASSERTION!', getAssertionResponse)
+    const assertionResponse = getAssertionResponse.response;
+    console.log('signature', assertionResponse.signature)
+    console.log('clientDataJSON', assertionResponse.clientDataJSON)
+    console.log('userHandle', assertionResponse.userHandle)
+    alert('SUCCESSFULLY GOT AN ASSERTION! Open your browser console!')
+    console.log('SUCCESSFULLY GOT AN ASSERTION!', getAssertionResponse)
+    (async () => {
+      valid = await window.crypto.subtle.verify({name: 'ECDSA', namedCurve: 'P-256'}, key, assertionResponse.signature, challenge)
+    })()
   })
   .catch((error) => {
-      alert('Open your browser console!')
-      console.log('FAIL', error)
+    alert('Open your browser console!')
+    console.log('FAIL', error)
   })
 }
 

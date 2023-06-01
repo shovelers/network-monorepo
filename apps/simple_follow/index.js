@@ -46,6 +46,11 @@ server.get("/auth/account_creation_challenge", (req, res) => {
   res.send({ challenge: challenge, user: { id: userId, name: handle, displayName: handle}, rpName: rpName })
 });
 
+server.get("/auth/login_challenge", (req, res) => {
+  challenge = Crypto.getRandomValues(new Uint32Array(1))[0];
+  res.send({challenge: challenge})
+});
+
 server.post("/account", async (req, res) => {
   var handle = req.body.fhandle;
   var did = req.body.fdid;
