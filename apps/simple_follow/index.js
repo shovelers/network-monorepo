@@ -2,6 +2,8 @@ const express = require("express");
 const DIDKit = require('@spruceid/didkit-wasm-node');
 const Protocol = require('client');
 const c = new Protocol();
+const Crypto = require('node:crypto').webcrypto;
+const sha256 = require('sha256');
 
 const path = require("path");
 const port = 3002;
@@ -37,11 +39,11 @@ server.get("/", (req, res) => {
 });
 
 server.get("/auth/account_creation_challenge", (req, res) => {
-  challenge = "random"
-  userId = "hash of handle"
-  userName = req.query.handle;
-  userDisplayName = "handle"
-  res.send({ challenge: challenge, user: { id: userId, name: userName, displayName: userDisplayName} })
+  handle = req.query.handle
+  challenge = Crypto.getRandomValues(new Uint32Array(1))[0];
+  userId = sha256(handle);
+  rpName = "Simple Follow";
+  res.send({ challenge: challenge, user: { id: userId, name: handle, displayName: handle}, rpName: rpName })
 });
 
 server.post("/account", async (req, res) => {

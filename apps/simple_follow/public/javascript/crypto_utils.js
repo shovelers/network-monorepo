@@ -47,16 +47,18 @@ async function signChallenge(form) {
 
 async function createPasskey(form) {
   var handle = document.getElementById('phandle').value;
-  console.log('handle:', handle)
-  var challenge = Uint8Array.from(window.atob(handle), c=>c.charCodeAt(0))
+  var res = await fetch('/auth/account_creation_challenge?' + new URLSearchParams({handle: handle}))
+  var response = await res.json()
 
-  var id = Uint8Array.from(window.atob(handle), c=>c.charCodeAt(0))
+  var challenge = new Uint8Array(response.challenge)
+  var id = new Uint8Array(response.user["id"])
+  var rpName = response.rpName
 
   var publicKey = {
     'challenge': challenge,
 
     'rp': {
-      'name': 'Simple Follow',
+      'name': rpName,
     },
 
     'user': {
@@ -74,20 +76,14 @@ async function createPasskey(form) {
 
   navigator.credentials.create({ 'publicKey': publicKey })
     .then((newCredentialInfo) => {
-      console.log('SUCCESS', newCredentialInfo);
       const publicK = newCredentialInfo.response.getPublicKey();
-      console.log('publicK', publicK);
-      console.log('alg', newCredentialInfo.response.getPublicKeyAlgorithm());
       (async () => {
         const ek = await window.crypto.subtle.importKey("spki", publicK, {name: 'ECDSA', namedCurve: 'P-256'}, true, ['verify']);
         const ke = await window.crypto.subtle.exportKey('jwk', ek);
-        console.log('ek', ek);
-        console.log('ke', ke);
         const did = keyToDID('key', JSON.stringify(ke));
-        console.log('did:', did);
         document.getElementById('pdid').value = did;
         const doc = await resolveDID(did, "{}");
-        document.getElementById('gdoc').value = doc;
+        document.getElementById('pdoc').value = doc;
         form.submit();
       })()
     })
