@@ -36,6 +36,14 @@ server.get("/", (req, res) => {
   res.render('pages/index', { alert: Alerts[req.query.alert] })
 });
 
+server.get("/auth/account_creation_challenge", (req, res) => {
+  challenge = "random"
+  userId = "hash of handle"
+  userName = req.query.handle;
+  userDisplayName = "handle"
+  res.send({ challenge: challenge, user: { id: userId, name: userName, displayName: userDisplayName} })
+});
+
 server.post("/account", async (req, res) => {
   var handle = req.body.fhandle;
   var did = req.body.fdid;
