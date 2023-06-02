@@ -40,15 +40,24 @@ server.get("/", (req, res) => {
 
 server.get("/auth/account_creation_challenge", (req, res) => {
   handle = req.query.handle
-  challenge = Crypto.getRandomValues(new Uint8Array(1))[0];
+  challenge = Crypto.getRandomValues(new Uint32Array(1))[0];
   userId = sha256(handle);
   rpName = "Simple Follow";
   res.send({ challenge: challenge, user: { id: userId, name: handle, displayName: handle}, rpName: rpName })
 });
 
 server.get("/auth/login_challenge", (req, res) => {
-  challenge = Crypto.getRandomValues(new Uint8Array(1))[0];
-  res.send({challenge: challenge})
+  handle = req.query.handle;
+  challenge = Crypto.getRandomValues(new Uint32Array(1))[0];
+  res.send({challenge: challenge});
+});
+
+server.get("/did", (req, res) => {
+  var handle = req.query.handle;
+  console.log(handle);
+  var did = handleDIDMap.get(handle);
+  console.log(did);
+  res.send({did: did});
 });
 
 server.post("/account", async (req, res) => {

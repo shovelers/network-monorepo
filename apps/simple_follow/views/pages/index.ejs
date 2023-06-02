@@ -63,9 +63,13 @@
         <input type="text" id="phandle" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
         <input type="hidden" id="pdid" name="fdid" value="">
         <input type="hidden" id="pdoc" name="fdoc" value="">
-        <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Create passkeys</button>
+        <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Sigup with passkeys</button>
       </form>
-      <button type="submit" onclick="assertPasskey()" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Assert Passkey</button>
+      <form id="passkey-sigin-form" onsubmit="event.preventDefault(); assertPasskey(this); return false" class="space-y-1 text-center">
+        <input type="text" id="shandle" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+        <input type="hidden" id="svp" name="fvp" value="">
+        <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Sigin with passkeys</button>
+      </form>
 
       <%- include('../partials/shovel.ejs') %>
     </div>
