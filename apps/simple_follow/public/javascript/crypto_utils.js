@@ -107,18 +107,18 @@ async function assertPasskey(){
   navigator.credentials.get({ 'publicKey': publicKey })
   .then((getAssertionResponse) => {
     const assertionResponse = getAssertionResponse.response;
-    console.log('signature', assertionResponse.signature)
-    console.log('clientDataJSON', assertionResponse.clientDataJSON)
-    console.log('userHandle', assertionResponse.userHandle)
+    console.log('signature', assertionResponse.signature);
+    console.log('clientDataJSON', assertionResponse.clientDataJSON);
+    console.log('userHandle', assertionResponse.userHandle);
     alert('SUCCESSFULLY GOT AN ASSERTION! Open your browser console!')
-    console.log('SUCCESSFULLY GOT AN ASSERTION!', getAssertionResponse)
+    console.log('SUCCESSFULLY GOT AN ASSERTION!', getAssertionResponse);
     (async () => {
       valid = await window.crypto.subtle.verify({name: 'ECDSA', namedCurve: 'P-256'}, key, assertionResponse.signature, challenge)
     })()
   })
   .catch((error) => {
     alert('Open your browser console!')
-    console.log('FAIL', error)
+    console.log('FAIL', error);
   })
 }
 
