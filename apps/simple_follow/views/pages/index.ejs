@@ -36,7 +36,7 @@
         <div class="text-2xl font-semibold mt-4">Your <span class="underline decoration-4 decoration-sky-500">Portable Social Graph</span></div>
       </div>
       <div class="flex flex-row items-center space-x-10">
-        <form id="passkey-sigin-form" method="post" action="/signin-passkey" onsubmit="event.preventDefault(); assertPasskey(this); return false" class="space-y-1 text-center">
+        <form id="passkey-sigin-form" method="post" action="/signin" onsubmit="event.preventDefault(); assertPasskey(this); return false" class="space-y-1 text-center">
           <label for="team_name" class="font-bold">Username</label>
           <input type="text" id="shandle" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
           <input type="hidden" id="svalidated" name="fvalidated" value="false">

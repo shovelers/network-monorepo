@@ -75,26 +75,6 @@ server.post("/account", async (req, res) => {
 });
 
 server.post("/signin", async (req, res) => {
-  var handle = req.body.fhandle;
-  var did = handleDIDMap.get(handle);
-  var key = req.body.fkey;
-  var vp = req.body.fvp;
-
-  var handleAlreadyTaken = await handleUniqueness(handle);
-  var validated = await c.validateSign(vp, handle);
-
-  if (handleAlreadyTaken == false) {
-    console.log("Create an account first");
-    res.redirect(`/?alert=missingAccount`);
-  } else if (validated == false) {
-    res.redirect(`/?alert=wrongKey`);
-  } else {
-    console.log(`Profile lookup for handle:${handle}`);
-    res.redirect(`profiles?session=${handle}`);
-  };
-});
-
-server.post("/signin-passkey", async (req, res) => {
   var handle = req.body.fhandle
   var handleAlreadyTaken = req.body.fhandleAlreadyTaken;
   var validated = req.body.fvalidated;

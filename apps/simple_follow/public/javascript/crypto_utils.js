@@ -72,7 +72,6 @@ async function assertPasskey(form){
 
   if (did === "undefined") {
     document.getElementById('shandleAlreadyTaken').value = false;
-    console.log("I am here");
     form.submit();
   } else {
     document.getElementById('shandleAlreadyTaken').value = true;
@@ -142,11 +141,6 @@ async function assertPasskey(form){
         console.log('FAIL', error);
       })
   };
-}
-
-function base64urlEncode(array) {
-  const base64 = btoa(String.fromCharCode(...array));
-  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 export { generateKeyAndDID, signChallenge, createPasskey, assertPasskey };
