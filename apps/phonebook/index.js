@@ -16,6 +16,10 @@ const apps = [
   { name: "Simple Follow", graphDID: "did:graph:simple_follow" }
 ]
 
+server.get("/", (req, res) => {
+  res.render('pages/index');
+});
+
 server.get("/users/:did", async (req, res) => {
   var socialGraph = []
   for (const app of apps) {
@@ -24,7 +28,7 @@ server.get("/users/:did", async (req, res) => {
     socialGraph.push({ name: app.name, relationships: relationships});
   };
 
-  res.render('pages/index', {
+  res.render('pages/profile', {
     socialGraph: socialGraph
   })
 });

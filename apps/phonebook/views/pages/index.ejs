@@ -2,35 +2,10 @@
 <html lang="en">
   <head>
     <link rel="stylesheet" href="../styles/style.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css" integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY=" crossorigin="anonymous">
   </head>
   <body>
     <div class="flex flex-col justify-evenly items-center h-screen bg-error-content">
       <div class="text-5xl font-bold tracking-tight">Phonebook</div>
-      <div class="flex flex-row space-x-4">
-        <div class="overflow-x-auto">
-          <table class="table w-full">
-            <thead>
-              <tr>
-                <th>To</th>
-                <th>From</th>
-                <th>App</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% socialGraph.forEach(function(app) { %>
-                <% app.relationships.forEach(function(relationship){ %>
-                  <tr>
-                    <td><%= relationship.to %></td>
-                    <td><%= relationship.from %></td>
-                    <td><%= app.name %></td>
-                  </tr>
-                <% }) %>
-              <% }) %>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   </body>
 </html>
