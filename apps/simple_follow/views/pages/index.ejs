@@ -23,7 +23,7 @@
       <div class="text-5xl font-extrabold tracking-tight box-decoration-slice bg-gradient-to-r from-blue-500 to-pink-500 text-white p-2">Simple Follow</div>
       <% if (alert) { %>
         <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-          <span class="font-medium">Alert!</span> <%= alert %>.
+          <%= alert %>
         </div>
       <% } %>
       <div class="relative p-4 text-center">
@@ -59,18 +59,22 @@
           </form>
         </div>
       </div>
-      <form id="passkey-create-form" method="post" action="/account" onsubmit="event.preventDefault(); createPasskey(this); return false" class="space-y-1 text-center">
-        <input type="text" id="phandle" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
-        <input type="hidden" id="pdid" name="fdid" value="">
-        <input type="hidden" id="pdoc" name="fdoc" value="">
-        <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Sigup with passkeys</button>
-      </form>
-      <form id="passkey-sigin-form" onsubmit="event.preventDefault(); assertPasskey(this); return false" class="space-y-1 text-center">
-        <input type="text" id="shandle" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
-        <input type="hidden" id="svp" name="fvp" value="">
-        <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Sigin with passkeys</button>
-      </form>
-
+      <div class="flex flex-row items-center space-x-10">
+        <form id="passkey-sigin-form" method="post" action="/signin-passkey" onsubmit="event.preventDefault(); assertPasskey(this); return false" class="space-y-1 text-center">
+          <label for="team_name" class="font-bold">Username</label>
+          <input type="text" id="shandle" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+          <input type="hidden" id="svalidated" name="fvalidated" value="false">
+          <input type="hidden" id="shandleAlreadyTaken" name="fhandleAlreadyTaken" value="false">
+          <button type="submit" class="rounded-lg bg-green-600 px-2 py-2 text-gray-200 font-medium">Sigin with passkeys</button>
+        </form>
+        <form id="passkey-create-form" method="post" action="/account" onsubmit="event.preventDefault(); createPasskey(this); return false" class="space-y-1 text-center">
+          <label for="team_name" class="font-bold">Username</label>
+          <input type="text" id="phandle" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+          <input type="hidden" id="pdid" name="fdid" value="">
+          <input type="hidden" id="pdoc" name="fdoc" value="">
+          <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Sigup with passkeys</button>
+        </form>
+      </div>
       <%- include('../partials/shovel.ejs') %>
     </div>
   </body>

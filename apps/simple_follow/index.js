@@ -27,10 +27,10 @@ var rolodex_did = "did:dcn:rolodex"
 var rolodex_graph_did = "did:graph:rolodex"
 
 const Alerts = {
-  missingAccount: "Create an account first",
+  missingAccount: "Account Not Registered! Create an account first",
   handleTaken: "Handle is already taken",
   requireLogin: "Please login or sign up before you proceed",
-  wrongKey: "Sigin Failed!! The key & handle do not match",
+  wrongKey: "Sigin Failed! The key & handle do not match",
 }
 
 
@@ -54,10 +54,8 @@ server.get("/auth/login_challenge", (req, res) => {
 
 server.get("/did", (req, res) => {
   var handle = req.query.handle;
-  console.log(handle);
   var did = handleDIDMap.get(handle);
-  console.log(did);
-  res.send({did: did});
+  res.send({did: `${did}`});
 });
 
 server.post("/account", async (req, res) => {
@@ -89,6 +87,22 @@ server.post("/signin", async (req, res) => {
     console.log("Create an account first");
     res.redirect(`/?alert=missingAccount`);
   } else if (validated == false) {
+    res.redirect(`/?alert=wrongKey`);
+  } else {
+    console.log(`Profile lookup for handle:${handle}`);
+    res.redirect(`profiles?session=${handle}`);
+  };
+});
+
+server.post("/signin-passkey", async (req, res) => {
+  var handle = req.body.fhandle
+  var handleAlreadyTaken = req.body.fhandleAlreadyTaken;
+  var validated = req.body.fvalidated;
+
+  if (handleAlreadyTaken === "false") {
+    console.log("Create an account first");
+    res.redirect(`/?alert=missingAccount`);
+  } else if (validated === "false") {
     res.redirect(`/?alert=wrongKey`);
   } else {
     console.log(`Profile lookup for handle:${handle}`);
@@ -162,7 +176,7 @@ server.listen(port, (err) => {
 
 async function handleUniqueness(handle) {
   return handlesTaken.includes(handle);
-  console.log(handlesTaken.includes(handle));
+  console.log('Handle Unquiness check', handlesTaken.includes(handle));
 };
 
 async function createAccount(handle, did, doc) {
