@@ -11,9 +11,7 @@
 
   <body class="antialiased">
     <script type="module">
-      import { generateKeyAndDID, signChallenge, createPasskey, assertPasskey } from "/javascript/crypto_utils.js";
-      window.generateKeyAndDID = generateKeyAndDID;
-      window.signChallenge = signChallenge;
+      import { createPasskey, assertPasskey } from "/javascript/crypto_utils.js";
       window.createPasskey = createPasskey;
       window.assertPasskey = assertPasskey;
     </script>
