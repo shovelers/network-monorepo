@@ -38,28 +38,6 @@
         <div class="text-2xl font-semibold mt-4">Your <span class="underline decoration-4 decoration-sky-500">Portable Social Graph</span></div>
       </div>
       <div class="flex flex-row items-center space-x-10">
-        <form id="signin-form" method="post" action="/signin" onsubmit="signChallenge(this); return false;" class="space-y-1 text-center">
-          <label class="font-semibold">Enter Username to signin</label><br>
-          <label for="team_name" class="font-bold">Username</label>
-          <input type="text" name="fhandle" id="ghandle" class="border border-gray-300 px-2 py-1 rounded-lg">
-          <label for="team_name" class="font-bold">Key</label>
-          <input type="text" name="fkey" id="gkey" class="border border-gray-300 px-2 py-1 rounded-lg">
-          <input type="hidden" name="fvp" id="gvp" value="">
-          <button type="submit" class="rounded-lg bg-green-600 px-2 py-2 text-gray-200 font-medium">Sign in</button>
-        </form>
-        <div class="flex flex-col space-y-4">
-          <form id="account-create-form" method="post" action="/account" onsubmit="generateKeyAndDID(this); return false;" class="space-y-1 text-center">
-            <label><span class="font-semibold">Choose desired Username</span></label><br>
-            <label for="team_name" class="font-bold">Username</label>
-            <input type="text" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
-            <label for="team_name" class="font-bold">DCN DID</label>
-            <input type="text" name="fdid" id="gdid" class="border border-gray-300 px-2 py-1 rounded-lg" placeholder="optional">
-            <input type="hidden" name="fdoc" id="gdoc" value="">
-            <button type="submit" class="rounded-lg bg-blue-500 px-2 py-2 text-gray-200 font-medium">Create Account</button>
-          </form>
-        </div>
-      </div>
-      <div class="flex flex-row items-center space-x-10">
         <form id="passkey-sigin-form" method="post" action="/signin-passkey" onsubmit="event.preventDefault(); assertPasskey(this); return false" class="space-y-1 text-center">
           <label for="team_name" class="font-bold">Username</label>
           <input type="text" id="shandle" name="fhandle" class="border border-gray-300 px-2 py-1 rounded-lg">
