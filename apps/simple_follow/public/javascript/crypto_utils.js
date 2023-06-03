@@ -143,4 +143,4 @@ async function assertPasskey(form){
   };
 }
 
-export { generateKeyAndDID, signChallenge, createPasskey, assertPasskey };
+export { createPasskey, assertPasskey };
