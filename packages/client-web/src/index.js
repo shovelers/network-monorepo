@@ -11,4 +11,3 @@ async function generateDID(key) {
 }
 
 exports.generateDID = generateDID;
-
