@@ -1,0 +1,26 @@
+{
+  "name": "client-web",
+  "version": "0.0.0",
+  "description": "Client for protocol",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specifiied\" && exit 1",
+    "build": "browserify index.js -o dist/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shovelers/protocol.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shovelers/protocol/issues"
+  },
+  "homepage": "https://github.com/shovelers/protocol#readme",
+  "dependencies": {
+    "@spruceid/didkit-wasm-node": "^0.2.1"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0"
+  }
+}
