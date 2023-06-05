@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "description": "Client for protocol",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specifiied\" && exit 1",
-    "build": "browserify index.js -o dist/bundle.js"
+    "build": "rollup -c rollup.config.js"
   },
   "repository": {
     "type": "git",
@@ -18,9 +19,11 @@
   },
   "homepage": "https://github.com/shovelers/protocol#readme",
   "dependencies": {
-    "@spruceid/didkit-wasm-node": "^0.2.1"
+    "@spruceid/didkit-wasm": "^0.2.1"
   },
   "devDependencies": {
-    "browserify": "^17.0.0"
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-wasm": "^6.1.3",
+    "rollup": "^3.23.1"
   }
 }
