@@ -3,7 +3,12 @@
   "version": "0.0.0",
   "description": "DCN protocol",
   "main": "index.js",
-  "workspaces":["./protocol", "./packages/*", "./apps/*", "./docs"],
+  "workspaces": [
+    "./protocol",
+    "./packages/*",
+    "./apps/*",
+    "./docs"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/shovelers/protocol/issues"
   },
-  "homepage": "https://github.com/shovelers/protocol#readme"
+  "homepage": "https://github.com/shovelers/protocol#readme",
+  "devDependencies": {
+    "lerna": "^6.6.2"
+  }
 }
