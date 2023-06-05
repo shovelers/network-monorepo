@@ -1,12 +1,14 @@
-import {keyToDID, resolveDID} from '@spruceid/didkit-wasm';
+import init, { generateEd25519Key, keyToDID, resolveDID, keyToVerificationMethod, DIDAuth } from "./didkit_wasm.js";
+import './didkit_wasm_bg.wasm'
 
-class ProtocolWeb {
-  async generateDID(key) {
-    var did = keyToDID('key', key);
-    var doc = await resolveDID(did, "{}");
+await init();
 
-    return {did: did, doc: doc}
-  }
+async function generateDID(key) {
+  var did = keyToDID('key', key);
+  var doc = await resolveDID(did, "{}");
+
+  return {did: did, doc: doc}
 }
 
-module.exports = ProtocolWeb;
+exports.generateDID = generateDID;
+

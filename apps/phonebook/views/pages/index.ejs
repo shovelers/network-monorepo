@@ -2,10 +2,14 @@
 <html lang="en">
   <head>
     <link rel="stylesheet" href="../styles/style.css" />
+    <script src="/javascript/index.js" type="module"></script>
   </head>
   <body>
     <div class="flex flex-col justify-evenly items-center h-screen bg-error-content">
       <div class="text-5xl font-bold tracking-tight">Phonebook</div>
+      <input type="text" id="skey" name="fkey" class="border border-gray-300 px-2 py-1 rounded-lg">
+      <button type="submit" onclick="generateDID(document.getElementById('skey').value)" class="rounded-lg bg-green-600 px-2 py-2 text-gray-200 font-medium">Sigin with passkeys</button>
+      </form>
     </div>
   </body>
 </html>

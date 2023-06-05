@@ -18,9 +18,6 @@
     "url": "https://github.com/shovelers/protocol/issues"
   },
   "homepage": "https://github.com/shovelers/protocol#readme",
-  "dependencies": {
-    "@spruceid/didkit-wasm": "^0.2.1"
-  },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-wasm": "^6.1.3",
