@@ -17,10 +17,5 @@
   "bugs": {
     "url": "https://github.com/shovelers/protocol/issues"
   },
-  "homepage": "https://github.com/shovelers/protocol#readme",
-  "devDependencies": {
-    "@rollup/plugin-node-resolve": "^15.1.0",
-    "@rollup/plugin-wasm": "^6.1.3",
-    "rollup": "^3.23.1"
-  }
+  "homepage": "https://github.com/shovelers/protocol#readme"
 }
