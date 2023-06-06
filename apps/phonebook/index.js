@@ -25,8 +25,15 @@ c.registerApp(app_did,"09opdsfasdfasfasd12iuasfdfghjkjhgfdsasdfghjmknbvcxcvbnbvc
 const handlesTaken = [];
 const handleDIDMap = new Map();
 
+const Alerts = {
+  missingAccount: "Account Not Registered! Create an account first",
+  handleTaken: "Handle is already taken",
+  requireLogin: "Please login or sign up before you proceed",
+  wrongKey: "Sigin Failed! The key & handle do not match",
+}
+
 server.get("/", (req, res) => {
-  res.render('pages/index');
+  res.render('pages/index', { alert: Alerts[req.query.alert] });
 });
 
 server.get("/auth/account_creation_challenge", (req, res) => {
