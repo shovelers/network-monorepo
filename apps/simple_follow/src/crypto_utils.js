@@ -1,7 +1,4 @@
-import * as wasm from "./fd561035ae18b6e9.wasm";
-import init, { generateEd25519Key, keyToDID, resolveDID, keyToVerificationMethod, DIDAuth } from "./didkit_wasm.js";
-import love from 'client-web';
-console.log(love);
+import init, { keyToDID, resolveDID } from 'client-web';
 
 await init();
 
