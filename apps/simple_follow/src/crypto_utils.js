@@ -1,3 +1,4 @@
+import * as wasm from "./fd561035ae18b6e9.wasm";
 import init, { generateEd25519Key, keyToDID, resolveDID, keyToVerificationMethod, DIDAuth } from "./didkit_wasm.js";
 
 await init();
