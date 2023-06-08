@@ -80,13 +80,11 @@ server.get("/profiles/:handle", async (req, res) => {
   var handle = params["handle"];
   var did = handleDIDMap.get(handle);
   var graphData = await c.readGraph(graph_did);
-  var rolodexData = await c.readGraph(rolodex_graph_did);
   var followers = await followerListFor(did, graphData);
   var followings = await followingListFor(did, graphData);
   
-  var rolodexFollowers = await followerDIDsFor(did, rolodexData);
   var current_user_did = handleDIDMap.get(req.query["session"])
-  var isRolodexFollower = rolodexFollowers.includes(current_user_did)
+  var isRolodexFollower = await checkRolodexFollower(did, current_user_did)
 
   res.render('pages/profile_v2',{
     did: did,
@@ -197,4 +195,13 @@ function findHandleByDID(searchDID) {
     if (value === searchDID)
       return key;
   }
+}
+
+async function checkRolodexFollower(did, current_user_did){
+  var rolodexData = await c.readGraph(rolodex_graph_did);
+  if (rolodexData === undefined)
+    return false
+
+  var rolodexFollowers = await followerDIDsFor(did, rolodexData);
+  return rolodexFollowers.includes(current_user_did)
 }
