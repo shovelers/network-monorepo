@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/shovelers/protocol/issues"
   },
+  "devDependencies": {
+    "protocol": "*"
+  },
   "homepage": "https://github.com/shovelers/protocol#readme"
 }
