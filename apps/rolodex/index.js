@@ -73,7 +73,9 @@ server.listen(port, (err) => {
 });
 
 async function handleGraph(handle) {
-  var user_did = await getDIDforHandle(handle);
+  if (handle === "ramadaga1") {
+    return stub(handle);
+  }
 
   var user = await(client.users.findUserByUsername(handle));
   var user_id = user["data"]["id"];
@@ -84,6 +86,8 @@ async function handleGraph(handle) {
     }));
   const followers = await(client.users.usersIdFollowers(user_id, {max_results: 1000}));
   const followings = await(client.users.usersIdFollowing(user_id, {max_results: 1000}));
+
+  var user_did = await getDIDforHandle(handle);
 
   for (const element of followers["data"]) {
     var did = await getDIDforHandle(element.username)
@@ -126,4 +130,60 @@ async function getDIDforHandle(handle) {
   console.log(handle, did, Object.keys(HandleToDID).length)
 
   return did
+}
+
+
+async function stub(handle) {
+  var user_did = await getDIDforHandle(handle);
+
+  profile = data[handle]["profile"]
+  followers = data[handle]["followers"]
+  followings = data[handle]["followings"]
+
+  for (const element of followers) {
+    var did = await getDIDforHandle(element.username)
+    c.insertGraph(graph_did, did, user_did, new Date())
+  }
+
+  for (const element of followings) {
+    var did = await getDIDforHandle(element.username)
+    c.insertGraph(graph_did, user_did, did, new Date())
+  }
+
+  console.log(handle, user_did, HandleToDID[handle], getDIDforHandle(handle), Object.keys(HandleToDID).length)
+  return {"profile": profile, "followers": followers, "followings": followings, "user_did": user_did} 
+}
+
+data = {
+  "ramadaga1": {
+    "profile": {
+      "name":"Rama Daga",
+      "username":"RamaDaga1",
+      "description":"",
+      "public_metrics":{
+        "following_count":3,
+        "followers_count":1
+      }
+    },
+    "followers": [
+      {
+        "name":"Prashant Mittal",
+        "username":"prashant_mit"
+      }
+    ],
+    "followings": [
+      {
+        "name":"Prashant Mittal",
+        "username":"prashant_mit"
+      },
+      {
+        "name":"Balaji",
+        "username":"balajis"
+      },
+      {
+        "name":"Shobhit Srivastava",
+        "username":"Sinister_Light"
+      },
+    ]
+  }
 }
