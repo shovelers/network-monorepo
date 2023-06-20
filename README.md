@@ -41,14 +41,16 @@ Requirements:
 
 Steps:
 
-1. Power up the protocol from the protocol repo from terminal. Protocol dashboard can be viewed at localhost:4000
+1. Power up the protocol from the protocol repo from terminal and checkout the demo version. Protocol dashboard can be viewed at localhost:4000
 ```
 npm start -w protocol
+
+git checkout demo-0.1
 ```
 
 2. Start the "Rolodex" application on the protocol, providing the required Twt API token. App can be accessed at localhost:3000
 ```
-BEARER_TOKEN= <replace_with_token> npm start -w rolodex
+npm start -w rolodex
 ```
 
 3. Import your social graph of followers and following by entering your Twt handle
@@ -64,12 +66,13 @@ npm start -w simple_follow
   a. Search for the handle of a profile you want to follow
   b. Enter your handle on their profile to follow them
   c. View your profile to see updated follow list
-  
+
 6. The protocol dashboard should display at all steps all the unique users, apps and relationships available on the protocol
   a. Restarting the protocol refreshes the dashboard. 
   b. Restarting applications does not refresh the dashboard. 
 
 Notes:
-1. Users are uniquely mapped from app <> protocol
+1. Users are uniquely mapped from app <> protocol 
 2. Each app's graph is stored independently
 3. Relationships are stored based on the app context
+4. Creating a user with an existing DID from Rolodex (or other apps on the protocol) allows apps to pull existing relationships for user
