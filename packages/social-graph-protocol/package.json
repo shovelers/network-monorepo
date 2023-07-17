@@ -1,0 +1,24 @@
+{
+  "name": "social-graph-protocol",
+  "version": "0.0.0",
+  "description": "Client for protocol",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shovelers/protocol.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shovelers/protocol/issues"
+  },
+  "homepage": "https://github.com/shovelers/protocol#readme",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "protocol": "*"
+  }
+}
