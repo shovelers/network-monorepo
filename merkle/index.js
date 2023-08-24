@@ -8,15 +8,15 @@ const port = 4000;
 
 const server = express();
 
-server.use(express.json());
-server.use(express.urlencoded({ extended: true }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+server.use(express.json());
+server.use(express.urlencoded({ extended: true }));
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
 
-
+const Heads = {}
 
 server.get("/", async (req, res) => {
   const helia = await createHelia()
@@ -55,3 +55,39 @@ server.listen(port, (err) => {
     `> Ready`
   );
 });
+
+/*
+server.post("/registry", (req, res) => {
+  registryDID = createRegistry(req.body)
+  res.status(200).json({})
+})
+
+async createRegistry (body) {
+  var name = body.name
+  var publickey = body.publickey
+  var did = createDID(publicKey)
+
+  return did
+}
+
+async addEvent (body) {
+  var relID = (body.regID).(body.to).(body.from)
+  var cid = findORcreateMerkle(event)
+  if cid not found
+    create node without link
+    put newcid in Heads table with key ad relID
+  else
+    create node with link as cid
+    put newcid in Heads table with key as relID
+  end
+}
+
+async findORcreateMerkle(event){
+  var head = Head[relID]
+}
+
+async createDID(key){
+  did = generateDIDkey
+  return did;
+}
+*/
