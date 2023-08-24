@@ -1,0 +1,16 @@
+{
+  "name": "merkle",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "test folder for implenting 0.3",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Prashant",
+  "license": "ISC",
+  "dependencies": {
+    "@helia/dag-cbor": "^0.0.0",
+    "helia": "^2.0.1"
+  }
+}
