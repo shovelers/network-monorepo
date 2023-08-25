@@ -1,8 +1,10 @@
 import { createHelia } from 'helia';
 import { dagCbor } from '@helia/dag-cbor';
 import express from 'express';
+import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { generateEd25519Key, keyToDID } from '@spruceid/didkit-wasm-node';
 
 const port = 4000;
 
@@ -10,12 +12,16 @@ const server = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 server.use(express.json());
+server.use(cors());
+
 server.use(express.urlencoded({ extended: true }));
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
 
+const Registries = {}
 const Heads = {}
 
 server.get("/", async (req, res) => {
@@ -57,18 +63,38 @@ server.listen(port, (err) => {
 });
 
 /*
+sample re.body =
+  {
+    "name": "simple_follow_follow",
+    "publickey": {"kty":"OKP","crv":"Ed25519","x":"EL_Z0oW6OLhN4Pe4LAzzGmOWkGZpxmhoqD0IAvQ4wGA"}
+  }
+*/
+server.post("/registry", async (req, res) => {
+  var registryDID = await createRegistry(req.body)
+  console.log(`registry created with did ${registryDID}`)
+  res.status(200).json({"did": registryDID})
+})
+
+async function createRegistry(body) {
+  var name = body.name
+  var publickey = body.publickey
+  var did = await createDID(publickey)
+
+  return did
+}
+
+async function createDID(key){
+  var nkey = generateEd25519Key();
+  var did = keyToDID('key', JSON.stringify(key));
+  return did
+}
+
+/*
 server.post("/registry", (req, res) => {
   registryDID = createRegistry(req.body)
   res.status(200).json({})
 })
 
-async createRegistry (body) {
-  var name = body.name
-  var publickey = body.publickey
-  var did = createDID(publicKey)
-
-  return did
-}
 
 async addEvent (body) {
   var relID = (body.regID).(body.to).(body.from)
