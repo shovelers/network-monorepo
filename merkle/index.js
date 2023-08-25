@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { generateEd25519Key, keyToDID } from '@spruceid/didkit-wasm-node';
+import { keyToDID } from '@spruceid/didkit-wasm-node';
 
 const port = 4000;
 
@@ -22,7 +22,14 @@ server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
 
 const Registries = {}
-const Heads = {}
+/*
+ head = {regID1to1from2: cid1
+         regID1to2from1: cid2}
+*/
+const Heads = new Map();
+
+const helia = await createHelia()
+const dag = await dagCbor(helia)
 
 server.get("/", async (req, res) => {
   const helia = await createHelia()
@@ -68,52 +75,57 @@ sample re.body =
     "name": "simple_follow_follow",
     "publickey": {"kty":"OKP","crv":"Ed25519","x":"EL_Z0oW6OLhN4Pe4LAzzGmOWkGZpxmhoqD0IAvQ4wGA"}
   }
-*/
+  */
 server.post("/registry", async (req, res) => {
   var registryDID = await createRegistry(req.body)
   console.log(`registry created with did ${registryDID}`)
   res.status(200).json({"did": registryDID})
 })
 
+/*
+ sample req.body =
+ {
+   "registryID": "did:reg",
+   "to": "did:a",
+   "from": "did:b",
+   "state": "requested",
+   "sig": "hakjshdkjasnd"
+ }
+ */
+server.post("/event", async (req, res) => {
+  var CID = await addEvent(req.body)
+  res.status(200).json({"cid": CID})
+})
+
 async function createRegistry(body) {
   var name = body.name
   var publickey = body.publickey
-  var did = await createDID(publickey)
+  var did = keyToDID('key', JSON.stringify(publickey))
 
   return did
 }
 
-async function createDID(key){
-  var nkey = generateEd25519Key();
-  var did = keyToDID('key', JSON.stringify(key));
-  return did
+async function addEvent (body) {
+  var relID = `${body.regID}` + `${body.to}` + `${body.from}`
+  if (Heads.has(relID)) {
+    var CID = Heads.get(relID);
+    console.log("already present CID", CID)
+    const object = { event: body, link: CID };
+    const newCID = await dag.add(object);
+    Heads.set(relID, newCID);
+    console.log('newCID:', newCID)
+    var top = await dag.get(newCID)
+    console.log("top", top)
+    console.log("first", await dag.get(top.link))
+    return newCID
+
+  } else {
+    const object = { event: body };
+    const CID = await dag.add(object);
+    Heads.set(relID, CID)
+    console.log("set CID", CID)
+    console.log('CID:',  CID)
+    console.log("first", await dag.get(CID))
+    return CID
+  }
 }
-
-/*
-server.post("/registry", (req, res) => {
-  registryDID = createRegistry(req.body)
-  res.status(200).json({})
-})
-
-
-async addEvent (body) {
-  var relID = (body.regID).(body.to).(body.from)
-  var cid = findORcreateMerkle(event)
-  if cid not found
-    create node without link
-    put newcid in Heads table with key ad relID
-  else
-    create node with link as cid
-    put newcid in Heads table with key as relID
-  end
-}
-
-async findORcreateMerkle(event){
-  var head = Head[relID]
-}
-
-async createDID(key){
-  did = generateDIDkey
-  return did;
-}
-*/
