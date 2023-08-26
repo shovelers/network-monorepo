@@ -32,34 +32,7 @@ const helia = await createHelia()
 const dag = await dagCbor(helia)
 
 server.get("/", async (req, res) => {
-  const helia = await createHelia()
-  const d = await dagCbor(helia)
-
-  const object1 = { to: 'did:1', from: 'did:2', state:'absent' }
-  const myImmutableAddress1 = await d.add(object1)
-
-  const object2 = { to:'did:1', from:'did:2', state:'requested', link: myImmutableAddress1 }
-  const myImmutableAddress2 = await d.add(object2)
-
-  const object3 = { to:'did:1', from:'did:2', state:'present', link: myImmutableAddress2 }
-  const myImmutableAddress3 = await d.add(object3)
-
-  const retrievedObject3 = await d.get(myImmutableAddress3)
-  console.log('Object3:',  retrievedObject3)
-
-  const retrievedObject2 = await d.get(myImmutableAddress2)
-  console.log(`Object2: ${retrievedObject2}`)
-
-  const retrievedObject1 = await d.get(myImmutableAddress1)
-  console.log(`Object1: ${retrievedObject1}`)
-  // { link: CID(baguqeerasor...) }
-
-  console.log(await d.get(retrievedObject3.link))
-  console.log(await d.get(retrievedObject2.link))
-  // { hello: 'world' }
-  res.render('pages/index', {
-    data: retrievedObject3,
-  })
+  res.render('pages/index', {})
 });
 
 server.listen(port, (err) => {
@@ -109,22 +82,21 @@ async function addEvent (body) {
   var relID = `${body.regID}` + `${body.to}` + `${body.from}`
   if (Heads.has(relID)) {
     var CID = Heads.get(relID);
-    console.log("already present CID", CID)
+    console.log("Already_Present_CID:", CID)
     const object = { event: body, link: CID };
     const newCID = await dag.add(object);
     Heads.set(relID, newCID);
     console.log('newCID:', newCID)
-    var top = await dag.get(newCID)
-    console.log("top", top)
-    console.log("first", await dag.get(top.link))
+    var head = await dag.get(newCID)
+    console.log("head:", head)
+    console.log("prev:", await dag.get(head.link))
     return newCID
 
   } else {
     const object = { event: body };
     const CID = await dag.add(object);
     Heads.set(relID, CID)
-    console.log("set CID", CID)
-    console.log('CID:',  CID)
+    console.log("set_CID", CID)
     console.log("first", await dag.get(CID))
     return CID
   }
