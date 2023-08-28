@@ -17,6 +17,7 @@
     "@spruceid/didkit-wasm-node": "^0.2.1",
     "express": "^4.18.2",
     "helia": "^1.0.0",
-    "libp2p": "^0.46.7"
+    "libp2p": "^0.46.7",
+    "multiaddr": "^10.0.1"
   }
 }
