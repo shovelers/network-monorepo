@@ -10,9 +10,13 @@
   "author": "Prashant",
   "license": "ISC",
   "dependencies": {
+    "@chainsafe/libp2p-noise": "^13.0.0",
+    "@chainsafe/libp2p-yamux": "^5.0.0",
     "@helia/dag-cbor": "^0.0.0",
+    "@libp2p/tcp": "^8.0.5",
     "@spruceid/didkit-wasm-node": "^0.2.1",
     "express": "^4.18.2",
-    "helia": "^1.0.0"
+    "helia": "^1.0.0",
+    "libp2p": "^0.46.7"
   }
 }
