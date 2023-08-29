@@ -155,3 +155,5 @@ async function createNode () {
     libp2p
   })
 }
+
+export { server } ;
