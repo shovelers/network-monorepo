@@ -25,5 +25,8 @@
   "homepage": "https://github.com/shovelers/protocol#readme",
   "devDependencies": {
     "lerna": "^6.6.2"
+  },
+  "overrides": {
+    "ipfs-bitswap": "19.0.0"
   }
 }

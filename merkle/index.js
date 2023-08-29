@@ -3,9 +3,11 @@ import { dagCbor } from '@helia/dag-cbor';
 import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { tcp } from '@libp2p/tcp'
+import { CID } from 'multiformats/cid'
 import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
 import { createLibp2p } from 'libp2p'
+import { pingService } from 'libp2p/ping'
 import { identifyService } from 'libp2p/identify'
 import express from 'express';
 import cors from 'cors';
@@ -43,6 +45,17 @@ console.log("node address:", multiaddrs);
 
 server.get("/", async (req, res) => {
   res.render('pages/index', {})
+});
+
+server.get("/cid/:id", async (req, res) => {
+  var cid = CID.parse(req.params["id"])
+  console.log(cid);
+  var content = await dag.get(cid, {
+    onProgress: (evt) => {
+      console.info(evt.type, evt.detail)
+    }
+  })
+  res.status(200).json(content)
 });
 
 server.listen(port, (err) => {
@@ -123,21 +136,16 @@ async function createNode () {
   const libp2p = await createLibp2p({
     datastore,
     addresses: {
-      listen: [
-        '/ip4/127.0.0.1/tcp/0'
-      ]
+      listen: ['/ip4/0.0.0.0/tcp/0']
     },
-    transports: [
-      tcp()
-    ],
-    connectionEncryption: [
-      noise()
-    ],
-    streamMuxers: [
-      yamux()
-    ],
+    transports: [tcp()],
+    connectionEncryption: [noise()],
+    streamMuxers: [yamux()],
     services: {
-      identify: identifyService()
+      identify: identifyService(),
+      ping: pingService({
+        protocolPrefix: 'ipfs'
+      })
     }
   })
 
