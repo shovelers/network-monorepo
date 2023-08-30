@@ -123,6 +123,7 @@ async function createRegistry(body) {
 
 async function addEvent (body) {
   var relID = `${body.regID}` + `${body.to}` + `${body.from}`
+  var result
   if (Heads.has(relID)) {
     var CID = Heads.get(relID);
     console.log("Already_Present_CID:", CID)
@@ -133,7 +134,7 @@ async function addEvent (body) {
     var head = await dag.get(newCID)
     console.log("head:", head)
     console.log("prev:", await dag.get(head.link))
-    return newCID
+    var result = newCID
 
   } else {
     const object = { event: body };
@@ -141,8 +142,9 @@ async function addEvent (body) {
     Heads.set(relID, CID)
     console.log("set_CID", CID)
     console.log("first", await dag.get(CID))
-    return CID
+    var result = CID
   }
+  return result
 }
 
 async function createNode () {
