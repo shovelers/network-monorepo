@@ -40,9 +40,10 @@ const Heads = new Map();
 
 //Node Setup
 const node = await createNode()
+
 const topic = "events"
 node.libp2p.services.pubsub.addEventListener("message", (evt) => {
-  console.log(`node1 received: ${evt} on topic ${evt.detail.topic}`)
+  console.log(`evt read from topic: ${evt.detail.topic} :`, new TextDecoder().decode(evt.detail.data))
 })
 await node.libp2p.services.pubsub.subscribe(topic)
 
