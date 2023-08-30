@@ -7,9 +7,14 @@ export function broadcast(node, topic, relID, data) {
   })
 }
 
-export function eventProcessor(dag, data) {
+export function eventProcessor(dag, data, heads) {
   var cid = CID.parse(JSON.parse(data)["cid"]["/"]);
+  var relID = JSON.parse(data)["relID"];
+  console.log(relID)
   console.log(cid)
+  console.log(heads)
+  var localCID = heads.get(relID);
+  console.log(localCID)
   //compare this cid to head cid
 }
 

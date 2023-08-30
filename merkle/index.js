@@ -34,7 +34,7 @@ server.use(express.static(path.join(__dirname, 'public')));
 
 const Registries = {}
 /*
- head = {regID1to1from2: cid1
+ heads = {regID1to1from2: cid1
          regID1to2from1: cid2}
 */
 const Heads = new Map();
@@ -47,7 +47,7 @@ const topic = "events"
 //event processor
 node.libp2p.services.pubsub.addEventListener("message", (evt) => {
   console.log(`evt read from topic: ${evt.detail.topic} :`, new TextDecoder().decode(evt.detail.data))
-  eventProcessor(dag, new TextDecoder().decode(evt.detail.data));
+  eventProcessor(dag, new TextDecoder().decode(evt.detail.data), Heads);
 })
 await node.libp2p.services.pubsub.subscribe(topic)
 
