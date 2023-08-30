@@ -135,7 +135,7 @@ async function addEvent (body) {
     console.log("first", await dag.get(CID))
     var result = CID
   }
-  broadcast(node, topic, result);
+  broadcast(node, topic, relID, result);
   return result;
 }
 

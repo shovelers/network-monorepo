@@ -1,4 +1,4 @@
-import { sum } from '../sum.js';
+import { eventProcessor } from '../braodcast.js';
 
 test('adds 1 + 2 to equal 3', () => {
   expect(sum(1, 2)).toBe(3);
