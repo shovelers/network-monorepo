@@ -1,5 +1,6 @@
 import { createHelia } from 'helia';
 import { dagCbor } from '@helia/dag-cbor';
+import { gossipsub } from '@chainsafe/libp2p-gossipsub'
 import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { tcp } from '@libp2p/tcp'
@@ -43,6 +44,13 @@ const node = await createNode()
 const multiaddrs = node.libp2p.getMultiaddrs()
 console.log("node address:", multiaddrs);
 await node.libp2p.dial(multiaddr(process.argv[2]));
+const topic = "events"
+node.libp2p.services.pubsub.addEventListener("message", (evt) => {
+  console.log(`evt read from topic: ${evt.detail.topic} :`, new TextDecoder().decode(evt.detail.data))
+})
+await node.libp2p.services.pubsub.subscribe(topic)
+
+
 const dag = await dagCbor(node)
 //console.log(dag.components.blockstore.bitswap);
 const latency = await node.libp2p.services.ping.ping(multiaddr(process.argv[2]))
@@ -148,9 +156,8 @@ async function createNode () {
     streamMuxers: [yamux()],
     services: {
       identify: identifyService(),
-      ping: pingService({
-        protocolPrefix: 'ipfs'
-      })
+      ping: pingService({ protocolPrefix: 'ipfs' }),
+      pubsub: gossipsub({ allowPublishToZeroPeers: true })
     },
   })
 

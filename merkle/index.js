@@ -1,5 +1,6 @@
 import { createHelia } from 'helia';
 import { dagCbor } from '@helia/dag-cbor';
+import { gossipsub } from '@chainsafe/libp2p-gossipsub'
 import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { tcp } from '@libp2p/tcp'
@@ -39,9 +40,22 @@ const Heads = new Map();
 
 //Node Setup
 const node = await createNode()
+const topic = "events"
+node.libp2p.services.pubsub.addEventListener("message", (evt) => {
+  console.log(`node1 received: ${evt} on topic ${evt.detail.topic}`)
+})
+await node.libp2p.services.pubsub.subscribe(topic)
+
+setInterval(() => {
+  node.libp2p.services.pubsub.publish(topic, new TextEncoder().encode('banana')).catch(err => {
+    console.error(err)
+  })
+}, 1000)
+
 const dag = await dagCbor(node)
 const multiaddrs = node.libp2p.getMultiaddrs()
 console.log("node address:", multiaddrs);
+
 
 server.get("/", async (req, res) => {
   res.render('pages/index', {})
@@ -143,9 +157,8 @@ async function createNode () {
     streamMuxers: [yamux()],
     services: {
       identify: identifyService(),
-      ping: pingService({
-        protocolPrefix: 'ipfs'
-      })
+      ping: pingService({ protocolPrefix: 'ipfs' }),
+      pubsub: gossipsub({ allowPublishToZeroPeers: true })
     }
   })
 
@@ -155,5 +168,3 @@ async function createNode () {
     libp2p
   })
 }
-
-export { server } ;
