@@ -16,6 +16,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { keyToDID } from '@spruceid/didkit-wasm-node';
+import { broadcast, eventProcessor } from './broadcast.js'
 
 const port = 4001;
 
@@ -44,21 +45,17 @@ const node = await createNode()
 const multiaddrs = node.libp2p.getMultiaddrs()
 console.log("node address:", multiaddrs);
 await node.libp2p.dial(multiaddr(process.argv[2]));
+const dag = await dagCbor(node)
 
 const topic = "events"
+
+//event processor
 node.libp2p.services.pubsub.addEventListener("message", (evt) => {
   console.log(`evt read from topic: ${evt.detail.topic} :`, new TextDecoder().decode(evt.detail.data))
+  eventProcessor(dag, new TextDecoder().decode(evt.detail.data));
 })
 await node.libp2p.services.pubsub.subscribe(topic)
 
-setInterval(() => {
-  node.libp2p.services.pubsub.publish(topic, new TextEncoder().encode('anana')).catch(err => {
-    console.error(err)
-  })
-}, 1000)
-
-
-const dag = await dagCbor(node)
 //console.log(dag.components.blockstore.bitswap);
 const latency = await node.libp2p.services.ping.ping(multiaddr(process.argv[2]))
 console.log("latency:", latency)
@@ -144,6 +141,7 @@ async function addEvent (body) {
     console.log("first", await dag.get(CID))
     var result = CID
   }
+  broadcast(node, topic, result);
   return result
 }
 
