@@ -15,7 +15,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { keyToDID } from '@spruceid/didkit-wasm-node';
-import { broadcast } from './broadcast.js'
+import { broadcast, eventProcessor } from './broadcast.js'
 
 const port = 4000;
 
@@ -41,15 +41,16 @@ const Heads = new Map();
 
 //Node Setup
 const node = await createNode()
+const dag = await dagCbor(node)
 const topic = "events"
 
 //event processor
 node.libp2p.services.pubsub.addEventListener("message", (evt) => {
   console.log(`evt read from topic: ${evt.detail.topic} :`, new TextDecoder().decode(evt.detail.data))
+  eventProcessor(dag, new TextDecoder().decode(evt.detail.data));
 })
 await node.libp2p.services.pubsub.subscribe(topic)
 
-const dag = await dagCbor(node)
 const multiaddrs = node.libp2p.getMultiaddrs()
 console.log("node address:", multiaddrs);
 
