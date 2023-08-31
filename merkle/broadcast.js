@@ -7,7 +7,7 @@ export function broadcast(node, topic, relID, data) {
   })
 }
 
-export function eventProcessor(dag, data, heads) {
+export async function eventProcessor(dag, data, heads) {
   var cid = CID.parse(JSON.parse(data)["cid"]["/"]);
   var relID = JSON.parse(data)["relID"];
   var headCID = heads.get(relID);
@@ -16,12 +16,40 @@ export function eventProcessor(dag, data, heads) {
     heads.set(relID, cid)
   } else if ( headCID == cid) {
     return
-  }else {
-    compareDAGs(dag, cid, headCID)
+  } else {
+    var result = await compareDAGs(dag, cid, headCID)
+    heads.set(relID, result)
+    console.log("head set as:", result)
   }
 }
 
-function compareDAGs(dag, cid, headCID) {
+async function compareDAGs(dag, cid, headCID) {
+  //walk both dags
   //compare this cid to head cid
-  console.log("hey")
+  var completeEventDAG = await cborWalker(dag, cid)
+  console.log("EventDAG:", completeEventDAG)
+  console.log("event cid:", cid)
+  var completeLocalDAG = await cborWalker(dag, headCID)
+  console.log("localDAG:", completeLocalDAG)
+  console.log("headCID:", headCID)
+  //check if local < event, keep event as head
+  if (completeEventDAG.includes(headCID)) {
+    return cid
+  //check if event < local, keep local as head
+  }
+  else if (completeLocalDAG.includes(cid)) {
+    return headCID
+  }
+}
+
+async function cborWalker(dag, cid) {
+  const cids = []
+  let id = cid
+  while (id) {
+    cids.push(id)
+    var data = await dag.get(id);
+    var link = data.link
+    id = link
+  }
+  return cids
 }
