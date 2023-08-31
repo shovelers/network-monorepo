@@ -14,9 +14,14 @@ export function eventProcessor(dag, data, heads) {
   console.log("localCID:", headCID)
   if (typeof headCID === 'undefined'){
     heads.set(relID, cid)
-  } else {
+  } else if ( headCID == cid) {
     return
+  }else {
+    compareDAGs(dag, cid, headCID)
   }
-  //compare this cid to head cid
 }
 
+function compareDAGs(dag, cid, headCID) {
+  //compare this cid to head cid
+  console.log("hey")
+}
