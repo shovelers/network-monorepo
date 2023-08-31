@@ -14,7 +14,17 @@ test('add cid from incoming event to heads if head is empty', () => {
 });
 
 //when same cid is present as head, do nothing
+test('do nothing if cid from incoming event is same as head', () => {
+  var dag = {}
+  var data = JSON.stringify({"relID":"did:key:z6MkfaeF275KQ5iDEM9GHAueLPYuvZcLeSfQfKMc6rd6yWP2did:1did:2","cid":{"/":"bafyreia54byuavvnvas5yo4omlqq5efivsvfz7aix34wegjcavb2evtf6a"}})
+  var heads = new Map()
+  heads.set("did:key:z6MkfaeF275KQ5iDEM9GHAueLPYuvZcLeSfQfKMc6rd6yWP2did:1did:2", CID.parse("bafyreia54byuavvnvas5yo4omlqq5efivsvfz7aix34wegjcavb2evtf6a"))
 
+  eventProcessor(dag, data, heads);
+
+  expect(heads.get("did:key:z6MkfaeF275KQ5iDEM9GHAueLPYuvZcLeSfQfKMc6rd6yWP2did:1did:2")).
+    toEqual(CID.parse("bafyreia54byuavvnvas5yo4omlqq5efivsvfz7aix34wegjcavb2evtf6a"));
+});
 
 //when different cids are present
 ////case 1: local dag is ahead
