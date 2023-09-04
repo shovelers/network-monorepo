@@ -33,11 +33,11 @@ async function compareDAGs(dag, cid, headCID) {
   console.log("localDAG:", completeLocalDAG)
   console.log("headCID:", headCID)
   //check if local < event, keep event as head
-  if (completeEventDAG.includes(headCID)) {
+  if (completeEventDAG.includes(headCID.toString())) {
     return cid
   //check if event < local, keep local as head
   }
-  else if (completeLocalDAG.includes(cid)) {
+  else if (completeLocalDAG.includes(cid.toString())) {
     return headCID
   }
 }
@@ -46,7 +46,7 @@ async function cborWalker(dag, cid) {
   const cids = []
   let id = cid
   while (id) {
-    cids.push(id)
+    cids.push(id.toString())
     var data = await dag.get(id);
     var link = data.link
     id = link
