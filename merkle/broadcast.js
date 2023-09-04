@@ -33,7 +33,6 @@ async function compareDAGs(dag, cid, headCID) {
   var completeLocalDAG = await cborWalker(dag, headCID)
   console.log("localDAG:", completeLocalDAG)
   console.log("headCID:", headCID)
-  console.log("headState:", await dag.get(headCID))
   //check if local < event, keep event as head
   if (completeEventDAG.includes(headCID.toString())) {
     return cid
@@ -43,10 +42,26 @@ async function compareDAGs(dag, cid, headCID) {
     return headCID
   }
   else {
-   // var localState = dag.get(headCID)
   //create new state by merging cid & headCID
-  //attach as a new node in local dag with link containing both cid & headCID
+    var headData = await dag.get(headCID)
+    var localState = headData.event.state
+    var eventData = await dag.get(cid)
+    var eventState = eventData.event.state
+    var finalState = mergeState(localState, eventState)
+    //attach as a new node in local dag with link containing both cid & headCID
+    const object = {
+      event: {
+        regID: eventData.event.regID,
+        to: eventData.event.to,
+        from: eventData.event.from,
+        state: finalState,
+        sig: eventData.event.sig  //should be new signature as the data has changed
+      },
+      link: [headCID, cid]
+    };
+    var newCID = await dag.add(object)
     //publish this event
+    //broadcast
     return headCID
   }
 }
@@ -67,4 +82,8 @@ async function cborWalker(dag, cid, seen) {
     }
   }
   return seen
+}
+
+function mergeState(state1, state2) {
+  return state1
 }
