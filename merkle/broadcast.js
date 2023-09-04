@@ -59,8 +59,8 @@ async function compareDAGs(dag, cid, headCID) {
       },
       link: [headCID, cid]
     };
-    var newCID = await dag.add(object)
     //publish this event
+    var newCID = await dag.add(object)
     //broadcast
     return headCID
   }
@@ -85,5 +85,24 @@ async function cborWalker(dag, cid, seen) {
 }
 
 function mergeState(state1, state2) {
-  return state1
+  //absent > present > requested > absent
+  if (state1 == "absent") {
+    if (state2 == "requested") {
+      return "requested";
+    } else {
+      return "absent"
+    }
+  } else if (state1 == "present") {
+    if (state2 == "absent") {
+      return "absent";
+    } else {
+      return "present"
+    }
+  } else if (state1 == "requested") {
+    if (state2 == "present") {
+      return "present";
+    } else {
+      return "requested"
+    }
+  }
 }
