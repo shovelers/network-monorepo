@@ -124,7 +124,7 @@ async function addEvent (body) {
   if (Heads.has(relID)) {
     var CID = Heads.get(relID);
     console.log("Already_Present_CID:", CID)
-    const object = { event: body, link: CID };
+    const object = { event: body, link: [CID] };
     const newCID = await dag.add(object);
     Heads.set(relID, newCID);
     console.log('newCID:', newCID)

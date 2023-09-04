@@ -9,6 +9,7 @@ export function broadcast(node, topic, relID, data) {
 
 export async function eventProcessor(dag, data, heads) {
   var cid = CID.parse(JSON.parse(data)["cid"]["/"]);
+  console.log("Input CID:", cid)
   var relID = JSON.parse(data)["relID"];
   var headCID = heads.get(relID);
   console.log("localCID:", headCID)
@@ -32,6 +33,7 @@ async function compareDAGs(dag, cid, headCID) {
   var completeLocalDAG = await cborWalker(dag, headCID)
   console.log("localDAG:", completeLocalDAG)
   console.log("headCID:", headCID)
+  let intersection = completeEventDAG.filter(x => completeLocalDAG.includes(x));
   //check if local < event, keep event as head
   if (completeEventDAG.includes(headCID.toString())) {
     return cid
@@ -40,16 +42,25 @@ async function compareDAGs(dag, cid, headCID) {
   else if (completeLocalDAG.includes(cid.toString())) {
     return headCID
   }
+  //check for divergence
+  //else if (intersection){
+  //create new state by merging cid & headCID
+  //attach as a new node in local dag with link containing both cid & headCID
+  //publish this event
+  //}
 }
 
-async function cborWalker(dag, cid) {
-  const cids = []
-  let id = cid
-  while (id) {
-    cids.push(id.toString())
-    var data = await dag.get(id);
-    var link = data.link
-    id = link
+//redimentary walker, doesn't do proper DFS, use https://github.com/multiformats/js-multiformats#traversal
+async function cborWalker(dag, cid, seen) {
+  var seen = seen || []
+  if (seen.includes(cid.toString())) {
+    return
   }
-  return cids
+  if (cid) {
+    seen.push(cid.toString())
+    var data = await dag.get(cid);
+    var links = data.link
+    if (links !== undefined ) { links.forEach(async (link) => await cborWalker(dag, link, seen)) }
+  }
+  return seen
 }
