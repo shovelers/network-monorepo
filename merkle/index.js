@@ -16,7 +16,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { keyToDID } from '@spruceid/didkit-wasm-node';
-import { broadcast, eventProcessor } from './broadcast.js'
+import { broadcast, eventProcessor } from './event.js'
 
 const port = process.argv[2];
 const peer = process.argv[3];
