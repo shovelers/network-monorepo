@@ -78,6 +78,20 @@ server.get("/cid/:id", async (req, res) => {
   res.status(200).json(content)
 });
 
+server.get("/relationship", async (req, res) => {
+  var relID = `${req.query.regID}` + `${req.query.to}` + `${req.query.from}`
+  var headCID = Heads.get(relID)
+  console.log("found the relationshipID:", headCID);
+  if (headCID) {
+    var content = await dag.get(headCID)
+
+    res.status(200).json(content)
+  }else {
+    //to-do: manage case when head is missing, as relationship could exist but this node hasn't got any events yet
+    res.status(400).json("not_found")
+  }
+});
+
 server.listen(port, (err) => {
   if (err) throw err;
   console.log(
