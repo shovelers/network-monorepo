@@ -10,6 +10,7 @@ import { MemoryDatastore } from 'datastore-core'
 import { createLibp2p } from 'libp2p'
 import { pingService } from 'libp2p/ping'
 import { identifyService } from 'libp2p/identify'
+import { multiaddr } from 'multiaddr'
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -17,8 +18,8 @@ import { fileURLToPath } from 'url';
 import { keyToDID } from '@spruceid/didkit-wasm-node';
 import { broadcast, eventProcessor } from './broadcast.js'
 
-const port = 4000;
-
+const port = process.argv[2];
+const peer = process.argv[3];
 const server = express();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,18 +42,25 @@ const Heads = new Map();
 
 //Node Setup
 const node = await createNode()
-const dag = await dagCbor(node)
-const topic = "events"
+const multiaddrs = node.libp2p.getMultiaddrs()
+console.log("node address:", multiaddrs);
 
+if (peer) {
+  await node.libp2p.dial(multiaddr(peer));
+
+  const latency = await node.libp2p.services.ping.ping(multiaddr(peer))
+  console.log("latency:", latency)
+};
+const dag = await dagCbor(node)
+
+//pubsub setup
+const topic = "events"
 //event processor
 node.libp2p.services.pubsub.addEventListener("message", async (evt) => {
   console.log(`evt read from topic: ${evt.detail.topic} :`, new TextDecoder().decode(evt.detail.data))
   await eventProcessor(dag, new TextDecoder().decode(evt.detail.data), Heads);
 })
 await node.libp2p.services.pubsub.subscribe(topic)
-
-const multiaddrs = node.libp2p.getMultiaddrs()
-console.log("node address:", multiaddrs);
 
 
 server.get("/", async (req, res) => {
@@ -127,6 +135,7 @@ async function addEvent (body) {
     console.log("head:", head)
     console.log("prev:", await dag.get(head.link[0]))
     var result = newCID
+
   } else {
     const object = { event: body };
     const CID = await dag.add(object);
