@@ -17,6 +17,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { keyToDID } from '@spruceid/didkit-wasm-node';
 import { broadcast, eventProcessor } from './event.js'
+import { getRegistry } from './indexer.js'
 
 const port = process.argv[2];
 const peer = process.argv[3];
@@ -90,6 +91,13 @@ server.get("/relationship", async (req, res) => {
     //to-do: manage case when head is missing, as relationship could exist but this node hasn't got any events yet
     res.status(400).json("not_found")
   }
+});
+
+server.get("/registry", async (req, res) => {
+  var regID = `${req.query.regID}`
+  var registry = await getRegistry(regID, Heads, dag)
+  console.log("found registry:", registry);
+  res.status(200).json(registry)
 });
 
 server.listen(port, (err) => {
