@@ -19,9 +19,7 @@ server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
 
 var app_did = "did:dcn:simple_follow"
-var graph_did = "did:graph:simple_follow"
-c.registerApp(app_did,"qwerdsfasdfasfasdfsafasfdfghjkjhgfdsasdfghjmknbvcxcvbnbvcuy")
-c.registerGraph(graph_did,"uiolpasdfghjkjhgfdsasdfghjmknbvcxcvbnbvcxzfghudsdfyuy", app_did)
+var graph_did = c.registerGraph("simple_follow", {"kty":"OKP","crv":"Ed25519","x":"EL_Z0oW6OLhN4Pe4LAzzGmOWkGZpxmhoqD0IAvQ4wGA"})
 
 var rolodex_did = "did:dcn:rolodex"
 var rolodex_graph_did = "did:graph:rolodex"

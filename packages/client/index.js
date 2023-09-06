@@ -4,6 +4,9 @@ const axios = require('axios');
 class Protocol {
   constructor(config) {
     this.axios_client  = axios.create({
+      baseURL: "http://localhost:4001/"
+    })
+    this.axios_client_old  = axios.create({
       baseURL: "http://localhost:4000/"
     })
   }
@@ -37,19 +40,19 @@ class Protocol {
   }
 
   async registerUser(did, doc, profile) {
-    await this.axios_client.post('/user', {did: did, doc: doc, profile: profile})
+    await this.axios_client_old.post('/user', {did: did, doc: doc, profile: profile})
   }
 
   async registerApp(did, doc) {
-    await this.axios_client.post('/app', {did: did, doc: doc})
+    await this.axios_client_old.post('/app', {did: did, doc: doc})
   }
 
-  async registerGraph(did, doc, app_did) {
-    await this.axios_client.post('/graph', {did: did, doc: doc, app_did: app_did})
+  async registerGraph(name, publickey) {
+    await this.axios_client.post('/registry', {name: name, publickey: publickey})
   }
 
-  async readGraph(graph_did) {
-    const response = await this.axios_client.get('/graph/' + graph_did)
+  async readGraph(regID) {
+    const response = await this.axios_client.get('/registry/' + regID)
       .then(function (response) {
         return response;
       })
@@ -62,8 +65,11 @@ class Protocol {
   }
 
   async insertGraph(graph_did, from, to, timestamp) {
-    await this.axios_client.post('/graph/' + graph_did , {from: from, to: to, timestamp: timestamp})
+    await this.axios_client.post('/event/',
+      {regID: regID, to: to, from: from, state: state, sig: sig}
+    )
   }
+
 }
 
 module.exports = Protocol
