@@ -20,6 +20,7 @@ server.use(express.static(path.join(__dirname, 'public')));
 
 var app_did = "did:dcn:simple_follow"
 var graph_did = c.registerGraph("simple_follow", {"kty":"OKP","crv":"Ed25519","x":"EL_Z0oW6OLhN4Pe4LAzzGmOWkGZpxmhoqD0IAvQ4wGA"})
+                 .then(function(data) { graph_did = data.did });
 
 var rolodex_did = "did:dcn:rolodex"
 var rolodex_graph_did = graph_did
@@ -106,6 +107,7 @@ server.get("/profiles/:handle", async (req, res) => {
   var handle = params["handle"];
   var did = handleDIDMap.get(handle);
   var key = handleKeyMap.get(handle);
+  console.log("graph_did: ", graph_did);
   var graphData = await c.readGraph(graph_did);
   var rolodexData = await c.readGraph(rolodex_graph_did);
   //var followers = await followerListFor(did, graphData);
@@ -139,7 +141,7 @@ server.post("/follow", async (req, res) => {
     console.log("Create an account first");
     res.status(404).send("Create an account first");
   } else {
-    c.insertGraph(graph_did, followerDID, followingDID, new Date())
+    c.insertGraph(graph_did, followerDID, followingDID, "present", "qwerty")
     console.log(`User ${followerHandle} followed ${followingHandle}`);
     res.redirect(`profiles/${followingHandle}?session=${followerHandle}`);
   };

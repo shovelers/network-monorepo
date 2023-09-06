@@ -48,11 +48,16 @@ class Protocol {
   }
 
   async registerGraph(name, publickey) {
-    await this.axios_client.post('/registry', {name: name, publickey: publickey})
+    const response = await this.axios_client.post('/registry', {name: name, publickey: publickey})
+      .then(function (response) {
+        return response;
+      });
+
+    return response.data;
   }
 
   async readGraph(regID) {
-    const response = await this.axios_client.get('/registry/' + regID)
+    const response = await this.axios_client.get('/registry/?regID=' + regID)
       .then(function (response) {
         return response;
       })
@@ -64,7 +69,7 @@ class Protocol {
     return response.data;
   }
 
-  async insertGraph(graph_did, from, to, timestamp) {
+  async insertGraph(regID, from, to, state, sig) {
     await this.axios_client.post('/event/',
       {regID: regID, to: to, from: from, state: state, sig: sig}
     )
