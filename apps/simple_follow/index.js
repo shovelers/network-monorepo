@@ -22,7 +22,7 @@ var app_did = "did:dcn:simple_follow"
 var graph_did = c.registerGraph("simple_follow", {"kty":"OKP","crv":"Ed25519","x":"EL_Z0oW6OLhN4Pe4LAzzGmOWkGZpxmhoqD0IAvQ4wGA"})
 
 var rolodex_did = "did:dcn:rolodex"
-var rolodex_graph_did = "did:graph:rolodex"
+var rolodex_graph_did = graph_did
 
 const Alerts = {
   missingAccount: "Account Not Registered! Create an account first",
@@ -108,23 +108,23 @@ server.get("/profiles/:handle", async (req, res) => {
   var key = handleKeyMap.get(handle);
   var graphData = await c.readGraph(graph_did);
   var rolodexData = await c.readGraph(rolodex_graph_did);
-  var followers = await followerListFor(did, graphData);
-  var followings = await followingListFor(did, graphData);
+  //var followers = await followerListFor(did, graphData);
+  //var followings = await followingListFor(did, graphData);
 
-  var rolodexFollowers = await followerDIDsFor(did, rolodexData);
-  var current_user_did = handleDIDMap.get(req.query["session"])
-  var isRolodexFollower = rolodexFollowers.includes(current_user_did)
+  //var rolodexFollowers = await followerDIDsFor(did, rolodexData);
+  //var current_user_did = handleDIDMap.get(req.query["session"])
+  //var isRolodexFollower = rolodexFollowers.includes(current_user_did)
 
   res.render('pages/profile_v2',{
     did: did,
     current_user: req.query["session"],
     handle: handle,
     key: key,
-    followers: followers,
-    followings: followings,
-    followersCount: followers.length,
-    followingsCount: followings.length,
-    isRolodexFollower: isRolodexFollower,
+    followers: [], //followers,
+    followings: [], //followings,
+    followersCount: 0, //followers.length,
+    followingsCount: 0, //followings.length,
+    isRolodexFollower: false,
   });
 });
 
