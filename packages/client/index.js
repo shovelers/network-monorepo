@@ -4,9 +4,6 @@ const axios = require('axios');
 class Protocol {
   constructor(config) {
     this.axios_client  = axios.create({
-      baseURL: "http://localhost:4001/"
-    })
-    this.axios_client_old  = axios.create({
       baseURL: "http://localhost:4000/"
     })
   }
@@ -37,14 +34,6 @@ class Protocol {
     } else {
       return false;
     }
-  }
-
-  async registerUser(did, doc, profile) {
-    await this.axios_client_old.post('/user', {did: did, doc: doc, profile: profile})
-  }
-
-  async registerApp(did, doc) {
-    await this.axios_client_old.post('/app', {did: did, doc: doc})
   }
 
   async registerGraph(name, publickey) {

@@ -107,11 +107,10 @@ server.get("/profiles/:handle", async (req, res) => {
   var handle = params["handle"];
   var did = handleDIDMap.get(handle);
   var key = handleKeyMap.get(handle);
-  console.log("graph_did: ", graph_did);
   var graphData = await c.readGraph(graph_did);
   var rolodexData = await c.readGraph(rolodex_graph_did);
-  //var followers = await followerListFor(did, graphData);
-  //var followings = await followingListFor(did, graphData);
+  var followers = await followerListFor(did, graphData);
+  var followings = await followingListFor(did, graphData);
 
   //var rolodexFollowers = await followerDIDsFor(did, rolodexData);
   //var current_user_did = handleDIDMap.get(req.query["session"])
@@ -122,10 +121,10 @@ server.get("/profiles/:handle", async (req, res) => {
     current_user: req.query["session"],
     handle: handle,
     key: key,
-    followers: [], //followers,
-    followings: [], //followings,
-    followersCount: 0, //followers.length,
-    followingsCount: 0, //followings.length,
+    followers: followers,
+    followings: followings,
+    followersCount: followers.length,
+    followingsCount: followings.length,
     isRolodexFollower: false,
   });
 });
@@ -162,7 +161,6 @@ async function handleUniqueness(handle) {
 async function createAccount(handle, did, doc) {
   var profile = {app_did: app_did, handle: handle};
   console.log(did);
-  c.registerUser(did, doc, profile);
 
   handlesTaken.push(handle);
   handleDIDMap.set(handle, did);
