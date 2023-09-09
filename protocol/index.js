@@ -34,7 +34,7 @@ server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
 
-const Registries = {}
+const Registries = new Array();
 /*
  heads = {regID1to1from2: cid1
          regID1to2from1: cid2}
@@ -65,7 +65,10 @@ await node.libp2p.services.pubsub.subscribe(topic)
 
 
 server.get("/", async (req, res) => {
-  res.render('pages/index', {})
+  res.render('pages/index', {
+    registeries: Registries.length,
+    relationships: Heads.size
+  })
 });
 
 server.get("/cid/:id", async (req, res) => {
@@ -132,6 +135,7 @@ sample re.body =
   */
 server.post("/registry", async (req, res) => {
   var registryDID = await createRegistry(req.body)
+  if (!Registries.includes(registryDID)) { Registries.push(registryDID) };
   console.log(`registry created with did ${registryDID}`)
   res.status(200).json({"did": registryDID})
 })
