@@ -12,3 +12,25 @@ export async function getRegistry(regID, Heads, dag) {
   }
   return rels
 }
+
+export function getFollowers(registryData, id) {
+  var followerList = [];
+  registryData.forEach(function (item, index) {
+    if (item['to'] == id) {
+      followerList.push(item['from']);
+    }
+  });
+
+  return {data: followerList, count: followerList.length}
+}
+
+export function getFollowing(registryData, id) {
+  var followingList = [];
+  registryData.forEach(function (item, index) {
+    if (item['from'] == id) {
+      followingList.push(item['to']);
+    }
+  });
+
+  return {data: followingList, count: followingList.length}
+}

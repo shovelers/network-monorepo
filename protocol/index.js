@@ -17,7 +17,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { keyToDID } from '@spruceid/didkit-wasm-node';
 import { broadcast, eventProcessor } from './event.js'
-import { getRegistry } from './indexer.js'
+import { getRegistry, getFollowers, getFollowing} from './indexer.js'
 
 const port = process.argv[2];
 const peer = process.argv[3];
@@ -98,6 +98,22 @@ server.get("/registry", async (req, res) => {
   var registry = await getRegistry(regID, Heads, dag)
   console.log("found registry:", registry);
   res.status(200).json(registry)
+});
+
+server.get("/registry/:regID/followers/:id", async (req, res) => {
+  var regID = req.params["regID"]
+  var id = req.params["id"]
+  var registry = await getRegistry(regID, Heads, dag)
+  var followers = getFollowers(registry, id)
+  res.status(200).json(followers)
+});
+
+server.get("/registry/:regID/following/:id", async (req, res) => {
+  var regID = req.params["regID"]
+  var id = req.params["id"]
+  var registry = await getRegistry(regID, Heads, dag)
+  var following = getFollowing(registry, id)
+  res.status(200).json(following)
 });
 
 server.listen(port, (err) => {
