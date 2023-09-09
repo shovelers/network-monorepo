@@ -109,8 +109,8 @@ server.get("/profiles/:handle", async (req, res) => {
   var key = handleKeyMap.get(handle);
   var graphData = await c.readGraph(graph_did);
   var rolodexData = await c.readGraph(rolodex_graph_did);
-  var followers = await followerListFor(did, graphData);
-  var followings = await followingListFor(did, graphData);
+  var followers = await followerListFor(did, graph_did);
+  var followings = await followingListFor(did, graph_did);
 
   //var rolodexFollowers = await followerDIDsFor(did, rolodexData);
   //var current_user_did = handleDIDMap.get(req.query["session"])
@@ -169,24 +169,22 @@ async function createAccount(handle, did, doc) {
   return {did: did}
 };
 
-async function followerListFor(did, graphData) {
+async function followerListFor(did, graph_did) {
   //hashes where did == to
+  var result = await c.getFollowers(graph_did, did)
   var followerList = [];
-  graphData.forEach(function (item, index) {
-    if (item['to'] == did) {
-      followerList.push(findHandleByDID(item['from']));
-    }
+  result.list.forEach(function (item, index) {
+    followerList.push(findHandleByDID(item))
   });
   return followerList;
 }
 
-async function followingListFor(did, graphData) {
+async function followingListFor(did, graph_did) {
   //hashes where did == from
+  var result = await c.getFollowing(graph_did, did)
   var followingList = [];
-  graphData.forEach(function (item, index) {
-    if (item['from'] == did) {
-      followingList.push(findHandleByDID(item['to']));
-    }
+  result.list.forEach(function (item, index) {
+    followingList.push(findHandleByDID(item));
   });
   return followingList;
 }
@@ -196,7 +194,7 @@ async function followerDIDsFor(did, graphData) {
   var followingList = [];
   graphData.forEach(function (item, index) {
     if (item['to'] == did) {
-      followingList.push(item['from']);
+      followingList.push(item);
     }
   });
   return followingList;

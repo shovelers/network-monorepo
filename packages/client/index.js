@@ -58,6 +58,32 @@ class Protocol {
     return response.data;
   }
 
+  async getFollowers(regID, did) {
+    const response = await this.axios_client.get('/registry/' + regID + '/followers/' + did)
+      .then(function (response) {
+        return response;
+      })
+      .catch(function (error) {
+        console.log(error);
+        return error
+      });
+
+    return response.data;
+  }
+
+  async getFollowing(regID, did) {
+    const response = await this.axios_client.get('/registry/' + regID + '/following/' + did)
+      .then(function (response) {
+        return response;
+      })
+      .catch(function (error) {
+        console.log(error);
+        return error
+      });
+
+    return response.data;
+  }
+
   async insertGraph(regID, from, to, state, sig) {
     await this.axios_client.post('/event/',
       {regID: regID, to: to, from: from, state: state, sig: sig}

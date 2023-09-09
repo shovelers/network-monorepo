@@ -21,7 +21,7 @@ export function getFollowers(registryData, id) {
     }
   });
 
-  return {data: followerList, count: followerList.length}
+  return {list: followerList, count: followerList.length}
 }
 
 export function getFollowing(registryData, id) {
@@ -32,5 +32,5 @@ export function getFollowing(registryData, id) {
     }
   });
 
-  return {data: followingList, count: followingList.length}
+  return {list: followingList, count: followingList.length}
 }
