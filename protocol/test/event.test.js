@@ -1,4 +1,4 @@
-import { eventProcessor } from '../broadcast.js';
+import { eventProcessor } from '../eventt.js';
 import { CID } from 'multiformats/cid'
 import { createHelia } from 'helia';
 import { dagCbor } from '@helia/dag-cbor';
