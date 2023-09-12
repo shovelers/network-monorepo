@@ -2,17 +2,30 @@
 <html lang="en">
   <head>
     <script type = "text/javascript" src="../index.js" defer></script>
+    <script src="https://unpkg.com/@oddjs/odd@latest/dist/index.esm.min.js"></script>
     <link rel="stylesheet" href="./styles/style.css" />
   </head>
 
   <%- include('../partials/google_analytics.ejs') %>
 
   <body class="antialiased bg-orange-100 text-gray-800">
+    <!--
+    <script type="module">
+      import { signup } from '/dist/odd.js';
+      window.signup = signup;
+    </script>
+    -->
+    <script>
+      const odd = self.oddjs;
+      const program = odd.program({namespace: {creator: "shovel", name: "rolodex"}})
+      console.log(program);
+    </script>
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
       <h1 class="text-6xl font-extrabold tracking-tight leading-none underline decoration-red-500 decoration-8">Rolodex</h1>
       <div class="p-4 text-center">
         <div class="text-3xl font-bold tracking-tight leading-none">Build Better Relationships</div>
       </div>
+      <button onclick="signup()" class="px-2 py-1 bg-black text-white rounded-lg">Signup</button>
     <%- include('../partials/shovel.ejs') %>
     </div>
   </body>

@@ -1,6 +1,5 @@
 import express from 'express';
 import Protocol from 'client';
-import * as odd from '@oddjs/odd'
 import path from 'path';
 import { fileURLToPath } from 'url';
 
