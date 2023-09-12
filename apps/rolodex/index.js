@@ -1,11 +1,16 @@
-const express = require("express");
-const Protocol = require('client');
+import express from 'express';
+import Protocol from 'client';
+import * as odd from '@oddjs/odd'
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const port = process.argv[2] || 3000;
+const server = express();
+
 const c = new Protocol();
 
-const path = require("path");
-const port = process.argv[2] || 3000;
-
-const server = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 server.use(express.urlencoded({ extended: true }))
 server.set('views', path.join(__dirname, 'views'));
