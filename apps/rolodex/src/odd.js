@@ -17,6 +17,26 @@ async function signup(odd) {
 
   })
   console.log("program", program)
+
+  let session
+  if (program.session) {
+    session = program.session
+    await session.destroy()
+  }
+  console.log("I am here")
+  const username = document.getElementById('handle').value
+  const valid = program.auth.isUsernameValid(username)
+  const available = await program.auth.isUsernameAvailable(username)
+  console.log("username available", available)
+
+  if (valid && available) {
+    // Register the user
+    const { success } = await program.auth.register({ username: username })
+
+    // Create a session on success
+    session = success ? program.auth.session() : null
+  }
+  console.log("session", await session)
 }
 
 export { signup };

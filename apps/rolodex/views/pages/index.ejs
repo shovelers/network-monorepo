@@ -18,8 +18,12 @@
       <div class="p-4 text-center">
         <div class="text-3xl font-bold tracking-tight leading-none">Build Better Relationships</div>
       </div>
-      <button onclick="signup(globalThis.oddjs)" class="px-2 py-1 bg-black text-white rounded-lg">Signup</button>
-    <%- include('../partials/shovel.ejs') %>
+      <form id="signup-form" onsubmit="event.preventDefault(); signup(globalThis.oddjs); return false" class="space-y-1 text-center">
+        <label for="user_name" class="font-bold">Username</label>
+        <input type="text" id="handle" name="handle" class="border border-gray-300 px-2 py-1 rounded-lg">
+        <button type="submit" class="rounded-lg bg-black px-2 py-2 text-gray-200 font-medium">Sigup</button>
+      </form>
+      <%- include('../partials/shovel.ejs') %>
     </div>
   </body>
 </html>
