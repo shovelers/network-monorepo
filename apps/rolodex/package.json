@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "npx tailwindcss build -i ./public/styles/tailwind.css -o ./public/styles/style.css",
+    "build": "rollup -cm rollup.config.js && npx tailwindcss build -i ./public/styles/tailwind.css -o ./public/styles/style.css",
     "start": "npm run build && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
