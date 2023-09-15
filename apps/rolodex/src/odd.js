@@ -69,7 +69,7 @@ async function updateProfile(odd) {
   const content = new TextDecoder().decode(await fs.read(privateFilePath))
   console.log("existing data :", JSON.parse(content))
   var profileData = JSON.parse(content)
-  profileData = profileData.set("name", name)
+  profileData.name = name
 
   await fs.write(privateFilePath,new TextEncoder().encode(JSON.stringify(profileData)))
   await fs.publish()
