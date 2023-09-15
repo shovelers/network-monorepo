@@ -60,16 +60,14 @@ async function signup(odd) {
   console.log("profile data :", content)
 }
 
-async function updateProfile(odd) {
+async function updateProfile(odd, name) {
   var program = await getProgram(odd);
   var session = await getSession(program);
 
   const fs = session.fs;
   const { RootBranch } = odd.path
-  const privateDirectoryPath = odd.path.directory("private", "profile")
   const privateFilePath = odd.path.file(RootBranch.Private, "profile", "profile.json")
 
-  var name = document.getElementById('name').value;
   const content = new TextDecoder().decode(await fs.read(privateFilePath))
   console.log("existing data :", JSON.parse(content))
   var profileData = JSON.parse(content)
@@ -88,7 +86,6 @@ async function getProfile(odd) {
 
   const fs = session.fs;
   const { RootBranch } = odd.path
-  const privateDirectoryPath = odd.path.directory("private", "profile")
   const privateFilePath = odd.path.file(RootBranch.Private, "profile", "profile.json")
 
   const content = new TextDecoder().decode(await fs.read(privateFilePath))
@@ -106,7 +103,7 @@ async function getContacts(odd) {
   return JSON.parse(content)
 }
 
-async function addContact(odd) {
+async function addContact(odd, newContact) {
   var program = await getProgram(odd);
   var session = await getSession(program);
 
@@ -114,10 +111,9 @@ async function addContact(odd) {
   const { RootBranch } = odd.path
   const contactFilePath = odd.path.file(RootBranch.Private, "contacts", "contacts.json")
 
-  var newContactHandle = document.getElementById('contacthandle').value;
   const content = new TextDecoder().decode(await fs.read(contactFilePath))
   var contactList = JSON.parse(content).contactList
-  contactList.push(newContactHandle)
+  contactList.push(newContact)
   var contactData = JSON.stringify({ contactList: contactList})
 
   await fs.write(contactFilePath, new TextEncoder().encode(contactData))

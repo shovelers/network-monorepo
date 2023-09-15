@@ -21,7 +21,7 @@
         <div class="text-3xl font-bold tracking-tight leading-none">Contact List</div>
         <div id="contactList" class="text-xl font-bold tracking-tight leading-none">Contact List</div>
       </div>
-      <form id="profile-updatae-form" onsubmit="event.preventDefault(); addContact(globalThis.oddjs); return false" class="space-y-1 text-center">
+      <form id="profile-updatae-form" onsubmit="event.preventDefault(); addContact(globalThis.oddjs, document.getElementById('contacthandle').value); return false" class="space-y-1 text-center">
         <label for="user_name" class="font-bold">Name</label>
         <input type="text" id="contacthandle" class="border border-gray-300 px-2 py-1 rounded-lg">
         <button type="submit" class="rounded-lg bg-black px-2 py-2 text-gray-200 font-medium">Add Contact</button>
