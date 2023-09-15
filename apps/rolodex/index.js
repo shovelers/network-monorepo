@@ -20,6 +20,10 @@ server.get("/", (req, res) => {
   res.render('pages/index')
 });
 
+server.get("/profile", (req, res) => {
+  res.render('pages/profile')
+});
+
 server.listen(port, (err) => {
   if (err) throw err;
   console.log(
