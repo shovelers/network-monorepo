@@ -23,8 +23,13 @@
       getContacts(globalThis.oddjs).then((result) => {document.getElementById("contactList").innerHTML = result.contactList})
     </script>
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
-      <div class="w-full p-4 text-center flex flex-row justify-evenly">
-        <div>
+      <div class="w-full h-4/5 p-4 text-center flex flex-row justify-evenly">
+        <div class="w-1/3 py-4 space-y-2">
+          <div class="avatar placeholder">
+            <div class="bg-neutral-focus text-neutral-content rounded-full w-32">
+              <span class="text-3xl">K</span>
+            </div>
+          </div> 
           <div id="handle" class="text-3xl font-bold tracking-tight leading-none">Welcome</div>
           <div id="name" class="text-xl font-bold tracking-tight leading-none"></div>
           <form id="profile-updatae-form" onsubmit="event.preventDefault(); updateProfile(globalThis.oddjs, document.getElementById('formname').value).then(function(){window.location.reload()}); return false" class="space-y-1 text-center">
@@ -36,9 +41,9 @@
             </button>
           </form>
         </div>
-        <div>
+        <div class="divider divider-horizontal"></div>
+        <div class="w-2/3 py-4 space-y-2">
           <div class="text-3xl font-bold tracking-tight leading-none">Contact List</div>
-          <div id="contactList" class="text-xl font-bold tracking-tight leading-none"></div>
           <form id="add-contact-form" onsubmit="event.preventDefault(); addContact(globalThis.oddjs, document.getElementById('contacthandle').value).then(function(){window.location.reload()}); return false" class="space-y-1 text-center">
             <label for="user_name" class="font-bold">Name</label>
             <input type="text" id="contacthandle" class="border border-gray-300 px-2 py-1 rounded-lg">
@@ -47,6 +52,7 @@
               Add Contact
             </button>
           </form>
+          <div id="contactList" class="text-xl font-bold tracking-tight leading-none"></div>
         </div>
       </div>
       <%- include('../partials/shovel.ejs') %>
