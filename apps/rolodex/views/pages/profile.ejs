@@ -10,25 +10,34 @@
 
   <body class="antialiased bg-orange-100 text-gray-800">
     <script type="module">
-      import { getProfile, updateProfile } from '/dist/odd.js';
+      import { getProfile, updateProfile, getContacts, addContact } from '/dist/odd.js';
       window.getProfile = getProfile;
       window.updateProfile = updateProfile;
+      window.getContacts = getContacts;
+      window.addContact = addContact;
 
       getProfile(globalThis.oddjs).then((result) => {
-        console.log("result", result)
         document.getElementById("handle").innerHTML = "Welcome "+ result.handle
         document.getElementById("name").innerHTML = "Name: " + result.name
       })
+      getContacts(globalThis.oddjs).then((result) => {document.getElementById("contactList").innerHTML = result.contactList})
     </script>
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
       <div class="p-4 text-center">
         <div id="handle" class="text-3xl font-bold tracking-tight leading-none">Welcome</div>
-        <div id="name" class="text-xl font-bold tracking-tight leading-none" />
+        <div id="name" class="text-xl font-bold tracking-tight leading-none"></div>
+        <div class="text-3xl font-bold tracking-tight leading-none">Contact List</div>
+        <div id="contactList" class="text-xl font-bold tracking-tight leading-none"></div>
       </div>
       <form id="profile-updatae-form" onsubmit="event.preventDefault(); updateProfile(globalThis.oddjs, document.getElementById('formname').value).then(function(){window.location.reload()}); return false" class="space-y-1 text-center">
         <label for="name" class="font-bold">Name</label>
         <input type="text" id="formname" class="border border-gray-300 px-2 py-1 rounded-lg">
         <button type="submit" class="rounded-lg bg-black px-2 py-2 text-gray-200 font-medium">Save</button>
+      </form>
+      <form id="profile-updatae-form" onsubmit="event.preventDefault(); addContact(globalThis.oddjs, document.getElementById('contacthandle').value).then(function(){window.location.reload()}); return false" class="space-y-1 text-center">
+        <label for="user_name" class="font-bold">Name</label>
+        <input type="text" id="contacthandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+        <button type="submit" class="rounded-lg bg-black px-2 py-2 text-gray-200 font-medium">Add Contact</button>
       </form>
       <%- include('../partials/shovel.ejs') %>
     </div>
