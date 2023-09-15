@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script type = "text/javascript" src="../index.js" defer></script>
+    <link rel="stylesheet" href="./styles/style.css" />
+    <script type="module" src="https://unpkg.com/@oddjs/odd@0.37.2/dist/index.umd.min.js"></script>
+  </head>
+
+  <%- include('../partials/google_analytics.ejs') %>
+
+  <body class="antialiased bg-orange-100 text-gray-800">
+    <script type="module">
+      import { getContacts, addContact } from '/dist/odd.js';
+      window.getContacts = getContacts;
+      window.addContact = addContact;
+
+      getContacts(globalThis.oddjs).then((result) => {document.getElementById("contactList").innerHTML = result.contactList})
+    </script>
+    <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
+      <div class="p-4 text-center">
+        <div class="text-3xl font-bold tracking-tight leading-none">Contact List</div>
+        <div id="contactList" class="text-xl font-bold tracking-tight leading-none">Contact List</div>
+      </div>
+      <form id="profile-updatae-form" onsubmit="event.preventDefault(); addContact(globalThis.oddjs); return false" class="space-y-1 text-center">
+        <label for="user_name" class="font-bold">Name</label>
+        <input type="text" id="contacthandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+        <button type="submit" class="rounded-lg bg-black px-2 py-2 text-gray-200 font-medium">Add Contact</button>
+      </form>
+      <%- include('../partials/shovel.ejs') %>
+    </div>
+  </body>
+</html>

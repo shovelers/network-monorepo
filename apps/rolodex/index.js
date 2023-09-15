@@ -24,6 +24,10 @@ server.get("/profile", (req, res) => {
   res.render('pages/profile')
 });
 
+server.get("/contacts", (req, res) => {
+  res.render('pages/contacts')
+});
+
 server.listen(port, (err) => {
   if (err) throw err;
   console.log(

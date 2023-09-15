@@ -1,6 +1,6 @@
 async function getProgram(odd) {
   const appInfo = { creator: "Shovel", name: "Rolod" }
-  const program = await odd.program({namespace: appInfo})
+  const program = await odd.program({ namespace: appInfo })
     .catch(error => {
       switch (error) {
         case odd.ProgramError.InsecureContext:
@@ -43,16 +43,20 @@ async function signup(odd) {
   //create fs
   const fs = session.fs
   console.log(fs)
-  const profileData = JSON.stringify({"handle": username})
+  const profileData = JSON.stringify({ "handle": username })
+  const contactData = JSON.stringify({ contactList: []})
 
   const { RootBranch } = odd.path
-  const privateDirectoryPath = odd.path.directory("private", "profile")
-  const privateFilePath = odd.path.file(RootBranch.Private, "profile", "profile.json")
+  const profileDirectoryPath = odd.path.directory("private", "profile")
+  const profileFilePath = odd.path.file(RootBranch.Private, "profile", "profile.json")
+  const contactDirectoryPath = odd.path.directory("private", "contacts")
+  const contactFilePath = odd.path.file(RootBranch.Private, "contacts", "contacts.json")
 
-  await fs.write(privateFilePath,new TextEncoder().encode(profileData))
+  await fs.write(profileFilePath, new TextEncoder().encode(profileData))
+  await fs.write(contactFilePath, new TextEncoder().encode(contactData))
   await fs.publish()
 
-  const content = new TextDecoder().decode(await fs.read(privateFilePath))
+  const content = new TextDecoder().decode(await fs.read(profileFilePath))
   console.log("profile data :", content)
 }
 
@@ -64,16 +68,16 @@ async function updateProfile(odd) {
   const { RootBranch } = odd.path
   const privateDirectoryPath = odd.path.directory("private", "profile")
   const privateFilePath = odd.path.file(RootBranch.Private, "profile", "profile.json")
-  
+
   var name = document.getElementById('name').value;
   const content = new TextDecoder().decode(await fs.read(privateFilePath))
   console.log("existing data :", JSON.parse(content))
   var profileData = JSON.parse(content)
   profileData.name = name
 
-  await fs.write(privateFilePath,new TextEncoder().encode(JSON.stringify(profileData)))
+  await fs.write(privateFilePath, new TextEncoder().encode(JSON.stringify(profileData)))
   await fs.publish()
-  
+
   const newContent = new TextDecoder().decode(await fs.read(privateFilePath))
   console.log("profile data :", newContent)
 }
@@ -86,10 +90,40 @@ async function getProfile(odd) {
   const { RootBranch } = odd.path
   const privateDirectoryPath = odd.path.directory("private", "profile")
   const privateFilePath = odd.path.file(RootBranch.Private, "profile", "profile.json")
-  
-  var name = document.getElementById('name').value;
+
   const content = new TextDecoder().decode(await fs.read(privateFilePath))
   return JSON.parse(content)
 }
 
-export { signup, getProfile, updateProfile };
+async function getContacts(odd) {
+  var program = await getProgram(odd);
+  var session = await getSession(program);
+  const fs = session.fs;
+  const { RootBranch } = odd.path
+  const privateFilePath = odd.path.file(RootBranch.Private, "contacts", "contacts.json")
+
+  const content = new TextDecoder().decode(await fs.read(privateFilePath))
+  return JSON.parse(content)
+}
+
+async function addContact(odd) {
+  var program = await getProgram(odd);
+  var session = await getSession(program);
+
+  const fs = session.fs;
+  const { RootBranch } = odd.path
+  const contactFilePath = odd.path.file(RootBranch.Private, "contacts", "contacts.json")
+
+  var newContactHandle = document.getElementById('contacthandle').value;
+  const content = new TextDecoder().decode(await fs.read(contactFilePath))
+  var contactList = JSON.parse(content).contactList
+  contactList.push(newContactHandle)
+  var contactData = JSON.stringify({ contactList: contactList})
+
+  await fs.write(contactFilePath, new TextEncoder().encode(contactData))
+  await fs.publish()
+
+  const newContent = new TextDecoder().decode(await fs.read(contactFilePath))
+  console.log("contacts :", newContent)
+}
+export { signup, getProfile, updateProfile, getContacts, addContact };
