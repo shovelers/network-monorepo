@@ -68,7 +68,6 @@ async function updateProfile(odd, name) {
   const privateFilePath = odd.path.file(RootBranch.Private, "profile", "profile.json")
 
   const content = new TextDecoder().decode(await fs.read(privateFilePath))
-  console.log("existing data :", JSON.parse(content))
   var profileData = JSON.parse(content)
   profileData.name = name
 
@@ -77,6 +76,8 @@ async function updateProfile(odd, name) {
 
   const newContent = new TextDecoder().decode(await fs.read(privateFilePath))
   console.log("profile data :", newContent)
+
+  return newContent;
 }
 
 async function getProfile(odd) {

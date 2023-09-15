@@ -14,15 +14,20 @@
       window.getProfile = getProfile;
       window.updateProfile = updateProfile;
 
-      getProfile(globalThis.oddjs).then((result) => {document.getElementById("handle").innerHTML = "Welcome "+ result.handle})
+      getProfile(globalThis.oddjs).then((result) => {
+        console.log("result", result)
+        document.getElementById("handle").innerHTML = "Welcome "+ result.handle
+        document.getElementById("name").innerHTML = "Name: " + result.name
+      })
     </script>
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
       <div class="p-4 text-center">
         <div id="handle" class="text-3xl font-bold tracking-tight leading-none">Welcome</div>
+        <div id="name" class="text-xl font-bold tracking-tight leading-none" />
       </div>
-      <form id="profile-updatae-form" onsubmit="event.preventDefault(); updateProfile(globalThis.oddjs, document.getElementById('name').value); return false" class="space-y-1 text-center">
+      <form id="profile-updatae-form" onsubmit="event.preventDefault(); updateProfile(globalThis.oddjs, document.getElementById('formname').value).then(function(){window.location.reload()}); return false" class="space-y-1 text-center">
         <label for="name" class="font-bold">Name</label>
-        <input type="text" id="name" class="border border-gray-300 px-2 py-1 rounded-lg">
+        <input type="text" id="formname" class="border border-gray-300 px-2 py-1 rounded-lg">
         <button type="submit" class="rounded-lg bg-black px-2 py-2 text-gray-200 font-medium">Save</button>
       </form>
       <%- include('../partials/shovel.ejs') %>
