@@ -8,7 +8,7 @@
 
   <%- include('../partials/google_analytics.ejs') %>
 
-  <body class="antialiased bg-orange-100 text-gray-800">
+  <body class="antialiased bg-base-100">
     <script type="module">
       import { getProfile, updateProfile, getContacts, addContact } from '/dist/odd.js';
       window.getProfile = getProfile;
@@ -34,7 +34,7 @@
         <input type="text" id="formname" class="border border-gray-300 px-2 py-1 rounded-lg">
         <button type="submit" class="rounded-lg bg-black px-2 py-2 text-gray-200 font-medium">Save</button>
       </form>
-      <form id="profile-updatae-form" onsubmit="event.preventDefault(); addContact(globalThis.oddjs, document.getElementById('contacthandle').value).then(function(){window.location.reload()}); return false" class="space-y-1 text-center">
+      <form id="add-contact-form" onsubmit="event.preventDefault(); addContact(globalThis.oddjs, document.getElementById('contacthandle').value).then(function(){window.location.reload()}); return false" class="space-y-1 text-center">
         <label for="user_name" class="font-bold">Name</label>
         <input type="text" id="contacthandle" class="border border-gray-300 px-2 py-1 rounded-lg">
         <button type="submit" class="rounded-lg bg-black px-2 py-2 text-gray-200 font-medium">Add Contact</button>
