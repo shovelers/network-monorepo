@@ -22,10 +22,9 @@ async function getSession(program) {
   return session;
 }
 
-async function signup(odd) {
+async function signup(odd, username) {
   var program = await getProgram(odd);
   var session = await getSession(program);
-  const username = document.getElementById('handle').value
   const valid = program.auth.isUsernameValid(username)
   const available = await program.auth.isUsernameAvailable(username)
   console.log("username available", available)
