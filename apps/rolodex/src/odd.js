@@ -43,7 +43,7 @@ async function signup(odd, username) {
   const fs = session.fs
   console.log(fs)
   const profileData = JSON.stringify({ "handle": username })
-  const contactData = JSON.stringify({ contactList: []})
+  const contactData = JSON.stringify({ contactList: [] })
 
   const { RootBranch } = odd.path
   const profileDirectoryPath = odd.path.directory("private", "profile")
@@ -104,22 +104,38 @@ async function getContacts(odd) {
 }
 
 async function addContact(odd, newContact) {
+  await updateFile(odd, "contacts", "contacts.json", (content) => {
+    content.contactList.push(newContact)
+    return content
+  })
+}
+
+async function updateFile(odd, folder, file, mutationFunction) {
   var program = await getProgram(odd);
   var session = await getSession(program);
 
   const fs = session.fs;
   const { RootBranch } = odd.path
-  const contactFilePath = odd.path.file(RootBranch.Private, "contacts", "contacts.json")
+  const contactFilePath = odd.path.file(RootBranch.Private, folder, file)
 
   const content = new TextDecoder().decode(await fs.read(contactFilePath))
-  var contactList = JSON.parse(content).contactList
-  contactList.push(newContact)
-  var contactData = JSON.stringify({ contactList: contactList})
+  const newContent = mutationFunction(JSON.parse(content))
 
-  await fs.write(contactFilePath, new TextEncoder().encode(contactData))
+  await fs.write(contactFilePath, new TextEncoder().encode(JSON.stringify(newContent)))
   await fs.publish()
 
-  const newContent = new TextDecoder().decode(await fs.read(contactFilePath))
-  console.log("contacts :", newContent)
+  const readContent = new TextDecoder().decode(await fs.read(contactFilePath))
+  console.log("contacts :", readContent)
+  return readContent;
 }
-export { signup, getProfile, updateProfile, getContacts, addContact };
+
+async function editContact(odd, contact) {
+  await updateFile(odd, "contacts", "contacts.json", (content) => {
+    var contactList = content.contactList
+    var index = contactList.findIndex(c => c.id === contact.id)
+    contactList[index] = contact
+    return content
+  })
+}
+
+export { signup, getProfile, updateProfile, getContacts, addContact, editContact };
