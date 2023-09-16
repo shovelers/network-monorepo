@@ -59,27 +59,6 @@ async function signup(odd, username) {
   console.log("profile data :", content)
 }
 
-async function updateProfile(odd, name) {
-  var program = await getProgram(odd);
-  var session = await getSession(program);
-
-  const fs = session.fs;
-  const { RootBranch } = odd.path
-  const privateFilePath = odd.path.file(RootBranch.Private, "profile", "profile.json")
-
-  const content = new TextDecoder().decode(await fs.read(privateFilePath))
-  var profileData = JSON.parse(content)
-  profileData.name = name
-
-  await fs.write(privateFilePath, new TextEncoder().encode(JSON.stringify(profileData)))
-  await fs.publish()
-
-  const newContent = new TextDecoder().decode(await fs.read(privateFilePath))
-  console.log("profile data :", newContent)
-
-  return newContent;
-}
-
 async function getProfile(odd) {
   var program = await getProgram(odd);
   var session = await getSession(program);
@@ -103,6 +82,12 @@ async function getContacts(odd) {
   return JSON.parse(content)
 }
 
+async function updateProfile(odd, name) {
+  await updateFile(odd, "profile", "profile.json", (content) => {
+    content.name = name
+    return content
+  })
+}
 async function addContact(odd, newContact) {
   await updateFile(odd, "contacts", "contacts.json", (content) => {
     content.contactList.push(newContact)
