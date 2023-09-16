@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "build": "rollup -cm rollup.config.js && npx tailwindcss build -i ./public/styles/tailwind.css -o ./public/styles/style.css",
+    "build-dev": "rollup -cm rollup.config.js && npx tailwindcss build -i ./public/styles/tailwind.css -o ./public/styles/style.css --watch",
     "start": "npm run build && node index.js",
+    "dev": "npm run build-dev && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -21,6 +23,7 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.2.1",
     "daisyui": "^3.7.4",
+    "nodemon": "^3.0.1",
     "rollup": "^3.29.1",
     "tailwindcss": "^3.3.3"
   }
