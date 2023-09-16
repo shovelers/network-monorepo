@@ -69,23 +69,42 @@
         <div class="divider divider-horizontal"></div>
         <div class="w-3/4 py-4 space-y-2">
           <div class="text-3xl font-bold tracking-tight leading-none">Contact List</div>
-          <form id="add-contact-form"
-            onsubmit="event.preventDefault(); addContact(globalThis.oddjs, document.getElementById('contacthandle').value).then(function(){window.location.reload()}); return false"
-            class="space-y-1 text-center">
-            <label for="user_name" class="font-bold">Name</label>
-            <input type="text" id="contacthandle" class="border border-gray-300 px-2 py-1 rounded-lg">
-            <button type="submit" class="btn btn-outline btn-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                <g fill="currentColor">
-                  <path
-                    d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
-                  <path
-                    d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
-                </g>
-              </svg>
-              Add Contact
-            </button>
-          </form>
+          <button id="contact-add-btn" class="btn btn-outline btn-sm" onclick="contact_add_modal.showModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+              <g fill="currentColor">
+                <path
+                  d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                <path
+                  d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+              </g>
+            </svg>
+            Add
+          </button>
+          <dialog id="contact_add_modal" class="modal">
+            <div class="modal-box">
+              <h3 class="font-bold text-lg">Contact Details</h3>
+              <p class="text-xs">Press ESC key or click the button below to close</p>
+              <div class="modal-action flex items-center">
+                <form id="add-contact-form"
+                  onsubmit="event.preventDefault(); addContact(globalThis.oddjs, document.getElementById('contacthandle').value).then(function(){window.location.reload()}); return false"
+                  class="space-y-1 text-center">
+                  <label for="user_name" class="font-bold">Name</label>
+                  <input type="text" id="contacthandle" class="border border-gray-300 px-2 py-1 rounded-lg">
+                  <button type="submit" class="btn btn-outline btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                      <path fill="currentColor"
+                        d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z" />
+                    </svg>
+                    Save
+                  </button>
+                </form>
+                <form method="dialog">
+                  <!-- if there is a button in form, it will close the modal -->
+                  <button class="btn btn-outline btn-sm">Close</button>
+                </form>
+              </div>
+            </div>
+          </dialog>
           <div id="contactList" class="text-xl font-bold tracking-tight leading-none"></div>
         </div>
       </div>
