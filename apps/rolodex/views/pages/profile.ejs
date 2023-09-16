@@ -20,9 +20,24 @@
       getProfile(globalThis.oddjs).then((result) => {
         document.getElementById("handle").innerHTML = "Welcome " + result.handle
         document.getElementById("name").innerHTML = "Name: " + result.name
-        document.getElementById("formname").placeholder = result.name
+        document.getElementById("formname").value = result.name
       })
-      getContacts(globalThis.oddjs).then((result) => { document.getElementById("contactList").innerHTML = result.contactList })
+      getContacts(globalThis.oddjs).then((result) => {
+        let table = document.createElement('table');
+        table.classList.add("table", "table-zebra", "table-pin-rows")
+        var thead = table.createTHead();
+        var row = thead.insertRow(0);
+        var cell = row.insertCell(0);
+        cell.innerHTML = "Name";
+        var tbody = table.createTBody();
+        for (let contact of result.contactList) {
+          let row = tbody.insertRow();
+          let cell = row.insertCell();
+          cell.textContent = contact;
+        }
+        console.log(table)
+        document.getElementById("contact-list-table").appendChild(table)
+      })
     </script>
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
       <div class="w-full h-4/5 p-4 text-center flex flex-row justify-evenly">
@@ -49,7 +64,7 @@
                   onsubmit="event.preventDefault(); updateProfile(globalThis.oddjs, document.getElementById('formname').value).then(function(){window.location.reload()}); return false"
                   class="space-y-1 text-center">
                   <label for="name" class="font-bold">Name</label>
-                  <input type="text" id="formname" class="border border-gray-300 px-2 py-1 rounded-lg" placeholder="name">
+                  <input type="text" id="formname" class="border border-gray-300 px-2 py-1 rounded-lg" value="name">
                   <button type="submit" class="btn btn-outline btn-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                       <path fill="currentColor"
@@ -105,7 +120,10 @@
               </div>
             </div>
           </dialog>
-          <div id="contactList" class="text-xl font-bold tracking-tight leading-none"></div>
+          <div class="flex justify-center max-h-1/3 pt-4">
+            <div id="contact-list-table" class="overflow-x-auto w-1/2">
+            </div>
+          </div>
         </div>
       </div>
       <%- include('../partials/shovel.ejs') %>
