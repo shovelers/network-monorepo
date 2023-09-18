@@ -11,9 +11,7 @@
   <body class="antialiased bg-base-100">
     <script type="module">
       import { getProfile, updateProfile, getContacts, addContact, editContact, signout } from '/dist/odd.js';
-      window.getProfile = getProfile;
       window.updateProfile = updateProfile;
-      window.getContacts = getContacts;
       window.addContact = addContact;
       window.editContact = editContact;
       window.signout = signout;
@@ -34,25 +32,17 @@
           let editcell = row.insertCell(1);
           editcell.classList.add("text-right")
           editcell.innerHTML = `
-            <button class="btn btn-ghost btn-xs" onclick="state.setContact('${value}'); contact_edit_modal.showModal(); document.getElementById('edit-contact-name').value='${value}';">
+            <button class="btn btn-ghost btn-xs" onclick="contact_edit_modal.showModal(); setContactEditForm('${key}', '${value}');">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="m13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057l3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/></svg>
             </button>`
         }
         document.getElementById("contact-list-table").appendChild(table)
       })
-
-      window.state = function(){
-        var current_contact = null;
-
-        return {
-          getContact: function(){
-            return current_contact;
-          },
-          setContact: function(contact){
-            current_contact = contact;
-          }
-        }
-      }();
+      
+      window.setContactEditForm = function (id, name){
+        document.getElementById("edit-contact-name").value = name
+        document.getElementById("edit-contact-id").value = id
+      }
 
     </script>
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
@@ -188,10 +178,11 @@
                 <p class="text-xs">Press ESC key or click the button below to close</p>
                 <div class="modal-action flex items-center">
                   <form id="edit-contact-form"
-                    onsubmit="event.preventDefault(); editContact(globalThis.oddjs, document.getElementById('edit-contact-name').value).then(function(){window.location.reload()}); return false"
+                    onsubmit="event.preventDefault(); editContact(globalThis.oddjs, document.getElementById('edit-contact-id').value, document.getElementById('edit-contact-name').value).then(function(){window.location.reload()}); return false"
                     class="space-y-1 text-center">
                     <label for="user_name" class="font-bold">Name</label>
-                    <input type="text" id="edit-contact-name" value="state.getContact()" class="border border-gray-300 px-2 py-1 rounded-lg">
+                    <input type="text" id="edit-contact-id" hidden class="border border-gray-300 px-2 py-1 rounded-lg">
+                    <input type="text" id="edit-contact-name" class="border border-gray-300 px-2 py-1 rounded-lg">
                     <button type="submit" class="btn btn-outline btn-sm">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                         <path fill="currentColor"

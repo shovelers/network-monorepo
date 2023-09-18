@@ -94,11 +94,10 @@ async function addContact(odd, newContact) {
   })
 }
 
-async function editContact(odd, contact) {
+async function editContact(odd, id, contact) {
   await updateFile(odd, "contacts.json", (content) => {
     var contactList = content.contactList
-    var index = contactList.findIndex(c => c.id === contact.id)
-    contactList[index] = contact
+    contactList[id] = contact
     return content
   })
 }
