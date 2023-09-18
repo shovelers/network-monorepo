@@ -42,7 +42,7 @@ async function signup(odd, username) {
   //create fs
   const fs = await session.fs
   console.log(fs)
-  const profileData = JSON.stringify({ "handle": username })
+  const profileData = JSON.stringify({ "handle": username, "name": "John Doe" })
   const contactData = JSON.stringify({ contactList: {} })
 
   const { RootBranch } = odd.path
