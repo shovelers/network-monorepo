@@ -102,6 +102,15 @@ async function editContact(odd, id, contact) {
   })
 }
 
+async function deleteContact(odd, id) {
+  await updateFile(odd, "contacts.json", (content) => {
+    delete content.contactList[id]
+    console.log("delete", id)
+    console.log("delete", content.contactList)
+    return content
+  })
+}
+
 async function updateFile(odd, file, mutationFunction) {
   var program = await getProgram(odd);
   var session = await getSession(program);
@@ -127,4 +136,4 @@ async function signout(odd) {
   await session.destroy()
 }
 
-export { signup, getProfile, updateProfile, getContacts, addContact, editContact, signout};
+export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout};
