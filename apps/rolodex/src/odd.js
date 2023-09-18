@@ -43,7 +43,7 @@ async function signup(odd, username) {
   const fs = await session.fs
   console.log(fs)
   const profileData = JSON.stringify({ "handle": username })
-  const contactData = JSON.stringify({ contactList: [] })
+  const contactData = JSON.stringify({ contactList: {} })
 
   const { RootBranch } = odd.path
   const profileFilePath = odd.path.file(RootBranch.Private, "profile.json")
@@ -88,7 +88,8 @@ async function updateProfile(odd, name) {
 }
 async function addContact(odd, newContact) {
   await updateFile(odd, "contacts.json", (content) => {
-    content.contactList.push(newContact)
+    var id = crypto.randomUUID()
+    content.contactList[id] = newContact
     return content
   })
 }
