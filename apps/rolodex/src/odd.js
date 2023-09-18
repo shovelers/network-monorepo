@@ -25,7 +25,7 @@ async function getSession(program) {
 async function signup(odd, username) {
   var program = await getProgram(odd);
   var session = await getSession(program);
-  const valid = program.auth.isUsernameValid(username)
+  const valid = await program.auth.isUsernameValid(username)
   const available = await program.auth.isUsernameAvailable(username)
   console.log("username available", available)
 
@@ -40,16 +40,14 @@ async function signup(odd, username) {
   console.log("session", await session)
 
   //create fs
-  const fs = session.fs
+  const fs = await session.fs
   console.log(fs)
   const profileData = JSON.stringify({ "handle": username })
   const contactData = JSON.stringify({ contactList: [] })
 
   const { RootBranch } = odd.path
-  const profileDirectoryPath = odd.path.directory("private", "profile")
-  const profileFilePath = odd.path.file(RootBranch.Private, "profile", "profile.json")
-  const contactDirectoryPath = odd.path.directory("private", "contacts")
-  const contactFilePath = odd.path.file(RootBranch.Private, "contacts", "contacts.json")
+  const profileFilePath = odd.path.file(RootBranch.Private, "profile.json")
+  const contactFilePath = odd.path.file(RootBranch.Private, "contacts.json")
 
   await fs.write(profileFilePath, new TextEncoder().encode(profileData))
   await fs.write(contactFilePath, new TextEncoder().encode(contactData))
@@ -65,7 +63,7 @@ async function getProfile(odd) {
 
   const fs = session.fs;
   const { RootBranch } = odd.path
-  const privateFilePath = odd.path.file(RootBranch.Private, "profile", "profile.json")
+  const privateFilePath = odd.path.file(RootBranch.Private, "profile.json")
 
   const content = new TextDecoder().decode(await fs.read(privateFilePath))
   return JSON.parse(content)
@@ -76,32 +74,41 @@ async function getContacts(odd) {
   var session = await getSession(program);
   const fs = session.fs;
   const { RootBranch } = odd.path
-  const privateFilePath = odd.path.file(RootBranch.Private, "contacts", "contacts.json")
+  const privateFilePath = odd.path.file(RootBranch.Private, "contacts.json")
 
   const content = new TextDecoder().decode(await fs.read(privateFilePath))
   return JSON.parse(content)
 }
 
 async function updateProfile(odd, name) {
-  await updateFile(odd, "profile", "profile.json", (content) => {
+  await updateFile(odd, "profile.json", (content) => {
     content.name = name
     return content
   })
 }
 async function addContact(odd, newContact) {
-  await updateFile(odd, "contacts", "contacts.json", (content) => {
+  await updateFile(odd, "contacts.json", (content) => {
     content.contactList.push(newContact)
     return content
   })
 }
 
-async function updateFile(odd, folder, file, mutationFunction) {
+async function editContact(odd, contact) {
+  await updateFile(odd, "contacts.json", (content) => {
+    var contactList = content.contactList
+    var index = contactList.findIndex(c => c.id === contact.id)
+    contactList[index] = contact
+    return content
+  })
+}
+
+async function updateFile(odd, file, mutationFunction) {
   var program = await getProgram(odd);
   var session = await getSession(program);
 
   const fs = session.fs;
   const { RootBranch } = odd.path
-  const contactFilePath = odd.path.file(RootBranch.Private, folder, file)
+  const contactFilePath = odd.path.file(RootBranch.Private, file)
 
   const content = new TextDecoder().decode(await fs.read(contactFilePath))
   const newContent = mutationFunction(JSON.parse(content))
@@ -114,13 +121,10 @@ async function updateFile(odd, folder, file, mutationFunction) {
   return readContent;
 }
 
-async function editContact(odd, contact) {
-  await updateFile(odd, "contacts", "contacts.json", (content) => {
-    var contactList = content.contactList
-    var index = contactList.findIndex(c => c.id === contact.id)
-    contactList[index] = contact
-    return content
-  })
+async function signout(odd) {
+  var program = await getProgram(odd);
+  var session = await getSession(program);
+  await session.destroy()
 }
 
-export { signup, getProfile, updateProfile, getContacts, addContact, editContact };
+export { signup, getProfile, updateProfile, getContacts, addContact, editContact, signout};
