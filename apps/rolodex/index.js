@@ -16,12 +16,12 @@ server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')))
 
-server.get("/", (req, res) => {
+server.get("/home", (req, res) => {
   res.render('pages/index')
 });
 
-server.get("/profile", (req, res) => {
-  res.render('pages/profile')
+server.get("/app", (req, res) => {
+  res.render('pages/app')
 });
 
 server.listen(port, (err) => {

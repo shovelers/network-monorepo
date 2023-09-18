@@ -13,6 +13,7 @@ async function getProgram(odd) {
     })
   return program;
 }
+
 async function getSession(program) {
   let session
   if (program.session) {
@@ -136,4 +137,4 @@ async function signout(odd) {
   await session.destroy()
 }
 
-export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout};
+export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout, getSession, getProgram};

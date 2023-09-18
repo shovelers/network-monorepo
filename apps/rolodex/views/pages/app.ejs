@@ -10,42 +10,48 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { getProfile, updateProfile, getContacts, addContact, editContact, signout, deleteContact } from '/dist/odd.js';
+      import { getProfile, updateProfile, getContacts, addContact, editContact, signout, deleteContact, getProgram, getSession } from '/dist/odd.js';
       window.updateProfile = updateProfile;
       window.addContact = addContact;
       window.editContact = editContact;
       window.deleteContact = deleteContact;
       window.signout = signout;
 
-      getProfile(globalThis.oddjs).then((result) => {
-        document.getElementById("handle").innerHTML = result.handle
-        document.getElementById("name").innerHTML = "Name: " + result.name
-        document.getElementById("formname").value = result.name
-      })
-      getContacts(globalThis.oddjs).then((result) => {
-        let table = document.createElement('table');
-        table.classList.add("table", "table-zebra", "table-pin-rows")
-        var tbody = table.createTBody();
-        for (let [key, value] of Object.entries(result.contactList)) {
-          let row = tbody.insertRow();
-          let cell = row.insertCell(0);
-          cell.textContent = value;
-          let editcell = row.insertCell(1);
-          editcell.classList.add("text-right")
-          editcell.innerHTML = `
-            <button class="btn btn-ghost btn-xs" onclick="contact_edit_modal.showModal(); setContactEditForm('${key}', '${value}');">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="m13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057l3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/></svg>
-            </button>`
+      var program = await getProgram(globalThis.oddjs);
+      var session = await getSession(program);
+      if (session === undefined) {
+        window.location.href = '/home';
+      } else {
+        getProfile(globalThis.oddjs).then((result) => {
+          document.getElementById("handle").innerHTML = result.handle
+          document.getElementById("name").innerHTML = "Name: " + result.name
+          document.getElementById("formname").value = result.name
+        })
+        getContacts(globalThis.oddjs).then((result) => {
+          let table = document.createElement('table');
+          table.classList.add("table", "table-zebra", "table-pin-rows")
+          var tbody = table.createTBody();
+          for (let [key, value] of Object.entries(result.contactList)) {
+            let row = tbody.insertRow();
+            let cell = row.insertCell(0);
+            cell.textContent = value;
+            let editcell = row.insertCell(1);
+            editcell.classList.add("text-right")
+            editcell.innerHTML = `
+              <button class="btn btn-ghost btn-xs" onclick="contact_edit_modal.showModal(); setContactEditForm('${key}', '${value}');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="m13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057l3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/></svg>
+              </button>`
+          }
+          document.getElementById("contact-list-table").appendChild(table)
+        })
+        
+        window.setContactEditForm = function (id, name){
+          document.getElementById("edit-contact-name").value = name
+          document.getElementById("edit-contact-id").value = id
         }
-        document.getElementById("contact-list-table").appendChild(table)
-      })
-      
-      window.setContactEditForm = function (id, name){
-        document.getElementById("edit-contact-name").value = name
-        document.getElementById("edit-contact-id").value = id
       }
-
     </script>
+
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
       <div class="w-full h-4/5 p-4 text-center flex flex-row justify-evenly">
         <div class="relative bg-base-200 w-1/4 py-4 space-y-2 rounded-lg">
@@ -95,7 +101,7 @@
               </svg>
               <a href="/logout">Recovery Key</a>
             </button>
-            <button class="btn btn-outline btn-sm w-2/3" onclick="signout(globalThis.oddjs).then(function(){window.location.href='/'}); console.log('signedout')">
+            <button class="btn btn-outline btn-sm w-2/3" onclick="signout(globalThis.oddjs).then(function(){window.location.href='/home'}); console.log('signedout')">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                 <path fill="currentColor"
                   d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2zM3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H3z" />

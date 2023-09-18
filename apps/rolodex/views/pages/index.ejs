@@ -9,15 +9,20 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { signup } from '/dist/odd.js';
+      import { signup, getProgram, getSession } from '/dist/odd.js';
       window.signup = signup;
+      var program = await getProgram(globalThis.oddjs);
+      var session = await getSession(program);
+      if (session) {
+        window.location.href = '/app';
+      }
     </script>
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
       <h1 class="text-6xl font-extrabold tracking-tight leading-none underline decoration-red-500 decoration-8">Rolodex</h1>
       <div class="p-4 text-center">
         <div class="text-3xl font-bold tracking-tight leading-none">Build Better Relationships</div>
       </div>
-      <form id="signup-form" onsubmit="event.preventDefault(); signup(globalThis.oddjs, document.getElementById('handle').value).then(function(){window.location.href='/profile'});" class="space-y-1 text-center">
+      <form id="signup-form" onsubmit="event.preventDefault(); signup(globalThis.oddjs, document.getElementById('handle').value).then(function(){window.location.href='/app'});" class="space-y-1 text-center">
         <label for="user_name" class="font-bold">Username</label>
         <input type="text" id="handle" name="handle" class="border border-gray-300 px-2 py-1 rounded-lg">
         <button type="submit" class="btn btn-outline btn-sm">
