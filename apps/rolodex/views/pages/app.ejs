@@ -26,6 +26,7 @@
           document.getElementById("handle").innerHTML = result.handle
           document.getElementById("name").innerHTML = "Name: " + result.name
           document.getElementById("formname").value = result.name
+          document.querySelector(".avatar > div > span").innerHTML = result.handle.charAt(0).toUpperCase()
         })
         getContacts(globalThis.oddjs).then((result) => {
           let table = document.createElement('table');
@@ -57,7 +58,7 @@
         <div class="relative bg-base-200 w-1/4 py-4 space-y-2 rounded-lg">
           <div class="avatar online placeholder">
             <div class="bg-neutral-focus text-neutral-content rounded-full w-32">
-              <span class="text-3xl">K</span>
+              <span class="text-3xl"></span>
             </div>
           </div>
           <div class="text-xl text-gray-700 font-light tracking-tight leading-none">Welcome <span id="handle" class="text-xl font-semibold"></span></div>

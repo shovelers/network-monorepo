@@ -1,12 +1,9 @@
 import express from 'express';
-import Protocol from 'client';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const port = process.argv[2] || 3000;
 const server = express();
-
-const c = new Protocol();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
