@@ -36,12 +36,12 @@ async function signup(odd, username) {
     const { success } = await program.auth.register({ username: username })
     console.log("success: ", success)
     // Create a session on success
-    session = success ? program.auth.session() : null
+    session = success ? await program.auth.session() : null
   }
-  console.log("session", await session)
 
   //create fs
-  const fs = await session.fs
+  console.log("newly created session: ", session)
+  const fs = session.fs
   console.log(fs)
   const profileData = JSON.stringify({ "handle": username, "name": "John Doe" })
   const contactData = JSON.stringify({ contactList: {} })
