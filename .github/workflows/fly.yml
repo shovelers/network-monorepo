@@ -13,7 +13,7 @@ jobs:
       - name: Deploy Rolodex
         run: |
           ls
-          cd ../apps/rolodex
+          cd apps/rolodex
           flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
