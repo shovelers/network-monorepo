@@ -143,28 +143,11 @@ async function producerChallengeProcessor(challenge, userInput) {
   console.log("userinput", userInput)
 
   // Either show `challenge.pin` or have the user input a PIN and see if they're equal.
-  if (userInput === challenge.pin.join("")) {challenge.confirmPin(); console.log("confirm pin")}
-  else {challenge.rejectPin(); console.log("reject pin")}
+  if (userInput === challenge.pin.join("")) {
+    challenge.confirmPin(); alert("success")
+  } else {
+    challenge.rejectPin(); alert("wrong pin")
+  }
 }
 
-async function linkDeviceConsumer(odd, username) {
-  var program = await getProgram(odd);
-  const consumer = await program.auth.accountConsumer(username)
-  console.log("consumer", consumer)
-
-  // The consumer generates a PIN and sends it to the producer
-  consumer.on("challenge", ({ pin }) => {
-    // Display the PIN
-    showPinOnUI(pin)
-  })
-
-  // The consumer receives an approval or rejection message from the producer
-  consumer.on("link", async ({ approved, username }) => {
-    if (approved) {
-      console.log(`Successfully authenticated as ${username}`)
-      session = await program.auth.session()
-    }
-  })
-}  
-
-export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout, getSession, getProgram, producerChallengeProcessor, linkDeviceConsumer};
+export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout, getSession, getProgram, producerChallengeProcessor };

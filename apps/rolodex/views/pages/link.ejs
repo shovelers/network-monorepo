@@ -25,6 +25,7 @@
           console.log(`Successfully authenticated as ${username}`)
           var session = await program.auth.session()
           console.log("session: ", session)
+          window.location.href = `/app`
         }
       })
     </script>
