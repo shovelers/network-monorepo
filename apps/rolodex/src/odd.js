@@ -137,22 +137,14 @@ async function signout(odd) {
   await session.destroy()
 }
 
-async function linkDeviceProducer(odd) {
+async function producerChallengeProcessor(challenge, userInput) {
   console.log("i am here")
-  var program = await getProgram(odd);
-  const producer = await program.auth.accountProducer(program.session.username)
-  console.log("producer", producer)
+  console.log("challenge pin", challenge.pin)
+  console.log("userinput", userInput)
 
-  producer.on("challenge", challenge => {
-    console.log("challenge: ", challenge)
-    // Either show `challenge.pin` or have the user input a PIN and see if they're equal.
-    if ("123456" === challenge.pin) challenge.confirmPin()
-    else challenge.rejectPin()
-  })
-
-  producer.on("link", ({ approved }) => {
-    if (approved) console.log("Link device successfully")
-  })
+  // Either show `challenge.pin` or have the user input a PIN and see if they're equal.
+  if (userInput === challenge.pin.join("")) {challenge.confirmPin(); console.log("confirm pin")}
+  else {challenge.rejectPin(); console.log("reject pin")}
 }
 
 async function linkDeviceConsumer(odd, username) {
@@ -175,4 +167,4 @@ async function linkDeviceConsumer(odd, username) {
   })
 }  
 
-export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout, getSession, getProgram, linkDeviceProducer, linkDeviceConsumer};
+export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout, getSession, getProgram, producerChallengeProcessor, linkDeviceConsumer};

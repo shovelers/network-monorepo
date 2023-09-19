@@ -10,13 +10,13 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { getProfile, updateProfile, getContacts, addContact, editContact, signout, deleteContact, getProgram, getSession, linkDeviceProducer } from '/dist/odd.js';
+      import { getProfile, updateProfile, getContacts, addContact, editContact, signout, deleteContact, getProgram, getSession, producerChallengeProcessor } from '/dist/odd.js';
       window.updateProfile = updateProfile;
       window.addContact = addContact;
       window.editContact = editContact;
       window.deleteContact = deleteContact;
       window.signout = signout;
-      window.linkDeviceProducer = linkDeviceProducer;
+      window.producerChallengeProcessor = producerChallengeProcessor;
 
       var program = await getProgram(globalThis.oddjs);
       var session = await getSession(program);
@@ -53,9 +53,16 @@
         }
 
         console.log("session: ", session)
-        console.log("username: ", session.username)
         document.querySelector("#link_device_modal > .modal-box > .modal-action > div").innerHTML = `${window.location.origin}/link?username=${session.username}`
-        linkDeviceProducer(globalThis.oddjs, session.username)
+        
+        var producer = await program.auth.accountProducer(session.username)
+        console.log("first producer: ", producer)
+        producer.on("challenge", challenge => {
+          window.challenge = challenge;
+        })
+        producer.on("link", ({ approved }) => {
+          if (approved) console.log("Link device successfully")
+        })
       }
     </script>
 
@@ -120,8 +127,15 @@
           <dialog id="link_device_modal" class="modal">
             <div class="modal-box">
               <p class="text-xs">copy this link and paste on another device</p>
-              <div class="modal-action flex justify-center items-center">
+              <div class="modal-action flex flex-col justify-center items-center space-y-2">
                 <div>link with username</div>
+                <form class="flex flex-row space-x-2" onsubmit="event.preventDefault(); producerChallengeProcessor(challenge, document.querySelector('#link_device_modal > .modal-box > .modal-action > form > input').value); return false">
+                  <input type="text" placeholder="put pin" class="input input-bordered input-sm w-full max-w-xs" />
+                  <button type="submit" class="btn btn-outline btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0a5.5 5.5 0 0 1 11 0z" /></svg>
+                    submit
+                  </button>
+                </form>
                 <form method="dialog">
                   <!-- if there is a button in form, it will close the modal -->
                   <button class="btn btn-outline btn-sm">
