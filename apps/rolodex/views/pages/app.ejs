@@ -4,6 +4,7 @@
 <head>
   <link rel="stylesheet" href="./styles/style.css" />
   <script type="module" src="https://unpkg.com/@oddjs/odd@0.37.2/dist/index.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
 </head>
 
 <%- include('../partials/google_analytics.ejs') %>
@@ -54,6 +55,14 @@
 
         console.log("session: ", session)
         document.querySelector("#link_device_modal > .modal-box > .modal-action > div").innerHTML = `${window.location.origin}/link?username=${session.username}`
+        var qrcode = new QRCode({
+          content: `${window.location.origin}/link?username=${session.username}`,
+          container: "svg-viewbox", //Responsive use
+          join: true //Crisp rendering and 4-5x reduced file size
+        });
+        console.log("generating svg")
+        var svg = qrcode.svg();
+        document.querySelector("#link_device_modal > .modal-box > .modal-action > .qr").innerHTML = svg;
         
         var producer = await program.auth.accountProducer(session.username)
         console.log("first producer: ", producer)
@@ -64,6 +73,8 @@
           if (approved) console.log("Link device successfully")
         })
       }
+
+
     </script>
 
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
@@ -126,9 +137,10 @@
           </dialog>
           <dialog id="link_device_modal" class="modal">
             <div class="modal-box">
-              <p class="text-xs">copy this link and paste on another device</p>
+              <p class="text-xs">1. Scan QR OR copy this link and paste on another device</br>2. Input the pin & submit</p>
               <div class="modal-action flex flex-col justify-center items-center space-y-2">
                 <div>link with username</div>
+                <div class="qr w-64 h-64"></div>
                 <form class="flex flex-row space-x-2" onsubmit="event.preventDefault(); producerChallengeProcessor(challenge, document.querySelector('#link_device_modal > .modal-box > .modal-action > form > input').value); return false">
                   <input type="text" placeholder="put pin" class="input input-bordered input-sm w-full max-w-xs" />
                   <button type="submit" class="btn btn-outline btn-sm">
