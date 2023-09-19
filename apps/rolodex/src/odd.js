@@ -137,4 +137,42 @@ async function signout(odd) {
   await session.destroy()
 }
 
-export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout, getSession, getProgram};
+async function linkDeviceProducer(odd) {
+  console.log("i am here")
+  var program = await getProgram(odd);
+  const producer = await program.auth.accountProducer(program.session.username)
+  console.log("producer", producer)
+
+  producer.on("challenge", challenge => {
+    console.log("challenge: ", challenge)
+    // Either show `challenge.pin` or have the user input a PIN and see if they're equal.
+    if ("123456" === challenge.pin) challenge.confirmPin()
+    else challenge.rejectPin()
+  })
+
+  producer.on("link", ({ approved }) => {
+    if (approved) console.log("Link device successfully")
+  })
+}
+
+async function linkDeviceConsumer(odd, username) {
+  var program = await getProgram(odd);
+  const consumer = await program.auth.accountConsumer(username)
+  console.log("consumer", consumer)
+
+  // The consumer generates a PIN and sends it to the producer
+  consumer.on("challenge", ({ pin }) => {
+    // Display the PIN
+    showPinOnUI(pin)
+  })
+
+  // The consumer receives an approval or rejection message from the producer
+  consumer.on("link", async ({ approved, username }) => {
+    if (approved) {
+      console.log(`Successfully authenticated as ${username}`)
+      session = await program.auth.session()
+    }
+  })
+}  
+
+export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout, getSession, getProgram, linkDeviceProducer, linkDeviceConsumer};
