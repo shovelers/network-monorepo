@@ -11,13 +11,15 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { getProfile, updateProfile, getContacts, addContact, editContact, signout, deleteContact, getProgram, getSession, producerChallengeProcessor } from '/dist/odd.js';
+      import { getProfile, updateProfile, getContacts, addContact, editContact, signout, deleteContact, getProgram, getSession, producerChallengeProcessor, filterContacts, renderTable} from '/dist/odd.js';
       window.updateProfile = updateProfile;
       window.addContact = addContact;
       window.editContact = editContact;
       window.deleteContact = deleteContact;
       window.signout = signout;
       window.producerChallengeProcessor = producerChallengeProcessor;
+      window.filterContacts = filterContacts;
+      window.renderTable = renderTable;
 
       var program = await getProgram(globalThis.oddjs);
       var session = await getSession(program);
@@ -73,8 +75,6 @@
           if (approved) console.log("Link device successfully")
         })
       }
-
-
     </script>
 
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
@@ -160,15 +160,13 @@
         </div>
         <div class="w-3/4 py-4 space-y-2">
           <div class="flex justify-evenly">
-            <div class="flex flex-row space-x-2">
+            <form class="search-form flex flex-row space-x-2"
+            onsubmit="event.preventDefault(); filterContacts(globalThis.oddjs, document.querySelector('.search-form > input').value).then((result) => {document.getElementById('contact-list-table').children[0].replaceWith(renderTable(result))}); return false">
               <input type="text" placeholder="Search" class="input input-bordered input-sm w-full max-w-xs" />
-              <button class="btn btn-outline btn-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                  <path fill="currentColor"
-                    d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0a5.5 5.5 0 0 1 11 0z" />
-                </svg>
+              <button type="submit" class="btn btn-outline btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor"d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0a5.5 5.5 0 0 1 11 0z" /></svg>
               </button>
-            </div>
+            </form>
             <button id="contact-add-btn" class="btn btn-outline btn-sm" onclick="contact_add_modal.showModal()">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M12.5 16a3.5 3.5 0 1 0 0-7a3.5 3.5 0 0 0 0 7Zm.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0Zm-2-6a3 3 0 1 1-6 0a3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4a2 2 0 0 0 0 4Z"/><path d="M8.256 14a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025c.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Z"/></g></svg>
               Add
