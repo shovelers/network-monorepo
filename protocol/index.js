@@ -5,8 +5,8 @@ import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { tcp } from '@libp2p/tcp'
 import { CID } from 'multiformats/cid'
-import { MemoryBlockstore } from 'blockstore-core'
-import { MemoryDatastore } from 'datastore-core'
+import { FsBlockstore } from 'blockstore-fs'
+import { FsDatastore } from 'datastore-fs'
 import { createLibp2p } from 'libp2p'
 import { pingService } from 'libp2p/ping'
 import { identifyService } from 'libp2p/identify'
@@ -14,6 +14,7 @@ import { multiaddr } from 'multiaddr'
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'node:fs/promises';
 import { fileURLToPath } from 'url';
 import { keyToDID } from '@spruceid/didkit-wasm-node';
 import { broadcast, eventProcessor } from './event.js'
@@ -192,10 +193,12 @@ async function addEvent (body) {
 
 async function createNode () {
   // the blockstore is where we store the blocks that make up files
-  const blockstore = new MemoryBlockstore()
+  await fs.mkdir(path.join(__dirname, 'protocol_db', 'blocks'), { recursive: true })
+  const blockstore = new FsBlockstore(path.join(__dirname, 'protocol_db', 'blocks'))
 
   // application-specific data lives in the datastore
-  const datastore = new MemoryDatastore()
+  await fs.mkdir(path.join(__dirname, 'protocol_db', 'data'), { recursive: true })
+  const datastore = new FsDatastore(path.join(__dirname, 'protocol_db', 'data'))
 
   // libp2p is the networking layer that underpins Helia
   const libp2p = await createLibp2p({
