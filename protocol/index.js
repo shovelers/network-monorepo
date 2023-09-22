@@ -19,7 +19,7 @@ import { keyToDID } from '@spruceid/didkit-wasm-node';
 import { broadcast, eventProcessor } from './event.js'
 import { getRegistry, getFollowers, getFollowing} from './indexer.js'
 
-const port = process.argv[2];
+const port = process.argv[2] || 3000;
 const peer = process.argv[3];
 const server = express();
 
