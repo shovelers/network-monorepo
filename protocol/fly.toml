@@ -18,4 +18,4 @@ primary_region = "sin"
 
 [mounts]
   source="protocol_data"
-  destination="protocol/protocol_db"
+  destination="/app/protocol_db"
