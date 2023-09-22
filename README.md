@@ -1,6 +1,29 @@
 # protocol
 DCN Protocol MonoRepo
 
+### Deployment
+We are using fly.io for deployment
+
+In order to do a new deployment
+1. In the app repo, generate the dockerfile by calling `npx --yes @flydotio/dockerfile@latest`
+2. In the app repo run below command to create app on fly & generate fly.toml
+  `flyctl launch --remote-only --ha=false --name=<name> --region=sin`
+3. In fly.toml change `auto_stop_machines = false` to prevent restarts when idle
+4. Deploy `flyctl deploy --remote-only --ha=false -a=<name>`
+Note: the default port exposed in the docker file is 3000
+
+5. For CD
+* from the <app> directory generate deployment token using `fly tokens create deploy -x 999999h`
+* add this token as a new secret in github repo
+* add the deploy step in github workflow file
+
+6. For Custom domain
+* Obtain IPs of the App: `flyctl ips list -a <name>`
+* Make entry for A, AAAA & CNAme in namecheap
+* Cretae Certs: `flyctl certs create -a <name> <custom domain>`
+* Cert status: `flyctl certs show -a <name> <custom domain>`, once this succeed you can access the app on <custom domain>
+
+
 ### DID Doc Example
 
 ```
