@@ -15,3 +15,7 @@ primary_region = "sin"
   auto_start_machines = true
   min_machines_running = 0
   processes = ["app"]
+
+[mounts]
+  source="protocol_data"
+  destination="protocol/protocol_db"
