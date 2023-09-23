@@ -2,17 +2,16 @@
 <html lang="en" data-theme="light">
   <head>
     <link rel="stylesheet" href="./styles/style.css" />
-    <script type="module" src="https://unpkg.com/@oddjs/odd@0.37.2/dist/index.umd.min.js"></script>
   </head>
 
   <%- include('../partials/google_analytics.ejs') %>
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { getProgram } from '/dist/odd.js';
+      import { getProgram, getContacts } from '/dist/odd.js';
       var username = window.location.href.split('?')[1].split("=")[1];
       console.log("usernmae: ", username)
-      var program = await getProgram(globalThis.oddjs); 
+      var program = await getProgram(); 
       var consumer = await program.auth.accountConsumer(username)
       
       consumer.on("challenge", ({ pin }) => {
@@ -25,7 +24,8 @@
           console.log(`Successfully authenticated as ${username}`)
           var session = await program.auth.session()
           console.log("session: ", session)
-          window.location.href = `/app`
+          console.log(getContacts())
+          //window.location.href = `/app`
         }
       })
     </script>

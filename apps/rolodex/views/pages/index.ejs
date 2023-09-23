@@ -2,7 +2,6 @@
 <html lang="en" data-theme="light">
   <head>
     <link rel="stylesheet" href="./styles/style.css" />
-    <script type="module" src="https://unpkg.com/@oddjs/odd@0.37.2/dist/index.umd.min.js"></script>
   </head>
 
   <%- include('../partials/google_analytics.ejs') %>
@@ -11,7 +10,7 @@
     <script type="module">
       import { signup, getProgram, getSession } from '/dist/odd.js';
       window.signup = signup;
-      var program = await getProgram(globalThis.oddjs);
+      var program = await getProgram();
       var session = await getSession(program);
       if (session) {
         window.location.href = '/app';
@@ -22,7 +21,7 @@
       <div class="p-4 text-center">
         <div class="text-3xl font-bold tracking-tight leading-none">Build Better Relationships</div>
       </div>
-      <form id="signup-form" onsubmit="event.preventDefault(); signup(globalThis.oddjs, document.getElementById('handle').value).then(function(){window.location.href='/app'});" class="space-y-1 text-center">
+      <form id="signup-form" onsubmit="event.preventDefault(); signup(document.getElementById('handle').value).then(function(){window.location.href='/app'});" class="space-y-1 text-center">
         <label for="user_name" class="font-bold">Username</label>
         <input type="text" id="handle" name="handle" class="border border-gray-300 px-2 py-1 rounded-lg">
         <button type="submit" class="btn btn-outline btn-sm">

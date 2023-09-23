@@ -1,4 +1,6 @@
-async function getProgram(odd) {
+import * as odd from "@oddjs/odd";
+
+async function getProgram() {
   const appInfo = { creator: "Shovel", name: "Rolod" }
   const program = await odd.program({ namespace: appInfo })
     .catch(error => {
@@ -23,8 +25,8 @@ async function getSession(program) {
   return session;
 }
 
-async function signup(odd, username) {
-  var program = await getProgram(odd);
+async function signup(username) {
+  var program = await getProgram();
   var session = await getSession(program);
   const valid = await program.auth.isUsernameValid(username)
   const available = await program.auth.isUsernameAvailable(username)
@@ -58,8 +60,8 @@ async function signup(odd, username) {
   console.log("profile data :", content)
 }
 
-async function getProfile(odd) {
-  var program = await getProgram(odd);
+async function getProfile() {
+  var program = await getProgram();
   var session = await getSession(program);
 
   const fs = session.fs;
@@ -70,19 +72,21 @@ async function getProfile(odd) {
   return JSON.parse(content)
 }
 
-async function getContacts(odd) {
-  var program = await getProgram(odd);
+async function getContacts() {
+  var program = await getProgram();
   var session = await getSession(program);
   const fs = session.fs;
   const { RootBranch } = odd.path
   const privateFilePath = odd.path.file(RootBranch.Private, "contacts.json")
+  console.log("root private: ", RootBranch.Private);
+  console.log("file path: ", privateFilePath);
 
   const content = new TextDecoder().decode(await fs.read(privateFilePath))
   return JSON.parse(content)
 }
 
-async function filterContacts(odd, filter) {
-  var contacts = await getContacts(odd)
+async function filterContacts(filter) {
+  var contacts = await getContacts()
   var filteredContacts = { "contactList": {} }
   for (var id in contacts.contactList) {
     var contact = contacts.contactList[id]
@@ -94,13 +98,13 @@ async function filterContacts(odd, filter) {
   return filteredContacts
 }
 
-async function updateProfile(odd, name) {
+async function updateProfile(name) {
   await updateFile(odd, "profile.json", (content) => {
     content.name = name
     return content
   })
 }
-async function addContact(odd, newContact) {
+async function addContact(newContact) {
   await updateFile(odd, "contacts.json", (content) => {
     var id = crypto.randomUUID()
     content.contactList[id] = newContact
@@ -108,16 +112,16 @@ async function addContact(odd, newContact) {
   })
 }
 
-async function editContact(odd, id, contact) {
-  await updateFile(odd, "contacts.json", (content) => {
+async function editContact(id, contact) {
+  await updateFile("contacts.json", (content) => {
     var contactList = content.contactList
     contactList[id] = contact
     return content
   })
 }
 
-async function deleteContact(odd, id) {
-  await updateFile(odd, "contacts.json", (content) => {
+async function deleteContact(id) {
+  await updateFile("contacts.json", (content) => {
     delete content.contactList[id]
     console.log("delete", id)
     console.log("delete", content.contactList)
@@ -143,8 +147,8 @@ function renderTable(contacts) {
   return tbody;
 }
 
-async function updateFile(odd, file, mutationFunction) {
-  var program = await getProgram(odd);
+async function updateFile(file, mutationFunction) {
+  var program = await getProgram();
   var session = await getSession(program);
 
   const fs = session.fs;
@@ -162,8 +166,8 @@ async function updateFile(odd, file, mutationFunction) {
   return readContent;
 }
 
-async function signout(odd) {
-  var program = await getProgram(odd);
+async function signout() {
+  var program = await getProgram();
   var session = await getSession(program);
   await session.destroy()
 }

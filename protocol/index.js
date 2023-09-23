@@ -67,7 +67,7 @@ await node.libp2p.services.pubsub.subscribe(topic)
 
 server.get("/", async (req, res) => {
   res.render('pages/index', {
-    registeries: Registries.length,
+    registries: Registries.length,
     relationships: Heads.size
   })
 });

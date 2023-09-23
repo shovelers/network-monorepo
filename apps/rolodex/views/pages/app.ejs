@@ -3,7 +3,6 @@
 
 <head>
   <link rel="stylesheet" href="./styles/style.css" />
-  <script type="module" src="https://unpkg.com/@oddjs/odd@0.37.2/dist/index.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
 </head>
 
@@ -22,7 +21,7 @@
       window.filterContacts = filterContacts;
       window.renderTable = renderTable;
 
-      var program = await getProgram(globalThis.oddjs);
+      var program = await getProgram();
       var session = await getSession(program);
       if (session === undefined) {
         window.location.href = '/home';

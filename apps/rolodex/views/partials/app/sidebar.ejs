@@ -22,7 +22,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647l.646-.647a.5.5 0 0 1 .708 0l.646.647l.646-.647a.5.5 0 0 1 .708 0l.646.647l.793-.793l-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z" /><path d="M4 8a1 1 0 1 1-2 0a1 1 0 0 1 2 0z" /></g></svg>
     Recovery Key
   </button>
-  <button class="btn btn-outline btn-sm w-2/3" onclick="signout(globalThis.oddjs).then(function(){window.location.href='/home'}); console.log('signedout')">
+  <button class="btn btn-outline btn-sm w-2/3" onclick="signout().then(function(){window.location.href='/home'}); console.log('signedout')">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2zM3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H3z" /></svg>
     Logout
   </button>
@@ -33,7 +33,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="profile-updatae-form"
-        onsubmit="event.preventDefault(); updateProfile(globalThis.oddjs, document.getElementById('formname').value).then(function(){window.location.reload()}); return false"
+        onsubmit="event.preventDefault(); updateProfile(document.getElementById('formname').value).then(function(){window.location.reload()}); return false"
         class="space-y-1 text-center">
         <label for="name" class="font-bold">Name</label>
         <input type="text" id="formname" class="border border-gray-300 px-2 py-1 rounded-lg" value="name">
