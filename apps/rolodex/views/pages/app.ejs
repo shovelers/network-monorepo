@@ -10,7 +10,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { getProfile, updateProfile, getContacts, addContact, editContact, signout, deleteContact, getProgram, getSession, producerChallengeProcessor, filterContacts, renderTable} from '/dist/odd.js';
+      import { getProfile, updateProfile, getContacts, addContact, editContact, signout, deleteContact, getProgram, getSession, producerChallengeProcessor, filterContacts, renderTable, generateRecoveryKit } from '/dist/odd.js';
       window.updateProfile = updateProfile;
       window.addContact = addContact;
       window.editContact = editContact;
@@ -20,6 +20,7 @@
       window.getContacts = getContacts;
       window.filterContacts = filterContacts;
       window.renderTable = renderTable;
+      window.generateRecoveryKit = generateRecoveryKit;
 
       var program = await getProgram();
       var session = await getSession(program);

@@ -1,4 +1,6 @@
 import * as odd from "@oddjs/odd";
+import { retrieve } from '@oddjs/odd/common/root-key';
+import * as uint8arrays from 'uint8arrays';
 
 async function getProgram() {
   const appInfo = { creator: "Shovel", name: "Rolod" }
@@ -186,4 +188,35 @@ async function producerChallengeProcessor(challenge, userInput) {
   }
 }
 
-export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout, getSession, getProgram, producerChallengeProcessor, filterContacts, renderTable};
+async function generateRecoveryKit(username){
+  console.log("I am here")
+  var program = await getProgram();
+  var crypto = program.components.crypto;
+  var accountDID = await program.accountDID(username);
+  var readKey  = await retrieve({ crypto, accountDID });
+  const encodedReadKey = uint8arrays.toString(readKey, 'base64pad');
+  console.log(encodedReadKey);
+  const content = `
+  # This is your recovery kit. (It's a yaml text file)
+  # Store this somewhere safe.
+  # Anyone with this file will have read access to your private files.
+  # Losing it means you won't be able to recover your account
+  # in case you lose access to all your linked devices.
+  
+  # To use this file, go to ${window.location.origin}/recover/
+  
+  username: ${username}
+  key: ${encodedReadKey}
+  `;
+  
+  const data = new Blob([content], { type: 'text/plain' })
+  var fileURL = window.URL.createObjectURL(data);
+  var tempLink = document.createElement('a');
+  tempLink.href = fileURL;
+  tempLink.setAttribute('download', 'rolodex-recovery-kit.yaml');
+  tempLink.click();
+  window.URL.revokeObjectURL(fileURL);
+  alert('your file has downloaded!'); 
+}
+
+export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout, getSession, getProgram, producerChallengeProcessor, filterContacts, renderTable, generateRecoveryKit};

@@ -23,6 +23,7 @@
         if (approved) {
           console.log(`Successfully authenticated as ${username}`)
           var session = await program.auth.session()
+          console.log("program: ", program)
           console.log("session: ", session)
           console.log(getContacts())
           //window.location.href = `/app`
