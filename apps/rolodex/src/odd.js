@@ -32,6 +32,7 @@ async function signup(username) {
   var session = await getSession(program);
   const valid = await program.auth.isUsernameValid(username)
   const available = await program.auth.isUsernameAvailable(username)
+  console.log("username valid", valid)
   console.log("username available", available)
 
   if (valid && available) {
