@@ -1,3 +1,8 @@
+<script type="module">
+  import { filterContacts } from '/dist/odd.js';
+  window.filterContacts = filterContacts;
+</script>
+
 <div class="flex flex-row space-x-2">
   <form class="search-form flex flex-row space-x-2"
   onsubmit="event.preventDefault(); filterContacts(document.querySelector('.search-form > input').value).then((result) => {document.querySelector('#contact-list-table > table').children[0].replaceWith(renderTable(result))}); return false">

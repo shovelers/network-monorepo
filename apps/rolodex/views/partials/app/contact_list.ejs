@@ -1,3 +1,15 @@
+<script type="module">
+  import { getContacts, editContact, deleteContact, renderTable } from '/dist/odd.js';
+  window.getContacts = getContacts;
+  window.editContact = editContact;
+  window.deleteContact = deleteContact;
+  window.renderTable = renderTable;
+
+  getContacts().then((result) => {
+    document.querySelector("#contact-list-table > table").appendChild(renderTable(result))
+  })
+</script>
+
 <div id="contact-list-table" class="overflow-x-auto w-1/2">
   <table class="table table-zebra"></table>
 </div>

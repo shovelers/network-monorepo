@@ -1,3 +1,31 @@
+<script type="module">
+  import { getProfile, updateProfile, signout, producerChallengeProcessor, generateRecoveryKit } from '/dist/odd.js';
+  window.updateProfile = updateProfile;
+  window.signout = signout;
+  window.producerChallengeProcessor = producerChallengeProcessor;
+  window.generateRecoveryKit = generateRecoveryKit;
+
+  getProfile().then((result) => {
+    document.getElementById("handle").innerHTML = result.handle
+    document.getElementById("name").innerHTML = "Name: " + result.name
+    document.getElementById("formname").value = result.name
+    document.querySelector(".avatar > div > span").innerHTML = result.handle.charAt(0).toUpperCase()
+  
+    //generating qr code
+    document.querySelector("#link_device_modal > .modal-box > .modal-action > div").innerHTML = `${window.location.origin}/link?username=${result.handle}`
+    var qrcode = new QRCode({
+      content: `${window.location.origin}/link?username=${result.handle}`,
+      container: "svg-viewbox", //Responsive use
+      join: true //Crisp rendering and 4-5x reduced file size
+    });
+    console.log("generating svg")
+    var svg = qrcode.svg();
+    document.querySelector("#link_device_modal > .modal-box > .modal-action > .qr").innerHTML = svg;
+  })
+
+
+</script>
+
 <div class="avatar online placeholder">
   <div class="bg-neutral-focus text-neutral-content rounded-full w-32">
     <span class="text-3xl"></span>

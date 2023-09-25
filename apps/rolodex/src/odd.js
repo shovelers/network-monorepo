@@ -213,7 +213,7 @@ async function generateRecoveryKit(username){
   var fileURL = window.URL.createObjectURL(data);
   var tempLink = document.createElement('a');
   tempLink.href = fileURL;
-  tempLink.setAttribute('download', 'rolodex-recovery-kit.yaml');
+  tempLink.setAttribute('download', `rolodex-${username}-recovery-kit.yaml`);
   tempLink.click();
   window.URL.revokeObjectURL(fileURL);
   alert('your file has downloaded!'); 

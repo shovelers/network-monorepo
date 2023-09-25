@@ -10,48 +10,14 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { getProfile, updateProfile, getContacts, addContact, editContact, signout, deleteContact, getProgram, getSession, producerChallengeProcessor, filterContacts, renderTable, generateRecoveryKit } from '/dist/odd.js';
-      window.updateProfile = updateProfile;
-      window.addContact = addContact;
-      window.editContact = editContact;
-      window.deleteContact = deleteContact;
-      window.signout = signout;
-      window.producerChallengeProcessor = producerChallengeProcessor;
-      window.getContacts = getContacts;
-      window.filterContacts = filterContacts;
-      window.renderTable = renderTable;
-      window.generateRecoveryKit = generateRecoveryKit;
+      import { getProgram, getSession } from '/dist/odd.js';
 
       var program = await getProgram();
       var session = await getSession(program);
       if (session === undefined) {
         window.location.href = '/home';
       } else {
-        getProfile(globalThis.oddjs).then((result) => {
-          document.getElementById("handle").innerHTML = result.handle
-          document.getElementById("name").innerHTML = "Name: " + result.name
-          document.getElementById("formname").value = result.name
-          document.querySelector(".avatar > div > span").innerHTML = result.handle.charAt(0).toUpperCase()
-        })
-        getContacts(globalThis.oddjs).then((result) => {
-          document.querySelector("#contact-list-table > table").appendChild(renderTable(result))
-        })
-        
-        window.setContactEditForm = function (id, name){
-          document.getElementById("edit-contact-name").value = name
-          document.getElementById("edit-contact-id").value = id
-        }
-
         console.log("session: ", session)
-        document.querySelector("#link_device_modal > .modal-box > .modal-action > div").innerHTML = `${window.location.origin}/link?username=${session.username}`
-        var qrcode = new QRCode({
-          content: `${window.location.origin}/link?username=${session.username}`,
-          container: "svg-viewbox", //Responsive use
-          join: true //Crisp rendering and 4-5x reduced file size
-        });
-        console.log("generating svg")
-        var svg = qrcode.svg();
-        document.querySelector("#link_device_modal > .modal-box > .modal-action > .qr").innerHTML = svg;
         
         var producer = await program.auth.accountProducer(session.username)
         console.log("first producer: ", producer)
