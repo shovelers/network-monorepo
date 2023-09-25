@@ -99,13 +99,13 @@ async function filterContacts(filter) {
 }
 
 async function updateProfile(name) {
-  await updateFile(odd, "profile.json", (content) => {
+  await updateFile("profile.json", (content) => {
     content.name = name
     return content
   })
 }
 async function addContact(newContact) {
-  await updateFile(odd, "contacts.json", (content) => {
+  await updateFile("contacts.json", (content) => {
     var id = crypto.randomUUID()
     content.contactList[id] = newContact
     return content
@@ -156,6 +156,7 @@ async function updateFile(file, mutationFunction) {
   const contactFilePath = odd.path.file(RootBranch.Private, file)
 
   const content = new TextDecoder().decode(await fs.read(contactFilePath))
+  console.log("content in file:", content)
   const newContent = mutationFunction(JSON.parse(content))
 
   await fs.write(contactFilePath, new TextEncoder().encode(JSON.stringify(newContent)))
