@@ -16,7 +16,7 @@
     document.querySelector("#link_device_modal > .modal-box > .modal-action > div").innerHTML = `${window.location.origin}/link?username=${fissionHandle}`
     //generating qr code
     var qrcode = new QRCode({
-      content: `${window.location.origin}/link?username=${result.handle}`,
+      content: `${window.location.origin}/link?username=${fissionHandle}`,
       container: "svg-viewbox", //Responsive use
       join: true //Crisp rendering and 4-5x reduced file size
     });
