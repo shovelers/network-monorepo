@@ -5,6 +5,11 @@
   window.deleteContact = deleteContact;
   window.renderTable = renderTable;
 
+  window.setContactEditForm = function (id, name){
+    document.getElementById("edit-contact-name").value = name
+    document.getElementById("edit-contact-id").value = id
+  }
+
   getContacts().then((result) => {
     document.querySelector("#contact-list-table > table").appendChild(renderTable(result))
   })
