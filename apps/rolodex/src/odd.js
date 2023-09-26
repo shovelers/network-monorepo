@@ -206,9 +206,10 @@ async function producerChallengeProcessor(challenge, userInput) {
   }
 }
 
-async function generateRecoveryKit(username){
+async function generateRecoveryKit(){
   console.log("I am here")
   var program = await getProgram();
+  var username = program.session.username;
   var crypto = program.components.crypto;
   var accountDID = await program.accountDID(username);
   var readKey  = await retrieve({ crypto, accountDID });
