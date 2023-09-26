@@ -1,22 +1,25 @@
 <script type="module">
   import { getContacts, editContact, deleteContact, renderTable } from '/dist/odd.js';
-  window.getContacts = getContacts;
   window.editContact = editContact;
   window.deleteContact = deleteContact;
-  window.renderTable = renderTable;
 
   window.setContactEditForm = function (id, name){
     document.getElementById("edit-contact-name").value = name
     document.getElementById("edit-contact-id").value = id
   }
 
-  getContacts().then((result) => {
-    document.querySelector("#contact-list-table > table").appendChild(renderTable(result))
-  })
+  window.refreshContacts = function(){
+    getContacts().then((result) => {
+      document.querySelector("#contact-list-table > table > tbody").replaceWith(renderTable(result))
+    })
+  }
+  refreshContacts();
 </script>
 
 <div id="contact-list-table" class="overflow-x-auto w-1/2">
-  <table class="table table-zebra"></table>
+  <table class="table table-zebra">
+    <tbody></tbody>
+  </table>
 </div>
 <dialog id="contact_edit_modal" class="modal">
   <div class="modal-box">
@@ -24,7 +27,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="edit-contact-form"
-        onsubmit="event.preventDefault(); editContact(document.getElementById('edit-contact-id').value, document.getElementById('edit-contact-name').value).then(function(){console.log('done')}); return false"
+        onsubmit="event.preventDefault(); editContact(document.getElementById('edit-contact-id').value, document.getElementById('edit-contact-name').value).then(function(){refreshContacts()}); return false"
         class="space-y-1 text-center">
         <label for="user_name" class="font-bold">Name</label>
         <input type="text" id="edit-contact-id" hidden class="border border-gray-300 px-2 py-1 rounded-lg">
