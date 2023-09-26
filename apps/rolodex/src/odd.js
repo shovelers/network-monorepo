@@ -49,8 +49,10 @@ async function fissionUsernames(username) {
 async function signup(username) {
   var program = await getProgram();
   var session = await getSession(program);
-  
-  var hashedUsername = await fissionUsernames(username).hashed 
+ 
+  var fissionusername = await fissionUsernames(username)
+  var hashedUsername = fissionusername.hashed
+
   const valid = await program.auth.isUsernameValid(hashedUsername)
   const available = await program.auth.isUsernameAvailable(hashedUsername)
   console.log("username valid", valid)
