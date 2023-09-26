@@ -1,9 +1,11 @@
 <script type="module">
-  import { getProfile, updateProfile, signout, producerChallengeProcessor, generateRecoveryKit } from '/dist/odd.js';
+  import { getProgram, getProfile, updateProfile, signout, producerChallengeProcessor, generateRecoveryKit } from '/dist/odd.js';
   window.updateProfile = updateProfile;
   window.signout = signout;
   window.producerChallengeProcessor = producerChallengeProcessor;
   window.generateRecoveryKit = generateRecoveryKit;
+
+  var fissionHandle = (await getProgram()).session.username
 
   getProfile().then((result) => {
     document.getElementById("handle").innerHTML = result.handle
@@ -11,8 +13,8 @@
     document.getElementById("formname").value = result.name
     document.querySelector(".avatar > div > span").innerHTML = result.handle.charAt(0).toUpperCase()
   
+    document.querySelector("#link_device_modal > .modal-box > .modal-action > div").innerHTML = `${window.location.origin}/link?username=${fissionHandle}`
     //generating qr code
-    document.querySelector("#link_device_modal > .modal-box > .modal-action > div").innerHTML = `${window.location.origin}/link?username=${result.handle}`
     var qrcode = new QRCode({
       content: `${window.location.origin}/link?username=${result.handle}`,
       container: "svg-viewbox", //Responsive use
