@@ -65,7 +65,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="profile-updatae-form"
-        onsubmit="event.preventDefault(); updateProfile(document.getElementById('formname').value).then(function(){console.log('i am here'); refreshProfile()}); return false"
+        onsubmit="event.preventDefault(); updateProfile(document.getElementById('formname').value).then(function(){console.log('i am here'); refreshProfile()}); profile_edit_modal.close(); return false"
         class="space-y-1 text-center">
         <label for="name" class="font-bold">Name</label>
         <input type="text" id="formname" class="border border-gray-300 px-2 py-1 rounded-lg" value="name">

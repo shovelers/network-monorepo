@@ -21,7 +21,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="add-contact-form"
-        onsubmit="event.preventDefault(); addContact(document.getElementById('contacthandle').value).then(function(){refreshContacts()}); return false"
+        onsubmit="event.preventDefault(); addContact(document.getElementById('contacthandle').value).then(function(){refreshContacts()}); contact_add_modal.close(); return false"
         class="space-y-1 text-center">
         <label for="user_name" class="font-bold">Name</label>
         <input type="text" id="contacthandle" class="border border-gray-300 px-2 py-1 rounded-lg">
