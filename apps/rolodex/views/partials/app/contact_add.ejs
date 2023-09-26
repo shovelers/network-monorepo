@@ -1,6 +1,13 @@
 <script type="module">
-  import { addContact } from '/dist/odd.js';
+  import { addContact, getContacts, renderTable } from '/dist/odd.js';
   window.addContact = addContact;
+  
+  window.refreshContacts = function(){
+    getContacts().then((result) => {
+      document.querySelector("#contact-list-table > table > tbody").replaceWith(renderTable(result))
+    })
+  }
+  refreshContacts();
 </script>
 
 <button id="contact-add-btn" class="btn btn-outline btn-sm" onclick="contact_add_modal.showModal()">
@@ -14,7 +21,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="add-contact-form"
-        onsubmit="event.preventDefault(); addContact(document.getElementById('contacthandle').value).then(function(){console.log('done')}); return false"
+        onsubmit="event.preventDefault(); addContact(document.getElementById('contacthandle').value).then(function(){refreshContacts()}); return false"
         class="space-y-1 text-center">
         <label for="user_name" class="font-bold">Name</label>
         <input type="text" id="contacthandle" class="border border-gray-300 px-2 py-1 rounded-lg">
