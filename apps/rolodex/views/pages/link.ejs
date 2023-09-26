@@ -8,7 +8,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { getProgram, getContacts } from '/dist/odd.js';
+      import { getProgram, waitForDataRoot } from '/dist/odd.js';
       var username = window.location.href.split('?')[1].split("=")[1];
       console.log("usernmae: ", username)
       var program = await getProgram(); 
@@ -23,10 +23,11 @@
         if (approved) {
           console.log(`Successfully authenticated as ${username}`)
           var session = await program.auth.session()
+          await waitForDataRoot(username)
           console.log("program: ", program)
           console.log("session: ", session)
           console.log(getContacts())
-          //window.location.href = `/app`
+          window.location.href = `/app`
         }
       })
     </script>

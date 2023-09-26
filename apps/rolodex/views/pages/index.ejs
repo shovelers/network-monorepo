@@ -8,8 +8,10 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { signup, getProgram, getSession } from '/dist/odd.js';
+      import { signup, getProgram, getSession, recover } from '/dist/odd.js';
       window.signup = signup;
+      window.recover = recover;
+
       var program = await getProgram();
       var session = await getSession(program);
       if (session) {
@@ -21,12 +23,20 @@
       <div class="p-4 text-center">
         <div class="text-3xl font-bold tracking-tight leading-none">Build Better Relationships</div>
       </div>
-      <form id="signup-form" onsubmit="event.preventDefault(); signup(document.getElementById('handle').value).then(function(){window.location.href='/app'});" class="space-y-1 text-center">
+      <form id="signup-form" onsubmit="event.preventDefault(); signup(document.getElementById('handle').value);" class="space-y-1 text-center">
         <label for="user_name" class="font-bold">Username</label>
         <input type="text" id="handle" name="handle" class="border border-gray-300 px-2 py-1 rounded-lg">
         <button type="submit" class="btn btn-outline btn-sm">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M12.5 16a3.5 3.5 0 1 0 0-7a3.5 3.5 0 0 0 0 7Zm.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0Zm-2-6a3 3 0 1 1-6 0a3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4a2 2 0 0 0 0 4Z"/><path d="M8.256 14a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025c.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Z"/></g></svg>
           Signup
+        </button>
+      </form>
+      <form id="recovery-form" onsubmit="event.preventDefault(); recover(document.querySelector('#recovery-form > input').files[0]);" class="space-y-1 text-center">
+        <label for="user_name" class="font-bold">Recovery Kit</label>
+        <input type="file" name="recovery_kit" class="border border-gray-300 px-2 py-1 rounded-lg">
+        <button type="submit" class="btn btn-outline btn-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M12.5 16a3.5 3.5 0 1 0 0-7a3.5 3.5 0 0 0 0 7Zm.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0Zm-2-6a3 3 0 1 1-6 0a3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4a2 2 0 0 0 0 4Z"/><path d="M8.256 14a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025c.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Z"/></g></svg>
+          Recover
         </button>
       </form>
       <%- include('../partials/shovel.ejs') %>

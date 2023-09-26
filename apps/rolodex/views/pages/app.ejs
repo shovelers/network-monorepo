@@ -18,7 +18,8 @@
         window.location.href = '/home';
       } else {
         console.log("session: ", session)
-        
+        await session.fs.publish()
+
         var producer = await program.auth.accountProducer(session.username)
         console.log("first producer: ", producer)
         producer.on("challenge", challenge => {

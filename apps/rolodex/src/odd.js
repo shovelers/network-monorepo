@@ -1,20 +1,28 @@
 import * as odd from "@oddjs/odd";
 import { retrieve } from '@oddjs/odd/common/root-key';
+import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 
+let program = null
+
 async function getProgram() {
-  const appInfo = { creator: "Shovel", name: "Rolod" }
-  const program = await odd.program({ namespace: appInfo })
-    .catch(error => {
-      switch (error) {
-        case odd.ProgramError.InsecureContext:
-          // ODD requires HTTPS
-          break;
-        case odd.ProgramError.UnsupportedBrowser:
-          // Browsers must support IndexedDB
-          break;
-      }
-    })
+  if (!program) {
+    console.log("I am here")
+    const appInfo = { creator: "Shovel", name: "Rolod" }
+    program = await odd.program({ namespace: appInfo, debug: true })
+      .catch(error => {
+        switch (error) {
+          case odd.ProgramError.InsecureContext:
+            // ODD requires HTTPS
+            break;
+          case odd.ProgramError.UnsupportedBrowser:
+            // Browsers must support IndexedDB
+            break;
+        }
+      })
+  }
+  console.log(program)
+  console.log(!program)
   return program;
 }
 
@@ -61,6 +69,11 @@ async function signup(username) {
 
   const content = new TextDecoder().decode(await fs.read(profileFilePath))
   console.log("profile data :", content)
+
+  const timeout = setTimeout(() => {
+    clearTimeout(timeout)
+    window.location.href = "/app";
+  }, 5000)
 }
 
 async function getProfile() {
@@ -70,9 +83,12 @@ async function getProfile() {
   const fs = session.fs;
   const { RootBranch } = odd.path
   const privateFilePath = odd.path.file(RootBranch.Private, "profile.json")
+  const pathExists = await fs.exists(privateFilePath)
 
-  const content = new TextDecoder().decode(await fs.read(privateFilePath))
-  return JSON.parse(content)
+  if (pathExists) {
+    const content = new TextDecoder().decode(await fs.read(privateFilePath))
+    return JSON.parse(content)
+  }
 }
 
 async function getContacts() {
@@ -81,11 +97,12 @@ async function getContacts() {
   const fs = session.fs;
   const { RootBranch } = odd.path
   const privateFilePath = odd.path.file(RootBranch.Private, "contacts.json")
-  console.log("root private: ", RootBranch.Private);
-  console.log("file path: ", privateFilePath);
-
-  const content = new TextDecoder().decode(await fs.read(privateFilePath))
-  return JSON.parse(content)
+  const pathExists = await fs.exists(privateFilePath)
+  
+  if (pathExists) {
+    const content = new TextDecoder().decode(await fs.read(privateFilePath))
+    return JSON.parse(content)
+  }
 }
 
 async function filterContacts(filter) {
@@ -220,4 +237,93 @@ async function generateRecoveryKit(username){
   alert('your file has downloaded!'); 
 }
 
-export { signup, getProfile, updateProfile, getContacts, addContact, editContact, deleteContact, signout, getSession, getProgram, producerChallengeProcessor, filterContacts, renderTable, generateRecoveryKit};
+async function recover(kit) {
+  var kitText = await kit.text()
+  var oldUsername = kitText.toString().split("username: ")[1].split("\n")[0].split("#")[0]
+  console.log("username: ...", oldUsername)
+  var readKey = kitText.toString().split("key: ")[1].split("\n")[0]
+  readKey = uint8arrays.fromString(readKey, 'base64pad');
+  console.log("readKey: ...", readKey)
+  var program = await getProgram();
+  var newDID = await program.agentDID();
+  var newUsername = `${oldUsername}-new5`;
+  console.log("newUsername: ...", newUsername);
+  console.log("newDID: ...", newDID)
+  const valid = await program.auth.isUsernameValid(`${newUsername}`)
+  const available = await program.auth.isUsernameAvailable(`${newUsername}`)
+  console.log("username available", available)
+  console.log("username valid", valid)
+  console.log("oldusername valid", await program.auth.isUsernameValid(oldUsername))
+  if (valid && available) {
+    const success = await program.fileSystem.recover({
+      newUsername: newUsername,
+      oldUsername: oldUsername,
+      readKey
+    })
+    setTimeout(() => {  console.log('World!'); }, 10000);
+    console.log("success: ", success);
+  }
+  var hashedNewUsername = await prepareUsername(`${oldUsername}#${newDID}`);
+  console.log("p", hashedNewUsername);
+  console.log("hashed new username valid", await program.auth.isUsernameValid(hashedNewUsername))
+}
+
+async function prepareUsername(username){
+  const normalizedUsername = username.normalize('NFD')
+  const hashedUsername = await sha256(
+    new TextEncoder().encode(normalizedUsername)
+  )
+
+  return uint8arrays
+    .toString(hashedUsername, 'base32')
+    .slice(0, 32)
+}
+
+async function waitForDataRoot(username) {
+  const program = await getProgram()
+  const reference = program?.components.reference
+  const EMPTY_CID = "Qmc5m94Gu7z62RC8waSKkZUrCCBJPyHbkpmGzEePxy2oXJ"
+
+  if (!reference)
+    throw new Error("Program must be initialized to check for data root")
+
+  let dataRoot = await reference.dataRoot.lookup(username)
+
+  if (dataRoot.toString() !== EMPTY_CID) return
+
+  return new Promise((resolve) => {
+    const maxRetries = 50
+    let attempt = 0
+
+    const dataRootInterval = setInterval(async () => {
+      dataRoot = await reference.dataRoot.lookup(username)
+
+      if (dataRoot.toString() === EMPTY_CID && attempt < maxRetries) {
+        attempt++
+        return
+      }
+
+      clearInterval(dataRootInterval)
+      resolve()
+    }, 500)
+  })
+}
+
+export { 
+  signup, 
+  getProfile, 
+  updateProfile, 
+  getContacts, 
+  addContact, 
+  editContact, 
+  deleteContact, 
+  signout, 
+  getSession, 
+  getProgram, 
+  producerChallengeProcessor, 
+  filterContacts, 
+  renderTable, 
+  generateRecoveryKit, 
+  recover,
+  waitForDataRoot
+};
