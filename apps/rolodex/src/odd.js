@@ -246,7 +246,7 @@ async function recover(kit) {
   console.log("readKey: ...", readKey)
   var program = await getProgram();
   var newDID = await program.agentDID();
-  var newUsername = `${oldUsername}-new5`;
+  var newUsername = `${oldUsername}-${Math.floor(1000 + Math.random() * 9000)}`;
   console.log("newUsername: ...", newUsername);
   console.log("newDID: ...", newDID)
   const valid = await program.auth.isUsernameValid(`${newUsername}`)
@@ -260,12 +260,14 @@ async function recover(kit) {
       oldUsername: oldUsername,
       readKey
     })
-    setTimeout(() => {  console.log('World!'); }, 10000);
+
+    const timeout = setTimeout(() => {
+      clearTimeout(timeout)
+      window.location.href = "/app";
+    }, 5000)
+    
     console.log("success: ", success);
   }
-  var hashedNewUsername = await prepareUsername(`${oldUsername}#${newDID}`);
-  console.log("p", hashedNewUsername);
-  console.log("hashed new username valid", await program.auth.isUsernameValid(hashedNewUsername))
 }
 
 async function prepareUsername(username){
