@@ -7,25 +7,27 @@
 
   var fissionHandle = (await getProgram()).session.username
 
-  getProfile().then((result) => {
-    document.getElementById("handle").innerHTML = result.handle
-    document.getElementById("name").innerHTML = "Name: " + result.name
-    document.getElementById("formname").value = result.name
-    document.querySelector(".avatar > div > span").innerHTML = result.handle.charAt(0).toUpperCase()
-  
-    document.querySelector("#link_device_modal > .modal-box > .modal-action > div").innerHTML = `${window.location.origin}/link?username=${fissionHandle}`
-    //generating qr code
-    var qrcode = new QRCode({
-      content: `${window.location.origin}/link?username=${fissionHandle}`,
-      container: "svg-viewbox", //Responsive use
-      join: true //Crisp rendering and 4-5x reduced file size
-    });
-    console.log("generating svg")
-    var svg = qrcode.svg();
-    document.querySelector("#link_device_modal > .modal-box > .modal-action > .qr").innerHTML = svg;
-  })
-
-
+  window.refreshProfile = function(){
+    getProfile().then((result) => {
+      console.log("result: ", result)
+      document.getElementById("handle").innerHTML = result.handle
+      document.getElementById("name").innerHTML = "Name: " + result.name
+      document.getElementById("formname").value = result.name
+      document.querySelector(".avatar > div > span").innerHTML = result.handle.charAt(0).toUpperCase()
+    
+      document.querySelector("#link_device_modal > .modal-box > .modal-action > div").innerHTML = `${window.location.origin}/link?username=${fissionHandle}`
+      //generating qr code
+      var qrcode = new QRCode({
+        content: `${window.location.origin}/link?username=${fissionHandle}`,
+        container: "svg-viewbox", //Responsive use
+        join: true //Crisp rendering and 4-5x reduced file size
+      });
+      console.log("generating svg")
+      var svg = qrcode.svg();
+      document.querySelector("#link_device_modal > .modal-box > .modal-action > .qr").innerHTML = svg;
+    })
+  }
+  refreshProfile();
 </script>
 
 <div class="avatar online placeholder">
@@ -63,7 +65,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="profile-updatae-form"
-        onsubmit="event.preventDefault(); updateProfile(document.getElementById('formname').value).then(function(){console.log('done')}); return false"
+        onsubmit="event.preventDefault(); updateProfile(document.getElementById('formname').value).then(function(){console.log('i am here'); refreshProfile()}); return false"
         class="space-y-1 text-center">
         <label for="name" class="font-bold">Name</label>
         <input type="text" id="formname" class="border border-gray-300 px-2 py-1 rounded-lg" value="name">
