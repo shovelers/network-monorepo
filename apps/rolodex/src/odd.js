@@ -2,12 +2,13 @@ import * as odd from "@oddjs/odd";
 import { retrieve } from '@oddjs/odd/common/root-key';
 import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
+import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 
 let program = null
+const USERNAME_STORAGE_KEY = "fullUsername"
 
 async function getProgram() {
   if (!program) {
-    console.log("I am here")
     const appInfo = { creator: "Shovel", name: "Rolod" }
     program = await odd.program({ namespace: appInfo, debug: true })
       .catch(error => {
@@ -21,8 +22,7 @@ async function getProgram() {
         }
       })
   }
-  console.log(program)
-  console.log(!program)
+  console.log("program: ", program)
   return program;
 }
 
@@ -34,19 +34,31 @@ async function getSession(program) {
 
   return session;
 }
+async function fissionUsernames(username) {
+  let fullUsername = await program.components.storage.getItem(USERNAME_STORAGE_KEY)
+  if (!fullUsername) {
+    const did = await createDID(program.components.crypto)
+    fullUsername = `${username}#${did}`
+    await program.components.storage.setItem(USERNAME_STORAGE_KEY, fullUsername)
+  }
+
+  var hashedUsername = await prepareUsername(fullUsername);
+  return {full: fullUsername, hashed: hashedUsername} 
+}
 
 async function signup(username) {
   var program = await getProgram();
   var session = await getSession(program);
-  const valid = await program.auth.isUsernameValid(username)
-  const available = await program.auth.isUsernameAvailable(username)
+  
+  var hashedUsername = await fissionUsernames(username).hashed 
+  const valid = await program.auth.isUsernameValid(hashedUsername)
+  const available = await program.auth.isUsernameAvailable(hashedUsername)
   console.log("username valid", valid)
   console.log("username available", available)
 
   if (valid && available) {
-    console.log("registering ...", username)
     // Register the user
-    const { success } = await program.auth.register({ username: username })
+    const { success } = await program.auth.register({ username: hashedUsername })
     console.log("success: ", success)
     // Create a session on success
     session = success ? await program.auth.session() : null
@@ -206,12 +218,13 @@ async function producerChallengeProcessor(challenge, userInput) {
   }
 }
 
-async function generateRecoveryKit(){
-  console.log("I am here")
+async function generateRecoveryKit(username){
   var program = await getProgram();
-  var username = program.session.username;
+  var fissionnames = await fissionUsernames(username)
+
+  var accountDID = await program.accountDID(fissionnames.hashed);
+  
   var crypto = program.components.crypto;
-  var accountDID = await program.accountDID(username);
   var readKey  = await retrieve({ crypto, accountDID });
   const encodedReadKey = uint8arrays.toString(readKey, 'base64pad');
   console.log(encodedReadKey);
@@ -224,7 +237,7 @@ async function generateRecoveryKit(){
   
   # To use this file, go to ${window.location.origin}/recover/
   
-  username: ${username}
+  username: ${fissionnames.full}
   key: ${encodedReadKey}
   `;
   
@@ -240,34 +253,40 @@ async function generateRecoveryKit(){
 
 async function recover(kit) {
   var kitText = await kit.text()
-  var oldUsername = kitText.toString().split("username: ")[1].split("\n")[0].split("#")[0]
-  console.log("username: ...", oldUsername)
+  var oldFullUsername = kitText.toString().split("username: ")[1].split("\n")[0]
+  var oldHashedUsername = await prepareUsername(oldFullUsername)
+  console.log("old username: ...", oldFullUsername)
+  console.log("hashed old username: ", oldHashedUsername)
   var readKey = kitText.toString().split("key: ")[1].split("\n")[0]
   readKey = uint8arrays.fromString(readKey, 'base64pad');
   console.log("readKey: ...", readKey)
+  
   var program = await getProgram();
-  var newDID = await program.agentDID();
-  var newUsername = `${oldUsername}-${Math.floor(1000 + Math.random() * 9000)}`;
-  console.log("newUsername: ...", newUsername);
-  console.log("newDID: ...", newDID)
-  const valid = await program.auth.isUsernameValid(`${newUsername}`)
-  const available = await program.auth.isUsernameAvailable(`${newUsername}`)
+  await program.components.storage.removeItem(USERNAME_STORAGE_KEY)
+  var fissionnames = await fissionUsernames(oldFullUsername.split("#")[0])
+  var newhashedUsername = fissionnames.hashed;
+  
+  const valid = await program.auth.isUsernameValid(`${newhashedUsername}`)
+  const available = await program.auth.isUsernameAvailable(`${newhashedUsername}`)
   console.log("username available", available)
   console.log("username valid", valid)
-  console.log("oldusername valid", await program.auth.isUsernameValid(oldUsername))
+  
   if (valid && available) {
     const success = await program.fileSystem.recover({
-      newUsername: newUsername,
-      oldUsername: oldUsername,
+      newUsername: newhashedUsername,
+      oldUsername: oldHashedUsername,
       readKey
     })
-
+    
+    console.log("success: ", success);
+    var session = await program.auth.session()
+    await waitForDataRoot(newhashedUsername)
+    console.log("session: ", session)
+    
     const timeout = setTimeout(() => {
       clearTimeout(timeout)
       window.location.href = "/app";
     }, 5000)
-    
-    console.log("success: ", success);
   }
 }
 
@@ -310,6 +329,17 @@ async function waitForDataRoot(username) {
       resolve()
     }, 500)
   })
+}
+
+async function createDID(crypto){
+  if (await program.agentDID()){
+    return program.agentDID()
+  } else {
+    const pubKey = await crypto.keystore.publicExchangeKey()
+    const ksAlg = await crypto.keystore.getAlgorithm()
+
+    return publicKeyToDid(crypto, pubKey, ksAlg)
+  }
 }
 
 export { 
