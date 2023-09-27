@@ -344,6 +344,15 @@ async function createDID(crypto){
   }
 }
 
+async function importContacts(username, password){
+  await updateFile("profile.json", (content) => {
+    content.appleCreds = {username: username, password: password} 
+    console.log("apple creds", content)
+    return content
+  })
+
+}
+
 export { 
   signup, 
   getProfile, 
@@ -360,5 +369,6 @@ export {
   renderTable, 
   generateRecoveryKit, 
   recover,
-  waitForDataRoot
+  waitForDataRoot,
+  importContacts
 };
