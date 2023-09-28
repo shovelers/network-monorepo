@@ -32,24 +32,30 @@ server.get("/link", (req, res) => {
 });
 
 server.get("/apple_contacts", async (req, res) => {
-  const client = await createDAVClient({
-    serverUrl: 'https://contacts.icloud.com',
-    credentials: {
-      username: req.query.username,
-      password: req.query.password,
-    },
-    authMethod: 'Basic',
-    defaultAccountType: 'carddav',
-  });
+  try {
+    const client = await createDAVClient({
+      serverUrl: 'https://contacts.icloud.com',
+      credentials: {
+        username: req.query.username,
+        password: req.query.password,
+      },
+      authMethod: 'Basic',
+      defaultAccountType: 'carddav',
+    });
 
-  const addressBooks = await client.fetchAddressBooks();
-  console.log(addressBooks);
+    const addressBooks = await client.fetchAddressBooks();
+    console.log(addressBooks);
 
-  const vcards = await client.fetchVCards({
-    addressBook: addressBooks[0],
-  });
-  
-  res.status(200).json(vcards)
+    const vcards = await client.fetchVCards({
+      addressBook: addressBooks[0],
+    });
+    
+    res.status(200).json(vcards)
+  } catch (err) {
+    console.log(err)
+    res.status(400).
+    json(err)
+  } 
 });
 
 server.listen(port, (err) => {
