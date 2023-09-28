@@ -3,7 +3,11 @@ import { retrieve } from '@oddjs/odd/common/root-key';
 import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
-import { fetchAppleContacts } from './apple_contacts.js';
+import axios from 'axios';
+
+const axios_client  = axios.create({
+  baseURL: `${window.location.origin}`,
+})
 
 let program = null
 const USERNAME_STORAGE_KEY = "fullUsername"
@@ -346,12 +350,19 @@ async function createDID(crypto){
 }
 
 async function importContacts(username, password){
+  //don't ask if already present
   await updateFile("profile.json", (content) => {
     content.appleCreds = {username: username, password: password} 
     console.log("apple creds", content)
     return content
   })
-  await fetchAppleContacts();
+
+  const response = await axios_client.get('/apple_contacts', { params: { username: username, password: password } })
+    .then(function (response) {
+      return response;
+    });
+
+  console.log("contacts :", response.data);
 }
 
 export { 
