@@ -4,6 +4,7 @@ import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 import axios from 'axios';
+import _ from 'lodash';
 
 const axios_client  = axios.create({
   baseURL: `${window.location.origin}`,
@@ -350,19 +351,37 @@ async function createDID(crypto){
 }
 
 async function importContacts(username, password){
-  //don't ask if already present
-  await updateFile("profile.json", (content) => {
-    content.appleCreds = {username: username, password: password} 
-    console.log("apple creds", content)
+  //fetch creds from store if already present
+  console.log("import triggered")
+  var credsPresence = await appleCredsPresent()
+  if (credsPresence.response) {
+    var user = credsPresence.value.username
+    var pass = credsPresence.value.password
+  } else {
+    await updateFile("profile.json", (content) => {
+      content.appleCreds = {username: username, password: password} 
+      return content
+    })
+    var user = username
+    var pass = password
+  }
+
+  const response = await axios_client.get('/apple_contacts', { params: { username: user, password: pass } })
+  .then(function (response) {
+    return response;
+  });
+
+  await updateFile("contacts.json", (content) => {
+    content.appleContacts = response.data
     return content
   })
+}
 
-  const response = await axios_client.get('/apple_contacts', { params: { username: username, password: password } })
-    .then(function (response) {
-      return response;
-    });
-
-  console.log("contacts :", response.data);
+async function appleCredsPresent(){
+  var profileData = await getProfile()
+  var credsPresent =  !(_.isEmpty(profileData.appleCreds) || profileData.appleCreds.username === "")
+  console.log("creds present: ", credsPresent)
+  return {response: credsPresent, value: profileData.appleCreds} 
 }
 
 export { 
@@ -382,5 +401,6 @@ export {
   generateRecoveryKit, 
   recover,
   waitForDataRoot,
-  importContacts
+  importContacts,
+  appleCredsPresent
 };
