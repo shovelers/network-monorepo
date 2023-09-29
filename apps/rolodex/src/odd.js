@@ -133,7 +133,7 @@ async function filterContacts(filter) {
   var filteredContacts = { "contactList": {}, "appleContacts": []}
   for (var id in contacts.contactList) {
     var contact = contacts.contactList[id]
-    if (contact.name.toLowerCase().includes(filter.toLowerCase())) {
+    if (contact.name.toLowerCase().includes(filter.toLowerCase()) || contact.tags.filter(tag => tag.toLowerCase().includes(filter.toLowerCase())).length > 0) {
       filteredContacts.contactList[id] = contact
     }
   }
@@ -147,7 +147,8 @@ async function updateProfile(name) {
     return content
   })
 }
-async function addContact(newContact, appleContactID = "", tags = []) {
+
+async function addContact(newContact, tags = [], appleContactID = "") {
   await updateFile("contacts.json", (content) => {
     var id = crypto.randomUUID()
     content.contactList[id] = { name: newContact , appleContactID: appleContactID, tags: tags }
