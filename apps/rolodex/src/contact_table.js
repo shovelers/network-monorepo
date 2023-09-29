@@ -60,17 +60,5 @@ export class ContactTable extends HTMLElement {
         </button>`
       tbody.appendChild(row);
     };
-
-    if (this._contacts.appleContacts.length > 0) {
-      (this._contacts.appleContacts).forEach((appleContact) => {
-        const row = tbody.insertRow();
-        const cell = row.insertCell(0);
-        const name = appleContact.data.split('\n')[3].split(':')[1].replaceAll(';', ' ');
-        cell.textContent = name;
-        const emptycell = row.insertCell(1);
-        emptycell.innerhtml = '';
-        tbody.appendChild(row);
-      });
-    }
   }
 }

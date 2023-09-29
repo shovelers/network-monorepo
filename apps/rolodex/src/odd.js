@@ -378,10 +378,10 @@ async function addAppleContactsToContactList(appleContacts){
   for (var i = 0; i < appleContacts.length; i++) {
     var appleContact = appleContacts[i]
     var id = crypto.randomUUID()
-    var name = appleContact.data.split('\n')[3].split(':')[1].replaceAll(';', ' ')
-    console.log("apple array :", appleContact.data.split('\n'))
-    console.log("apple array UID:", appleContact.data.split('\n').at(-2))
-    var uid = appleContact.data.split('\n').at(-2).split(':')[1]
+    var name = appleContact.data.split(/\r?\n/)[3].split(':')[1].replaceAll(';', ' ').trim()
+    var uid = appleContact.data.split(/\r?\n/).at(-2).split(':')[1].trim()
+    console.log("apple name :", name)
+    console.log("apple UID:", uid)
     newContacts[id] = {name: name, appleContactID: uid}
   }
 
