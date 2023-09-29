@@ -80,7 +80,7 @@ async function signup(username) {
   const fs = session.fs
   console.log(fs)
   const profileData = JSON.stringify({ "handle": username, "name": "John Doe" })
-  const contactData = JSON.stringify({ contactList: {} })
+  const contactData = JSON.stringify({ contactList: {}, appleContacts: [] })
 
   const { RootBranch } = odd.path
   const profileFilePath = odd.path.file(RootBranch.Private, "profile.json")
@@ -130,10 +130,10 @@ async function getContacts() {
 
 async function filterContacts(filter) {
   var contacts = await getContacts()
-  var filteredContacts = { "contactList": {} }
+  var filteredContacts = { "contactList": {}, "appleContacts": []}
   for (var id in contacts.contactList) {
     var contact = contacts.contactList[id]
-    if (contact.toLowerCase().includes(filter.toLowerCase())) {
+    if (contact.name.toLowerCase().includes(filter.toLowerCase())) {
       filteredContacts.contactList[id] = contact
     }
   }
@@ -147,18 +147,18 @@ async function updateProfile(name) {
     return content
   })
 }
-async function addContact(newContact) {
+async function addContact(newContact, appleContactID = "") {
   await updateFile("contacts.json", (content) => {
     var id = crypto.randomUUID()
-    content.contactList[id] = newContact
+    content.contactList[id] = { name: newContact , appleContactID: appleContactID }
     return content
   })
 }
 
-async function editContact(id, contact) {
+async function editContact(id, name) {
   await updateFile("contacts.json", (content) => {
     var contactList = content.contactList
-    contactList[id] = contact
+    contactList[id].name = name
     return content
   })
 }
@@ -199,7 +199,6 @@ async function signout() {
 }
 
 async function producerChallengeProcessor(challenge, userInput) {
-  console.log("i am here")
   console.log("challenge pin", challenge.pin)
   console.log("userinput", userInput)
 
