@@ -1,19 +1,18 @@
 <script type="module">
-  import { filterContacts, renderTable, getContacts } from '/dist/odd.js';
+  import { filterContacts, getContacts } from '/dist/odd.js';
   window.filterContacts = filterContacts;
-  window.renderTable = renderTable;
   window.getContacts = getContacts;
 </script>
 
 <div class="flex flex-row space-x-2">
   <form class="search-form flex flex-row space-x-2"
-  onsubmit="event.preventDefault(); filterContacts(document.querySelector('.search-form > input').value).then((result) => {document.querySelector('#contact-list-table > table > tbody').replaceWith(renderTable(result))}); return false">
+  onsubmit="event.preventDefault(); filterContacts(document.querySelector('.search-form > input').value).then((result) => {document.querySelector('contact-table').contacts = result}); return false">
     <input type="text" placeholder="Search" class="input input-bordered input-sm w-full max-w-xs" />
     <button type="submit" class="btn btn-outline btn-sm">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor"d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0a5.5 5.5 0 0 1 11 0z" /></svg>
     </button>
   </form>
-  <button class="btn btn-outline btn-sm" onclick="getContacts().then((result) => {document.querySelector('#contact-list-table > table > tbody').replaceWith(renderTable(result)); document.querySelector('.search-form > input').value = ''})">
+  <button class="btn btn-outline btn-sm" onclick="getContacts().then((result) => {document.querySelector('contact-table').contacts = result; document.querySelector('.search-form > input').value = ''})">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914a.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></g></svg>
   </button>
 </div>
