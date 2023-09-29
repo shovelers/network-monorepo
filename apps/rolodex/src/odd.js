@@ -359,6 +359,11 @@ async function importContacts(username, password){
     content.appleContacts = response.data
     return content
   })
+
+  //insert appleContacts to contactList
+  await addAppleContactsToContactList(response.data)
+  console.log("import done")
+  console.log("updated contactlist :", await getContacts())
 }
 
 async function appleCredsPresent(){
@@ -366,6 +371,24 @@ async function appleCredsPresent(){
   var credsPresent =  !(_.isEmpty(profileData.appleCreds) || profileData.appleCreds.username === "")
   console.log("creds present: ", credsPresent)
   return {response: credsPresent, value: profileData.appleCreds} 
+}
+
+async function addAppleContactsToContactList(appleContacts){
+  var newContacts = {}
+  for (var i = 0; i < appleContacts.length; i++) {
+    var appleContact = appleContacts[i]
+    var id = crypto.randomUUID()
+    var name = appleContact.data.split('\n')[3].split(':')[1].replaceAll(';', ' ')
+    console.log("apple array :", appleContact.data.split('\n'))
+    console.log("apple array UID:", appleContact.data.split('\n').at(-2))
+    var uid = appleContact.data.split('\n').at(-2).split(':')[1]
+    newContacts[id] = {name: name, appleContactID: uid}
+  }
+
+  await updateFile("contacts.json", (content) => {
+    content.contactList = {...content.contactList, ...newContacts}
+    return content
+  })  
 }
 
 export { 

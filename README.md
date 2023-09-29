@@ -23,6 +23,30 @@ Note: the default port exposed in the docker file is 3000
 * Cretae Certs: `flyctl certs create -a <name> <custom domain>`
 * Cert status: `flyctl certs show -a <name> <custom domain>`, once this succeed you can access the app on <custom domain>
 
+### Apple Contact Example
+```
+{
+  url: 'https://contacts.icloud.com/1794573574/carddavhome/card/QTU4RjE1RkEtNzZENC00MDYzLUFEOEItQkQ3RUM1RjkxMDUx.vcf',
+  etag: '"koohvdtp"',
+  data: 'BEGIN:VCARD\r\n' +
+    'VERSION:3.0\r\n' +
+    'PRODID:-//Apple Inc.//iOS 12.0//EN\r\n' +
+    'N:Dinkar;Tejas;;;\r\n' +
+    'FN:Tejas Dinkar\r\n' +
+    'ORG:Quintype;\r\n' +
+    'item1.EMAIL;type=INTERNET;type=pref:txxxxxs@quxxxxpe.com\r\n' +
+    'item1.X-ABLabel:\r\n' +
+    'TEL;type=CELL;type=VOICE;type=pref:+91984xxxx696\r\n' +
+    'PHOTO;TYPE=JPEG;X-ABCROP-RECTANGLE=ABClipRect_1&0&0&96&96&iZkOka9PA8YVSYzPI\r\n' +
+    ' QfKmw==;VALUE=uri:https://gateway.icloud.com/contacts/1794573574/ck/card/81\r\n' +
+    ' 4c4737b7a47da29e2c7a60ae2ca280\r\n' +
+    'REV:2018-10-30T01:49:37Z\r\n' +
+    'UID:A58F15FA-76D4-4063-AD8B-BD7EC5F91051\r\n' +
+    'END:VCARD'
+}
+
+```
+
 
 ### DID Doc Example
 
