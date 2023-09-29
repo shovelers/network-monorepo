@@ -147,18 +147,19 @@ async function updateProfile(name) {
     return content
   })
 }
-async function addContact(newContact, appleContactID = "") {
+async function addContact(newContact, appleContactID = "", tags = []) {
   await updateFile("contacts.json", (content) => {
     var id = crypto.randomUUID()
-    content.contactList[id] = { name: newContact , appleContactID: appleContactID }
+    content.contactList[id] = { name: newContact , appleContactID: appleContactID, tags: tags }
     return content
   })
 }
 
-async function editContact(id, name) {
+async function editContact(id, name, tags = []) {
   await updateFile("contacts.json", (content) => {
     var contactList = content.contactList
     contactList[id].name = name
+    contactList[id].tags = tags
     return content
   })
 }
@@ -396,21 +397,21 @@ async function addAppleContactsToContactList(appleContacts){
 }
 
 export { 
+  getSession, 
+  getProgram, 
+  producerChallengeProcessor, 
+  waitForDataRoot,
   signup, 
+  signout, 
+  generateRecoveryKit, 
+  recover,
   getProfile, 
   updateProfile, 
   getContacts, 
   addContact, 
   editContact, 
   deleteContact, 
-  signout, 
-  getSession, 
-  getProgram, 
-  producerChallengeProcessor, 
   filterContacts, 
-  generateRecoveryKit, 
-  recover,
-  waitForDataRoot,
   importContacts,
   appleCredsPresent
 };
