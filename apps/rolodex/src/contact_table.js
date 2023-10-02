@@ -55,9 +55,13 @@ export class ContactTable extends HTMLElement {
       nameCell.classList.add('justify-self-start');
       nameCell.textContent = value.name;
       let tagscell = row.insertCell(1);
-      tagscell.innerHTML = value.tags;
       if (value.tags !== undefined && value.tags.length > 0) {
-        tagscell.classList.add('place-self-center','badge','badge-info');
+        tagscell.classList.add('place-self-center', 'overflow-auto', 'flex', 'space-x-1');
+        for (let tag of value.tags) {
+          tagscell.innerHTML += `<span class="badge badge-info">${tag}</span>`;
+        }
+      } else {
+        tagscell.innerHTML = '';
       }
       let editcell = row.insertCell(2);
       editcell.classList.add('justify-self-end');

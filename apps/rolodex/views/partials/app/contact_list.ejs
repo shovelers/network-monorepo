@@ -26,7 +26,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="edit-contact-form"
-      onsubmit="event.preventDefault(); editContact(document.getElementById('edit-contact-id').value, document.getElementById('edit-contact-name').value, [document.getElementById('edit-contact-tags').value]).then(function(){refreshContacts()}); contact_edit_modal.close(); return false"
+      onsubmit="event.preventDefault(); editContact(document.getElementById('edit-contact-id').value, document.getElementById('edit-contact-name').value, tagsArray(document.getElementById('edit-contact-tags').value)).then(function(){refreshContacts()}); contact_edit_modal.close(); return false"
       class="text-center">
         <input type="text" id="edit-contact-id" hidden>
         <label for="edit-contact-name" class="label"><span class="label-text">Name</span> </label>
