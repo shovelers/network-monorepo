@@ -45,6 +45,10 @@
     document.getElementById("apple_username").style.display = "none"
     document.getElementById("apple_password").style.display = "none"
   }
+
+  window.hideLoading = function(){
+    document.querySelector(".loading").classList.add("hidden");
+  }
 </script>
 
 <div class="avatar online placeholder">
@@ -125,7 +129,7 @@
   <div class="modal-box">
     <p class="text-sm">Generate app specific password <a href="https://support.apple.com/en-us/102654" class="link" target="_blank">here</a></p>
     <div class="modal-action flex flex-col justify-center items-center space-y-2">
-      <form class="flex flex-col space-y-2 items-center" onsubmit="event.preventDefault(); importContacts(document.querySelector('#apple_username').value, document.querySelector('#apple_password').value); showLoading(); setTimeout(()=>{import_contacts_modal.close(); refreshContacts();}, 5000); return false">
+      <form class="flex flex-col space-y-2 items-center" onsubmit="event.preventDefault(); importContacts(document.querySelector('#apple_username').value, document.querySelector('#apple_password').value); showLoading(); setTimeout(()=>{import_contacts_modal.close(); refreshContacts(); hideLoading();}, 5000); return false">
         <input type="text" id="apple_username" placeholder="Apple ID" class="input input-bordered input-sm w-full max-w-xs" />
         <input type="password" id="apple_password" placeholder="App Specific Password" class="input input-bordered input-sm w-full max-w-xs" />
         <div class="loading loading-infinity loading-lg hidden"></div>
