@@ -38,7 +38,7 @@
           Signup
         </button>
       </form>
-      <form id="recovery-form" onsubmit="event.preventDefault(); recover(document.querySelector('#recovery-form > input').files[0]);" class="space-y-1 text-center">
+      <form id="recovery-form" onsubmit="event.preventDefault(); recover(document.querySelector('#recovery-form > input').files[0]); showLoading();" class="space-y-1 text-center">
         <label for="user_name" class="font-bold">Recovery Kit</label>
         <input type="file" name="recovery_kit" class="border border-gray-300 px-2 py-1 rounded-lg">
         <button type="submit" class="btn btn-outline btn-sm">
