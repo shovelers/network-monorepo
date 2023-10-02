@@ -73,6 +73,10 @@ async function signup(username) {
     console.log("success: ", success)
     // Create a session on success
     session = success ? await program.auth.session() : null
+  } else if (!valid) {
+    alert("username is not valid")
+  } else if (!available) {
+    alert("username is not available")
   }
 
   //create fs

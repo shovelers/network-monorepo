@@ -8,6 +8,11 @@
     })
   }
   refreshContacts();
+
+  window.clearFields = function(){
+    document.getElementById("contacthandle").value = "";
+    document.getElementById("contacttags").value = "";
+  }
 </script>
 
 <button id="contact-add-btn" class="btn btn-outline btn-sm" onclick="contact_add_modal.showModal()">
@@ -21,7 +26,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="add-contact-form"
-        onsubmit="event.preventDefault(); addContact(document.getElementById('contacthandle').value,[document.getElementById('contacttags').value]).then(function(){refreshContacts()}); contact_add_modal.close(); return false"
+        onsubmit="event.preventDefault(); addContact(document.getElementById('contacthandle').value,[document.getElementById('contacttags').value]).then(function(){refreshContacts()}); contact_add_modal.close(); clearFields(); return false"
         class="space-y-1 text-center">
         <label for="contacthandle" class="label"><span class="label-text">Name</span></label>
         <input type="text" name="contacthandle" id="contacthandle" class="input input-sm input-bordered rounded-lg">
