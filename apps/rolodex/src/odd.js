@@ -369,7 +369,6 @@ async function importContacts(username, password){
   //insert appleContacts to contactList
   await addAppleContactsToContactList(response.data)
   console.log("import done")
-  console.log("updated contactlist :", await getContacts())
 }
 
 async function appleCredsPresent(){
