@@ -50,13 +50,13 @@ export class ContactTable extends HTMLElement {
     // Create table rows for contacts
     for (let [key, value] of Object.entries(this._contacts.contactList)) {
       const row = tbody.insertRow();
-      row.classList.add('grid','grid-cols-3', 'place-content-center');
+      row.classList.add('grid','grid-cols-6', 'gap-2', 'place-content-center');
       const nameCell = row.insertCell(0);
-      nameCell.classList.add('justify-self-start');
+      nameCell.classList.add('justify-self-start', 'col-span-2');
       nameCell.textContent = value.name;
       let tagscell = row.insertCell(1);
       if (value.tags !== undefined && value.tags.length > 0 && value.tags[0] !== '') {
-        tagscell.classList.add('place-self-center', 'overflow-auto', 'flex', 'space-x-1');
+        tagscell.classList.add('place-self-center', 'space-x-1', 'space-y-1', 'col-span-3');
         for (let tag of value.tags) {
           tagscell.innerHTML += `<span class="badge badge-info">${tag}</span>`;
         }
