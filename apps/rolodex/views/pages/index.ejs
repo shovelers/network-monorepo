@@ -20,8 +20,7 @@
 
       window.showLoading = function(){
         document.querySelector(".loading").classList.remove("hidden");
-        document.querySelector("#signup-form").classList.add("hidden");
-        document.querySelector("#recovery-form").classList.add("hidden");
+        document.querySelector("#input-forms").classList.add("hidden");
       }
     </script>
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
@@ -30,7 +29,7 @@
         <div class="text-3xl font-bold tracking-tight leading-none">Build Better Relationships</div>
       </div>
       <div class="loading loading-infinity loading-lg hidden"></div>
-      <div class="space-y-8 bg-base-200 p-12 rounded-lg">
+      <div id="input-forms" class="space-y-8 bg-base-200 p-12 rounded-lg">
         <form id="signup-form" onsubmit="event.preventDefault(); signup(document.getElementById('handle').value); showLoading();" class="space-y-1 text-center">
           <label for="user_name" class="font-bold">Username</label>
           <input type="text" id="handle" name="handle" class="border border-gray-300 px-2 py-1 rounded-lg">
