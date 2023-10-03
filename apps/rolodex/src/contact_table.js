@@ -55,7 +55,7 @@ export class ContactTable extends HTMLElement {
       nameCell.classList.add('justify-self-start');
       nameCell.textContent = value.name;
       let tagscell = row.insertCell(1);
-      if (value.tags !== undefined && value.tags.length > 0) {
+      if (value.tags !== undefined && value.tags.length > 0 && value.tags[0] !== '') {
         tagscell.classList.add('place-self-center', 'overflow-auto', 'flex', 'space-x-1');
         for (let tag of value.tags) {
           tagscell.innerHTML += `<span class="badge badge-info">${tag}</span>`;
