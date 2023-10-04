@@ -211,9 +211,9 @@ async function producerChallengeProcessor(challenge, userInput) {
 
   // Either show `challenge.pin` or have the user input a PIN and see if they're equal.
   if (userInput === challenge.pin.join("")) {
-    challenge.confirmPin(); alert("success")
+    challenge.confirmPin(); alert("Correct PIN.... Wait for the other device to load account data")
   } else {
-    challenge.rejectPin(); alert("wrong pin")
+    challenge.rejectPin(); alert("Wrong PIN")
   }
 }
 
