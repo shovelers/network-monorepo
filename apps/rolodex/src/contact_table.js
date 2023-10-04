@@ -4,7 +4,7 @@ export class ContactTable extends HTMLElement {
 
     // Create a table element
     const table = document.createElement('table');
-    table.classList.add('table', 'table-pin-rows');
+    table.classList.add('table', 'table-lg', 'table-pin-rows');
 
     // Create the table header row
     const thead = table.createTHead();

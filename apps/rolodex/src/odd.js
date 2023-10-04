@@ -6,6 +6,7 @@ import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 import axios from 'axios';
 import _ from 'lodash';
 import { ContactTable } from "./contact_table";
+import {vCardParser} from './vcard_parser.js';
 
 customElements.define('contact-table', ContactTable);
 
@@ -386,9 +387,10 @@ async function addAppleContactsToContactList(appleContacts){
   var newContacts = {}
   for (var i = 0; i < appleContacts.length; i++) {
     var appleContact = appleContacts[i]
+    var parsedAppleContact = vCardParser.parse(appleContact.data)[0]
     var id = crypto.randomUUID()
-    var name = appleContact.data.split(/\r?\n/)[3].split(':')[1].replaceAll(';', ' ').trim()
-    var uid = appleContact.data.split(/\r?\n/).at(-2).split(':')[1].trim()
+    var name = parsedAppleContact.displayName
+    var uid = parsedAppleContact.UID
     if (!existingAppleContactIDs.includes(uid)) {
       newContacts[id] = {name: name, appleContactID: uid, tags: []} 
     }
