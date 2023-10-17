@@ -387,7 +387,12 @@ async function addAppleContactsToContactList(appleContacts){
   var newContacts = {}
   for (var i = 0; i < appleContacts.length; i++) {
     var appleContact = appleContacts[i]
-    var parsedAppleContact = vCardParser.parse(appleContact.data)[0]
+    try {
+      var parsedAppleContact = vCardParser.parse(appleContact.data)[0]
+    } catch (error) {
+      console.log("error for contact: ", appleContact, "error: ", error)
+      continue
+    }
     var id = crypto.randomUUID()
     var name = parsedAppleContact.displayName
     var uid = parsedAppleContact.UID

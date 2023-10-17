@@ -49,6 +49,8 @@ server.get("/apple_contacts", async (req, res) => {
     const vcards = await client.fetchVCards({
       addressBook: addressBooks[0],
     });
+
+    console.log("Fetched " + vcards.length + " contacts for " + req.query.username + " successfully!")
     
     res.status(200).json(vcards)
   } catch (err) {
