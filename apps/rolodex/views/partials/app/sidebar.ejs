@@ -127,7 +127,7 @@
 </dialog>
 <dialog id="import_contacts_modal" class="modal">
   <div class="modal-box">
-    <p class="text-base">Generate app specific password <a href="https://support.apple.com/en-us/102654" class="link" target="_blank">here</a></p>
+    <p class="text-base">Generate app specific password <a href="https://appleid.apple.com/" class="link" target="_blank">here</a></p>
     <p class="text-xs italic">Rolodex DOES NOT store to any of your data, it stays encrypted on your device & in your private vault on IPFS</p>
     <div class="modal-action flex flex-col justify-center items-center space-y-2">
       <form class="flex flex-col space-y-2 items-center" onsubmit="event.preventDefault(); importContacts(document.querySelector('#apple_username').value, document.querySelector('#apple_password').value); showLoading(); setTimeout(()=>{import_contacts_modal.close(); refreshContacts(); hideLoading();}, 5000); return false">
