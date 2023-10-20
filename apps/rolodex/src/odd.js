@@ -408,19 +408,16 @@ async function addAppleContactsToContactList(appleContacts){
 }
 
 async function importGoogleContacts() {
-  var access_token
-  var client = google.accounts.oauth2.initTokenClient({
+  google.accounts.oauth2.initTokenClient({
     client_id: '916329778021-oj160t8s79775rpvnkv5lfjcr1cv02pm.apps.googleusercontent.com',
     scope: 'https://www.googleapis.com/auth/contacts.readonly',
     callback: async (tokenResponse) => {
-      access_token = tokenResponse.access_token;
       const response = await axios_client.get('https://people.googleapis.com/v1/people/me/connections',
-        {params: { personFields: 'names'}, headers: { Authorization: `Bearer ${access_token}` }}
+        {params: { personFields: 'names'}, headers: { Authorization: `Bearer ${tokenResponse.access_token}` }}
       )
       console.log(response.data);
     },
-  });
-  client.requestAccessToken();
+  }).requestAccessToken();
 }
 
 export { 
