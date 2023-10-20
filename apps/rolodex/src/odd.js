@@ -412,7 +412,7 @@ async function addAppleContactsToContactList(appleContacts){
 
 async function importGoogleContacts(refresh) {
   google.accounts.oauth2.initTokenClient({
-    client_id: '916329778021-oj160t8s79775rpvnkv5lfjcr1cv02pm.apps.googleusercontent.com',
+    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
     scope: 'https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/userinfo.email',
     callback: async (tokenResponse) => {
       const profile = await axios_client.get('https://www.googleapis.com/oauth2/v2/userinfo', {headers: { Authorization: `Bearer ${tokenResponse.access_token}`}})
