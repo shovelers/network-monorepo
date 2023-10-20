@@ -407,7 +407,7 @@ async function addAppleContactsToContactList(appleContacts){
   })  
 }
 
-async function importGoogleContacts() {
+async function importGoogleContacts(refresh) {
   google.accounts.oauth2.initTokenClient({
     client_id: '916329778021-oj160t8s79775rpvnkv5lfjcr1cv02pm.apps.googleusercontent.com',
     scope: 'https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/userinfo.email',
@@ -424,8 +424,35 @@ async function importGoogleContacts() {
         content.googleContacts[profile.data.email] = response.data.connections
         return content
       })
+
+      await addGoogleContactsToContactList(response.data.connections)
+      console.log("import done")
+
+      refresh()
     },
   }).requestAccessToken();
+}
+
+async function addGoogleContactsToContactList(googleContacts){
+  var contacts = await getContacts()
+  var existingGoogleContactIDs = Object.values(contacts.contactList).map(contact => contact.googleContactID)
+
+  var newContacts = {}
+  for (var i = 0; i < googleContacts.length; i++) {
+    var googleContact = googleContacts[i]
+
+    var id = crypto.randomUUID()
+    var name = googleContact.names[0].displayName
+    var uid = googleContact.resourceName
+    if (!existingGoogleContactIDs.includes(uid)) {
+      newContacts[id] = {name: name, googleContactID: uid, tags: []} 
+    }
+  }
+
+  await updateFile("contacts.json", (content) => {
+    content.contactList = {...content.contactList, ...newContacts}
+    return content
+  })  
 }
 
 export { 
