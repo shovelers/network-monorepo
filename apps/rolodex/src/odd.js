@@ -161,11 +161,12 @@ async function addContact(newContact, tags = [], appleContactID = "") {
   })
 }
 
-async function editContact(id, name, tags = []) {
+async function editContact(id, name, tags = [], text='') {
   await updateFile("contacts.json", (content) => {
     var contactList = content.contactList
     contactList[id].name = name
     contactList[id].tags = tags
+    contactList[id].text = text
     return content
   })
 }
