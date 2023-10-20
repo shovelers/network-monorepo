@@ -153,10 +153,10 @@ async function updateProfile(name) {
   })
 }
 
-async function addContact(newContact, tags = [], appleContactID = "") {
+async function addContact(newContact, tags = [], text = "") {
   await updateFile("contacts.json", (content) => {
     var id = crypto.randomUUID()
-    content.contactList[id] = { name: newContact , appleContactID: appleContactID, tags: tags }
+    content.contactList[id] = { name: newContact , appleContactID: "", tags: tags, text: text }
     return content
   })
 }
