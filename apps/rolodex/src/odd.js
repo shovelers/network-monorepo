@@ -84,7 +84,7 @@ async function signup(username) {
   console.log("newly created session: ", session)
   const fs = session.fs
   console.log(fs)
-  const profileData = JSON.stringify({ "handle": username, "name": "John Doe" })
+  const profileData = JSON.stringify({ "handle": username, "name": "John Doe", tags: [], text: '' })
   const contactData = JSON.stringify({ contactList: {}, appleContacts: [], googleContacts: {} })
 
   const { RootBranch } = odd.path
@@ -146,9 +146,11 @@ async function filterContacts(filter) {
   return filteredContacts
 }
 
-async function updateProfile(name) {
+async function updateProfile(name, tags, text) {
   await updateFile("profile.json", (content) => {
     content.name = name
+    content.tags = tags || []
+    content.text = text || ''
     return content
   })
 }
