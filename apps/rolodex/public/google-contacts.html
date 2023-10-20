@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://accounts.google.com/gsi/client" onload="initClient()" async defer></script>
+  </head>
+  <body>
+    <script>
+      var client;
+      var access_token;
+
+      function initClient() {
+        client = google.accounts.oauth2.initTokenClient({
+          client_id: '916329778021-oj160t8s79775rpvnkv5lfjcr1cv02pm.apps.googleusercontent.com',
+          scope: 'https://www.googleapis.com/auth/calendar.readonly \
+                  https://www.googleapis.com/auth/contacts.readonly',
+          callback: (tokenResponse) => {
+            access_token = tokenResponse.access_token;
+          },
+        });
+      }
+      function getToken() {
+        client.requestAccessToken();
+      }
+      function revokeToken() {
+        google.accounts.oauth2.revoke(access_token, () => {console.log('access token revoked')});
+      }
+      function loadCalendar() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses');
+        xhr.setRequestHeader('Authorization', 'Bearer ' + access_token);
+        console.log(access_token);
+        xhr.send();
+      }
+    </script>
+    <h1>Google Identity Services Authorization Token model</h1>
+    <button onclick="getToken();">Get access token</button><br><br>
+    <button onclick="loadCalendar();">Load Calendar</button><br><br>
+    <button onclick="revokeToken();">Revoke token</button>
+  </body>
+</html>
