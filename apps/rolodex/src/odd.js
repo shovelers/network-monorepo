@@ -85,7 +85,7 @@ async function signup(username) {
   const fs = session.fs
   console.log(fs)
   const profileData = JSON.stringify({ "handle": username, "name": "John Doe" })
-  const contactData = JSON.stringify({ contactList: {}, appleContacts: [] })
+  const contactData = JSON.stringify({ contactList: {}, appleContacts: [], googleContacts: {} })
 
   const { RootBranch } = odd.path
   const profileFilePath = odd.path.file(RootBranch.Private, "profile.json")
@@ -410,12 +410,20 @@ async function addAppleContactsToContactList(appleContacts){
 async function importGoogleContacts() {
   google.accounts.oauth2.initTokenClient({
     client_id: '916329778021-oj160t8s79775rpvnkv5lfjcr1cv02pm.apps.googleusercontent.com',
-    scope: 'https://www.googleapis.com/auth/contacts.readonly',
+    scope: 'https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/userinfo.email',
     callback: async (tokenResponse) => {
+      const profile = await axios_client.get('https://www.googleapis.com/oauth2/v2/userinfo', {headers: { Authorization: `Bearer ${tokenResponse.access_token}`}})
       const response = await axios_client.get('https://people.googleapis.com/v1/people/me/connections',
         {params: { personFields: 'names'}, headers: { Authorization: `Bearer ${tokenResponse.access_token}` }}
       )
-      console.log(response.data);
+
+      console.log("google contacts ", response.data);
+      await updateFile("contacts.json", (content) => {
+        if (content.googleContacts === undefined){ content.googleContacts = {}}
+
+        content.googleContacts[profile.data.email] = response.data.connections
+        return content
+      })
     },
   }).requestAccessToken();
 }
