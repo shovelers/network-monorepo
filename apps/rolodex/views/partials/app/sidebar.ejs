@@ -14,8 +14,8 @@
       console.log("result: ", result)
       document.getElementById("handle").innerHTML = result.handle
       document.getElementById("name").innerHTML = "Name: " + result.name
+      document.getElementById("tags").innerHTML = '';
       for (let tag of result.tags) {
-        document.getElementById("tags").innerHTML = '';
         document.getElementById("tags").innerHTML += `<span class="badge badge-neutral">${tag}</span>`;
       }
       document.getElementById("profile-name").value = result.name
