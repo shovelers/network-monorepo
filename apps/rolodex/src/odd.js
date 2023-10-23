@@ -445,7 +445,12 @@ async function addGoogleContactsToContactList(googleContacts){
     var googleContact = googleContacts[i]
 
     var id = crypto.randomUUID()
-    var name = googleContact.names[0].displayName
+    try {
+      var name = googleContact.names[0].displayName
+    } catch (error) {
+      console.log("error for contact: ", googleContact, "error: ", error)
+      continue
+    }
     var uid = googleContact.resourceName
     if (!existingGoogleContactIDs.includes(uid)) {
       newContacts[id] = {name: name, googleContactID: uid, tags: []} 
@@ -455,7 +460,9 @@ async function addGoogleContactsToContactList(googleContacts){
   await updateFile("contacts.json", (content) => {
     content.contactList = {...content.contactList, ...newContacts}
     return content
-  })  
+  })
+  console.log("Imported Contacts Count: ", googleContacts.length)
+  console.log("New Contacts Count: ", Object.keys(newContacts).length)
 }
 
 export { 
