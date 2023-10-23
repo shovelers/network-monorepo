@@ -7,6 +7,9 @@ jobs:
   deploy_rolodex:
     name: Deploy Rolodex
     runs-on: ubuntu-latest
+    environment:
+      name: prod-fly-io
+      url: https://app-rolodex.shovel.company
     steps:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
@@ -20,6 +23,9 @@ jobs:
   deploy_protocol:
     name: Deploy Protocol
     runs-on: ubuntu-latest
+    environment:
+      name: prod-fly-io
+      url: https://testnet-protocol.shovel.company/
     steps:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
