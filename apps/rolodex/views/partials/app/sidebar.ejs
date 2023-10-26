@@ -16,6 +16,7 @@
       document.getElementById("name").innerHTML = "Name: " + result.name
       document.getElementById("tags").innerHTML = '';
       for (let tag of result.tags) {
+        if (tag == '') continue;
         document.getElementById("tags").innerHTML += `<span class="badge badge-neutral">${tag}</span>`;
       }
       document.getElementById("profile-name").value = result.name
