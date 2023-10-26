@@ -13,6 +13,8 @@ export class ContactTable extends HTMLElement {
     headers.forEach((headerText) => {
       const th = document.createElement('th');
       th.textContent = headerText;
+      th.value = "asc";
+      th.onclick = () => {this.sortTable(th);};
       headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -29,7 +31,7 @@ export class ContactTable extends HTMLElement {
   // Define a property setter for the "contacts" property
   set contacts(value) {
     this._contacts = value;
-    this.updateTable();
+    this.updateTable(this._contacts.contactList);
   }
 
   // Define a property getter for the "contacts" property
@@ -38,7 +40,7 @@ export class ContactTable extends HTMLElement {
   }
 
   // Method to update the table based on the contacts data
-  updateTable() {
+  updateTable(contactList) {
     const table = this.querySelector('table');
     const tbody = this.querySelector('tbody');
     
@@ -48,7 +50,7 @@ export class ContactTable extends HTMLElement {
     }
 
     // Create table rows for contacts
-    for (let [key, value] of Object.entries(this._contacts.contactList)) {
+    for (let [key, value] of Object.entries(contactList)) {
       const row = tbody.insertRow();
       row.classList.add('grid','grid-cols-6', 'gap-2', 'place-content-center', 'hover');
       const nameCell = row.insertCell(0);
@@ -72,5 +74,22 @@ export class ContactTable extends HTMLElement {
         </button>`
       tbody.appendChild(row);
     };
+  }
+
+  sortTable(element) {
+    switch (element.value) {
+      case "asc":
+        var sortedContactList = Object.fromEntries(Object.entries(this._contacts.contactList).sort((a, b) => { return a[1].name.localeCompare(b[1].name) }))
+        this.updateTable(sortedContactList);
+        element.textContent = "Name  ▼";
+        element.value = "desc";
+        break;
+      case "desc":
+        var sortedContactList = Object.fromEntries(Object.entries(this._contacts.contactList).sort((a, b) => { return a[1].name.localeCompare(b[1].name) }).reverse())
+        this.updateTable(sortedContactList);
+        element.textContent = "Name  ▲";
+        element.value = "asc";
+        break;
+    }
   }
 }
