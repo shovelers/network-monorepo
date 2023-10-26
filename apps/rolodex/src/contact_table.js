@@ -9,9 +9,10 @@ export class ContactTable extends HTMLElement {
     // Create the table header row
     const thead = table.createTHead();
     const headerRow = document.createElement('tr');
-    const headers = ['Name']; // Customize as needed
+    const headers = ['Name (sort)']; // Customize as needed
     headers.forEach((headerText) => {
       const th = document.createElement('th');
+      th.classList.add('cursor-pointer')
       th.textContent = headerText;
       th.value = "asc";
       th.onclick = () => {this.sortTable(th);};
