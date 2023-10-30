@@ -417,7 +417,7 @@ async function importGoogleContacts(refresh) {
     callback: async (tokenResponse) => {
       const profile = await axios_client.get('https://www.googleapis.com/oauth2/v2/userinfo', {headers: { Authorization: `Bearer ${tokenResponse.access_token}`}})
       const response = await axios_client.get('https://people.googleapis.com/v1/people/me/connections',
-        {params: { personFields: 'names'}, headers: { Authorization: `Bearer ${tokenResponse.access_token}` }}
+        {params: { personFields: 'names', sortOrder: 'LAST_MODIFIED_DESCENDING', pageSize: 200 }, headers: { Authorization: `Bearer ${tokenResponse.access_token}` }}
       )
 
       console.log("google contacts ", response.data);
