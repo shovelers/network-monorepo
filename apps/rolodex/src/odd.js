@@ -175,9 +175,8 @@ async function editContact(id, name, tags = [], text='') {
 
 async function deleteContact(id) {
   await updateFile("contacts.json", (content) => {
-    delete content.contactList[id]
-    console.log("delete", id)
-    console.log("delete", content.contactList)
+    content.contactList[id].archived = true
+    console.log("archived contact", content.contactList[id])
     return content
   })
 }

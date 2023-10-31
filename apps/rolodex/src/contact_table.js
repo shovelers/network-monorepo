@@ -52,6 +52,9 @@ export class ContactTable extends HTMLElement {
 
     // Create table rows for contacts
     for (let [key, value] of Object.entries(contactList)) {
+      if (value.archived == true) {
+        continue;
+      }
       const row = tbody.insertRow();
       row.classList.add('grid','grid-cols-6', 'gap-2', 'place-content-center', 'hover');
       const nameCell = row.insertCell(0);
