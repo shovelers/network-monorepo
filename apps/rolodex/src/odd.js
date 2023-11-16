@@ -138,11 +138,13 @@ async function filterContacts(filter) {
   var filteredContacts = { "contactList": {}, "appleContacts": []}
   for (var id in contacts.contactList) {
     var contact = contacts.contactList[id]
-    if (contact.name.toLowerCase().includes(filter.toLowerCase()) || 
-        contact.tags.filter(tag => tag.toLowerCase().includes(filter.toLowerCase())).length > 0 ||
-        contact.text.toLowerCase().includes(filter.toLowerCase()) ||
-        contact.links.filter(link => link.toLowerCase().includes(filter.toLowerCase())).length > 0
-        ) {
+    if (contact.name.toLowerCase().includes(filter.toLowerCase()) || contact.tags.filter(tag => tag.toLowerCase().includes(filter.toLowerCase())).length > 0) {
+      filteredContacts.contactList[id] = contact
+    }
+    if (contact.text && contact.text.toLowerCase().includes(filter.toLowerCase())) {
+      filteredContacts.contactList[id] = contact
+    }
+    if (contact.links && contact.links.filter(link => link.toLowerCase().includes(filter.toLowerCase())).length > 0) {
       filteredContacts.contactList[id] = contact
     }
   }
