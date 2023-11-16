@@ -229,7 +229,6 @@ async function downloadContactsDataLocally() {
   tempLink.setAttribute('download', 'contacts.json');
   tempLink.click();
   window.URL.revokeObjectURL(fileURL);
-  alert('your file has been downloaded!');
 }
 
 async function generateRecoveryKit(username){
