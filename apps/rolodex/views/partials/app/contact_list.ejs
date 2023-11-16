@@ -3,11 +3,12 @@
   window.editContact = editContact;
   window.deleteContact = deleteContact;
 
-  window.setContactEditForm = function (id, name, tags, text){
+  window.setContactEditForm = function (id, name, tags, text, links){
     document.getElementById("edit-contact-name").value = name
     document.getElementById("edit-contact-id").value = id
     document.getElementById("edit-contact-tags").value = tags
     document.getElementById("edit-contact-text").value = text
+    document.getElementById("edit-contact-links").value = links 
   }
 
   window.refreshContacts = function(){
@@ -31,13 +32,15 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="edit-contact-form"
-      onsubmit="event.preventDefault(); editContact(document.getElementById('edit-contact-id').value, document.getElementById('edit-contact-name').value, tagsArray(document.getElementById('edit-contact-tags').value), document.getElementById('edit-contact-text').value).then(function(){refreshContacts()}); contact_edit_modal.close(); return false"
+      onsubmit="event.preventDefault(); editContact(document.getElementById('edit-contact-id').value, document.getElementById('edit-contact-name').value, tagsArray(document.getElementById('edit-contact-tags').value), document.getElementById('edit-contact-text').value, tagsArray(document.getElementById('edit-contact-links').value)).then(function(){refreshContacts()}); contact_edit_modal.close(); return false"
       class="text-center min-w-full px-4">
         <input type="text" id="edit-contact-id" hidden>
         <label for="edit-contact-name" class="label"><span class="label-text">Name</span> </label>
         <input type="text" name="edit-contact-name" id="edit-contact-name" class="input input-bordered input-sm rounded-lg w-full">
         <label for="edit-contact-tags" class="label"><span class="label-text">Tags (comma separated)</span></label>
         <input type="text" name="edit-contact-tags" id="edit-contact-tags" class="input input-bordered input-sm rounded-lg w-full">
+        <label for="edit-contact-links" class="label"><span class="label-text">Links (comma separated)</span></label>
+        <input type="text" name="edit-contact-links" id="edit-contact-links" class="input input-bordered input-sm rounded-lg w-full">
         <label for="edit-contact-text" class="label"><span class="label-text">Text</span></label>
         <textarea type="text" name="edit-contact-text" id="edit-contact-text" class="textarea textarea-bordered rounded-lg w-full h-32"></textarea>
         <div class="flex flex-row space-x-2 pt-4 justify-center">
