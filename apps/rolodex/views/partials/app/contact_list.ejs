@@ -32,14 +32,14 @@
     <div class="modal-action flex justify-center items-center">
       <form id="edit-contact-form"
       onsubmit="event.preventDefault(); editContact(document.getElementById('edit-contact-id').value, document.getElementById('edit-contact-name').value, tagsArray(document.getElementById('edit-contact-tags').value), document.getElementById('edit-contact-text').value).then(function(){refreshContacts()}); contact_edit_modal.close(); return false"
-      class="text-center">
+      class="text-center min-w-full px-4">
         <input type="text" id="edit-contact-id" hidden>
         <label for="edit-contact-name" class="label"><span class="label-text">Name</span> </label>
-        <input type="text" name="edit-contact-name" id="edit-contact-name" class="input input-bordered input-sm rounded-lg">
+        <input type="text" name="edit-contact-name" id="edit-contact-name" class="input input-bordered input-sm rounded-lg w-full">
         <label for="edit-contact-tags" class="label"><span class="label-text">Tags (comma separated)</span></label>
-        <input type="text" name="edit-contact-tags" id="edit-contact-tags" class="input input-bordered input-sm rounded-lg">
+        <input type="text" name="edit-contact-tags" id="edit-contact-tags" class="input input-bordered input-sm rounded-lg w-full">
         <label for="edit-contact-text" class="label"><span class="label-text">Text</span></label>
-        <textarea type="text" name="edit-contact-text" id="edit-contact-text" class="textarea textarea-bordered rounded-lg"></textarea>
+        <textarea type="text" name="edit-contact-text" id="edit-contact-text" class="textarea textarea-bordered rounded-lg w-full h-32"></textarea>
         <div class="flex flex-row space-x-2 pt-4 justify-center">
           <button type="submit" class="btn btn-outline btn-sm">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M12 2h-2v3h2V2Z"/><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5V2.914a1.5 1.5 0 0 0-.44-1.06L14.147.439A1.5 1.5 0 0 0 13.086 0H1.5ZM4 6a1 1 0 0 1-1-1V1h10v4a1 1 0 0 1-1 1H4ZM3 9h10a1 1 0 0 1 1 1v5H2v-5a1 1 0 0 1 1-1Z"/></g></svg>
