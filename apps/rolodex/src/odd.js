@@ -219,6 +219,19 @@ async function producerChallengeProcessor(challenge, userInput) {
   }
 }
 
+async function downloadContactsDataLocally() {
+  const content = await getContacts()
+  console.log("content: ", content)
+  const data = new Blob([JSON.stringify(content, null, 4)], { type: 'application/json' })
+  var fileURL = window.URL.createObjectURL(data);
+  var tempLink = document.createElement('a');
+  tempLink.href = fileURL;
+  tempLink.setAttribute('download', 'contacts.json');
+  tempLink.click();
+  window.URL.revokeObjectURL(fileURL);
+  alert('your file has been downloaded!');
+}
+
 async function generateRecoveryKit(username){
   var program = await getProgram();
   var fissionnames = await fissionUsernames(username)
@@ -249,7 +262,7 @@ async function generateRecoveryKit(username){
   tempLink.setAttribute('download', `rolodex-${username}-recovery-kit.yaml`);
   tempLink.click();
   window.URL.revokeObjectURL(fileURL);
-  alert('your file has downloaded!'); 
+  alert('your file has been downloaded!'); 
 }
 
 async function recover(kit) {
@@ -482,5 +495,6 @@ export {
   filterContacts, 
   importContacts,
   importGoogleContacts,
-  appleCredsPresent
+  appleCredsPresent,
+  downloadContactsDataLocally
 };
