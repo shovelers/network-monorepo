@@ -5,11 +5,13 @@ import { yamux } from '@chainsafe/libp2p-yamux'
 import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
 import { createLibp2p } from 'libp2p'
+import { ping } from '@libp2p/ping'
 import { multiaddr } from 'multiaddr'
 import * as filters from '@libp2p/websockets/filters'
 
 async function dial(node, peer){
-  const latency = await node.libp2p.dial(multiaddr(peer));
+  const connection = await node.libp2p.dial(multiaddr(peer));
+  const latency = await node.libp2p.services.ping.ping(multiaddr(peer))
   console.log("latency:", latency)
 };
 
@@ -31,6 +33,13 @@ async function createNode () {
         const str = multiAddr.toString()
         return !str.includes("/ws/") && !str.includes("/wss/") && !str.includes("/webtransport/")
       },
+    },
+    services: {
+      ping: ping({
+        maxInboundStreams: 100,
+        maxOutboundStreams: 100,
+        runOnTransientConnection: false,
+      }),
     },
   })
 
