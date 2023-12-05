@@ -5,6 +5,7 @@ import { yamux } from '@chainsafe/libp2p-yamux'
 import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
 import { createLibp2p } from 'libp2p'
+import * as filters from '@libp2p/websockets/filters'
 
 const node = await createNode()
 const multiaddrs = node.libp2p.getMultiaddrs()
@@ -23,9 +24,15 @@ async function createNode () {
     addresses: {
       listen: ['/ip4/0.0.0.0/tcp/0/ws']
     },
-    transports: [webSockets()],
+    transports: [webSockets({filter: filters.all})],
     connectionEncryption: [noise()],
     streamMuxers: [yamux()],
+    connectionGater: {
+      denyDialMultiaddr: async (multiAddr) => {
+        const str = multiAddr.toString()
+        return !str.includes("/ws/") && !str.includes("/wss/") && !str.includes("/webtransport/")
+      },
+    },
   })
 
   return await createHelia({

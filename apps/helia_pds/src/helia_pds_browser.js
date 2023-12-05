@@ -6,9 +6,10 @@ import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
 import { createLibp2p } from 'libp2p'
 import { multiaddr } from 'multiaddr'
+import * as filters from '@libp2p/websockets/filters'
 
-async function dial(peer){
-  await node.libp2p.dial(multiaddr(peer));
+async function dial(node, peer){
+  const latency = await node.libp2p.dial(multiaddr(peer));
   console.log("latency:", latency)
 };
 
@@ -22,9 +23,15 @@ async function createNode () {
   // libp2p is the networking layer that underpins Helia
   const libp2p = await createLibp2p({
     datastore,
-    transports: [webSockets()],
+    transports: [webSockets({filter: filters.all})],
     connectionEncryption: [noise()],
     streamMuxers: [yamux()],
+    connectionGater: {
+      denyDialMultiaddr: async (multiAddr) => {
+        const str = multiAddr.toString()
+        return !str.includes("/ws/") && !str.includes("/wss/") && !str.includes("/webtransport/")
+      },
+    },
   })
 
   return await createHelia({
@@ -34,4 +41,4 @@ async function createNode () {
   })
 }
 
-export { createNode, dial }
+export { createNode, dial, multiaddr }

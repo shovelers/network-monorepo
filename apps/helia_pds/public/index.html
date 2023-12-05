@@ -4,9 +4,11 @@
   </head>
   <body>
     <script type="module">
-      import { createNode, dial } from '/dist/helia_pds_browser.js';
-      createNode();
+      import { createNode, dial, multiaddr} from '/dist/helia_pds_browser.js';
+      window.node = await createNode();
+      console.log(window.node.libp2p.getMultiaddrs());
       window.dial = dial;
+      window.multiaddr = multiaddr;
     </script>
     <div class="flex flex-col justify-evenly items-center h-screen bg-neutral">
       <div class="text-5xl font-bold tracking-tight underline underline-offset-4 decoration-4 decoration-accent">Helia PDS</div>
