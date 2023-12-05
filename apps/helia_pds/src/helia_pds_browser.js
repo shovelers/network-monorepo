@@ -7,10 +7,6 @@ import { MemoryDatastore } from 'datastore-core'
 import { createLibp2p } from 'libp2p'
 import { multiaddr } from 'multiaddr'
 
-const node = await createNode()
-const multiaddrs = node.libp2p.getMultiaddrs()
-console.log("node address:", multiaddrs);
-
 async function dial(peer){
   await node.libp2p.dial(multiaddr(peer));
   console.log("latency:", latency)

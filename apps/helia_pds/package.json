@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "vite build && node server.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,7 +17,9 @@
     "blockstore-core": "^4.3.7",
     "datastore-core": "^9.2.5",
     "express": "^4.18.2",
+    "glob": "^10.3.10",
     "helia": "^2.1.0",
-    "libp2p": "^1.0.8"
+    "libp2p": "^1.0.8",
+    "vite": "^5.0.5"
   }
 }
