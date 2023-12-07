@@ -1,5 +1,4 @@
 import { createHelia } from 'helia';
-import { unixfs } from '@helia/unixfs'
 import { webSockets } from '@libp2p/websockets'
 import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
@@ -9,7 +8,7 @@ import { PublicDirectory } from "wnfs";
 import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
 import * as filters from '@libp2p/websockets/filters'
-import { WnfsBlockstore } from './helia_wnfs_blockstore_adaptor.js';
+import { WnfsBlockstore } from './src/helia_wnfs_blockstore_adaptor.js';
 
 const node = await createNode()
 const multiaddrs = node.libp2p.getMultiaddrs()

@@ -1,5 +1,4 @@
 import { createHelia } from 'helia';
-import { unixfs } from '@helia/unixfs'
 import { webSockets } from '@libp2p/websockets'
 import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
@@ -10,19 +9,42 @@ import { ping } from '@libp2p/ping'
 import { multiaddr } from 'multiaddr'
 import * as filters from '@libp2p/websockets/filters'
 import { CID } from 'multiformats/cid'
+import { WnfsBlockstore } from './helia_wnfs_blockstore_adaptor.js';
+import { PublicDirectory } from "wnfs";
 
-async function dial(node, peer){
+async function dial(node, peer) {
   const connection = await node.libp2p.dial(multiaddr(peer));
   const latency = await node.libp2p.services.ping.ping(multiaddr(peer))
   console.log("latency:", latency)
 };
 
-async function createFs(node) {
-  const fs = unixfs(node)
-  window.fs = fs
+async function write_data(node, data) {
+  const wnfsBlockstore = new WnfsBlockstore(node)
+  const dir = new PublicDirectory(new Date());
+  var { rootDir } = await dir.mkdir(["pictures", "cats"], new Date(), wnfsBlockstore);
+
+  var content = new TextEncoder().encode(data)
+
+  var { rootDir } = await rootDir.write(
+    ["pictures", "cats", "tabby.txt"],
+    content,
+    new Date(),
+    wnfsBlockstore
+  );
+  console.log("root after write", rootDir)
+
+  await rootDir.store(wnfsBlockstore)
+
+  // List all files in /pictures directory.
+  var result = await rootDir.ls(["pictures"], wnfsBlockstore);
+  console.log("existent test: ", result)
+
+  var fileContent = await rootDir.read(["pictures", "cats", "tabby.txt"], wnfsBlockstore)
+
+  console.log("Files Content:", new TextDecoder().decode(fileContent));
 }
 
-async function createNode () {
+async function createHeliaNode() {
   // the blockstore is where we store the blocks that make up files
   const blockstore = new MemoryBlockstore()
 
@@ -32,7 +54,7 @@ async function createNode () {
   // libp2p is the networking layer that underpins Helia
   const libp2p = await createLibp2p({
     datastore,
-    transports: [webSockets({filter: filters.all})],
+    transports: [webSockets({ filter: filters.all })],
     connectionEncryption: [noise()],
     streamMuxers: [yamux()],
     connectionGater: {
@@ -57,4 +79,4 @@ async function createNode () {
   })
 }
 
-export { createNode, dial, multiaddr, createFs, CID }
+export { createHeliaNode, dial, write_data }
