@@ -8,7 +8,6 @@ import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
 import { multiaddr } from 'multiaddr'
 import * as filters from '@libp2p/websockets/filters'
-import { CID } from 'multiformats/cid'
 import { WnfsBlockstore } from './helia_wnfs_blockstore_adaptor.js';
 import { PublicDirectory } from "wnfs";
 
