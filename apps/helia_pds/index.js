@@ -18,10 +18,8 @@ console.log("node address:", multiaddrs);
 const wnfsBlockstore = new WnfsBlockstore(node)
 const dir = new PublicDirectory(new Date());
 var { rootDir } = await dir.mkdir(["pictures"], new Date(), wnfsBlockstore);
-var { result } = await rootDir.ls(["pictures"], wnfsBlockstore);
-console.log("Files in /pictures directory:", result);
 
-var content = encoder.encode('Hello World 101\n')
+var content = new TextEncoder().encode("Hello World 101")
 
 var { rootDir } = await rootDir.write(
   ["pictures", "tabby.txt"],
