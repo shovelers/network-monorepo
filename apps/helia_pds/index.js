@@ -28,7 +28,8 @@ var { rootDir } = await rootDir.write(
 );
 console.log("root after write", rootDir)
 
-await rootDir.store(wnfsBlockstore)
+var rootDirCID = await rootDir.store(wnfsBlockstore)
+console.log("rootDirCID:", rootDirCID)
 
 // List all files in /pictures directory.
 var result  = await rootDir.ls(["pictures"], wnfsBlockstore);

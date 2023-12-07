@@ -11,6 +11,8 @@ import * as filters from '@libp2p/websockets/filters'
 import { WnfsBlockstore } from './helia_wnfs_blockstore_adaptor.js';
 import { PublicDirectory } from "wnfs";
 
+var rootDirCID
+
 async function dial(node, peer) {
   const connection = await node.libp2p.dial(multiaddr(peer));
   const latency = await node.libp2p.services.ping.ping(multiaddr(peer))
@@ -32,7 +34,8 @@ async function write_data(node, data) {
   );
   console.log("root after write", rootDir)
 
-  await rootDir.store(wnfsBlockstore)
+  rootDirCID = await rootDir.store(wnfsBlockstore)
+  console.log("rootDirCID:", rootDirCID)
 
   // List all files in /pictures directory.
   var result = await rootDir.ls(["pictures"], wnfsBlockstore);
@@ -41,6 +44,16 @@ async function write_data(node, data) {
   var fileContent = await rootDir.read(["pictures", "cats", "tabby.txt"], wnfsBlockstore)
 
   console.log("Files Content:", new TextDecoder().decode(fileContent));
+}
+
+async function readFile(node, path) {
+  const wnfsBlockstore = new WnfsBlockstore(node)
+  const dir = new PublicDirectory(new Date());
+  var root = await PublicDirectory.load(rootDirCID ,wnfsBlockstore)
+  console.log("loaded root:", root)
+  var fileContent = await root.read(["pictures", "cats", "tabby.txt"], wnfsBlockstore)
+  console.log("Files Content:", fileContent);
+  return new TextDecoder().decode(fileContent)
 }
 
 async function createHeliaNode() {
@@ -78,4 +91,4 @@ async function createHeliaNode() {
   })
 }
 
-export { createHeliaNode, dial, write_data }
+export { createHeliaNode, dial, write_data, readFile }
