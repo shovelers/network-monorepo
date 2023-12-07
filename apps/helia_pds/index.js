@@ -17,12 +17,12 @@ console.log("node address:", multiaddrs);
 
 const wnfsBlockstore = new WnfsBlockstore(node)
 const dir = new PublicDirectory(new Date());
-var { rootDir } = await dir.mkdir(["pictures"], new Date(), wnfsBlockstore);
+var { rootDir } = await dir.mkdir(["pictures", "cats"], new Date(), wnfsBlockstore);
 
 var content = new TextEncoder().encode("Hello World 101")
 
 var { rootDir } = await rootDir.write(
-  ["pictures", "tabby.txt"],
+  ["pictures", "cats", "tabby.txt"],
   content,
   new Date(),
   wnfsBlockstore
@@ -32,9 +32,12 @@ console.log("root after write", rootDir)
 await rootDir.store(wnfsBlockstore)
 
 // List all files in /pictures directory.
-var { result } = await rootDir.ls(["pictures"], wnfsBlockstore);
+var result  = await rootDir.ls(["pictures"], wnfsBlockstore);
+console.log("existent test: ",result)
 
-console.log("Files in /pictures directory:", result);
+var fileContent = await rootDir.read(["pictures", "cats", "tabby.txt"], wnfsBlockstore)
+
+console.log("Files Content:", new TextDecoder().decode(fileContent));
 
 async function createNode () {
   // the blockstore is where we store the blocks that make up files

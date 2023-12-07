@@ -8,7 +8,8 @@ export class WnfsBlockstore {
 
   async getBlock (cid){
     const decoded_cid = CID.decode(cid)
-    return this.helia.blockstore.get(decoded_cid)
+    const content = this.helia.blockstore.get(decoded_cid)
+    return content
   }
   
   async putBlock (bytes, codec){
