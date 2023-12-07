@@ -1,4 +1,5 @@
 import { createHelia } from 'helia';
+import { unixfs } from '@helia/unixfs'
 import { webSockets } from '@libp2p/websockets'
 import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
@@ -8,12 +9,18 @@ import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
 import { multiaddr } from 'multiaddr'
 import * as filters from '@libp2p/websockets/filters'
+import { CID } from 'multiformats/cid'
 
 async function dial(node, peer){
   const connection = await node.libp2p.dial(multiaddr(peer));
   const latency = await node.libp2p.services.ping.ping(multiaddr(peer))
   console.log("latency:", latency)
 };
+
+async function createFs(node) {
+  const fs = unixfs(node)
+  window.fs = fs
+}
 
 async function createNode () {
   // the blockstore is where we store the blocks that make up files
@@ -50,4 +57,4 @@ async function createNode () {
   })
 }
 
-export { createNode, dial, multiaddr }
+export { createNode, dial, multiaddr, createFs, CID }
