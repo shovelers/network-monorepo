@@ -8,6 +8,35 @@ import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
 import { multiaddr } from 'multiaddr'
 import * as filters from '@libp2p/websockets/filters'
+import { unixfs } from '@helia/unixfs'
+import { CID } from 'multiformats/cid'
+
+async function writeFile(node, data) {
+  const fs = unixfs(node)
+  const encoder = new TextEncoder()
+  const cid = await fs.addBytes(encoder.encode(data), {
+    onProgress: (evt) => {
+      console.info('add event', evt.type, evt.detail)
+    }
+  })
+  console.log('Added file:', cid.toString())
+}
+
+async function readFile(node, cid){
+  const fs = unixfs(node)
+  const decoder = new TextDecoder()
+  let text = ''
+  for await (const chunk of fs.cat(cid, {
+    onProgress: (evt) => {
+      console.info('cat event', evt.type, evt.detail)
+    }
+  })) {
+    text += decoder.decode(chunk, {
+      stream: true
+    })
+  }
+  console.log('Added file contents:', text)
+}
 
 async function dial(node, peer){
   const connection = await node.libp2p.dial(multiaddr(peer));
@@ -50,4 +79,4 @@ async function createNode () {
   })
 }
 
-export { createNode, dial, multiaddr }
+export { createNode, dial, multiaddr, writeFile, readFile, CID }
