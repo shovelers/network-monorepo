@@ -1,13 +1,15 @@
 import { createHelia } from 'helia';
-import { webSockets } from '@libp2p/websockets'
+import { bitswap } from 'helia/block-brokers'
 import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
 import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
-import { multiaddr } from 'multiaddr'
+import { identify } from '@libp2p/identify'
+import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
+import { multiaddr } from 'multiaddr'
 import { WnfsBlockstore } from './helia_wnfs_blockstore_adaptor.js';
 import { PublicDirectory } from "wnfs";
 import { CID } from 'multiformats/cid'
@@ -44,7 +46,10 @@ async function readFile(node, cid) {
   const wnfsBlockstore = new WnfsBlockstore(node)
   console.log("passed cid: ",CID.parse(cid).bytes)
   console.log("rootDirCID: ",rootDirCID)
-  await node.pins.add(CID.parse(cid))
+  if (await node.pins.isPinned(CID.parse(cid)) == false) {
+    console.log("pinning rootCID")
+    await node.pins.add(CID.parse(cid))
+  }
   var rootDir = await PublicDirectory.load(CID.parse(cid).bytes ,wnfsBlockstore)
   console.log("loaded root:", rootDir)
   var fileContent = await rootDir.read(["pictures", "cats", "tabby.txt"], wnfsBlockstore)
@@ -77,13 +82,17 @@ async function createHeliaNode() {
         maxOutboundStreams: 100,
         runOnTransientConnection: false,
       }),
+      identify: identify(),
     },
   })
 
   return await createHelia({
     datastore,
     blockstore,
-    libp2p
+    libp2p,
+    blockBrokers: [
+      bitswap()
+    ]
   })
 }
 

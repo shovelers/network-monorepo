@@ -1,5 +1,5 @@
 import { createHelia } from 'helia';
-import { webSockets } from '@libp2p/websockets'
+import { bitswap } from 'helia/block-brokers'
 import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { MemoryBlockstore } from 'blockstore-core'
@@ -7,6 +7,8 @@ import { MemoryDatastore } from 'datastore-core'
 import { PublicDirectory } from "wnfs";
 import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
+import { identify } from '@libp2p/identify'
+import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
 import { WnfsBlockstore } from './src/helia_wnfs_blockstore_adaptor.js';
 import { CID } from 'multiformats/cid'
@@ -63,6 +65,7 @@ async function createNode () {
       },
     },
     services: {
+      identify: identify(),
       ping: ping({
         maxInboundStreams: 100,
         maxOutboundStreams: 100,
@@ -75,6 +78,9 @@ async function createNode () {
   return await createHelia({
     datastore,
     blockstore,
-    libp2p
+    libp2p,
+    blockBrokers: [
+      bitswap()
+    ]
   })
 }
