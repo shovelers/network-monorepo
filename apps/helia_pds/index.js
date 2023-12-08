@@ -9,6 +9,7 @@ import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
 import * as filters from '@libp2p/websockets/filters'
 import { WnfsBlockstore } from './src/helia_wnfs_blockstore_adaptor.js';
+import { CID } from 'multiformats/cid'
 
 const node = await createNode()
 const multiaddrs = node.libp2p.getMultiaddrs()
@@ -29,7 +30,7 @@ var { rootDir } = await rootDir.write(
 console.log("root after write", rootDir)
 
 var rootDirCID = await rootDir.store(wnfsBlockstore)
-console.log("rootDirCID:", rootDirCID)
+console.log("rootDirCID:", CID.decode(rootDirCID))
 
 // List all files in /pictures directory.
 var result  = await rootDir.ls(["pictures"], wnfsBlockstore);
