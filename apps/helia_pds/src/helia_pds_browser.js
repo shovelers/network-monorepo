@@ -78,13 +78,16 @@ async function writePrivateData(node, data) {
   var { rootDir, forest } = await rootDir.write(["private", "cats", "tabby.png"], true, privateContent, new Date(), forest, wnfsBlockstore, rng);
   
   var privateDirResult = await rootDir.store(forest, wnfsBlockstore, rng)
+  var forestCid = await privateDirResult[1].store(wnfsBlockstore)
   window.privateDirResult = privateDirResult
+  window.forestCid = forestCid
   return privateDirResult
 }
 
-async function readPrivateFile(node, accessKey, forest) {
+async function readPrivateFile(node, accessKey, forestCid) {
   const wnfsBlockstore = new WnfsBlockstore(node)
-
+  const forest = await PrivateForest.load(forestCid, wnfsBlockstore)
+  console.log("loaded forest:", forest)
   //load private node from PrivateForest using Access key
   var node = await PrivateNode.load(accessKey, forest, wnfsBlockstore)
   console.log("loaded node:", node)
