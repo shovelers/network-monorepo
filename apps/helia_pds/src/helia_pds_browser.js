@@ -11,7 +11,7 @@ import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
 import { multiaddr } from 'multiaddr'
 import { WnfsBlockstore } from './helia_wnfs_blockstore_adaptor.js';
-import { PublicDirectory, PrivateDirectory, PrivateForest, PrivateNode } from "wnfs";
+import { PublicDirectory, PrivateDirectory, PrivateForest, PrivateNode, AccessKey } from "wnfs";
 import { CID } from 'multiformats/cid'
 
 var rootDirCID
@@ -80,16 +80,18 @@ async function writePrivateData(node, data) {
   var privateDirResult = await rootDir.store(forest, wnfsBlockstore, rng)
   var forestCid = await privateDirResult[1].store(wnfsBlockstore)
   window.privateDirResult = privateDirResult
+  window.accessKey = privateDirResult[0].toBytes()
   window.forestCid = forestCid
   return privateDirResult
 }
 
 async function readPrivateFile(node, accessKey, forestCid) {
   const wnfsBlockstore = new WnfsBlockstore(node)
+  const key = AccessKey.fromBytes(accessKey)
   const forest = await PrivateForest.load(forestCid, wnfsBlockstore)
   console.log("loaded forest:", forest)
   //load private node from PrivateForest using Access key
-  var node = await PrivateNode.load(accessKey, forest, wnfsBlockstore)
+  var node = await PrivateNode.load(key, forest, wnfsBlockstore)
   console.log("loaded node:", node)
   window.loadedNode = node
   //load the node as_dir to get the rootDir 
