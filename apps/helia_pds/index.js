@@ -33,7 +33,7 @@ var { rootDir } = await rootDir.write(
 console.log("root after write", rootDir)
 
 var rootDirCID = await rootDir.store(wnfsBlockstore)
-console.log("rootDirCID:", CID.decode(rootDirCID))
+console.log("Public rootDirCID:", CID.decode(rootDirCID))
 
 // List all files in /pictures directory.
 var result  = await rootDir.ls(["pictures"], wnfsBlockstore);
@@ -56,8 +56,13 @@ var privateContent = new TextEncoder().encode("Hello Private World 101")
 
 var { rootDir, forest } = await rootDir.write(["private", "cats", "tabby.png"], true, privateContent, new Date(), forest, wnfsBlockstore, rng);
 
-var privateRootDirCID = await rootDir.store(forest, wnfsBlockstore, rng)
-console.log("private root dir cid: ", privateRootDirCID)
+var privateRootDir = await rootDir.store(forest, wnfsBlockstore, rng)
+var forestCid = await privateRootDir[1].store(wnfsBlockstore)
+console.log("private root dir object: ", privateRootDir)
+console.log("Access Key: ", privateRootDir[0].toBytes())
+process.stdout.write(privateRootDir[0].toBytes() + '\n');
+console.log("private forest CID: ", CID.decode(forestCid))
+
 
 var privateResult  = await rootDir.ls(["private"], true, forest, wnfsBlockstore);
 console.log("private ls: ", privateResult)
