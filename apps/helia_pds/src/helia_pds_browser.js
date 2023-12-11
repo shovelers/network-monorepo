@@ -11,7 +11,7 @@ import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
 import { multiaddr } from 'multiaddr'
 import { WnfsBlockstore } from './helia_wnfs_blockstore_adaptor.js';
-import { PublicDirectory } from "wnfs";
+import { PublicDirectory, PrivateDirectory, PrivateForest, PrivateNode } from "wnfs";
 import { CID } from 'multiformats/cid'
 
 var rootDirCID
@@ -22,7 +22,7 @@ async function dial(node, peer) {
   console.log("latency:", latency)
 };
 
-async function write_data(node, data) {
+async function writeData(node, data) {
   const wnfsBlockstore = new WnfsBlockstore(node)
   const dir = new PublicDirectory(new Date());
   var { rootDir } = await dir.mkdir(["pictures", "cats"], new Date(), wnfsBlockstore);
@@ -55,6 +55,45 @@ async function readFile(node, cid) {
   var fileContent = await rootDir.read(["pictures", "cats", "tabby.txt"], wnfsBlockstore)
   console.log("Files Content:", fileContent);
   return new TextDecoder().decode(fileContent)
+}
+
+class Rng {
+  randomBytes(count) {
+    const array = new Uint8Array(count);
+    self.crypto.getRandomValues(array);
+    return array;
+  }
+}
+
+async function writePrivateData(node, data) {
+  const wnfsBlockstore = new WnfsBlockstore(node)
+  const rng = new Rng()
+  const initialForest = new PrivateForest(rng)
+  const privateDir = new PrivateDirectory(initialForest.emptyName(), new Date(), rng)
+
+  var { rootDir, forest } = await privateDir.mkdir(["private", "cats"], true, new Date(), initialForest, wnfsBlockstore, rng);
+
+  var privateContent = new TextEncoder().encode(data)
+
+  var { rootDir, forest } = await rootDir.write(["private", "cats", "tabby.png"], true, privateContent, new Date(), forest, wnfsBlockstore, rng);
+  
+  var privateDirResult = await rootDir.store(forest, wnfsBlockstore, rng)
+  window.privateDirResult = privateDirResult
+  return privateDirResult
+}
+
+async function readPrivateFile(node, accessKey, forest) {
+  const wnfsBlockstore = new WnfsBlockstore(node)
+
+  //load private node from PrivateForest using Access key
+  var node = await PrivateNode.load(accessKey, forest, wnfsBlockstore)
+  console.log("loaded node:", node)
+  window.loadedNode = node
+  //load the node as_dir to get the rootDir 
+  var rootDir = await node.asDir(forest, wnfsBlockstore)
+  
+  var privateFileContent = await rootDir.read(["private", "cats", "tabby.png"], true, forest, wnfsBlockstore)
+  return new TextDecoder().decode(privateFileContent.result)
 }
 
 async function createHeliaNode() {
@@ -96,4 +135,4 @@ async function createHeliaNode() {
   })
 }
 
-export { createHeliaNode, dial, write_data, readFile, CID }
+export { createHeliaNode, dial, writeData, readFile, CID, writePrivateData, readPrivateFile }

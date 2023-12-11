@@ -4,19 +4,20 @@ import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
-import { PublicDirectory } from "wnfs";
+import { PublicDirectory, PrivateDirectory, PrivateForest } from "wnfs";
 import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
 import { identify } from '@libp2p/identify'
 import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
-import { WnfsBlockstore } from './src/helia_wnfs_blockstore_adaptor.js';
+import { WnfsBlockstore, Rng } from './src/helia_wnfs_blockstore_adaptor.js';
 import { CID } from 'multiformats/cid'
 
 const node = await createNode()
 const multiaddrs = node.libp2p.getMultiaddrs()
 console.log("node address:", multiaddrs);
 
+//Public Directory
 const wnfsBlockstore = new WnfsBlockstore(node)
 const dir = new PublicDirectory(new Date());
 var { rootDir } = await dir.mkdir(["pictures", "cats"], new Date(), wnfsBlockstore);
@@ -41,6 +42,28 @@ console.log("existent test: ",result)
 var fileContent = await rootDir.read(["pictures", "cats", "tabby.txt"], wnfsBlockstore)
 
 console.log("Files Content:", new TextDecoder().decode(fileContent));
+
+//Private Directory
+const rng = new Rng()
+const initialForest = new PrivateForest(rng)
+console.log("initial forest: ", initialForest)
+const privateDir = new PrivateDirectory(initialForest.emptyName(), new Date(), rng)
+console.log("private dir: ", privateDir)
+
+var { rootDir, forest } = await privateDir.mkdir(["private", "cats"], true, new Date(), initialForest, wnfsBlockstore, rng);
+
+var privateContent = new TextEncoder().encode("Hello Private World 101")
+
+var { rootDir, forest } = await rootDir.write(["private", "cats", "tabby.png"], true, privateContent, new Date(), forest, wnfsBlockstore, rng);
+
+var privateRootDirCID = await rootDir.store(forest, wnfsBlockstore, rng)
+console.log("private root dir cid: ", privateRootDirCID)
+
+var privateResult  = await rootDir.ls(["private"], true, forest, wnfsBlockstore);
+console.log("private ls: ", privateResult)
+
+var privateFileContent = await rootDir.read(["private", "cats", "tabby.png"], true, forest, wnfsBlockstore)
+console.log("private file content: ", new TextDecoder().decode(privateFileContent.result))
 
 async function createNode () {
   // the blockstore is where we store the blocks that make up files

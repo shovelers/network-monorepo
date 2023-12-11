@@ -4,14 +4,16 @@
   </head>
   <body>
     <script type="module">
-      import { createHeliaNode, dial, write_data, readFile, CID } from '/helia_pds_browser.js';
+      import { createHeliaNode, dial, writeData, readFile, CID, writePrivateData, readPrivateFile } from '/helia_pds_browser.js';
       window.createHeliaNode = createHeliaNode;
       window.node = await createHeliaNode();
       console.log(window.node.libp2p.getMultiaddrs());
       window.dial = dial;
-      window.write_data = write_data;
+      window.writeData = writeData;
       window.readFile = readFile;
       window.CID = CID;
+      window.writePrivateData = writePrivateData;
+      window.readPrivateFile = readPrivateFile;
     </script>
     <div class="flex flex-col justify-evenly items-center h-screen bg-neutral">
       <div class="text-5xl font-bold tracking-tight underline underline-offset-4 decoration-4 decoration-accent">Helia PDS new</div>

@@ -1,5 +1,6 @@
 import { CID } from 'multiformats/cid'
 import { sha256 } from 'multiformats/hashes/sha2'
+import crypto from 'crypto'
 
 export class WnfsBlockstore {
   constructor(node) {
@@ -20,3 +21,10 @@ export class WnfsBlockstore {
   }
 }
 
+export class Rng {
+  randomBytes(count) {
+    const array = new Uint8Array(count);
+    crypto.getRandomValues(array);
+    return array;
+  }
+}
