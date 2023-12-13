@@ -4,7 +4,7 @@ import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
-import { PublicDirectory, PrivateDirectory, PrivateForest } from "wnfs";
+import { PublicDirectory, PrivateDirectory, PrivateForest, share, createShareName } from "wnfs";
 import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
 import { identify } from '@libp2p/identify'
@@ -69,6 +69,26 @@ console.log("private ls: ", privateResult)
 
 var privateFileContent = await rootDir.read(["private", "cats", "tabby.png"], true, forest, wnfsBlockstore)
 console.log("private file content: ", new TextDecoder().decode(privateFileContent.result))
+
+// Share: Pass receipient's exchange root CID & recipientExchPubKey 
+export async function generateShareLabel(recipientExchPubKey, recipientExchRootCid){
+  const sharerRootDid = "did:key:z6MkqZjY";
+  var recipientExchRootCid = CID.parse(recipientExchRootCid).bytes 
+  console.log("test: ", privateRootDir[0])
+  
+  var forest2 = await share(
+    privateRootDir[0],
+    0,
+    sharerRootDid,
+    recipientExchRootCid,
+    privateRootDir[1],
+    wnfsBlockstore
+  );
+  console.log("forest2: ", forest2)
+  
+  const shareLabel = createShareName(0, sharerRootDid, recipientExchPubKey, forest2);
+  return shareLabel
+}
 
 async function createNode () {
   // the blockstore is where we store the blocks that make up files

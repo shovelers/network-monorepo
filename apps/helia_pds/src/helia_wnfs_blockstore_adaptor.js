@@ -28,3 +28,40 @@ export class Rng {
     return array;
   }
 }
+
+export class PrivateKey {
+  constructor(key) {
+    this.key = key;
+  }
+
+  static async generate(){
+    const keyPair = await crypto.subtle.generateKey(
+      {
+        name: "RSA-OAEP",
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+        hash: { name: "SHA-256" },
+      },
+      true,
+      ["decrypt"]
+    );
+
+    return new PrivateKey(keyPair);
+  }
+
+  async decrypt(data) {
+    const decryptedData = await window.crypto.subtle.decrypt(
+      {
+        name: "RSA-OAEP",
+      },
+      this.key.privateKey,
+      data
+    );
+
+    return new Uint8Array(decryptedData);
+  }
+
+  getPublicKey() {
+    return this.key.publicKey;
+  }
+}

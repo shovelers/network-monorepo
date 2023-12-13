@@ -10,8 +10,8 @@ import { identify } from '@libp2p/identify'
 import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
 import { multiaddr } from 'multiaddr'
-import { WnfsBlockstore } from './helia_wnfs_blockstore_adaptor.js';
-import { PublicDirectory, PrivateDirectory, PrivateForest, PrivateNode, AccessKey } from "wnfs";
+import { WnfsBlockstore} from './helia_wnfs_blockstore_adaptor.js';
+import { PublicDirectory, PrivateDirectory, PrivateForest, PrivateNode, AccessKey, receiveShare } from "wnfs";
 import { CID } from 'multiformats/cid'
 
 var rootDirCID
@@ -65,6 +65,43 @@ class Rng {
   }
 }
 
+export class PrivateKey {
+  constructor(key) {
+    this.key = key;
+  }
+
+  static async generate(){
+    const keyPair = await self.crypto.subtle.generateKey(
+      {
+        name: "RSA-OAEP",
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+        hash: { name: "SHA-256" },
+      },
+      true,
+      ["decrypt"]
+    );
+
+    return new PrivateKey(keyPair);
+  }
+
+  async decrypt(data) {
+    const decryptedData = await self.crypto.subtle.decrypt(
+      {
+        name: "RSA-OAEP",
+      },
+      this.key.privateKey,
+      data
+    );
+
+    return new Uint8Array(decryptedData);
+  }
+
+  getPublicKey() {
+    return this.key.publicKey;
+  }
+}
+
 async function writePrivateData(node, data) {
   const wnfsBlockstore = new WnfsBlockstore(node)
   const rng = new Rng()
@@ -99,6 +136,36 @@ async function readPrivateFile(node, accessKey, forestCid) {
   
   var privateFileContent = await rootDir.read(["private", "cats", "tabby.png"], true, forest, wnfsBlockstore)
   return new TextDecoder().decode(privateFileContent.result)
+}
+
+async function createExchangeRoot(node) {
+  const wnfsBlockstore = new WnfsBlockstore(node)
+  const key = await PrivateKey.generate();
+
+  const loadKey = await crypto.subtle.exportKey("jwk", key.getPublicKey());
+  const exchangePubKey = loadKey.n;
+
+  const { rootDir } = await new PublicDirectory(new Date()).write(
+    ["device1", "v1.exchange_key"],
+    exchangePubKey,
+    new Date(),
+    wnfsBlockstore
+  );
+
+  const recipientExchRootCid = await rootDir.store(wnfsBlockstore);
+  return [exchangePubKey, CID.decode(recipientExchRootCid).toString()]
+};
+
+async function acceptShare(node, recipientExchPubKey, shareLabel) {
+  const wnfsBlockstore = new WnfsBlockstore(node)
+  const rng = new Rng()
+  const forest = new PrivateForest(rng); 
+  const sharedNode = await receiveShare(
+    shareLabel,
+    recipientExchPubKey,
+    forest,
+    wnfsBlockstore
+  );
 }
 
 async function createHeliaNode() {
@@ -140,4 +207,4 @@ async function createHeliaNode() {
   })
 }
 
-export { createHeliaNode, dial, writeData, readFile, CID, writePrivateData, readPrivateFile }
+export { createHeliaNode, dial, writeData, readFile, CID, writePrivateData, readPrivateFile, createExchangeRoot, acceptShare}

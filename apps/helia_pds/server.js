@@ -2,6 +2,7 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import cors from 'cors';
+import { generateShareLabel } from './index.js';
 
 const port = process.argv[2] || 3000;
 const server = express();
@@ -20,6 +21,13 @@ server.use(express.static(path.join(__dirname, 'public')));
 server.get("/", (req, res) => {
   res.render('pages/index')
 });
+
+server.post("/generate_share", (req, res) => {
+  generateShareLabel(req.body.key, req.body.cid).then((result) => {
+    res.send(result);
+  });
+}
+)
 
 server.listen(port, (err) => {
   if (err) throw err;
