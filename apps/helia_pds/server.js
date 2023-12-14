@@ -3,7 +3,10 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import cors from 'cors';
 import { generateShareLabel } from './index.js';
+import { ExchangeKey } from './src/helia_wnfs_blockstore_adaptor.js';
+import { fromString } from 'uint8arrays'
 
+globalThis.ExchangeKey = ExchangeKey;
 const port = process.argv[2] || 3000;
 const server = express();
 
@@ -23,7 +26,8 @@ server.get("/", (req, res) => {
 });
 
 server.post("/generate_share", (req, res) => {
-  generateShareLabel(req.body.key, req.body.cid).then((result) => {
+  var key = fromString(req.body.key, "base64url")
+  generateShareLabel(key, req.body.cid).then((result) => {
     res.send(result);
   });
 }

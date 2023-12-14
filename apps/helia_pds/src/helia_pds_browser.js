@@ -13,6 +13,7 @@ import { multiaddr } from 'multiaddr'
 import { WnfsBlockstore} from './helia_wnfs_blockstore_adaptor.js';
 import { PublicDirectory, PrivateDirectory, PrivateForest, PrivateNode, AccessKey, receiveShare } from "wnfs";
 import { CID } from 'multiformats/cid'
+import { fromString, toString} from 'uint8arrays';
 
 var rootDirCID
 
@@ -65,6 +66,51 @@ class Rng {
   }
 }
 
+class ExchangeKey {
+  constructor(key) {
+    this.key = key;
+  }
+
+  static async fromModulus(modulus){
+    var keyData = {
+      kty: "RSA",
+      n: toString(modulus, "base64url"),
+      e: toString(new Uint8Array([0x01, 0x00, 0x01]), "base64url"),
+      alg: "RSA-OAEP-256",
+      ext: true,
+    };
+
+    const key = await self.crypto.subtle.importKey(
+      "jwk",
+      keyData,
+      {
+        name: "RSA-OAEP",
+        hash: { name: "SHA-256" },
+      },
+      false,
+      ["encrypt"]
+    );
+
+    return new ExchangeKey(key);
+  }
+
+  async encrypt(data) {
+    const encryptedData = await self.crypto.subtle.encrypt(
+      {
+        name: "RSA-OAEP",
+      },
+      this.key,
+      data
+    );
+    return new Uint8Array(encryptedData);
+  }
+
+  async getPublicKeyModulus() {
+    const key = await self.crypto.subtle.exportKey("jwk", this.key);
+    return fromString(key.n, "base64url");
+  }
+}
+
 export class PrivateKey {
   constructor(key) {
     this.key = key;
@@ -98,7 +144,7 @@ export class PrivateKey {
   }
 
   getPublicKey() {
-    return this.key.publicKey;
+    return new ExchangeKey(this.key.publicKey);
   }
 }
 
@@ -141,19 +187,17 @@ async function readPrivateFile(node, accessKey, forestCid) {
 async function createExchangeRoot(node) {
   const wnfsBlockstore = new WnfsBlockstore(node)
   const key = await PrivateKey.generate();
-
-  const loadKey = await crypto.subtle.exportKey("jwk", key.getPublicKey());
-  const exchangePubKey = loadKey.n;
+  const excKey = await key.getPublicKey().getPublicKeyModulus()
 
   const { rootDir } = await new PublicDirectory(new Date()).write(
     ["device1", "v1.exchange_key"],
-    exchangePubKey,
+    excKey,
     new Date(),
     wnfsBlockstore
   );
 
   const recipientExchRootCid = await rootDir.store(wnfsBlockstore);
-  return [exchangePubKey, CID.decode(recipientExchRootCid).toString()]
+  return [toString(excKey, 'base64url'), CID.decode(recipientExchRootCid).toString()]
 };
 
 async function acceptShare(node, recipientExchPubKey, shareLabel) {

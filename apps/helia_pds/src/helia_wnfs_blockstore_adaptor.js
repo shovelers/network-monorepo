@@ -1,6 +1,7 @@
 import { CID } from 'multiformats/cid'
 import { sha256 } from 'multiformats/hashes/sha2'
 import crypto from 'crypto'
+import { fromString } from 'uint8arrays'
 
 export class WnfsBlockstore {
   constructor(node) {
@@ -29,6 +30,52 @@ export class Rng {
   }
 }
 
+export class ExchangeKey {
+  constructor(key) {
+    this.key = key;
+  }
+
+  static async fromModulus(modulus) {
+    var keyData = {
+      kty: "RSA",
+      n: toString(modulus, "base64url"),
+      e: toString(new Uint8Array([0x01, 0x00, 0x01]), "base64url"),
+      alg: "RSA-OAEP-256",
+      ext: true,
+    };
+
+    const key = await crypto.subtle.importKey(
+      "jwk",
+      keyData,
+      {
+        name: "RSA-OAEP",
+        hash: { name: "SHA-256" },
+      },
+      false,
+      ["encrypt"]
+    );
+
+    return new ExchangeKey(key);
+  }
+
+  async encrypt(data) {
+    const encryptedData = await crypto.subtle.encrypt(
+      {
+        name: "RSA-OAEP",
+      },
+      this.key,
+      data
+    );
+
+    return new Uint8Array(encryptedData);
+  }
+
+  async getPublicKeyModulus() {
+    const key = await crypto.subtle.exportKey("jwk", this.key);
+    return fromString(key.n, "base64url");
+  }
+}
+
 export class PrivateKey {
   constructor(key) {
     this.key = key;
@@ -50,7 +97,7 @@ export class PrivateKey {
   }
 
   async decrypt(data) {
-    const decryptedData = await window.crypto.subtle.decrypt(
+    const decryptedData = await crypto.subtle.decrypt(
       {
         name: "RSA-OAEP",
       },
@@ -62,6 +109,6 @@ export class PrivateKey {
   }
 
   getPublicKey() {
-    return this.key.publicKey;
+    return new ExchangeKey(this.key.publicKey);
   }
 }

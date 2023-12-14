@@ -10,7 +10,7 @@ import { ping } from '@libp2p/ping'
 import { identify } from '@libp2p/identify'
 import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
-import { WnfsBlockstore, Rng } from './src/helia_wnfs_blockstore_adaptor.js';
+import { WnfsBlockstore, Rng, ExchangeKey,  PrivateKey } from './src/helia_wnfs_blockstore_adaptor.js';
 import { CID } from 'multiformats/cid'
 
 const node = await createNode()
@@ -74,14 +74,20 @@ console.log("private file content: ", new TextDecoder().decode(privateFileConten
 export async function generateShareLabel(recipientExchPubKey, recipientExchRootCid){
   const sharerRootDid = "did:key:z6MkqZjY";
   var recipientExchRootCid = CID.parse(recipientExchRootCid).bytes 
-  console.log("test: ", privateRootDir[0])
+  // console.log("privateRootDir: ", privateRootDir)
+  // console.log('forestCid', forestCid)
+  // const forest = await PrivateForest.load(forestCid, wnfsBlockstore)
+  // var node = await PrivateNode.load(privateRootDir[0], forest, wnfsBlockstore)
+  // var rootDir = await node.asDir(forest, wnfsBlockstore)
+  // var privateFileContent = await rootDir.read(["private", "cats", "tabby.png"], true, forest, wnfsBlockstore)
+  // console.log("private file content: ", new TextDecoder().decode(privateFileContent.result))
   
   var forest2 = await share(
     privateRootDir[0],
     0,
     sharerRootDid,
     recipientExchRootCid,
-    privateRootDir[1],
+    forest,
     wnfsBlockstore
   );
   console.log("forest2: ", forest2)
