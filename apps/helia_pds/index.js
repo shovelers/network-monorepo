@@ -53,7 +53,7 @@ console.log("private dir: ", privateDir)
 
 var { rootDir, forest } = await privateDir.mkdir(["private", "cats"], true, new Date(), initialForest, wnfsBlockstore, rng);
 
-var privateContent = new TextEncoder().encode("Hello Private World 201")
+var privateContent = new TextEncoder().encode("Hello Private World 101")
 
 var { rootDir, forest } = await rootDir.write(["private", "cats", "tabby.png"], true, privateContent, new Date(), forest, wnfsBlockstore, rng);
 
