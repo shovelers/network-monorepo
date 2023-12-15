@@ -74,13 +74,6 @@ console.log("private file content: ", new TextDecoder().decode(privateFileConten
 export async function generateShareLabel(recipientExchPubKey, recipientExchRootCid){
   const sharerRootDid = "did:key:z6MkqZjY";
   var recipientExchRootCid = CID.parse(recipientExchRootCid).bytes 
-  // console.log("privateRootDir: ", privateRootDir)
-  // console.log('forestCid', forestCid)
-  // const forest = await PrivateForest.load(forestCid, wnfsBlockstore)
-  // var node = await PrivateNode.load(privateRootDir[0], forest, wnfsBlockstore)
-  // var rootDir = await node.asDir(forest, wnfsBlockstore)
-  // var privateFileContent = await rootDir.read(["private", "cats", "tabby.png"], true, forest, wnfsBlockstore)
-  // console.log("private file content: ", new TextDecoder().decode(privateFileContent.result))
   
   var forest2 = await share(
     privateRootDir[0],
@@ -93,6 +86,7 @@ export async function generateShareLabel(recipientExchPubKey, recipientExchRootC
   console.log("forest2: ", forest2)
   
   const shareLabel = createShareName(0, sharerRootDid, recipientExchPubKey, forest2);
+  console.log(shareLabel)
   return shareLabel
 }
 

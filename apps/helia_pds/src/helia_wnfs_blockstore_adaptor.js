@@ -1,7 +1,6 @@
 import { CID } from 'multiformats/cid'
 import { sha256 } from 'multiformats/hashes/sha2'
-import crypto from 'crypto'
-import { fromString } from 'uint8arrays'
+import { fromString, toString } from 'uint8arrays'
 
 export class WnfsBlockstore {
   constructor(node) {
@@ -66,6 +65,8 @@ export class ExchangeKey {
       this.key,
       data
     );
+    return new Uint8Array(encryptedData);
+   //const encryptedData = await crypto.publicEncrypt({key: this.key, oaepHash: "SHA-256", padding: crypto.constants.RSA_NO_PADDING}, data)
 
     return new Uint8Array(encryptedData);
   }
@@ -90,7 +91,7 @@ export class PrivateKey {
         hash: { name: "SHA-256" },
       },
       true,
-      ["decrypt"]
+      ["encrypt", "decrypt"]
     );
 
     return new PrivateKey(keyPair);
