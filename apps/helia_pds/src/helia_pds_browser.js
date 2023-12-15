@@ -125,7 +125,9 @@ async function acceptShare(node, recipientExchPrvKey, shareLabel, forestCid) {
   const wnfsBlockstore = new WnfsBlockstore(node)
   const rng = new Rng()
   const forest = await PrivateForest.load(CID.parse(forestCid).bytes, wnfsBlockstore)
+  console.log("loaded forest:", forest)
   shareLabel = new Name(NameAccumulator.fromBytes(fromString(shareLabel, "base64url"))); 
+  console.log("shareLabel:", shareLabel)
   const sharedNode = await receiveShare(
     shareLabel,
     recipientExchPrvKey,
@@ -133,6 +135,12 @@ async function acceptShare(node, recipientExchPrvKey, shareLabel, forestCid) {
     wnfsBlockstore
   );
   window.sharedNode = sharedNode
+  console.log("sharedNode:", sharedNode)
+
+  const { rootDir } = await sharedNode.asDir().ls([], true, forest, wnfsBlockstore);
+  console.log("rootDir:", rootDir)
+  var privateFileContent = await rootDir.read(["private", "cats", "tabby.png"], true, forest, wnfsBlockstore)
+  console.log(new TextDecoder().decode(privateFileContent.result))
 }
 
 async function createHeliaNode() {

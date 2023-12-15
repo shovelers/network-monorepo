@@ -53,7 +53,7 @@ console.log("private dir: ", privateDir)
 
 var { rootDir, forest } = await privateDir.mkdir(["private", "cats"], true, new Date(), initialForest, wnfsBlockstore, rng);
 
-var privateContent = new TextEncoder().encode("Hello Private World 101")
+var privateContent = new TextEncoder().encode("Hello Private World 201")
 
 var { rootDir, forest } = await rootDir.write(["private", "cats", "tabby.png"], true, privateContent, new Date(), forest, wnfsBlockstore, rng);
 
@@ -81,14 +81,16 @@ export async function generateShareLabel(recipientExchPubKey, recipientExchRootC
     0,
     sharerRootDid,
     recipientExchRootCid,
-    forest,
+    privateRootDir[1],
     wnfsBlockstore
   );
   console.log("forest2: ", forest2)
   
   const shareLabel = createShareName(0, sharerRootDid, recipientExchPubKey, forest2);
   var forestCid = await forest2.store(wnfsBlockstore)
-  
+
+  var diff = await forest2.diff(privateRootDir[1], wnfsBlockstore)
+  console.log("diff: ", diff)
   return {shareLabel: toString(shareLabel.toNameAccumulator(forest2).toBytes(), "base64url"), forestCid: CID.decode(forestCid)}
 }
 
