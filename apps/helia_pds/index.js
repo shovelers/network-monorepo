@@ -4,7 +4,7 @@ import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
-import { PublicDirectory, PrivateDirectory, PrivateForest, share, createShareName } from "wnfs";
+import { PublicDirectory, PrivateDirectory, PrivateForest, share, createShareName, Name } from "wnfs";
 import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
 import { identify } from '@libp2p/identify'
@@ -12,6 +12,7 @@ import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
 import { WnfsBlockstore, Rng, ExchangeKey,  PrivateKey } from './src/helia_wnfs_blockstore_adaptor.js';
 import { CID } from 'multiformats/cid'
+import { toString } from 'uint8arrays'
 
 const node = await createNode()
 const multiaddrs = node.libp2p.getMultiaddrs()
@@ -86,8 +87,9 @@ export async function generateShareLabel(recipientExchPubKey, recipientExchRootC
   console.log("forest2: ", forest2)
   
   const shareLabel = createShareName(0, sharerRootDid, recipientExchPubKey, forest2);
-  console.log(shareLabel)
-  return shareLabel
+  var forestCid = await forest2.store(wnfsBlockstore)
+  
+  return {shareLabel: toString(shareLabel.toNameAccumulator(forest2).toBytes(), "base64url"), forestCid: CID.decode(forestCid)}
 }
 
 async function createNode () {

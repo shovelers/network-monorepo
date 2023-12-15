@@ -28,6 +28,7 @@ server.get("/", (req, res) => {
 server.post("/generate_share", (req, res) => {
   var key = fromString(req.body.key, "base64url")
   generateShareLabel(key, req.body.cid).then((result) => {
+    console.log(result)
     res.send(result);
   });
 }
