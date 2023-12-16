@@ -14,6 +14,12 @@ import { WnfsBlockstore, PrivateKey} from './helia_wnfs_blockstore_adaptor.js';
 import { PublicDirectory, PrivateDirectory, PrivateForest, PrivateNode, AccessKey, receiveShare, Name, NameAccumulator } from "wnfs";
 import { CID } from 'multiformats/cid'
 import { toString, fromString } from 'uint8arrays';
+import { createBrowserNode } from './helia_wnfs_node.js';
+import { PublicFileExample } from './public_file_example.js';
+
+// file = new PublicFileExample(await createBrowserNode())
+// await file.write("Hello World 101")
+// console.log(await file.read())
 
 var rootDirCID
 var keypair
@@ -182,4 +188,4 @@ async function createHeliaNode() {
   })
 }
 
-export { createHeliaNode, dial, writeData, readFile, CID, writePrivateData, readPrivateFile, createExchangeRoot, acceptShare}
+export { createHeliaNode, dial, writeData, readFile, CID, writePrivateData, readPrivateFile, createExchangeRoot, acceptShare, createBrowserNode, PublicFileExample}
