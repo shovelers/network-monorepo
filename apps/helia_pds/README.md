@@ -1,27 +1,6 @@
 ### Testing multinode read-write
-1. Public file
-* Run `node index.js`
-* Copy the Public rootDirCID from backend terminal and run `await readFile(node, <value>)`
-* it should print `Hello World 101` 
 
-2. Private File
-* Run `node index.js`
-* Copy the Access Key byte array from backend terminal and run `var key = new Uint8Array(<value>)` on browser console
-* Copy the Forest CID string from backend terminal and run `var forestcid = CID.parse(<value>).bytes` on browser console
-* On broswer console run: `await readPrivateFile(node, key, forestcid)`
-* it should print `Hello Private World 101`
-
-3. Share Private File
-* Run `npm run start`
-* Open `localhost:3000` and open console
-* copy the server multiaddr from backend terminal logs & run `dial(node, <value>)` on the browser console
-* On browser console run `await createExchangeRoot(node)`. this will return Array of 2 values these will be used in next step
-* Make a POST request using postman on `localhost:3000/generate_share_label` with body {key: <first value from above array>, cid: <second value from above array>}. As response you will get {shareLabel: <>, forestCid: <>}
-* On broswer console run `await acceptShare(node, keypair, <shareLabel>, <forestCid>)`
-* it should print `Hello Private World 101` 
-
-
-Examples
+Test-cases
 1. Public file
 2. Private file
 3. Share private file
@@ -32,3 +11,20 @@ Networking scenarios
 3. Browser -> Standalone
 4. Standalone -> Browser
 5. Browser -> Standalone -> Browser
+
+### Navigating repo
+
+`src/server`
+* runs a nodejs + express server
+* runs a helia node, listening over websockets
+* creates a Public file using `src/ExamplePulbicFile`
+* creates a Private file using `src/ExamplePrivateFile`
+* exposes `POST /generate_share` API for the shareing the above example private file
+
+`src/browser`
+* Exposes methods in browser to run through console
+* `createBrowserNode()` method to create a helia node and `dial()` method to connect with server
+* `new ExamplePublicFile(node).write()` methods allows to create a public file, and `read()` to read content
+* `ExamplePublicFile.load()` methods allows loading PublicDiretory created on other nodes in network
+* Similar methods are available for `ExamplePrivateFile`
+* `new Recipient(node)` create a receipient object through which shared files can be accepted.
