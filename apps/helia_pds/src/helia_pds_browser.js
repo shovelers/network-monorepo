@@ -14,7 +14,7 @@ import { WnfsBlockstore, PrivateKey} from './helia_wnfs_blockstore_adaptor.js';
 import { PublicDirectory, PrivateDirectory, PrivateForest, PrivateNode, AccessKey, receiveShare, Name, NameAccumulator } from "wnfs";
 import { CID } from 'multiformats/cid'
 import { toString, fromString } from 'uint8arrays';
-import { createBrowserNode } from './helia_wnfs_node.js';
+import { createBrowserNode } from './helia_node.js';
 import { PublicFileExample } from './public_file_example.js';
 
 // file = new PublicFileExample(await createBrowserNode())

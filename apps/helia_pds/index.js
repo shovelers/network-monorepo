@@ -1,20 +1,10 @@
-import { createHelia } from 'helia';
-import { bitswap } from 'helia/block-brokers'
-import { noise } from '@chainsafe/libp2p-noise'
-import { yamux } from '@chainsafe/libp2p-yamux'
-import { MemoryBlockstore } from 'blockstore-core'
-import { MemoryDatastore } from 'datastore-core'
 import { PublicDirectory, PrivateDirectory, PrivateForest, share, createShareName, Name } from "wnfs";
-import { createLibp2p } from 'libp2p'
-import { ping } from '@libp2p/ping'
-import { identify } from '@libp2p/identify'
-import { webSockets } from '@libp2p/websockets'
-import * as filters from '@libp2p/websockets/filters'
 import { WnfsBlockstore, Rng, ExchangeKey,  PrivateKey } from './src/helia_wnfs_blockstore_adaptor.js';
+import { createStandaloneNode } from './src/helia_node.js';
 import { CID } from 'multiformats/cid'
 import { toString } from 'uint8arrays'
 
-const node = await createNode()
+const node = await createStandaloneNode()
 const multiaddrs = node.libp2p.getMultiaddrs()
 console.log("node address:", multiaddrs);
 
@@ -92,47 +82,4 @@ export async function generateShareLabel(recipientExchPubKey, recipientExchRootC
   var diff = await forest2.diff(privateRootDir[1], wnfsBlockstore)
   console.log("diff: ", diff)
   return {shareLabel: toString(shareLabel.toNameAccumulator(forest2).toBytes(), "base64url"), forestCid: CID.decode(forestCid)}
-}
-
-async function createNode () {
-  // the blockstore is where we store the blocks that make up files
-  const blockstore = new MemoryBlockstore()
-
-  // application-specific data lives in the datastore
-  const datastore = new MemoryDatastore()
-
-  // libp2p is the networking layer that underpins Helia
-  const libp2p = await createLibp2p({
-    datastore,
-    addresses: {
-      listen: ['/ip4/0.0.0.0/tcp/0/ws']
-    },
-    transports: [webSockets({filter: filters.all})],
-    connectionEncryption: [noise()],
-    streamMuxers: [yamux()],
-    connectionGater: {
-      denyDialMultiaddr: async (multiAddr) => {
-        const str = multiAddr.toString()
-        return !str.includes("/ws/") && !str.includes("/wss/") && !str.includes("/webtransport/")
-      },
-    },
-    services: {
-      identify: identify(),
-      ping: ping({
-        maxInboundStreams: 100,
-        maxOutboundStreams: 100,
-        runOnTransientConnection: false,
-      }),
-    },
-  })
-  
-  
-  return await createHelia({
-    datastore,
-    blockstore,
-    libp2p,
-    blockBrokers: [
-      bitswap()
-    ]
-  })
 }
