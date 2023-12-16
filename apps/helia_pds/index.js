@@ -4,14 +4,20 @@ import { createStandaloneNode } from './src/helia_node.js';
 import { CID } from 'multiformats/cid'
 import { toString } from 'uint8arrays'
 import { ExamplePublicFile } from './src/example_public_file.js';
+import { ExamplePrivateFile } from './src/example_private_file.js';
 
 const node = await createStandaloneNode()
 const multiaddrs = node.libp2p.getMultiaddrs()
 console.log("node address:", multiaddrs);
 
-const file = new ExamplePublicFile(node)
-const fileCID = await file.write("Standalone: Hello World")
-console.log("PublicFileCID: ", CID.decode(fileCID))
+const publicFile = new ExamplePublicFile(node)
+const publicFileCID = await publicFile.write("Standalone: Public Hello World")
+console.log("PublicFileCID: ", CID.decode(publicFileCID))
+
+const privateFile = new ExamplePrivateFile(node)
+const [accessKey, privateForestCID] = await privateFile.write("Standalone: Private Hello World")
+process.stdout.write("AccessKey: " + accessKey + '\n');
+console.log("PrivateForestCID: ", CID.decode(privateForestCID))
 
 //Public Directory
 const wnfsBlockstore = new WnfsBlockstore(node)

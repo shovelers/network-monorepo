@@ -4,15 +4,11 @@
   </head>
   <body>
     <script type="module">
-      import { dial, writeData, readFile, CID, writePrivateData, readPrivateFile, createExchangeRoot, acceptShare, createBrowserNode, ExamplePublicFile} from '/helia_pds_browser.js';
+      import { dial, createExchangeRoot, acceptShare, createBrowserNode, ExamplePublicFile, ExamplePrivateFile} from '/helia_pds_browser.js';
       window.createBrowserNode = createBrowserNode;
       window.ExamplePublicFile = ExamplePublicFile;
+      window.ExamplePrivateFile = ExamplePrivateFile;
       window.dial = dial;
-      window.writeData = writeData;
-      window.readFile = readFile;
-      window.CID = CID;
-      window.writePrivateData = writePrivateData;
-      window.readPrivateFile = readPrivateFile;
       window.createExchangeRoot = createExchangeRoot;
       window.acceptShare = acceptShare;
     </script>
