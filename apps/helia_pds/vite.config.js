@@ -10,7 +10,7 @@ export default {
     emptyOutDir: true,
     outDir: path.join(__dirname, "public"),
     rollupOptions: {
-      input: glob.sync(path.resolve(__dirname, "src", "helia_pds_browser.js")),
+      input: glob.sync(path.resolve(__dirname, "src", "browser.js")),
       output: {
         entryFileNames: "[name].js",
       },

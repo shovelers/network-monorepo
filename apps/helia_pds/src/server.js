@@ -2,13 +2,13 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import cors from 'cors';
-import { ExchangeKey } from './src/helia_wnfs_blockstore_adaptor.js';
+import { ExchangeKey } from './helia_wnfs_blockstore_adaptor.js';
 import { fromString } from 'uint8arrays'
-import { createStandaloneNode } from './src/helia_node.js';
+import { createStandaloneNode } from './helia_node.js';
 import { CID } from 'multiformats/cid'
-import { ExamplePublicFile } from './src/example_public_file.js';
-import { ExamplePrivateFile } from './src/example_private_file.js';
-import { Sharer } from "./src/share.js";
+import { ExamplePublicFile } from './example_public_file.js';
+import { ExamplePrivateFile } from './example_private_file.js';
+import { Sharer } from "./share.js";
 
 globalThis.ExchangeKey = ExchangeKey;
 const port = process.argv[2] || 3000;
@@ -21,9 +21,9 @@ server.use(express.json());
 server.use(cors());
 
 server.use(express.urlencoded({ extended: true }));
-server.set('views', path.join(__dirname, 'views'));
+server.set('views', path.join(__dirname, '../views'));
 server.set('view engine', 'ejs');
-server.use(express.static(path.join(__dirname, 'public')));
+server.use(express.static(path.join(__dirname, '../public')));
 
 const node = await createStandaloneNode()
 const multiaddrs = node.libp2p.getMultiaddrs()
