@@ -19,3 +19,16 @@
 * Make a POST request using postman on `localhost:3000/generate_share_label` with body {key: <first value from above array>, cid: <second value from above array>}. As response you will get {shareLabel: <>, forestCid: <>}
 * On broswer console run `await acceptShare(node, keypair, <shareLabel>, <forestCid>)`
 * it should print `Hello Private World 101` 
+
+
+Examples
+1. Public file
+2. Private file
+3. Share private file
+
+Networking scenarios
+1. Browser 
+2. Standalone
+3. Browser -> Standalone
+4. Standalone -> Browser
+5. Browser -> Standalone -> Browser

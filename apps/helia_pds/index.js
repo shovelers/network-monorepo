@@ -3,10 +3,19 @@ import { WnfsBlockstore, Rng, ExchangeKey,  PrivateKey } from './src/helia_wnfs_
 import { createStandaloneNode } from './src/helia_node.js';
 import { CID } from 'multiformats/cid'
 import { toString } from 'uint8arrays'
+import { PublicFileExample } from './src/public_file_example.js';
+
+// file = new PublicFileExample(await createBrowserNode())
+// await file.write("Hello World 101")
+// console.log(await file.read())
 
 const node = await createStandaloneNode()
 const multiaddrs = node.libp2p.getMultiaddrs()
 console.log("node address:", multiaddrs);
+
+const file = new PublicFileExample(node)
+const fileCID = await file.write("Standalone: Hello World")
+console.log("PublicFileCID: ", CID.decode(fileCID))
 
 //Public Directory
 const wnfsBlockstore = new WnfsBlockstore(node)

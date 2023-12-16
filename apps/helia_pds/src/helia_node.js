@@ -9,6 +9,7 @@ import { ping } from '@libp2p/ping'
 import { identify } from '@libp2p/identify'
 import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
+import { multiaddr } from 'multiaddr'
 
 const STANDALONE = 1
 const BROWSER = 2
@@ -62,3 +63,9 @@ export async function createStandaloneNode() {
 export async function createBrowserNode() {
   return await createNode(BROWSER)
 }
+
+export async function dial(node, peer) {
+  const connection = await node.libp2p.dial(multiaddr(peer));
+  const latency = await node.libp2p.services.ping.ping(multiaddr(peer))
+  console.log("latency:", latency)
+};

@@ -1,4 +1,5 @@
 import { WnfsBlockstore } from './helia_wnfs_blockstore_adaptor.js'
+import { CID } from 'multiformats/cid'
 import { PublicDirectory } from "wnfs";
 
 export class PublicFileExample {
@@ -18,6 +19,12 @@ export class PublicFileExample {
     const rootCID = await this.rootDir.store(this.store)
   }
 
+  async loadRootDIR(cid) {
+    var rootDir = await PublicDirectory.load(CID.parse(cid).bytes, this.store)
+    console.log("loaded root:", rootDir)
+    this.rootDir = rootDir
+  }
+
   async write(content) {
     if (this.rootDir == null) {
       await this.initalise()
@@ -32,7 +39,7 @@ export class PublicFileExample {
     console.log("root after write", rootDir)
 
     this.rootDir = rootDir
-    await this.rootDir.store(this.store)
+    return await this.rootDir.store(this.store)
   }
 
   async read() {

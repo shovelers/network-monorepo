@@ -9,26 +9,15 @@ import { ping } from '@libp2p/ping'
 import { identify } from '@libp2p/identify'
 import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
-import { multiaddr } from 'multiaddr'
 import { WnfsBlockstore, PrivateKey} from './helia_wnfs_blockstore_adaptor.js';
 import { PublicDirectory, PrivateDirectory, PrivateForest, PrivateNode, AccessKey, receiveShare, Name, NameAccumulator } from "wnfs";
 import { CID } from 'multiformats/cid'
 import { toString, fromString } from 'uint8arrays';
-import { createBrowserNode } from './helia_node.js';
+import { createBrowserNode, dial } from './helia_node.js';
 import { PublicFileExample } from './public_file_example.js';
-
-// file = new PublicFileExample(await createBrowserNode())
-// await file.write("Hello World 101")
-// console.log(await file.read())
 
 var rootDirCID
 var keypair
-
-async function dial(node, peer) {
-  const connection = await node.libp2p.dial(multiaddr(peer));
-  const latency = await node.libp2p.services.ping.ping(multiaddr(peer))
-  console.log("latency:", latency)
-};
 
 async function writeData(node, data) {
   const wnfsBlockstore = new WnfsBlockstore(node)
