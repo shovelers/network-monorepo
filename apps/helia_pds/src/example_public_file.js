@@ -2,11 +2,11 @@ import { WnfsBlockstore } from './helia_wnfs_blockstore_adaptor.js'
 import { CID } from 'multiformats/cid'
 import { PublicDirectory } from "wnfs";
 
-export class PublicFileExample {
+export class ExamplePublicFile {
   constructor(node) {
     this.store = new WnfsBlockstore(node)
-    this.path = ["pictures", "cats"]
-    this.name = "tabby.txt"
+    this.path = ["public"]
+    this.name = "note.txt"
 
     this.file = this.path.concat(this.name)
   }

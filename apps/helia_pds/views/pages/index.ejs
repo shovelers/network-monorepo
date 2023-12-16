@@ -4,12 +4,9 @@
   </head>
   <body>
     <script type="module">
-      import { createHeliaNode, dial, writeData, readFile, CID, writePrivateData, readPrivateFile, createExchangeRoot, acceptShare, createBrowserNode, PublicFileExample} from '/helia_pds_browser.js';
+      import { dial, writeData, readFile, CID, writePrivateData, readPrivateFile, createExchangeRoot, acceptShare, createBrowserNode, ExamplePublicFile} from '/helia_pds_browser.js';
       window.createBrowserNode = createBrowserNode;
-      window.PublicFileExample = PublicFileExample;
-      window.createHeliaNode = createHeliaNode;
-      // window.node = await createHeliaNode();
-      // console.log(window.node.libp2p.getMultiaddrs());
+      window.ExamplePublicFile = ExamplePublicFile;
       window.dial = dial;
       window.writeData = writeData;
       window.readFile = readFile;

@@ -14,7 +14,7 @@ import { PublicDirectory, PrivateDirectory, PrivateForest, PrivateNode, AccessKe
 import { CID } from 'multiformats/cid'
 import { toString, fromString } from 'uint8arrays';
 import { createBrowserNode, dial } from './helia_node.js';
-import { PublicFileExample } from './public_file_example.js';
+import { ExamplePublicFile } from './example_public_file.js';
 
 var rootDirCID
 var keypair
@@ -138,43 +138,4 @@ async function acceptShare(node, recipientExchPrvKey, shareLabel, forestCid) {
   console.log(new TextDecoder().decode(privateFileContent.result))
 }
 
-async function createHeliaNode() {
-  // the blockstore is where we store the blocks that make up files
-  const blockstore = new MemoryBlockstore()
-
-  // application-specific data lives in the datastore
-  const datastore = new MemoryDatastore()
-
-  // libp2p is the networking layer that underpins Helia
-  const libp2p = await createLibp2p({
-    datastore,
-    transports: [webSockets({ filter: filters.all })],
-    connectionEncryption: [noise()],
-    streamMuxers: [yamux()],
-    connectionGater: {
-      denyDialMultiaddr: async (multiAddr) => {
-        const str = multiAddr.toString()
-        return !str.includes("/ws/") && !str.includes("/wss/") && !str.includes("/webtransport/")
-      },
-    },
-    services: {
-      ping: ping({
-        maxInboundStreams: 100,
-        maxOutboundStreams: 100,
-        runOnTransientConnection: false,
-      }),
-      identify: identify(),
-    },
-  })
-
-  return await createHelia({
-    datastore,
-    blockstore,
-    libp2p,
-    blockBrokers: [
-      bitswap()
-    ]
-  })
-}
-
-export { createHeliaNode, dial, writeData, readFile, CID, writePrivateData, readPrivateFile, createExchangeRoot, acceptShare, createBrowserNode, PublicFileExample}
+export { dial, writeData, readFile, CID, writePrivateData, readPrivateFile, createExchangeRoot, acceptShare, createBrowserNode, ExamplePublicFile }
