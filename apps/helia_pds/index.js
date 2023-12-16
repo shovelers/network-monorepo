@@ -1,5 +1,4 @@
 import { PublicDirectory, PrivateDirectory, PrivateForest, share, createShareName, Name } from "wnfs";
-import { WnfsBlockstore, Rng, ExchangeKey,  PrivateKey } from './src/helia_wnfs_blockstore_adaptor.js';
 import { createStandaloneNode } from './src/helia_node.js';
 import { CID } from 'multiformats/cid'
 import { toString } from 'uint8arrays'
@@ -19,8 +18,6 @@ const [accessKey, privateForestCID] = await privateFile.write("Standalone: Priva
 process.stdout.write("AccessKey: " + accessKey + '\n');
 console.log("PrivateForestCID: ", CID.decode(privateForestCID))
 
-const wnfsBlockstore = new WnfsBlockstore(node)
-
 export async function generateShareLabel(recipientExchPubKey, recipientExchRootCid){
   const sharerRootDid = "did:key:z6MkqZjY";
   var recipientExchRootCid = CID.parse(recipientExchRootCid).bytes 
@@ -31,12 +28,12 @@ export async function generateShareLabel(recipientExchPubKey, recipientExchRootC
     sharerRootDid,
     recipientExchRootCid,
     privateFile.forest,
-    wnfsBlockstore
+    privateFile.store
   );
   console.log("forest2: ", forest2)
   
   const shareLabel = createShareName(0, sharerRootDid, recipientExchPubKey, forest2);
-  var forestCid = await forest2.store(wnfsBlockstore)
+  var forestCid = await forest2.store(privateFile.store)
 
   return {shareLabel: toString(shareLabel.toNameAccumulator(forest2).toBytes(), "base64url"), forestCid: CID.decode(forestCid)}
 }
