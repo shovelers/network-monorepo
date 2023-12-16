@@ -1,14 +1,6 @@
-import { WnfsBlockstore } from './helia_wnfs_blockstore_adaptor.js'
+import { WnfsBlockstore, Rng } from './helia_wnfs_blockstore_adaptor.js'
 import { CID } from 'multiformats/cid'
 import { PrivateDirectory, PrivateForest, PrivateNode, AccessKey } from "wnfs";
-
-class Rng {
-  randomBytes(count) {
-    const array = new Uint8Array(count);
-    crypto.getRandomValues(array);
-    return array;
-  }
-}
 
 export class ExamplePrivateFile {
   constructor(node) {
