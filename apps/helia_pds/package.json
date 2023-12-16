@@ -16,6 +16,7 @@
     "@helia/unixfs": "^1.4.3",
     "@libp2p/identify": "^1.0.5",
     "@libp2p/websockets": "^8.0.5",
+    "@libp2p/ping": "^1.0.6",
     "blockstore-core": "^4.3.7",
     "datastore-core": "^9.2.5",
     "express": "^4.18.2",
