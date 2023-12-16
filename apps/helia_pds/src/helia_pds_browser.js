@@ -52,7 +52,7 @@ async function acceptShare(node, recipientExchPrvKey, shareLabel, forestCid) {
 
   const { rootDir } = await sharedNode.asDir().ls([], true, forest, wnfsBlockstore);
   console.log("rootDir:", rootDir)
-  var privateFileContent = await rootDir.read(["private", "cats", "tabby.png"], true, forest, wnfsBlockstore)
+  var privateFileContent = await rootDir.read(["private", "note.txt"], true, forest, wnfsBlockstore)
   console.log(new TextDecoder().decode(privateFileContent.result))
 }
 
