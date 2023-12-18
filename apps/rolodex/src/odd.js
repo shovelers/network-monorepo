@@ -144,28 +144,18 @@ async function updateProfile(name, tags, text) {
   })
 }
 
-async function addContact(newContact, tags = [], text = "", links = []) {
-  let contact = new Contact({name: newContact, tags: tags, text: text, links: links})
+async function addContact(name, tags = [], text = "", links = []) {
+  let contact = new Contact({name: name, tags: tags, text: text, links: links})
   return cr.create(contact)
 }
 
 async function editContact(id, name, tags = [], text='', links = []) {
-  await updateFile("contacts.json", (content) => {
-    var contactList = content.contactList
-    contactList[id].name = name
-    contactList[id].tags = tags
-    contactList[id].text = text
-    contactList[id].links = links
-    return content
-  })
+  let contact = new Contact({id: id, name: name, tags: tags, text: text, links: links})
+  return cr.edit(contact)
 }
 
 async function deleteContact(id) {
-  await updateFile("contacts.json", (content) => {
-    content.contactList[id].archived = true
-    console.log("archived contact", content.contactList[id])
-    return content
-  })
+  return cr.delete(id)
 }
 
 async function updateFile(file, mutationFunction) {

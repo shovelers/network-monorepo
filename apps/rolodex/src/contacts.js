@@ -46,7 +46,18 @@ export class ContactRepository {
     })
   }
 
-  async edit(){}
+  async edit(contact){
+    await this.store.updatePrivateFile(this.filename, (content) => {
+      content.contactList[contact.id] = contact.asJSON()
+      return content
+    }) 
+  }
 
-  async delete(){}
+  async delete(contactID){
+    await this.store.updatePrivateFile(this.filename, (content) => {
+      content.contactList[contactID].archived = true
+      console.log("archived contact", content.contactList[contactID])
+      return content
+    })  
+  }
 }
