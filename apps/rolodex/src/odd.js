@@ -63,46 +63,7 @@ async function fissionUsernames(username) {
 }
 
 async function signup(username) {
-  var program = await getProgram();
-  var session = await getSession(program);
- 
-  var fissionusername = await fissionUsernames(username)
-  var hashedUsername = fissionusername.hashed
-
-  const valid = await program.auth.isUsernameValid(hashedUsername)
-  const available = await program.auth.isUsernameAvailable(hashedUsername)
-  console.log("username valid", valid)
-  console.log("username available", available)
-
-  if (valid && available) {
-    // Register the user
-    const { success } = await program.auth.register({ username: hashedUsername })
-    console.log("success: ", success)
-    // Create a session on success
-    session = success ? await program.auth.session() : null
-  } else if (!valid) {
-    alert("username is not valid")
-  } else if (!available) {
-    alert("username is not available")
-  }
-
-  //create fs
-  console.log("newly created session: ", session)
-  const fs = session.fs
-  console.log(fs)
-  const profileData = JSON.stringify({ "handle": username, "name": "John Doe", tags: [], text: '' })
-  const contactData = JSON.stringify({ contactList: {}, appleContacts: [], googleContacts: {} })
-
-  const { RootBranch } = odd.path
-  const profileFilePath = odd.path.file(RootBranch.Private, "profile.json")
-  const contactFilePath = odd.path.file(RootBranch.Private, "contacts.json")
-
-  await fs.write(profileFilePath, new TextEncoder().encode(profileData))
-  await fs.write(contactFilePath, new TextEncoder().encode(contactData))
-  await fs.publish()
-
-  const content = new TextDecoder().decode(await fs.read(profileFilePath))
-  console.log("profile data :", content)
+  await account.create(username);
 
   const timeout = setTimeout(() => {
     clearTimeout(timeout)

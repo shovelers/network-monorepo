@@ -35,4 +35,11 @@ export class Account {
       return content
     })
   }
+
+  async create(handle) {
+    await this.store.createFissionUser(handle)
+
+    this.store.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
+    this.store.updatePrivateFile("contacts.json", () => { return { contactList: {}, appleContacts: [], googleContacts: {} } })  
+  }
 }

@@ -1,16 +1,22 @@
 import * as odd from "@oddjs/odd";
+import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
+import * as uint8arrays from 'uint8arrays';
+import { publicKeyToDid } from '@oddjs/odd/did/transformers';
+
+const USERNAME_STORAGE_KEY = "fullUsername"
 
 class OddSession {
   constructor(odd) {
-    this.odd = odd
-    this.program = null
+    this.odd = odd;
+    this.program = null;
   }
 
   async getProgram() {
     if (!this.program) {
-      const appInfo = { creator: "Shovel", name: "Rolod" }
-      this.program = await this.odd.program({ namespace: appInfo, debug: true })
-        .catch(error => {
+      const appInfo = { creator: "Shovel", name: "Rolod" };
+      this.program = await this.odd
+        .program({ namespace: appInfo, debug: true })
+        .catch((error) => {
           switch (error) {
             case this.odd.ProgramError.InsecureContext:
               // ODD requires HTTPS
@@ -19,50 +25,123 @@ class OddSession {
               // Browsers must support IndexedDB
               break;
           }
-        })
+        });
     }
-    console.log("program: ", this.program)
+    console.log("program: ", this.program);
     return this.program;
   }
 
   async getSession() {
-    var p = await this.getProgram()
+    var p = await this.getProgram();
     if (p.session) {
-      return p.session
+      return p.session;
     }
-    return
+    return;
   }
 
   async readPrivateFile(filename) {
     const session = await this.getSession();
-    const fs = session.fs
-    const { RootBranch } = this.odd.path
-    const filePath = this.odd.path.file(RootBranch.Private, filename)
-    const pathExists = await fs.exists(filePath)
-    
+    const fs = session.fs;
+    const { RootBranch } = this.odd.path;
+    const filePath = this.odd.path.file(RootBranch.Private, filename);
+    const pathExists = await fs.exists(filePath);
+
     if (pathExists) {
-      const content = new TextDecoder().decode(await fs.read(filePath))
-      return JSON.parse(content)
-    } 
+      const content = new TextDecoder().decode(await fs.read(filePath));
+      return JSON.parse(content);
+    }
   }
 
   async updatePrivateFile(filename, mutationFunction) {
     var session = await this.getSession();
-  
+
     const fs = session.fs;
-    const { RootBranch } = this.odd.path
-    const filePath = this.odd.path.file(RootBranch.Private, filename)
-  
-    const content = new TextDecoder().decode(await fs.read(filePath))
-    console.log("content in file:", content)
-    const newContent = mutationFunction(JSON.parse(content))
-  
-    await fs.write(filePath, new TextEncoder().encode(JSON.stringify(newContent)))
-    await fs.publish()
-  
-    const readContent = new TextDecoder().decode(await fs.read(filePath))
-    console.log(filename, " :", readContent)
+    const { RootBranch } = this.odd.path;
+    const filePath = this.odd.path.file(RootBranch.Private, filename);
+
+    const fileExists = await fs.exists(filePath)
+    let newContent
+
+    if(fileExists){
+      const content = new TextDecoder().decode(await fs.read(filePath));
+      console.log("content in file:", content);
+      newContent = mutationFunction(JSON.parse(content));
+    } else {
+      newContent = mutationFunction();
+    }
+
+    await fs.write(
+      filePath,
+      new TextEncoder().encode(JSON.stringify(newContent))
+    );
+    await fs.publish();
+
+    const readContent = new TextDecoder().decode(await fs.read(filePath));
+    console.log(filename, " :", readContent);
     return readContent;
+  }
+
+  async createFissionUser(handle) {
+    this.program = await this.getProgram()
+    var fissionusername = await this.fissionUsernames(handle);
+    var hashedUsername = fissionusername.hashed;
+
+    const valid = await this.program.auth.isUsernameValid(hashedUsername);
+    const available = await this.program.auth.isUsernameAvailable(hashedUsername);
+    console.log("username valid", valid);
+    console.log("username available", available);
+
+    if (valid && available) {
+      // Register the user
+      const { success } = await this.program.auth.register({
+        username: hashedUsername,
+      });
+      console.log("success: ", success);
+      // Create a session on success
+      let session = success ? await this.program.auth.session() : null;
+      this.program.session = session
+      return session
+    } else if (!valid) {
+      alert("username is not valid");
+    } else if (!available) {
+      alert("username is not available");
+    }
+  }
+
+  async fissionUsernames(username) {
+    let program = await this.getProgram()
+    console.log(program)
+    let fullUsername = await program.components.storage.getItem(USERNAME_STORAGE_KEY)
+    if (!fullUsername) {
+      const did = await this.createDID(program.components.crypto)
+      fullUsername = `${username}#${did}`
+      await program.components.storage.setItem(USERNAME_STORAGE_KEY, fullUsername)
+    }
+  
+    var hashedUsername = await this.prepareUsername(fullUsername);
+    return {full: fullUsername, hashed: hashedUsername} 
+  }
+
+  async createDID(crypto){
+    if (await this.program.agentDID()){
+      return this.program.agentDID()
+    } else {
+      const pubKey = await crypto.keystore.publicExchangeKey()
+      const ksAlg = await crypto.keystore.getAlgorithm()
+  
+      return publicKeyToDid(crypto, pubKey, ksAlg)
+    }
+  }
+  
+  async prepareUsername(username){
+    const normalizedUsername = username.normalize('NFD')
+    const hashedUsername = await sha256(
+      new TextEncoder().encode(normalizedUsername)
+    )
+  
+    return uint8arrays
+      .toString(hashedUsername, 'base32')
+      .slice(0, 32)
   }
 }
 
