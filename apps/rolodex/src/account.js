@@ -1,12 +1,13 @@
 export class Profile {
   constructor(args) {
-    let defaults = { name: "John Doe", tags: [], text: '' }
+    let defaults = { name: "John Doe", tags: [], text: '', appleCreds: {username: '', password: ''} }
     let params = {...defaults, ...args}
 
     this.handle = params.handle
     this.name = params.name
     this.tags = params.tags
     this.text = params.text
+    this.appleCreds = params.appleCreds
   }
 
   asJSON() {
@@ -14,7 +15,8 @@ export class Profile {
       handle: this.handle,
       name: this.name,
       tags: this.tags,
-      text: this.text
+      text: this.text,
+      appleCreds: this.appleCreds
     }
   }
 }
@@ -23,15 +25,22 @@ export class Account {
   constructor(os) {
     this.store = os
     this.filename = "profile.json"
+    this.profile = null
   }
 
   async getProfile(){
-    return this.store.readPrivateFile(this.filename)
+    var data = await this.store.readPrivateFile(this.filename)
+    this.profile = new Profile(data);
+    return this.profile.asJSON()
   }
 
-  async editProfile(profile){
+  async editProfile(params){
+    if (!this.profile) {
+      await this.getProfile()
+    }
+
     await this.store.updatePrivateFile(this.filename, (content) => {
-      content = profile.asJSON()
+      content = {...this.profile.asJSON(), ...params}
       return content
     })
   }

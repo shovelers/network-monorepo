@@ -99,8 +99,7 @@ async function filterContacts(filter) {
 }
 
 async function updateProfile(handle, name, tags = [], text = '') {
-  let p = new Profile({handle: handle, name: name, tags: tags, text: text})
-  account.editProfile(p)
+  account.editProfile({handle: handle, name: name, tags: tags, text: text})
 }
 
 async function addContact(name, tags = [], text = "", links = []) {
@@ -297,10 +296,7 @@ async function importContacts(username, password){
     var user = credsPresence.value.username
     var pass = credsPresence.value.password
   } else {
-    await updateFile("profile.json", (content) => {
-      content.appleCreds = {username: username, password: password} 
-      return content
-    })
+    account.editProfile({appleCreds: {username: username, password: password}});
     var user = username
     var pass = password
   }
