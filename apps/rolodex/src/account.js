@@ -42,4 +42,8 @@ export class Account {
     this.store.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
     this.store.updatePrivateFile("contacts.json", () => { return { contactList: {}, appleContacts: [], googleContacts: {} } })  
   }
+
+  async signout(){
+    (await this.store.getSession()).destroy()
+  }
 }

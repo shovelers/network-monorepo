@@ -138,9 +138,7 @@ async function updateFile(file, mutationFunction) {
 }
 
 async function signout() {
-  var program = await getProgram();
-  var session = await getSession(program);
-  await session.destroy()
+  await account.signout()
 }
 
 async function producerChallengeProcessor(challenge, userInput) {
