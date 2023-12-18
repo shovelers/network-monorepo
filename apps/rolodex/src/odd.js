@@ -9,8 +9,10 @@ import { ContactTable } from "./contact_table";
 import {vCardParser} from './vcard_parser.js';
 import { os } from './odd_session.js';
 import { Contact, ContactRepository } from "./contacts.js";
+import { Profile, Account } from "./account.js";
 
 const cr = new ContactRepository(os)
+const account = new Account(os)
 
 customElements.define('contact-table', ContactTable);
 
@@ -109,7 +111,7 @@ async function signup(username) {
 }
 
 async function getProfile() {
-  return os.readPrivateFile("profile.json")
+  return account.getProfile()
 }
 
 async function getContacts() {
@@ -135,13 +137,9 @@ async function filterContacts(filter) {
   return filteredContacts
 }
 
-async function updateProfile(name, tags, text) {
-  await updateFile("profile.json", (content) => {
-    content.name = name
-    content.tags = tags || []
-    content.text = text || ''
-    return content
-  })
+async function updateProfile(handle, name, tags = [], text = '') {
+  let p = new Profile({handle: handle, name: name, tags: tags, text: text})
+  account.editProfile(p)
 }
 
 async function addContact(name, tags = [], text = "", links = []) {

@@ -108,7 +108,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="profile-updatae-form"
-        onsubmit="event.preventDefault(); updateProfile(document.getElementById('profile-name').value, tagsArray(document.getElementById('profile-tags').value), document.getElementById('profile-text').value).then(function(){console.log('i am here'); refreshProfile()}); profile_edit_modal.close(); return false"
+        onsubmit="event.preventDefault(); updateProfile(document.getElementById('handle').innerHTML, document.getElementById('profile-name').value, tagsArray(document.getElementById('profile-tags').value), document.getElementById('profile-text').value).then(function(){console.log('i am here'); refreshProfile()}); profile_edit_modal.close(); return false"
         class="space-y-1 text-center">
         <label for="profile-name" class="label"><span class="label-text">Name</span></label>
         <input type="text" id="profile-name" class="border border-gray-300 px-2 py-1 rounded-lg" value="name">
