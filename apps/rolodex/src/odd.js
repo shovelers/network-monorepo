@@ -11,7 +11,7 @@ import { os } from './odd_session.js';
 import { Contact, ContactRepository } from "./contacts.js";
 import { Profile, Account } from "./account.js";
 
-const cr = new ContactRepository(os)
+const contactRepo = new ContactRepository(os)
 const account = new Account(os)
 
 customElements.define('contact-table', ContactTable);
@@ -76,7 +76,7 @@ async function getProfile() {
 }
 
 async function getContacts() {
-  return cr.list()
+  return contactRepo.list()
 }
 
 async function filterContacts(filter) {
@@ -105,16 +105,16 @@ async function updateProfile(handle, name, tags = [], text = '') {
 
 async function addContact(name, tags = [], text = "", links = []) {
   let contact = new Contact({name: name, tags: tags, text: text, links: links})
-  return cr.create(contact)
+  return contactRepo.create(contact)
 }
 
 async function editContact(id, name, tags = [], text='', links = []) {
   let contact = new Contact({id: id, name: name, tags: tags, text: text, links: links})
-  return cr.edit(contact)
+  return contactRepo.edit(contact)
 }
 
 async function deleteContact(id) {
-  return cr.delete(id)
+  return contactRepo.delete(id)
 }
 
 async function updateFile(file, mutationFunction) {
@@ -382,14 +382,13 @@ async function importGoogleContacts(refresh) {
 }
 
 async function addGoogleContactsToContactList(googleContacts){
-  var contacts = await getContacts()
-  var existingGoogleContactIDs = Object.values(contacts.contactList).map(contact => contact.googleContactID)
+  var contacts = await contactRepo.list()
+  var existingGoogleContactIDs = Object.values(contacts.contactList).map(contact => contact.googleContactID && !contact.archived)
 
-  var newContacts = {}
+  var contactList = []
   for (var i = 0; i < googleContacts.length; i++) {
     var googleContact = googleContacts[i]
 
-    var id = crypto.randomUUID()
     try {
       var name = googleContact.names[0].displayName
     } catch (error) {
@@ -398,16 +397,12 @@ async function addGoogleContactsToContactList(googleContacts){
     }
     var uid = googleContact.resourceName
     if (!existingGoogleContactIDs.includes(uid)) {
-      newContacts[id] = {name: name, googleContactID: uid, tags: []} 
+      contactList.push(new Contact({name: name, googleContactID: uid}))
     }
   }
 
-  await updateFile("contacts.json", (content) => {
-    content.contactList = {...content.contactList, ...newContacts}
-    return content
-  })
-  console.log("Imported Contacts Count: ", googleContacts.length)
-  console.log("New Contacts Count: ", Object.keys(newContacts).length)
+  await contactRepo.bulkCreate(contactList)
+  console.log("Imported Contacts Count: ", contactList.length)
 }
 
 export { 

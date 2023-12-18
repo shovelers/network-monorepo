@@ -46,6 +46,15 @@ export class ContactRepository {
     })
   }
 
+  async bulkCreate(contacts){
+    await this.store.updatePrivateFile(this.filename, (content) => {
+      contacts.forEach(element => {
+        content.contactList[element.id] = element.asJSON()
+      });
+      return content
+    })
+  }
+
   async edit(contact){
     await this.store.updatePrivateFile(this.filename, (content) => {
       content.contactList[contact.id] = contact.asJSON()
