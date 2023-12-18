@@ -17,6 +17,51 @@ const axios_client  = axios.create({
 let program = null
 const USERNAME_STORAGE_KEY = "fullUsername"
 
+class OddSession {
+  constructor(odd) {
+    this.odd = odd
+    this.program = null
+  }
+
+  async getProgram() {
+    if (!this.program) {
+      const appInfo = { creator: "Shovel", name: "Rolod" }
+      this.program = await this.odd.program({ namespace: appInfo, debug: true })
+        .catch(error => {
+          switch (error) {
+            case this.odd.ProgramError.InsecureContext:
+              // ODD requires HTTPS
+              break;
+            case this.odd.ProgramError.UnsupportedBrowser:
+              // Browsers must support IndexedDB
+              break;
+          }
+        })
+    }
+    console.log("program: ", this.program)
+    return this.program;
+  }
+
+  async getSession() {
+    getProgram().session
+  }
+
+  async readPrivateFile(filename) {
+    var program = await getProgram();
+    var session = await getSession(program);
+    const fs = session.fs;
+    const { RootBranch } = odd.path
+    const privateFilePath = odd.path.file(RootBranch.Private, filename)
+    const pathExists = await fs.exists(privateFilePath)
+    
+    if (pathExists) {
+      const content = new TextDecoder().decode(await fs.read(privateFilePath))
+      return JSON.parse(content)
+    } 
+  }
+}
+const os = new OddSession(odd);
+
 async function getProgram() {
   if (!program) {
     const appInfo = { creator: "Shovel", name: "Rolod" }
@@ -120,17 +165,7 @@ async function getProfile() {
 }
 
 async function getContacts() {
-  var program = await getProgram();
-  var session = await getSession(program);
-  const fs = session.fs;
-  const { RootBranch } = odd.path
-  const privateFilePath = odd.path.file(RootBranch.Private, "contacts.json")
-  const pathExists = await fs.exists(privateFilePath)
-  
-  if (pathExists) {
-    const content = new TextDecoder().decode(await fs.read(privateFilePath))
-    return JSON.parse(content)
-  }
+  return os.readPrivateFile("contacts.json")
 }
 
 async function filterContacts(filter) {
