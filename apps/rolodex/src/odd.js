@@ -8,7 +8,7 @@ import _ from 'lodash';
 import { ContactTable } from "./contact_table";
 import {vCardParser} from './vcard_parser.js';
 import { os } from './odd_session.js';
-import { ContactRepository } from "./contacts.js";
+import { Contact, ContactRepository } from "./contacts.js";
 
 const cr = new ContactRepository(os)
 
@@ -145,11 +145,8 @@ async function updateProfile(name, tags, text) {
 }
 
 async function addContact(newContact, tags = [], text = "", links = []) {
-  await updateFile("contacts.json", (content) => {
-    var id = crypto.randomUUID()
-    content.contactList[id] = { name: newContact , appleContactID: "", tags: tags, text: text, links: links }
-    return content
-  })
+  let contact = new Contact({name: newContact, tags: tags, text: text, links: links})
+  return cr.create(contact)
 }
 
 async function editContact(id, name, tags = [], text='', links = []) {
