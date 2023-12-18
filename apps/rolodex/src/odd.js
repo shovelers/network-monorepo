@@ -330,9 +330,9 @@ async function appleCredsPresent(){
 async function addAppleContactsToContactList(appleContacts){
   //check if the uid to appleContacts[i] is == to any of the appleContactIDs in contactList
   //if not, add it to contactList
-  var contacts = await getContacts()
-  var existingAppleContactIDs = Object.values(contacts.contactList).map(contact => contact.appleContactID)
-  var newContacts = {}
+  var contacts = await contactRepo.list()
+  var existingAppleContactIDs = Object.values(contacts.contactList).filter((contact) => !contact.archived).map(contact => contact.appleContactID)
+  var contactList = []
   for (var i = 0; i < appleContacts.length; i++) {
     var appleContact = appleContacts[i]
     try {
@@ -341,18 +341,14 @@ async function addAppleContactsToContactList(appleContacts){
       console.log("error for contact: ", appleContact, "error: ", error)
       continue
     }
-    var id = crypto.randomUUID()
     var name = parsedAppleContact.displayName
     var uid = parsedAppleContact.UID
     if (!existingAppleContactIDs.includes(uid)) {
-      newContacts[id] = {name: name, appleContactID: uid, tags: []} 
+      contactList.push(new Contact({name: name, appleContactID: uid}))
     }
   }
-
-  await updateFile("contacts.json", (content) => {
-    content.contactList = {...content.contactList, ...newContacts}
-    return content
-  })  
+  await contactRepo.bulkCreate(contactList)
+  console.log("Imported Contacts Count: ", contactList.length)
 }
 
 async function importGoogleContacts(refresh) {
@@ -383,7 +379,7 @@ async function importGoogleContacts(refresh) {
 
 async function addGoogleContactsToContactList(googleContacts){
   var contacts = await contactRepo.list()
-  var existingGoogleContactIDs = Object.values(contacts.contactList).map(contact => contact.googleContactID && !contact.archived)
+  var existingGoogleContactIDs = Object.values(contacts.contactList).filter((contact) => !contact.archived).map(contact => contact.googleContactID)
 
   var contactList = []
   for (var i = 0; i < googleContacts.length; i++) {
