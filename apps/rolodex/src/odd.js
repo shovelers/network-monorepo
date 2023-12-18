@@ -310,11 +310,6 @@ async function importContacts(username, password){
     return response;
   });
 
-  await updateFile("contacts.json", (content) => {
-    content.appleContacts = response.data
-    return content
-  })
-
   //insert appleContacts to contactList
   await addAppleContactsToContactList(response.data)
   console.log("import done")
@@ -362,12 +357,6 @@ async function importGoogleContacts(refresh) {
       )
 
       console.log("google contacts ", response.data);
-      await updateFile("contacts.json", (content) => {
-        if (content.googleContacts === undefined){ content.googleContacts = {}}
-
-        content.googleContacts[profile.data.email] = response.data.connections
-        return content
-      })
 
       await addGoogleContactsToContactList(response.data.connections)
       console.log("import done")
