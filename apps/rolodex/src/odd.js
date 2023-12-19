@@ -1,15 +1,12 @@
-import * as odd from "@oddjs/odd";
 import { retrieve } from '@oddjs/odd/common/root-key';
-import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
-import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 import axios from 'axios';
 import _ from 'lodash';
 import { ContactTable } from "./contact_table";
 import {vCardParser} from './vcard_parser.js';
 import { os } from './odd_session.js';
 import { Contact, ContactRepository } from "./contacts.js";
-import { Profile, Account } from "./account.js";
+import { Account } from "./account.js";
 
 const contactRepo = new ContactRepository(os)
 const account = new Account(os)
@@ -24,42 +21,12 @@ let program = null
 const USERNAME_STORAGE_KEY = "fullUsername"
 
 async function getProgram() {
-  if (!program) {
-    const appInfo = { creator: "Shovel", name: "Rolod" }
-    program = await odd.program({ namespace: appInfo, debug: true })
-      .catch(error => {
-        switch (error) {
-          case odd.ProgramError.InsecureContext:
-            // ODD requires HTTPS
-            break;
-          case odd.ProgramError.UnsupportedBrowser:
-            // Browsers must support IndexedDB
-            break;
-        }
-      })
-  }
-  console.log("program: ", program)
-  return program;
+  program = await os.getProgram()
+  return program
 }
 
 async function getSession(program) {
-  let session
-  if (program.session) {
-    session = program.session
-  }
-
-  return session;
-}
-async function fissionUsernames(username) {
-  let fullUsername = await program.components.storage.getItem(USERNAME_STORAGE_KEY)
-  if (!fullUsername) {
-    const did = await createDID(program.components.crypto)
-    fullUsername = `${username}#${did}`
-    await program.components.storage.setItem(USERNAME_STORAGE_KEY, fullUsername)
-  }
-
-  var hashedUsername = await prepareUsername(fullUsername);
-  return {full: fullUsername, hashed: hashedUsername} 
+  return await os.getSession()
 }
 
 async function signup(username) {
@@ -116,26 +83,6 @@ async function deleteContact(id) {
   return contactRepo.delete(id)
 }
 
-async function updateFile(file, mutationFunction) {
-  var program = await getProgram();
-  var session = await getSession(program);
-
-  const fs = session.fs;
-  const { RootBranch } = odd.path
-  const contactFilePath = odd.path.file(RootBranch.Private, file)
-
-  const content = new TextDecoder().decode(await fs.read(contactFilePath))
-  console.log("content in file:", content)
-  const newContent = mutationFunction(JSON.parse(content))
-
-  await fs.write(contactFilePath, new TextEncoder().encode(JSON.stringify(newContent)))
-  await fs.publish()
-
-  const readContent = new TextDecoder().decode(await fs.read(contactFilePath))
-  console.log("contacts :", readContent)
-  return readContent;
-}
-
 async function signout() {
   await account.signout()
 }
@@ -166,7 +113,7 @@ async function downloadContactsDataLocally() {
 
 async function generateRecoveryKit(username){
   var program = await getProgram();
-  var fissionnames = await fissionUsernames(username)
+  var fissionnames = await os.fissionUsernames(username)
 
   var accountDID = await program.accountDID(fissionnames.hashed);
   
@@ -200,7 +147,7 @@ async function generateRecoveryKit(username){
 async function recover(kit) {
   var kitText = await kit.text()
   var oldFullUsername = kitText.toString().split("username: ")[1].split("\n")[0]
-  var oldHashedUsername = await prepareUsername(oldFullUsername)
+  var oldHashedUsername = await os.prepareUsername(oldFullUsername)
   console.log("old username: ...", oldFullUsername)
   console.log("hashed old username: ", oldHashedUsername)
   var readKey = kitText.toString().split("key: ")[1].split("\n")[0]
@@ -209,7 +156,7 @@ async function recover(kit) {
   
   var program = await getProgram();
   await program.components.storage.removeItem(USERNAME_STORAGE_KEY)
-  var fissionnames = await fissionUsernames(oldFullUsername.split("#")[0])
+  var fissionnames = await os.fissionUsernames(oldFullUsername.split("#")[0])
   var newhashedUsername = fissionnames.hashed;
   
   const valid = await program.auth.isUsernameValid(`${newhashedUsername}`)
@@ -234,17 +181,6 @@ async function recover(kit) {
       window.location.href = "/app";
     }, 5000)
   }
-}
-
-async function prepareUsername(username){
-  const normalizedUsername = username.normalize('NFD')
-  const hashedUsername = await sha256(
-    new TextEncoder().encode(normalizedUsername)
-  )
-
-  return uint8arrays
-    .toString(hashedUsername, 'base32')
-    .slice(0, 32)
 }
 
 async function waitForDataRoot(username) {
@@ -275,17 +211,6 @@ async function waitForDataRoot(username) {
       resolve()
     }, 500)
   })
-}
-
-async function createDID(crypto){
-  if (await program.agentDID()){
-    return program.agentDID()
-  } else {
-    const pubKey = await crypto.keystore.publicExchangeKey()
-    const ksAlg = await crypto.keystore.getAlgorithm()
-
-    return publicKeyToDid(crypto, pubKey, ksAlg)
-  }
 }
 
 async function importContacts(username, password){

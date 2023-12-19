@@ -1,4 +1,4 @@
-export class Profile {
+class Profile {
   constructor(args) {
     let defaults = { name: "John Doe", tags: [], text: '', appleCreds: {username: '', password: ''} }
     let params = {...defaults, ...args}
