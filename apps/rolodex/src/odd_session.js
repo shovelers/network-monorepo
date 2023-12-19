@@ -35,6 +35,7 @@ class OddSession {
   async getSession() {
     var p = await this.getProgram();
     if (p.session) {
+      window.shovelFs = fs
       return p.session;
     }
     return;
