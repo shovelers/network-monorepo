@@ -28,5 +28,8 @@
   },
   "overrides": {
     "ipfs-bitswap": "19.0.0"
+  },
+  "dependencies": {
+    "vite-plugin-wasm": "^3.3.0"
   }
 }

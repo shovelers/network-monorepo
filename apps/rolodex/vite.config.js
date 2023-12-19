@@ -1,10 +1,11 @@
 import path from "path";
 import { glob } from "glob";
+import wasm from "vite-plugin-wasm";
 
 export default {
   root: path.join(__dirname, "src"),
   build: {
-    target: 'es2020',
+    target: 'es2022',
     emptyOutDir: true,
     outDir: path.join(__dirname, "public", "dist"),
     rollupOptions: {
@@ -15,4 +16,7 @@ export default {
       preserveEntrySignatures: 'allow-extension'
     },
   },
+  plugins: [
+    wasm(),
+  ] 
 };
