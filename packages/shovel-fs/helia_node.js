@@ -4,6 +4,8 @@ import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
+import { IDBBlockstore } from 'blockstore-idb'
+import { IDBDatastore } from 'datastore-idb'
 import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
 import { identify } from '@libp2p/identify'
@@ -14,10 +16,7 @@ import { multiaddr } from 'multiaddr'
 const STANDALONE = 1
 const BROWSER = 2
 
-async function createNode(type) {
-  const blockstore = new MemoryBlockstore()
-  const datastore = new MemoryDatastore()
-
+async function createNode(type, blockstore, datastore) {
   var libp2pconfig = {
     datastore,
     transports: [webSockets({filter: filters.all})],
@@ -57,11 +56,20 @@ async function createNode(type) {
 }
 
 export async function createStandaloneNode() {
-  return await createNode(STANDALONE)
+  const blockstore = new MemoryBlockstore()
+  const datastore = new MemoryDatastore()
+
+  return await createNode(STANDALONE, blockstore, datastore)
 }
 
 export async function createBrowserNode() {
-  return await createNode(BROWSER)
+  const blockstore = new IDBBlockstore('blockstore/shovel')
+  await blockstore.open()
+
+  const datastore = new IDBDatastore('datastore/shovel')
+  await datastore.open()
+
+  return await createNode(BROWSER, blockstore, datastore)
 }
 
 export async function dial(node, peer) {
