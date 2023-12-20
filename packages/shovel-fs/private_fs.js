@@ -22,7 +22,7 @@ export class PrivateFS {
 
   async loadForest(accessKey, forestCID) {
     const key = AccessKey.fromBytes(accessKey)
-    const forest = await PrivateForest.load(CID.parse(forestCID).bytes, this.store)
+    const forest = await PrivateForest.load(forestCID, this.store)
     console.log("loaded forest:", forest)
 
     //load private node from PrivateForest using Access key
@@ -32,19 +32,20 @@ export class PrivateFS {
     //load the node as_dir to get the rootDir 
     var rootDir = await node.asDir(forest, this.store)
 
+    this.rng = new Rng()
     this.forest = forest
     this.rootDir = rootDir
   }
 
   async write(filename, content) {
-    this.file = this.path.concat(filename)
+    let file = this.path.concat(filename)
 
     if (this.rootDir == null) {
       await this.initalise()
     }
 
     var { rootDir, forest } = await this.rootDir.write(
-      this.file,
+      file,
       true,
       new TextEncoder().encode(content),
       new Date(),
@@ -67,13 +68,13 @@ export class PrivateFS {
   }
 
   async read(filename) {
-    this.file = this.path.concat(filename)
+    let file = this.path.concat(filename)
 
     if (this.rootDir == null) {
       await this.initalise()
     }
 
-    var content = await this.rootDir.read(this.file, true, this.forest, this.store)
+    var content = await this.rootDir.read(file, true, this.forest, this.store)
     console.log("Files Content:", content);
 
     return new TextDecoder().decode(content.result)
