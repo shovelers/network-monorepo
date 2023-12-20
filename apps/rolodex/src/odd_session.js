@@ -5,6 +5,8 @@ import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 import { createBrowserNode, PrivateFS } from 'shovel-fs'
 
 const USERNAME_STORAGE_KEY = "fullUsername"
+const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
+const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const FS = import.meta.env.VITE_FS || "ODD" // "SHOVEL"
 
 class OddFS {
@@ -50,23 +52,35 @@ class OddFS {
 }
 
 class ShovelFS {
-  constructor(helia){
+  constructor(helia, kvStore){
     this.fs = new PrivateFS(helia)
+    this.kvStore = kvStore
+  }
+
+  async load(){
+    let access_key = await this.kvStore.getItem(SHOVEL_FS_ACCESS_KEY)
+    let forest_cid = await this.kvStore.getItem(SHOVEL_FS_FOREST_CID)
+
+    if (access_key && forest_cid){
+      await this.fs.loadForest(access_key, forest_cid)
+    }
   }
 
   async readPrivateFile(filename) {
     try {
       let content = await this.fs.read(filename)
-      return content
+      return JSON.parse(content)
     } catch (error) {
-      console.log(error)
+      console.log("missing file: ", filename)
     }
   }
 
   async updatePrivateFile(filename, mutationFunction) {
-    let content = await this.readPrivateFile(filename) || ""
+    let content = await this.readPrivateFile(filename)
     let newContent = mutationFunction(content)
-    await this.fs.write(filename, newContent)
+    var [access_key, forest_cid] = await this.fs.write(filename, JSON.stringify(newContent))
+    await this.kvStore.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
+    await this.kvStore.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
     return newContent
   }
 }
@@ -190,5 +204,8 @@ class OddSession {
 }
 
 const helia = await createBrowserNode()
-const shovelfs = new ShovelFS(helia)
 export const os = new OddSession(odd);
+
+let program = await os.getProgram()
+const shovelfs = new ShovelFS(helia, program.components.storage)
+await shovelfs.load()

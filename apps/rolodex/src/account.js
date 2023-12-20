@@ -30,8 +30,7 @@ export class Account {
 
   async getProfile(){
     var data = await this.store.readPrivateFile(this.filename)
-    this.profile = new Profile(data);
-    return this.profile.asJSON()
+    return data
   }
 
   async editProfile(params){
@@ -48,8 +47,8 @@ export class Account {
   async create(handle) {
     await this.store.createFissionUser(handle)
 
-    this.store.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
-    this.store.updatePrivateFile("contacts.json", () => { return { contactList: {}, appleContacts: [], googleContacts: {} } })  
+    await this.store.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
+    await this.store.updatePrivateFile("contacts.json", () => { return { contactList: {}, appleContacts: [], googleContacts: {} } })  
   }
 
   async signout(){
