@@ -1,5 +1,5 @@
 import { createBrowserNode, dial } from './helia_node.js';
-import { PrivateFS } from './private_file.js';
+import { PrivateFS } from './private_fs.js';
 
 export { createBrowserNode, PrivateFS }
 
