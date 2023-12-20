@@ -49,7 +49,6 @@ class OddFS {
   }
 }
 
-const helia = await createBrowserNode()
 class ShovelFS {
   constructor(helia){
     this.fs = new PrivateFS(helia)
@@ -71,7 +70,6 @@ class ShovelFS {
     return newContent
   }
 }
-window.shovelfs = new ShovelFS(helia)
 
 class OddSession {
   constructor(odd) {
@@ -107,15 +105,23 @@ class OddSession {
     return;
   }
 
+  async getFS() {
+    if (FS == "SHOVEL") {
+      return shovelfs
+    } else {
+      let session = await this.getSession()
+      let fs = new OddFS(this.odd, session) 
+      return fs
+    }
+  }
+
   async readPrivateFile(filename) {
-    let session = await this.getSession()
-    let fs = new OddFS(this.odd, session) 
+    let fs = await this.getFS()
     return fs.readPrivateFile(filename)
   }
 
   async updatePrivateFile(filename, mutationFunction) {
-    let session = await this.getSession()
-    let fs = new OddFS(this.odd, session) 
+    let fs = await this.getFS()
     return fs.updatePrivateFile(filename, mutationFunction)
   }
 
@@ -183,4 +189,6 @@ class OddSession {
   }
 }
 
+const helia = await createBrowserNode()
+const shovelfs = new ShovelFS(helia)
 export const os = new OddSession(odd);
