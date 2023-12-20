@@ -5,6 +5,49 @@ import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 import {fs} from 'shovel-fs'
 
 const USERNAME_STORAGE_KEY = "fullUsername"
+const FS = import.meta.env.VITE_FS || "ODD" // "SHOVEL"
+
+class OddFS {
+  constructor(odd, session) {
+    this.odd = odd
+    this.fs = session.fs
+  }
+ 
+  async readPrivateFile(filename) {
+    const { RootBranch } = this.odd.path;
+    const filePath = this.odd.path.file(RootBranch.Private, filename);
+    const pathExists = await this.fs.exists(filePath);
+
+    if (pathExists) {
+      const content = new TextDecoder().decode(await this.fs.read(filePath));
+      return JSON.parse(content);
+    }
+  }
+
+  async updatePrivateFile(filename, mutationFunction) {
+    const { RootBranch } = this.odd.path;
+    const filePath = this.odd.path.file(RootBranch.Private, filename);
+
+    const fileExists = await this.fs.exists(filePath)
+    let newContent
+
+    if(fileExists){
+      const content = new TextDecoder().decode(await this.fs.read(filePath));
+      console.log("content in file:", content);
+      newContent = mutationFunction(JSON.parse(content));
+    } else {
+      newContent = mutationFunction();
+    }
+
+    await this.fs.write(
+      filePath,
+      new TextEncoder().encode(JSON.stringify(newContent))
+    );
+    await this.fs.publish();
+
+    return newContent;
+  }
+}
 
 class OddSession {
   constructor(odd) {
@@ -42,45 +85,15 @@ class OddSession {
   }
 
   async readPrivateFile(filename) {
-    const session = await this.getSession();
-    const fs = session.fs;
-    const { RootBranch } = this.odd.path;
-    const filePath = this.odd.path.file(RootBranch.Private, filename);
-    const pathExists = await fs.exists(filePath);
-
-    if (pathExists) {
-      const content = new TextDecoder().decode(await fs.read(filePath));
-      return JSON.parse(content);
-    }
+    let session = await this.getSession()
+    let fs = new OddFS(this.odd, session) 
+    return fs.readPrivateFile(filename)
   }
 
   async updatePrivateFile(filename, mutationFunction) {
-    var session = await this.getSession();
-
-    const fs = session.fs;
-    const { RootBranch } = this.odd.path;
-    const filePath = this.odd.path.file(RootBranch.Private, filename);
-
-    const fileExists = await fs.exists(filePath)
-    let newContent
-
-    if(fileExists){
-      const content = new TextDecoder().decode(await fs.read(filePath));
-      console.log("content in file:", content);
-      newContent = mutationFunction(JSON.parse(content));
-    } else {
-      newContent = mutationFunction();
-    }
-
-    await fs.write(
-      filePath,
-      new TextEncoder().encode(JSON.stringify(newContent))
-    );
-    await fs.publish();
-
-    const readContent = new TextDecoder().decode(await fs.read(filePath));
-    console.log(filename, " :", readContent);
-    return readContent;
+    let session = await this.getSession()
+    let fs = new OddFS(this.odd, session) 
+    return fs.updatePrivateFile(filename, mutationFunction)
   }
 
   async createFissionUser(handle) {
