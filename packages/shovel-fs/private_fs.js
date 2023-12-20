@@ -2,13 +2,10 @@ import { WnfsBlockstore, Rng } from './helia_wnfs_blockstore_adaptor.js'
 import { CID } from 'multiformats/cid'
 import { PrivateDirectory, PrivateForest, PrivateNode, AccessKey } from "wnfs";
 
-export class PrivateFile {
+export class PrivateFS {
   constructor(node) {
     this.store = new WnfsBlockstore(node)
     this.path = ["private"]
-    this.name = "note.txt"
-
-    this.file = this.path.concat(this.name)
   }
 
   async initalise() {
@@ -39,7 +36,9 @@ export class PrivateFile {
     this.rootDir = rootDir
   }
 
-  async write(content) {
+  async write(filename, content) {
+    this.file = this.path.concat(filename)
+
     if (this.rootDir == null) {
       await this.initalise()
     }
@@ -67,7 +66,13 @@ export class PrivateFile {
     return [this.accessKey.toBytes(), forestCID]
   }
 
-  async read() {
+  async read(filename) {
+    this.file = this.path.concat(filename)
+
+    if (this.rootDir == null) {
+      await this.initalise()
+    }
+
     var content = await this.rootDir.read(this.file, true, this.forest, this.store)
     console.log("Files Content:", content);
 

@@ -2,7 +2,7 @@ import * as odd from "@oddjs/odd";
 import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
-import {fs} from 'shovel-fs'
+import { createBrowserNode, PrivateFS } from 'shovel-fs'
 
 const USERNAME_STORAGE_KEY = "fullUsername"
 const FS = import.meta.env.VITE_FS || "ODD" // "SHOVEL"
@@ -49,6 +49,30 @@ class OddFS {
   }
 }
 
+const helia = await createBrowserNode()
+class ShovelFS {
+  constructor(helia){
+    this.fs = new PrivateFS(helia)
+  }
+
+  async readPrivateFile(filename) {
+    try {
+      let content = await this.fs.read(filename)
+      return content
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async updatePrivateFile(filename, mutationFunction) {
+    let content = await this.readPrivateFile(filename) || ""
+    let newContent = mutationFunction(content)
+    await this.fs.write(filename, newContent)
+    return newContent
+  }
+}
+window.shovelfs = new ShovelFS(helia)
+
 class OddSession {
   constructor(odd) {
     this.odd = odd;
@@ -78,7 +102,6 @@ class OddSession {
   async getSession() {
     var p = await this.getProgram();
     if (p.session) {
-      window.shovelFs = fs
       return p.session;
     }
     return;
