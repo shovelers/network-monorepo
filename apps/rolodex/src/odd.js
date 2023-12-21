@@ -112,15 +112,21 @@ async function downloadContactsDataLocally() {
 }
 
 async function generateRecoveryKit(username){
-  var program = await getProgram();
-  var fissionnames = await os.fissionUsernames(username)
+  let accessKey, handle;
+  if (import.meta.env.VITE_FS == "SHOVEL") {
+    let data = await account.recoveryKitData()
+    accessKey = data.accessKey
+    handle = data.handle
+  } else { 
+    var program = await getProgram();
+    var fissionnames = await os.fissionUsernames(username)
+    handle = fissionnames.full
 
-  var accountDID = await program.accountDID(fissionnames.hashed);
-  
-  var crypto = program.components.crypto;
-  var readKey  = await retrieve({ crypto, accountDID });
-  const encodedReadKey = uint8arrays.toString(readKey, 'base64pad');
-  console.log(encodedReadKey);
+    var accountDID = await program.accountDID(fissionnames.hashed);
+    var crypto = program.components.crypto;
+    accessKey  = await retrieve({ crypto, accountDID });
+  }
+  const encodedAccessKey = uint8arrays.toString(accessKey, 'base64pad');
   const content = `
   # This is your recovery kit. (It's a yaml text file)
   # Store this somewhere safe.
@@ -130,8 +136,8 @@ async function generateRecoveryKit(username){
   
   # To use this file, go to ${window.location.origin}/recover/
   
-  username: ${fissionnames.full}
-  key: ${encodedReadKey}
+  username: ${handle}
+  key: ${encodedAccessKey}
   `;
   
   const data = new Blob([content], { type: 'text/plain' })

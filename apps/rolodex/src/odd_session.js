@@ -72,6 +72,12 @@ class ShovelFS {
     await this.startSync()
   }
 
+  async recover(access_key, forest_cid) {
+    await this.kvStore.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
+    await this.kvStore.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
+    await this.load()
+  }
+
   async readPrivateFile(filename) {
     try {
       let content = await this.fs.read(filename)
@@ -160,6 +166,19 @@ class OddSession {
       let fs = new OddFS(this.odd, session) 
       return fs
     }
+  }
+
+  async recoveryKitData(){
+    let program = await this.getProgram()
+    let ak = await program.components.storage.getItem(SHOVEL_FS_ACCESS_KEY)
+    let handle = (await program.components.storage.getItem(USERNAME_STORAGE_KEY)).split('#')[0]
+    return {accessKey: ak, handle: handle}
+  }
+
+  async recover(access_key, forest_cid) {
+    await program.components.storage.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
+    await program.components.storage.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
+    await shovelfs.load()
   }
 
   async readPrivateFile(filename) {

@@ -1,3 +1,5 @@
+import { CID } from "@oddjs/odd"
+
 class Profile {
   constructor(args) {
     let defaults = { name: "John Doe", tags: [], text: '', appleCreds: {username: '', password: ''} }
@@ -54,5 +56,14 @@ export class Account {
   async signout(){
     let session = await this.store.getSession()
     await session.destroy()
+  }
+
+  async recoveryKitData() {
+    return await this.store.recoveryKitData()
+  }
+
+  async recover(kit) {
+
+    await this.store.recover(access_key, forest_cid)
   }
 }
