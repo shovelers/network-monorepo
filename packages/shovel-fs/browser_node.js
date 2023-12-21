@@ -1,7 +1,7 @@
 import { createBrowserNode, dial } from './helia_node.js';
 import { PrivateFS } from './private_fs.js';
 
-export { createBrowserNode, PrivateFS }
+export { createBrowserNode, PrivateFS, dial }
 
 // const fileExists = await fs.exists(filePath)
 

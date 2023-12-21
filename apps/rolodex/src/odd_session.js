@@ -2,12 +2,14 @@ import * as odd from "@oddjs/odd";
 import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
-import { createBrowserNode, PrivateFS } from 'shovel-fs'
+import { createBrowserNode, dial, PrivateFS } from 'shovel-fs'
+import axios from 'axios';
 
 const USERNAME_STORAGE_KEY = "fullUsername"
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const FS = import.meta.env.VITE_FS || "ODD" // "SHOVEL"
+const SHOVEL_FS_SYNC_HOST = import.meta.env.VITE_SHOVEL_FS_SYNC_HOST
 
 class OddFS {
   constructor(odd, session) {
@@ -209,3 +211,13 @@ export const os = new OddSession(odd);
 let program = await os.getProgram()
 const shovelfs = new ShovelFS(helia, program.components.storage)
 await shovelfs.load()
+
+if (SHOVEL_FS_SYNC_HOST) {
+  const axios_client  = axios.create({baseURL: SHOVEL_FS_SYNC_HOST})
+  await axios_client.get('/bootstrap').then(async (response) => {
+    await dial(helia, response.data.peerAddress)
+  }).catch((e) => {
+    console.log(e);
+    return e
+  })
+}
