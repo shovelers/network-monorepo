@@ -87,15 +87,16 @@ class ShovelFS {
     var [access_key, forest_cid] = await this.fs.write(filename, JSON.stringify(newContent))
     await this.kvStore.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
     await this.kvStore.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
-    await this.pin(forest_cid)
+    this.pin(forest_cid)
     return newContent
   }
 
   async pin(forest_cid) {
     if (SHOVEL_FS_SYNC_HOST) {
       let cid = CID.decode(forest_cid).toString()
+      let handle = (await this.kvStore.getItem(USERNAME_STORAGE_KEY)).split('#')[0] 
       const axios_client  = axios.create({baseURL: SHOVEL_FS_SYNC_HOST})
-      await axios_client.post('/pin', { cid: cid }).then(async (response) => {
+      await axios_client.post('/pin', { cid: cid, handle: handle }).then(async (response) => {
         console.log(response.status)
       }).catch((e) => {
         console.log(e);

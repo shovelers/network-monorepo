@@ -10,6 +10,7 @@ import { keyToDID } from '@spruceid/didkit-wasm-node';
 import { broadcast, eventProcessor } from './event.js'
 import { getRegistry, getFollowers, getFollowing} from './indexer.js'
 import { createStandaloneNode } from 'shovel-fs/standalone.js';
+import morgan from 'morgan';
 
 const port = process.argv[2] || 3000;
 const peer = process.argv[3];
@@ -25,6 +26,7 @@ server.use(express.urlencoded({ extended: true }));
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
+server.use(morgan('tiny'))
 
 const Registries = new Array();
 /*
@@ -32,6 +34,7 @@ const Registries = new Array();
          regID1to2from1: cid2}
 */
 const Heads = new Map();
+const UsernameForestCID = new Map();
 
 //Node Setup
 await fs.mkdir(path.join(__dirname, 'protocol_db', 'blocks'), { recursive: true })
@@ -66,10 +69,16 @@ server.get("/bootstrap", async (req, res) => {
 
 server.post('/pin', async (req, res) => {
   var cid = CID.parse(req.body.cid)
+  var handle = req.body.handle
+  UsernameForestCID.set(handle, cid.toString())
   var pin = await node.pins.add(cid)
   console.log("pin", pin, cid)
   res.status(201).json({})
 });
+
+server.get("/forestCID/:handle", async (req, res) => {
+  res.status(200).json({cid: UsernameForestCID.get(req.params["handle"])})
+})
 
 server.get("/", async (req, res) => {
   res.render('pages/index', {

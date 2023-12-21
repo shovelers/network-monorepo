@@ -30,6 +30,7 @@
     "ipfs-bitswap": "19.0.0"
   },
   "dependencies": {
+    "morgan": "^1.10.0",
     "vite-plugin-wasm": "^3.3.0"
   }
 }
