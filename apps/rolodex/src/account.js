@@ -29,8 +29,8 @@ export class Account {
   }
 
   async getProfile(){
-    var data = await this.store.readPrivateFile(this.filename)
-    return data
+    this.profile = await this.store.readPrivateFile(this.filename)
+    return this.profile
   }
 
   async editProfile(params){
@@ -39,7 +39,7 @@ export class Account {
     }
 
     await this.store.updatePrivateFile(this.filename, (content) => {
-      content = {...this.profile.asJSON(), ...params}
+      content = {...this.profile, ...params}
       return content
     })
   }

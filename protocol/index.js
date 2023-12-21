@@ -64,6 +64,13 @@ server.get("/bootstrap", async (req, res) => {
   }) 
 });
 
+server.post('/pin', async (req, res) => {
+  var cid = CID.parse(req.body.cid)
+  var pin = await node.pins.add(cid)
+  console.log("pin", pin, cid)
+  res.status(201).json({})
+});
+
 server.get("/", async (req, res) => {
   res.render('pages/index', {
     registries: Registries.length,

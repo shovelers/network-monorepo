@@ -4,6 +4,7 @@ import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 import { createBrowserNode, dial, PrivateFS } from 'shovel-fs'
 import axios from 'axios';
+import { CID } from 'multiformats/cid'
 
 const USERNAME_STORAGE_KEY = "fullUsername"
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
@@ -55,6 +56,7 @@ class OddFS {
 
 class ShovelFS {
   constructor(helia, kvStore){
+    this.helia = helia
     this.fs = new PrivateFS(helia)
     this.kvStore = kvStore
   }
@@ -66,6 +68,8 @@ class ShovelFS {
     if (access_key && forest_cid){
       await this.fs.loadForest(access_key, forest_cid)
     }
+
+    await this.startSync()
   }
 
   async readPrivateFile(filename) {
@@ -83,7 +87,33 @@ class ShovelFS {
     var [access_key, forest_cid] = await this.fs.write(filename, JSON.stringify(newContent))
     await this.kvStore.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
     await this.kvStore.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
+    await this.pin(forest_cid)
     return newContent
+  }
+
+  async pin(forest_cid) {
+    if (SHOVEL_FS_SYNC_HOST) {
+      let cid = CID.decode(forest_cid).toString()
+      const axios_client  = axios.create({baseURL: SHOVEL_FS_SYNC_HOST})
+      await axios_client.post('/pin', { cid: cid }).then(async (response) => {
+        console.log(response.status)
+      }).catch((e) => {
+        console.log(e);
+        return e
+      })
+    }
+  }
+
+  async startSync(){
+    if (SHOVEL_FS_SYNC_HOST) {
+      const axios_client  = axios.create({baseURL: SHOVEL_FS_SYNC_HOST})
+      await axios_client.get('/bootstrap').then(async (response) => {
+        await dial(this.helia, response.data.peerAddress)
+      }).catch((e) => {
+        console.log(e);
+        return e
+      })
+    }
   }
 }
 
@@ -211,13 +241,3 @@ export const os = new OddSession(odd);
 let program = await os.getProgram()
 const shovelfs = new ShovelFS(helia, program.components.storage)
 await shovelfs.load()
-
-if (SHOVEL_FS_SYNC_HOST) {
-  const axios_client  = axios.create({baseURL: SHOVEL_FS_SYNC_HOST})
-  await axios_client.get('/bootstrap').then(async (response) => {
-    await dial(helia, response.data.peerAddress)
-  }).catch((e) => {
-    console.log(e);
-    return e
-  })
-}
