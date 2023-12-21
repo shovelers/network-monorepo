@@ -58,6 +58,11 @@ node.libp2p.services.pubsub.addEventListener("message", async (evt) => {
 })
 await node.libp2p.services.pubsub.subscribe(topic)
 
+server.get("/bootstrap", async (req, res) => {
+  res.status(200).json({
+    peerAddress: multiaddrs[0].toString()
+  }) 
+});
 
 server.get("/", async (req, res) => {
   res.render('pages/index', {
