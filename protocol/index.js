@@ -1,24 +1,15 @@
-import { createHelia } from 'helia';
 import { dagCbor } from '@helia/dag-cbor';
-import { gossipsub } from '@chainsafe/libp2p-gossipsub'
-import { noise } from '@chainsafe/libp2p-noise'
-import { yamux } from '@chainsafe/libp2p-yamux'
-import { tcp } from '@libp2p/tcp'
 import { CID } from 'multiformats/cid'
-import { FsBlockstore } from 'blockstore-fs'
-import { FsDatastore } from 'datastore-fs'
-import { createLibp2p } from 'libp2p'
-import { pingService } from 'libp2p/ping'
-import { identifyService } from 'libp2p/identify'
 import { multiaddr } from 'multiaddr'
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 import fs from 'node:fs/promises';
+import path from 'path';
 import { fileURLToPath } from 'url';
 import { keyToDID } from '@spruceid/didkit-wasm-node';
 import { broadcast, eventProcessor } from './event.js'
 import { getRegistry, getFollowers, getFollowing} from './indexer.js'
+import { createStandaloneNode } from 'shovel-fs/standalone.js';
 
 const port = process.argv[2] || 3000;
 const peer = process.argv[3];
@@ -43,7 +34,10 @@ const Registries = new Array();
 const Heads = new Map();
 
 //Node Setup
-const node = await createNode()
+await fs.mkdir(path.join(__dirname, 'protocol_db', 'blocks'), { recursive: true })
+await fs.mkdir(path.join(__dirname, 'protocol_db', 'data'), { recursive: true })
+const node = await createStandaloneNode(path.join(__dirname, 'protocol_db', 'blocks'), path.join(__dirname, 'protocol_db', 'data'))
+
 const multiaddrs = node.libp2p.getMultiaddrs()
 console.log("node address:", multiaddrs);
 
@@ -189,36 +183,4 @@ async function addEvent (body) {
   }
   broadcast(node, topic, relID, result);
   return result;
-}
-
-async function createNode () {
-  // the blockstore is where we store the blocks that make up files
-  await fs.mkdir(path.join(__dirname, 'protocol_db', 'blocks'), { recursive: true })
-  const blockstore = new FsBlockstore(path.join(__dirname, 'protocol_db', 'blocks'))
-
-  // application-specific data lives in the datastore
-  await fs.mkdir(path.join(__dirname, 'protocol_db', 'data'), { recursive: true })
-  const datastore = new FsDatastore(path.join(__dirname, 'protocol_db', 'data'))
-
-  // libp2p is the networking layer that underpins Helia
-  const libp2p = await createLibp2p({
-    datastore,
-    addresses: {
-      listen: ['/ip4/0.0.0.0/tcp/0']
-    },
-    transports: [tcp()],
-    connectionEncryption: [noise()],
-    streamMuxers: [yamux()],
-    services: {
-      identify: identifyService(),
-      ping: pingService({ protocolPrefix: 'ipfs' }),
-      pubsub: gossipsub({ allowPublishToZeroPeers: true })
-    }
-  })
-
-  return await createHelia({
-    datastore,
-    blockstore,
-    libp2p
-  })
 }

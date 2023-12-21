@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "browser_node.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +12,7 @@
   "dependencies": {
     "@chainsafe/libp2p-noise": "^14.0.0",
     "@chainsafe/libp2p-yamux": "^6.0.1",
+    "@chainsafe/libp2p-gossipsub": "^11.0.1",
     "@helia/unixfs": "^1.4.3",
     "@libp2p/identify": "^1.0.5",
     "@libp2p/websockets": "^8.0.5",
@@ -24,6 +26,8 @@
     "uint8arrays": "^5.0.0",
     "blockstore-idb": "^1.1.6",
     "datastore-idb": "^2.1.6",
+    "blockstore-fs": "^1.1.8",
+    "datastore-fs": "^9.1.6",
     "wnfs": "^0.1.29-alpha1"
   }
 }

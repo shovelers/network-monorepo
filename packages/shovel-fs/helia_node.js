@@ -2,8 +2,7 @@ import { createHelia } from 'helia';
 import { bitswap } from 'helia/block-brokers'
 import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
-import { MemoryBlockstore } from 'blockstore-core'
-import { MemoryDatastore } from 'datastore-core'
+import { gossipsub } from '@chainsafe/libp2p-gossipsub'
 import { IDBBlockstore } from 'blockstore-idb'
 import { IDBDatastore } from 'datastore-idb'
 import { createLibp2p } from 'libp2p'
@@ -13,10 +12,10 @@ import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
 import { multiaddr } from 'multiaddr'
 
-const STANDALONE = 1
+export const STANDALONE = 1
 const BROWSER = 2
 
-async function createNode(type, blockstore, datastore) {
+export async function createNode(type, blockstore, datastore) {
   var libp2pconfig = {
     datastore,
     transports: [webSockets({filter: filters.all})],
@@ -40,6 +39,7 @@ async function createNode(type, blockstore, datastore) {
 
   if (type == STANDALONE) {
     libp2pconfig.addresses = { listen: ['/ip4/0.0.0.0/tcp/0/ws'] }
+    libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
   }
 
   const libp2p = await createLibp2p(libp2pconfig)
@@ -53,13 +53,6 @@ async function createNode(type, blockstore, datastore) {
       bitswap()
     ]
   })
-}
-
-export async function createStandaloneNode() {
-  const blockstore = new MemoryBlockstore()
-  const datastore = new MemoryDatastore()
-
-  return await createNode(STANDALONE, blockstore, datastore)
 }
 
 export async function createBrowserNode() {
