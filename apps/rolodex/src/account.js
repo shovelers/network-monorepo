@@ -62,8 +62,7 @@ export class Account {
     return await this.store.recoveryKitData()
   }
 
-  async recover(kit) {
-
-    await this.store.recover(access_key, forest_cid)
+  async recover(access_key, handle) {
+    return await this.store.recover(access_key, handle)
   }
 }

@@ -78,6 +78,20 @@ class ShovelFS {
     await this.load()
   }
 
+  async getForestCidForHandle(handle){
+    let forest_cid;
+    if (SHOVEL_FS_SYNC_HOST) {
+      const axios_client  = axios.create({baseURL: SHOVEL_FS_SYNC_HOST})
+      await axios_client.get('/forestCID/'+ handle).then(async (response) => {
+        forest_cid = response.data.cid
+      }).catch((e) => {
+        console.log(e);
+        return e
+      })
+    }
+    return forest_cid; 
+  }
+
   async readPrivateFile(filename) {
     try {
       let content = await this.fs.read(filename)
@@ -175,8 +189,11 @@ class OddSession {
     return {accessKey: ak, handle: handle}
   }
 
-  async recover(access_key, forest_cid) {
+  async recover(access_key, handle) {
     await program.components.storage.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
+
+    let forest_cid = await shovelfs.getForestCidForHandle(handle)
+    forest_cid = CID.parse(forest_cid).bytes
     await program.components.storage.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
     await shovelfs.load()
   }

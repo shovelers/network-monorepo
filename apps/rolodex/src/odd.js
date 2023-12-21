@@ -171,6 +171,9 @@ async function recover(kit) {
   console.log("username valid", valid)
   
   if (valid && available) {
+    if (import.meta.env.VITE_FS == "SHOVEL") {
+      await account.recover(readKey, oldFullUsername.split('#')[0])
+    }
     const success = await program.fileSystem.recover({
       newUsername: newhashedUsername,
       oldUsername: oldHashedUsername,
