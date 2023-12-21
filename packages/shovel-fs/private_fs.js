@@ -1,5 +1,4 @@
 import { WnfsBlockstore, Rng } from './helia_wnfs_blockstore_adaptor.js'
-import { CID } from 'multiformats/cid'
 import { PrivateDirectory, PrivateForest, PrivateNode, AccessKey } from "wnfs";
 
 export class PrivateFS {
