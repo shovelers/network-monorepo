@@ -12,7 +12,6 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV="production"
 
-
 # Throw-away build stage to reduce size of final image
 FROM base as build
 
@@ -20,15 +19,14 @@ FROM base as build
 RUN apt-get update -qq && \
     apt-get install -y build-essential pkg-config python-is-python3
 
-# Install node modules
-COPY --link package.json ./
-RUN npm install --include=dev
-
 # Copy application code
 COPY --link . .
 
+# Install node modules
+RUN npm install --include=dev -w protocol
+
 # Build application
-RUN npm run build
+RUN npm run build -w protocol
 
 # Remove development dependencies
 RUN npm prune --omit=dev
@@ -42,4 +40,4 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "run", "start", "-w", "protocol" ]
