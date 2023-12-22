@@ -16,7 +16,6 @@ export default {
       preserveEntrySignatures: 'allow-extension',
     },
   },
-  resolve: { preserveSymlinks: true },
   plugins: [
     wasm(),
   ] 
