@@ -16,7 +16,7 @@ jobs:
       - name: Deploy Rolodex
         run: |
           ls
-          flyctl deploy --remote-only --ha=false --build-secret VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} apps/rolodex
+          flyctl deploy --remote-only --ha=false --build-secret VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} --config apps/rolodex/fly.toml --dockerfile apps/rolodex/Dockerfile
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
   deploy_protocol:
