@@ -45,8 +45,6 @@ const node = await createStandaloneNode(path.join(__dirname, 'protocol_db', 'blo
 const multiaddrs = node.libp2p.getMultiaddrs()
 console.log("node address:", multiaddrs);
 
-console.log(multiaddr("/dnsaddr/testnet-protocol.shovel.company/tcp/40899/ws/p2p/12D3KooWBCWuAoVu4ZprdAQcbFuDeUUwHKHXHCFGRmEPj7URR8Fz"))
-
 if (peer) {
   await node.libp2p.dial(multiaddr(peer));
 
