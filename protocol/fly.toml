@@ -19,10 +19,14 @@ primary_region = "sin"
   [services.concurrency]
     hard_limit = 25
     soft_limit = 20
+  
+  [[services.ports]]
+    handlers = ["http"]
+    port = "80"
 
   [[services.ports]]
     handlers = ["tls", "http"]
-    port = "3000"
+    port = "443"
 
   [[services.tcp_checks]]
     interval = 10000
