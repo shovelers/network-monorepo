@@ -10,7 +10,7 @@ import { ping } from '@libp2p/ping'
 import { identify } from '@libp2p/identify'
 import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
-import { multiaddr } from 'multiaddr'
+import { multiaddr } from '@multiformats/multiaddr'
 
 export const STANDALONE = 1
 const BROWSER = 2
