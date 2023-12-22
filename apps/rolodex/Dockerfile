@@ -12,7 +12,6 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV="production"
 
-
 # Throw-away build stage to reduce size of final image
 FROM base as build
 
@@ -20,26 +19,18 @@ FROM base as build
 RUN apt-get update -qq && \
     apt-get install -y build-essential pkg-config python-is-python3
 
-# Install node modules
-# COPY --link package.json ./
-# RUN npm install --include=dev
-
 # Copy application code
 COPY --link . .
+
 # Install node modules
-RUN ls 
 RUN npm install --include=dev -w rolodex
 
 # Build application
-RUN ls node_modules/
-RUN ls /
-RUN ls /root/
 RUN --mount=type=secret,id=VITE_GOOGLE_CLIENT_ID \
     VITE_GOOGLE_CLIENT_ID="$(cat /run/secrets/VITE_GOOGLE_CLIENT_ID)" npm run build -w rolodex
 
 # Remove development dependencies
 RUN npm prune --omit=dev
-
 
 # Final stage for app image
 FROM base
@@ -49,4 +40,4 @@ COPY --from=build /app/rolodex /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "npm", "run", "server" ]
+CMD [ "npm", "run", "server", "-w", "rolodex" ]
