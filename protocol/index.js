@@ -64,7 +64,8 @@ await node.libp2p.services.pubsub.subscribe(topic)
 
 server.get("/bootstrap", async (req, res) => {
   res.status(200).json({
-    peerAddress: multiaddrs[0].toString()
+    peerAddress: multiaddrs[0].toString(),
+    addrs: multiaddrs
   }) 
 });
 
