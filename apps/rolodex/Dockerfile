@@ -28,7 +28,7 @@ RUN npm install --include=dev
 COPY --link . .
 
 # Build application
-RUN ls node_modules/shovel-fs/
+RUN ls node_modules/
 RUN --mount=type=secret,id=VITE_GOOGLE_CLIENT_ID \
     VITE_GOOGLE_CLIENT_ID="$(cat /run/secrets/VITE_GOOGLE_CLIENT_ID)" npm run build
 
