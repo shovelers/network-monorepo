@@ -27,6 +27,7 @@ RUN apt-get update -qq && \
 # Copy application code
 COPY --link ../../ .
 # Install node modules
+RUN ls 
 RUN npm install --include=dev -w rolodex
 
 # Build application
