@@ -67,6 +67,11 @@ server.get("/bootstrap", async (req, res) => {
   }) 
 });
 
+server.get("/metrics", async (req, res) => {
+  res.write(await client.register.metrics());
+  res.end();
+})
+
 server.post('/pin', async (req, res) => {
   var cid = CID.parse(req.body.cid)
   var handle = req.body.handle

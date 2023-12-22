@@ -19,3 +19,7 @@ primary_region = "sin"
 [mounts]
   source="protocol_data"
   destination="/app/protocol_db"
+
+[metrics]
+  port = 3000
+  path = "/metrics"

@@ -9,6 +9,7 @@ import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
 import { identify } from '@libp2p/identify'
 import { webSockets } from '@libp2p/websockets'
+import { prometheusMetrics } from '@libp2p/prometheus-metrics'
 import * as filters from '@libp2p/websockets/filters'
 import { multiaddr } from '@multiformats/multiaddr'
 
@@ -40,6 +41,7 @@ export async function createNode(type, blockstore, datastore) {
   if (type == STANDALONE) {
     libp2pconfig.addresses = { listen: ['/ip4/0.0.0.0/tcp/0/ws'] }
     libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
+    libp2pconfig.metrics = prometheusMetrics()
   }
 
   const libp2p = await createLibp2p(libp2pconfig)
