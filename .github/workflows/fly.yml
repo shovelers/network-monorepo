@@ -15,11 +15,6 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Deploy Rolodex
         run: |
-          cd packages/shovel-fs 
-          npm link
-          cd ../../apps/rolodex
-          npm link shovel-fs
-          cd ../..
           flyctl deploy --remote-only --ha=false --build-secret VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} apps/rolodex
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
