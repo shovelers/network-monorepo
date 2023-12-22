@@ -11,6 +11,7 @@ import { broadcast, eventProcessor } from './event.js'
 import { getRegistry, getFollowers, getFollowing} from './indexer.js'
 import { createStandaloneNode } from 'shovel-fs/standalone.js';
 import morgan from 'morgan';
+import client from 'prom-client'
 
 const port = process.argv[2] || 3000;
 const peer = process.argv[3];
