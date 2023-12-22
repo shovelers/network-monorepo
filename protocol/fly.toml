@@ -8,15 +8,27 @@ primary_region = "sin"
 
 [build]
 
-[http_service]
+[[services]]
   internal_port = 3000
   force_https = true
   auto_stop_machines = false
   auto_start_machines = true
   min_machines_running = 0
   processes = ["app"]
+  
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
 
-[[libp2p_service]]
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = "3000"
+
+  [[services.tcp_checks]]
+    interval = 10000
+    timeout = 2000
+
+[[services]]
   internal_port = 3001
   protocol = "tcp"
 
@@ -25,12 +37,8 @@ primary_region = "sin"
     soft_limit = 20
 
   [[services.ports]]
-    handlers = ["http"]
-    port = "80"
-
-  [[services.ports]]
     handlers = ["tls", "http"]
-    port = "443"
+    port = "3001"
 
   [[services.tcp_checks]]
     interval = 10000
