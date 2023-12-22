@@ -16,6 +16,10 @@ primary_region = "sin"
   min_machines_running = 0
   processes = ["app"]
 
+[libp2p_service]
+  internal_port = 3001
+  protocol = "tcp"
+
 [mounts]
   source="protocol_data"
   destination="/app/protocol_db"
