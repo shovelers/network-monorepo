@@ -29,6 +29,8 @@ COPY --link . .
 
 # Build application
 RUN ls node_modules/
+RUN ls /
+RUN ls /root/
 RUN --mount=type=secret,id=VITE_GOOGLE_CLIENT_ID \
     VITE_GOOGLE_CLIENT_ID="$(cat /run/secrets/VITE_GOOGLE_CLIENT_ID)" npm run build
 
