@@ -31,6 +31,10 @@ COPY --link . .
 RUN ls
 RUN ls node_modules/
 RUN cat package-lock.json
+RUN ls node_modules/shovel-fs
+RUN ls ../
+RUN ls ../../
+Run ls ../../packages
 RUN --mount=type=secret,id=VITE_GOOGLE_CLIENT_ID \
     VITE_GOOGLE_CLIENT_ID="$(cat /run/secrets/VITE_GOOGLE_CLIENT_ID)" npm run build
 
