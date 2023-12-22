@@ -21,18 +21,20 @@ RUN apt-get update -qq && \
     apt-get install -y build-essential pkg-config python-is-python3
 
 # Install node modules
-COPY --link package.json ./
-RUN npm install --include=dev
+# COPY --link package.json ./
+# RUN npm install --include=dev
 
 # Copy application code
-COPY --link . .
+COPY --link ../../ .
+# Install node modules
+RUN npm install --include=dev -w rolodex
 
 # Build application
 RUN ls node_modules/
 RUN ls /
 RUN ls /root/
 RUN --mount=type=secret,id=VITE_GOOGLE_CLIENT_ID \
-    VITE_GOOGLE_CLIENT_ID="$(cat /run/secrets/VITE_GOOGLE_CLIENT_ID)" npm run build
+    VITE_GOOGLE_CLIENT_ID="$(cat /run/secrets/VITE_GOOGLE_CLIENT_ID)" npm run build -w rolodex
 
 # Remove development dependencies
 RUN npm prune --omit=dev
@@ -42,7 +44,7 @@ RUN npm prune --omit=dev
 FROM base
 
 # Copy built application
-COPY --from=build /app /app
+COPY --from=build /app/rolodex /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
