@@ -15,7 +15,12 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Deploy Rolodex
         run: |
-          flyctl deploy --remote-only --ha=false --build-secret VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} --config apps/rolodex/fly.toml --dockerfile apps/rolodex/Dockerfile
+          flyctl deploy --remote-only --ha=false \
+          --build-secret VITE_FS=${{ secrets.VITE_FS }} \
+          --build-secret VITE_SHOVEL_FS_SYNC_HOST=${{ secrets.VITE_SHOVEL_FS_SYNC_HOST }} \
+          --build-secret VITE_NETWORK=${{ secrets.VITE_NETWORK }} \
+          --build-secret VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} \
+          --config apps/rolodex/fly.toml --dockerfile apps/rolodex/Dockerfile
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
   deploy_protocol:
