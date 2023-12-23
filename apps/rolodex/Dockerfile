@@ -27,12 +27,12 @@ RUN npm install --include=dev -w rolodex
 
 # Build application
 RUN --mount=type=secret,id=VITE_FS \
-    VITE_FS="$(cat /run/secrets/VITE_FS)" \
     --mount=type=secret,id=VITE_SHOVEL_FS_SYNC_HOST \
-    VITE_SHOVEL_FS_SYNC_HOST="$(cat /run/secrets/VITE_SHOVEL_FS_SYNC_HOST)" \
     --mount=type=secret,id=VITE_NETWORK \
-    VITE_NETWORK="$(cat /run/secrets/VITE_NETWORK)" \
     --mount=type=secret,id=VITE_GOOGLE_CLIENT_ID \
+    VITE_FS="$(cat /run/secrets/VITE_FS)" \
+    VITE_SHOVEL_FS_SYNC_HOST="$(cat /run/secrets/VITE_SHOVEL_FS_SYNC_HOST)" \
+    VITE_NETWORK="$(cat /run/secrets/VITE_NETWORK)" \
     VITE_GOOGLE_CLIENT_ID="$(cat /run/secrets/VITE_GOOGLE_CLIENT_ID)" npm run build -w rolodex
 
 # Remove development dependencies
