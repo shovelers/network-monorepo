@@ -11,6 +11,7 @@ const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const FS = import.meta.env.VITE_FS || "ODD" // "SHOVEL"
 const SHOVEL_FS_SYNC_HOST = import.meta.env.VITE_SHOVEL_FS_SYNC_HOST
+const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 
 class OddFS {
   constructor(odd, session) {
@@ -129,7 +130,9 @@ class ShovelFS {
     if (SHOVEL_FS_SYNC_HOST) {
       const axios_client  = axios.create({baseURL: SHOVEL_FS_SYNC_HOST})
       await axios_client.get('/bootstrap').then(async (response) => {
-        await dial(this.helia, response.data.peerAddress)
+        const prefix = (NETWORK == "TESTNET") ? "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/" : "/ip4/127.0.0.1/tcp/3001/ws/p2p/"
+        const peerAddress = prefix + response.data.peerId
+        await dial(this.helia, peerAddress)
       }).catch((e) => {
         console.log(e);
         return e

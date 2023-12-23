@@ -43,7 +43,9 @@ await fs.mkdir(path.join(__dirname, 'protocol_db', 'data'), { recursive: true })
 const node = await createStandaloneNode(path.join(__dirname, 'protocol_db', 'blocks'), path.join(__dirname, 'protocol_db', 'data'))
 
 const multiaddrs = node.libp2p.getMultiaddrs()
+const peers = await node.libp2p.peerStore.all()
 console.log("node address:", multiaddrs);
+console.log("peers:", peers.length)
 
 if (peer) {
   await node.libp2p.dial(multiaddr(peer));
@@ -64,8 +66,8 @@ await node.libp2p.services.pubsub.subscribe(topic)
 
 server.get("/bootstrap", async (req, res) => {
   res.status(200).json({
-    peerAddress: multiaddrs[0].toString(),
-    addrs: multiaddrs
+    peerId: node.libp2p.peerId.toString(),
+    peers: peers.length
   }) 
 });
 
