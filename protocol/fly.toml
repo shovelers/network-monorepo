@@ -26,7 +26,7 @@ primary_region = "sin"
 
   [[services.ports]]
     handlers = ["tls", "http"]
-    port = "443"
+    port = "3002"
 
   [[services.tcp_checks]]
     interval = 10000
@@ -46,7 +46,7 @@ primary_region = "sin"
 
   [[services.ports]]
     handlers = ["tls", "http"]
-    port = "3002"
+    port = "443"
 
   [[services.tcp_checks]]
     interval = 10000
