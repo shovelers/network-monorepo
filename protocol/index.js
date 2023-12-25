@@ -38,9 +38,11 @@ const Registries = new Array();
 const Heads = new Map();
 
 //Node Setup
-await fs.mkdir(path.join(__dirname, 'protocol_db', 'blocks'), { recursive: true })
-await fs.mkdir(path.join(__dirname, 'protocol_db', 'data'), { recursive: true })
-const node = await createStandaloneNode(path.join(__dirname, 'protocol_db', 'blocks'), path.join(__dirname, 'protocol_db', 'data'))
+
+const homeDir = process.env.PROTOCOL_DB_HOME || path.join(__dirname, 'protocol_db')
+await fs.mkdir(path.join(homeDir, 'blocks'), { recursive: true })
+await fs.mkdir(path.join(homeDir, 'data'), { recursive: true })
+const node = await createStandaloneNode(path.join(homeDir, 'blocks'), path.join(homeDir, 'data'))
 
 const multiaddrs = node.libp2p.getMultiaddrs()
 const peers = await node.libp2p.peerStore.all()

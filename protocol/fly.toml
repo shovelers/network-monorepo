@@ -8,6 +8,9 @@ primary_region = "sin"
 
 [build]
 
+[env]
+  PROTOCOL_DB_HOME = "/app/protocol_db"
+
 [[services]]
   internal_port = 3000
   force_https = true
