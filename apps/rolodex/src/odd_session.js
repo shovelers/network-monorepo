@@ -281,3 +281,9 @@ export const os = new OddSession(odd);
 let program = await os.getProgram()
 const shovelfs = new ShovelFS(helia, program.components.storage)
 await shovelfs.load()
+
+window.shovel = {
+  helia: helia,
+  fs: shovelfs,
+  odd: program
+}
