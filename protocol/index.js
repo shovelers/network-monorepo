@@ -12,6 +12,7 @@ import { getRegistry, getFollowers, getFollowing} from './indexer.js'
 import { createStandaloneNode } from 'shovel-fs/standalone.js';
 import morgan from 'morgan';
 import client from 'prom-client'
+import { Key } from 'interface-datastore';
 
 const port = process.argv[2] || 3000;
 const peer = process.argv[3];
@@ -35,7 +36,6 @@ const Registries = new Array();
          regID1to2from1: cid2}
 */
 const Heads = new Map();
-const UsernameForestCID = new Map();
 
 //Node Setup
 await fs.mkdir(path.join(__dirname, 'protocol_db', 'blocks'), { recursive: true })
@@ -79,15 +79,17 @@ server.get("/metrics", async (req, res) => {
 server.post('/pin', async (req, res) => {
   var cid = CID.parse(req.body.cid)
   var handle = req.body.handle
-  UsernameForestCID.set(handle, cid.toString())
+  await node.datastore.put(new Key('/handle/' + handle), cid.bytes)
   var pin = await node.pins.add(cid)
   console.log("pin", pin, cid)
   res.status(201).json({})
 });
 
 server.get("/forestCID/:handle", async (req, res) => {
-  res.status(200).json({cid: UsernameForestCID.get(req.params["handle"])})
-})
+  var cid = await node.datastore.get(new Key('/handle/' + req.params["handle"]))
+  cid = CID.decode(cid)
+  res.status(200).json({cid: cid.toString()})
+});
 
 server.get("/", async (req, res) => {
   res.render('pages/index', {
