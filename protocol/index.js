@@ -88,9 +88,13 @@ server.post('/pin', async (req, res) => {
 });
 
 server.get("/forestCID/:handle", async (req, res) => {
-  var cid = await node.datastore.get(new Key('/handle/' + req.params["handle"]))
-  cid = CID.decode(cid)
-  res.status(200).json({cid: cid.toString()})
+  try {
+    var cid = await node.datastore.get(new Key('/handle/' + req.params["handle"]))
+    cid = CID.decode(cid)
+    res.status(200).json({cid: cid.toString()})
+  } catch (error) {
+    res.status(404).json({})
+  }
 });
 
 server.get("/", async (req, res) => {
