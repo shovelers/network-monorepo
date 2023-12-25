@@ -112,20 +112,16 @@ async function downloadContactsDataLocally() {
 }
 
 async function generateRecoveryKit(username){
-  let accessKey, handle;
-  if (import.meta.env.VITE_FS == "SHOVEL") {
-    let data = await account.recoveryKitData()
-    accessKey = data.accessKey
-    handle = data.handle
-  } else { 
-    var program = await getProgram();
-    var fissionnames = await os.fissionUsernames(username)
-    handle = fissionnames.full
+  let kitData = await account.recoveryKitData()
+  let accessKey = kitData.accessKey
+  let handle = kitData.fissionusername
 
-    var accountDID = await program.accountDID(fissionnames.hashed);
-    var crypto = program.components.crypto;
-    accessKey  = await retrieve({ crypto, accountDID });
-  }
+  var fissionnames = await os.fissionUsernames(username)
+  var program = await getProgram();
+  var accountDID = await program.accountDID(fissionnames.hashed);
+  var crypto = program.components.crypto;
+  var oddAccessKey  = await retrieve({ crypto, accountDID });
+  var encodedOddKey = uint8arrays.toString(oddAccessKey, 'base64pad')
   const encodedAccessKey = uint8arrays.toString(accessKey, 'base64pad');
   const content = `
   # This is your recovery kit. (It's a yaml text file)
@@ -137,7 +133,8 @@ async function generateRecoveryKit(username){
   # To use this file, go to ${window.location.origin}/recover/
   
   username: ${handle}
-  key: ${encodedAccessKey}
+  shovelkey: ${encodedAccessKey}
+  oddkey: ${encodedOddKey}
   `;
   
   const data = new Blob([content], { type: 'text/plain' })
@@ -156,7 +153,11 @@ async function recover(kit) {
   var oldHashedUsername = await os.prepareUsername(oldFullUsername)
   console.log("old username: ...", oldFullUsername)
   console.log("hashed old username: ", oldHashedUsername)
-  var readKey = kitText.toString().split("key: ")[1].split("\n")[0]
+
+  var shovelKey = kitText.toString().split("shovelkey: ")[1].split("\n")[0]
+  shovelKey = uint8arrays.fromString(shovelKey, 'base64pad'); 
+  
+  var readKey = kitText.toString().split("oddkey: ")[1].split("\n")[0]
   readKey = uint8arrays.fromString(readKey, 'base64pad');
   console.log("readKey: ...", readKey)
   
@@ -172,7 +173,7 @@ async function recover(kit) {
   
   if (valid && available) {
     if (import.meta.env.VITE_FS == "SHOVEL") {
-      await account.recover(readKey, oldFullUsername.split('#')[0])
+      await account.recover(shovelKey, oldFullUsername.split('#')[0])
     }
     const success = await program.fileSystem.recover({
       newUsername: newhashedUsername,

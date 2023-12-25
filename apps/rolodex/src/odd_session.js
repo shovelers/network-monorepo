@@ -188,8 +188,8 @@ class OddSession {
   async recoveryKitData(){
     let program = await this.getProgram()
     let ak = await program.components.storage.getItem(SHOVEL_FS_ACCESS_KEY)
-    let handle = (await program.components.storage.getItem(USERNAME_STORAGE_KEY)).split('#')[0]
-    return {accessKey: ak, handle: handle}
+    let fu = await program.components.storage.getItem(USERNAME_STORAGE_KEY) 
+    return {accessKey: ak, handle: fu.split('#')[0], fissionusername: fu}
   }
 
   async recover(access_key, handle) {
