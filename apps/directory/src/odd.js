@@ -3,7 +3,6 @@ import * as uint8arrays from 'uint8arrays';
 import axios from 'axios';
 import _ from 'lodash';
 import { ContactTable } from "./contact_table";
-import {vCardParser} from './vcard_parser.js';
 import { os } from './odd_session.js';
 import { Contact, ContactRepository } from "./contacts.js";
 import { Account } from "./account.js";
@@ -223,104 +222,6 @@ async function waitForDataRoot(username) {
   })
 }
 
-async function importContacts(username, password){
-  //fetch creds from store if already present
-  console.log("import triggered")
-  var credsPresence = await appleCredsPresent()
-  if (credsPresence.response) {
-    var user = credsPresence.value.username
-    var pass = credsPresence.value.password
-  } else {
-    account.editProfile({appleCreds: {username: username, password: password}});
-    var user = username
-    var pass = password
-  }
-
-  const response = await axios_client.get('/apple_contacts', { params: { username: user, password: pass } })
-  .then(function (response) {
-    return response;
-  });
-
-  //insert appleContacts to contactList
-  await addAppleContactsToContactList(response.data)
-  console.log("import done")
-}
-
-async function appleCredsPresent(){
-  var profileData = await getProfile()
-  var credsPresent =  !(_.isEmpty(profileData.appleCreds) || profileData.appleCreds.username === "")
-  console.log("creds present: ", credsPresent)
-  return {response: credsPresent, value: profileData.appleCreds} 
-}
-
-async function addAppleContactsToContactList(appleContacts){
-  //check if the uid to appleContacts[i] is == to any of the appleContactIDs in contactList
-  //if not, add it to contactList
-  var contacts = await contactRepo.list()
-  var existingAppleContactIDs = Object.values(contacts.contactList).filter((contact) => !contact.archived).map(contact => contact.appleContactID)
-  var contactList = []
-  for (var i = 0; i < appleContacts.length; i++) {
-    var appleContact = appleContacts[i]
-    try {
-      var parsedAppleContact = vCardParser.parse(appleContact.data)[0]
-    } catch (error) {
-      console.log("error for contact: ", appleContact, "error: ", error)
-      continue
-    }
-    var name = parsedAppleContact.displayName
-    var uid = parsedAppleContact.UID
-    if (!existingAppleContactIDs.includes(uid)) {
-      contactList.push(new Contact({name: name, appleContactID: uid}))
-    }
-  }
-  await contactRepo.bulkCreate(contactList)
-  console.log("Imported Contacts Count: ", contactList.length)
-}
-
-async function importGoogleContacts(refresh) {
-  google.accounts.oauth2.initTokenClient({
-    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/userinfo.email',
-    callback: async (tokenResponse) => {
-      const profile = await axios_client.get('https://www.googleapis.com/oauth2/v2/userinfo', {headers: { Authorization: `Bearer ${tokenResponse.access_token}`}})
-      const response = await axios_client.get('https://people.googleapis.com/v1/people/me/connections',
-        {params: { personFields: 'names', sortOrder: 'LAST_MODIFIED_DESCENDING', pageSize: 200 }, headers: { Authorization: `Bearer ${tokenResponse.access_token}` }}
-      )
-
-      console.log("google contacts ", response.data);
-
-      await addGoogleContactsToContactList(response.data.connections)
-      console.log("import done")
-
-      refresh()
-    },
-  }).requestAccessToken();
-}
-
-async function addGoogleContactsToContactList(googleContacts){
-  var contacts = await contactRepo.list()
-  var existingGoogleContactIDs = Object.values(contacts.contactList).filter((contact) => !contact.archived).map(contact => contact.googleContactID)
-
-  var contactList = []
-  for (var i = 0; i < googleContacts.length; i++) {
-    var googleContact = googleContacts[i]
-
-    try {
-      var name = googleContact.names[0].displayName
-    } catch (error) {
-      console.log("error for contact: ", googleContact, "error: ", error)
-      continue
-    }
-    var uid = googleContact.resourceName
-    if (!existingGoogleContactIDs.includes(uid)) {
-      contactList.push(new Contact({name: name, googleContactID: uid}))
-    }
-  }
-
-  await contactRepo.bulkCreate(contactList)
-  console.log("Imported Contacts Count: ", contactList.length)
-}
-
 export { 
   getSession, 
   getProgram, 
@@ -337,8 +238,5 @@ export {
   editContact, 
   deleteContact, 
   filterContacts, 
-  importContacts,
-  importGoogleContacts,
-  appleCredsPresent,
   downloadContactsDataLocally
 };

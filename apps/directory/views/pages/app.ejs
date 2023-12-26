@@ -3,12 +3,8 @@
 
 <head>
   <link rel="stylesheet" href="./styles/style.css" />
-  <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
-  <script src="https://accounts.google.com/gsi/client"></script>
   <link rel="icon" href="/favicon.ico">
 </head>
-
-<%- include('../partials/google_analytics.ejs') %>
 
   <body class="antialiased bg-base-100">
     <script type="module">
@@ -21,15 +17,6 @@
       } else {
         console.log("session: ", session)
         await session.fs.publish()
-
-        var producer = await program.auth.accountProducer(session.username)
-        console.log("first producer: ", producer)
-        producer.on("challenge", challenge => {
-          window.challenge = challenge;
-        })
-        producer.on("link", ({ approved }) => {
-          if (approved) console.log("Link device successfully")
-        })
       }
     </script>
 
