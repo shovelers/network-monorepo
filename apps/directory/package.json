@@ -1,0 +1,35 @@
+{
+  "name": "directory",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "vite build && npx tailwindcss build -i ./public/styles/tailwind.css -o ./public/styles/style.css",
+    "build-dev": "vite build && npx tailwindcss build -i ./public/styles/tailwind.css -o ./public/styles/style.css --watch",
+    "start": "npm run build && node index.js",
+    "server": "node index.js",
+    "dev": "npm run build-dev && node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@oddjs/odd": "^0.37.2",
+    "axios": "^1.5.1",
+    "daisyui": "^3.7.4",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "glob": "^10.3.6",
+    "lodash": "^4.17.21",
+    "account-fs": "*",
+    "tailwindcss": "^3.3.3",
+    "tsdav": "^2.0.5",
+    "vite": "^4.4.9",
+    "vite-plugin-wasm": "^3.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

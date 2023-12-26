@@ -23,6 +23,23 @@ jobs:
           --config apps/rolodex/fly.toml --dockerfile apps/rolodex/Dockerfile
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  deploy_directory:
+    name: Deploy Directory
+    runs-on: ubuntu-latest
+    environment:
+      name: prod-fly-io
+      url: https://app-directory.shovel.company
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Deploy Directory
+        run: |
+          flyctl deploy --remote-only --ha=false \
+          --build-secret VITE_SHOVEL_FS_SYNC_HOST=${{ secrets.VITE_SHOVEL_FS_SYNC_HOST }} \
+          --build-secret VITE_NETWORK=${{ secrets.VITE_NETWORK }} \
+          --config apps/directory/fly.toml --dockerfile apps/directory/Dockerfile
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
   deploy_protocol:
     name: Deploy Protocol
     runs-on: ubuntu-latest
