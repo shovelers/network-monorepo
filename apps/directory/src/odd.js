@@ -1,6 +1,5 @@
 import { retrieve } from '@oddjs/odd/common/root-key';
 import * as uint8arrays from 'uint8arrays';
-import axios from 'axios';
 import _ from 'lodash';
 import { ContactTable } from "./contact_table";
 import { os } from './odd_session.js';
@@ -11,10 +10,6 @@ const contactRepo = new ContactRepository(os)
 const account = new Account(os)
 
 customElements.define('contact-table', ContactTable);
-
-const axios_client  = axios.create({
-  baseURL: `${window.location.origin}`,
-})
 
 let program = null
 const USERNAME_STORAGE_KEY = "fullUsername"
@@ -27,10 +22,6 @@ async function validSession() {
 async function getProgram() {
   program = await os.getProgram()
   return program
-}
-
-async function getSession(program) {
-  return await os.getSession()
 }
 
 async function signup(username) {
@@ -101,18 +92,6 @@ async function producerChallengeProcessor(challenge, userInput) {
   } else {
     challenge.rejectPin(); alert("Wrong PIN")
   }
-}
-
-async function downloadContactsDataLocally() {
-  const content = await getContacts()
-  console.log("content: ", content)
-  const data = new Blob([JSON.stringify(content, null, 4)], { type: 'application/json' })
-  var fileURL = window.URL.createObjectURL(data);
-  var tempLink = document.createElement('a');
-  tempLink.href = fileURL;
-  tempLink.setAttribute('download', 'contacts.json');
-  tempLink.click();
-  window.URL.revokeObjectURL(fileURL);
 }
 
 async function generateRecoveryKit(username){
