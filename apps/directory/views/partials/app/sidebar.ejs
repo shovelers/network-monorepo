@@ -1,11 +1,11 @@
 <script type="module">
-  import { getProfile, updateProfile, signout, generateRecoveryKit } from '/odd.js';
+  import { account, updateProfile, signout, generateRecoveryKit } from '/odd.js';
   window.updateProfile = updateProfile;
   window.signout = signout;
   window.generateRecoveryKit = generateRecoveryKit;
 
   window.refreshProfile = function(){
-    getProfile().then((result) => {
+    account.getProfile().then((result) => {
       console.log("result: ", result)
       document.getElementById("handle").innerHTML = result.handle
       document.getElementById("name").innerHTML = "Name: " + result.name

@@ -33,10 +33,6 @@ async function signup(username) {
   }, 5000)
 }
 
-async function getProfile() {
-  return account.getProfile()
-}
-
 async function getContacts() {
   return contactRepo.list()
 }
@@ -207,12 +203,12 @@ async function waitForDataRoot(username) {
 }
 
 export { 
+  account,
   validSession,
   signup, 
   signout, 
   generateRecoveryKit, 
   recover,
-  getProfile, 
   updateProfile, 
   getContacts, 
   addContact, 
