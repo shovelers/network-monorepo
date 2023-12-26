@@ -9,51 +9,8 @@ import { CID } from 'multiformats/cid'
 const USERNAME_STORAGE_KEY = "fullUsername"
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
-const FS = import.meta.env.VITE_FS || "ODD" // "SHOVEL"
 const SHOVEL_FS_SYNC_HOST = import.meta.env.VITE_SHOVEL_FS_SYNC_HOST
 const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
-
-class OddFS {
-  constructor(odd, session) {
-    this.odd = odd
-    this.fs = session.fs
-  }
- 
-  async readPrivateFile(filename) {
-    const { RootBranch } = this.odd.path;
-    const filePath = this.odd.path.file(RootBranch.Private, filename);
-    const pathExists = await this.fs.exists(filePath);
-
-    if (pathExists) {
-      const content = new TextDecoder().decode(await this.fs.read(filePath));
-      return JSON.parse(content);
-    }
-  }
-
-  async updatePrivateFile(filename, mutationFunction) {
-    const { RootBranch } = this.odd.path;
-    const filePath = this.odd.path.file(RootBranch.Private, filename);
-
-    const fileExists = await this.fs.exists(filePath)
-    let newContent
-
-    if(fileExists){
-      const content = new TextDecoder().decode(await this.fs.read(filePath));
-      console.log("content in file:", content);
-      newContent = mutationFunction(JSON.parse(content));
-    } else {
-      newContent = mutationFunction();
-    }
-
-    await this.fs.write(
-      filePath,
-      new TextEncoder().encode(JSON.stringify(newContent))
-    );
-    await this.fs.publish();
-
-    return newContent;
-  }
-}
 
 class ShovelFS {
   constructor(helia, kvStore){
@@ -175,16 +132,6 @@ class OddSession {
     return;
   }
 
-  async getFS() {
-    if (FS == "SHOVEL") {
-      return shovelfs
-    } else {
-      let session = await this.getSession()
-      let fs = new OddFS(this.odd, session) 
-      return fs
-    }
-  }
-
   async recoveryKitData(){
     let program = await this.getProgram()
     let ak = await program.components.storage.getItem(SHOVEL_FS_ACCESS_KEY)
@@ -202,13 +149,11 @@ class OddSession {
   }
 
   async readPrivateFile(filename) {
-    let fs = await this.getFS()
-    return fs.readPrivateFile(filename)
+    return shovelfs.readPrivateFile(filename)
   }
 
   async updatePrivateFile(filename, mutationFunction) {
-    let fs = await this.getFS()
-    return fs.updatePrivateFile(filename, mutationFunction)
+    return shovelfs.updatePrivateFile(filename, mutationFunction)
   }
 
   async createFissionUser(handle) {
