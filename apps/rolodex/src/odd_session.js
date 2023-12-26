@@ -2,7 +2,7 @@ import * as odd from "@oddjs/odd";
 import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
-import { createBrowserNode, AccountFS } from 'shovel-fs'
+import { createBrowserNode, AccountFS } from 'account-fs'
 import { CID } from 'multiformats/cid'
 
 const USERNAME_STORAGE_KEY = "fullUsername"

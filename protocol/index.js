@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 import { keyToDID } from '@spruceid/didkit-wasm-node';
 import { broadcast, eventProcessor } from './event.js'
 import { getRegistry, getFollowers, getFollowing} from './indexer.js'
-import { createStandaloneNode } from 'shovel-fs/standalone.js';
+import { createStandaloneNode } from 'account-fs/standalone.js';
 import morgan from 'morgan';
 import client from 'prom-client'
 import { Key } from 'interface-datastore';

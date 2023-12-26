@@ -1,8 +1,8 @@
 {
-  "name": "shovel-fs",
+  "name": "account-fs",
   "version": "1.0.0",
   "description": "",
-  "main": "browser_node.js",
+  "main": "browser.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
