@@ -24,14 +24,15 @@ class Profile {
 }
 
 export class Account {
-  constructor(os) {
+  constructor(os, accountfs) {
     this.store = os
+    this.accountfs = accountfs
     this.filename = "profile.json"
     this.profile = null
   }
 
   async getProfile(){
-    this.profile = await this.store.readPrivateFile(this.filename)
+    this.profile = await this.accountfs.readPrivateFile(this.filename)
     return this.profile
   }
 
@@ -40,7 +41,7 @@ export class Account {
       await this.getProfile()
     }
 
-    await this.store.updatePrivateFile(this.filename, (content) => {
+    await this.accountfs.updatePrivateFile(this.filename, (content) => {
       content = {...this.profile, ...params}
       return content
     })
@@ -49,8 +50,8 @@ export class Account {
   async create(handle) {
     await this.store.createFissionUser(handle)
 
-    await this.store.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
-    await this.store.updatePrivateFile("contacts.json", () => { return { contactList: {}, appleContacts: [], googleContacts: {} } })  
+    await this.accountfs.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
+    await this.accountfs.updatePrivateFile("contacts.json", () => { return { contactList: {}, appleContacts: [], googleContacts: {} } })  
   }
 
   async signout(){

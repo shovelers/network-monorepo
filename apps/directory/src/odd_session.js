@@ -61,14 +61,6 @@ class OddSession {
     await accountfs.load()
   }
 
-  async readPrivateFile(filename) {
-    return accountfs.readPrivateFile(filename)
-  }
-
-  async updatePrivateFile(filename, mutationFunction) {
-    return accountfs.updatePrivateFile(filename, mutationFunction)
-  }
-
   async createFissionUser(handle) {
     this.program = await this.getProgram()
     var fissionusername = await this.fissionUsernames(handle);

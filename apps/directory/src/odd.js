@@ -7,7 +7,7 @@ import { Contact, ContactRepository } from "./contacts.js";
 import { Account } from "./account.js";
 
 const contactRepo = new ContactRepository(accountfs)
-const account = new Account(os)
+const account = new Account(os, accountfs)
 
 customElements.define('contact-table', ContactTable);
 
