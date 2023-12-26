@@ -28,8 +28,8 @@ export class Contact {
 }
 
 export class ContactRepository {
-  constructor(os) {
-    this.store = os
+  constructor(accountfs) {
+    this.store = accountfs
     this.filename = "contacts.json"
   }
 

@@ -55,18 +55,18 @@ class OddSession {
   async recover(access_key, handle) {
     await program.components.storage.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
 
-    let forest_cid = await shovelfs.getForestCidForHandle(handle)
+    let forest_cid = await accountfs.getForestCidForHandle(handle)
     forest_cid = CID.parse(forest_cid).bytes
     await program.components.storage.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
-    await shovelfs.load()
+    await accountfs.load()
   }
 
   async readPrivateFile(filename) {
-    return shovelfs.readPrivateFile(filename)
+    return accountfs.readPrivateFile(filename)
   }
 
   async updatePrivateFile(filename, mutationFunction) {
-    return shovelfs.updatePrivateFile(filename, mutationFunction)
+    return accountfs.updatePrivateFile(filename, mutationFunction)
   }
 
   async createFissionUser(handle) {
@@ -137,11 +137,11 @@ const helia = await createBrowserNode()
 export const os = new OddSession(odd);
 
 let program = await os.getProgram()
-const shovelfs = new AccountFS(helia, program.components.storage, NETWORK, SHOVEL_FS_SYNC_HOST)
-await shovelfs.load()
+export const accountfs = new AccountFS(helia, program.components.storage, NETWORK, SHOVEL_FS_SYNC_HOST)
+await accountfs.load()
 
 window.shovel = {
   helia: helia,
-  fs: shovelfs,
+  fs: accountfs,
   odd: program
 }

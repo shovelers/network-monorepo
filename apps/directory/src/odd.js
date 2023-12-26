@@ -2,11 +2,11 @@ import { retrieve } from '@oddjs/odd/common/root-key';
 import * as uint8arrays from 'uint8arrays';
 import _ from 'lodash';
 import { ContactTable } from "./contact_table";
-import { os } from './odd_session.js';
+import { os, accountfs } from './odd_session.js';
 import { Contact, ContactRepository } from "./contacts.js";
 import { Account } from "./account.js";
 
-const contactRepo = new ContactRepository(os)
+const contactRepo = new ContactRepository(accountfs)
 const account = new Account(os)
 
 customElements.define('contact-table', ContactTable);
