@@ -8,15 +8,11 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { getProgram, getSession } from '/odd.js';
+      import { validSession } from '/odd.js';
 
-      var program = await getProgram();
-      var session = await getSession(program);
-      if (session === undefined) {
+      var sesssionValid = await validSession();
+      if (!sesssionValid) {
         window.location.href = '/home';
-      } else {
-        console.log("session: ", session)
-        await session.fs.publish()
       }
     </script>
 

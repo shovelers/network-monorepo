@@ -7,13 +7,12 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { signup, getProgram, getSession, recover } from '/odd.js';
+      import { signup, validSession, recover } from '/odd.js';
       window.signup = signup;
       window.recover = recover;
 
-      var program = await getProgram();
-      var session = await getSession(program);
-      if (session) {
+      var sesssionValid = await validSession();
+      if (sesssionValid) {
         window.location.href = '/app';
       }
 

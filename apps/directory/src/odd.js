@@ -19,6 +19,11 @@ const axios_client  = axios.create({
 let program = null
 const USERNAME_STORAGE_KEY = "fullUsername"
 
+async function validSession() {
+  let session = await os.getSession()
+  return (session !== undefined)
+}
+
 async function getProgram() {
   program = await os.getProgram()
   return program
@@ -223,10 +228,7 @@ async function waitForDataRoot(username) {
 }
 
 export { 
-  getSession, 
-  getProgram, 
-  producerChallengeProcessor, 
-  waitForDataRoot,
+  validSession,
   signup, 
   signout, 
   generateRecoveryKit, 
@@ -237,6 +239,5 @@ export {
   addContact, 
   editContact, 
   deleteContact, 
-  filterContacts, 
-  downloadContactsDataLocally
+  filterContacts 
 };

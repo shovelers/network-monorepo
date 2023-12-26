@@ -132,5 +132,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-apps/rolodex/public/odd.js
+apps/*/public/odd.js
 apps/directory/public/assets/
