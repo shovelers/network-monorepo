@@ -4,7 +4,6 @@ import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 import { createBrowserNode, AccountFS } from 'account-fs'
-import { CID } from 'multiformats/cid'
 
 const USERNAME_STORAGE_KEY = "fullUsername"
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
@@ -53,15 +52,6 @@ class OddSession {
     return {accessKey: ak, handle: fu.split('#')[0], fissionusername: fu}
   }
 
-  async recover(access_key, handle) {
-    await program.components.storage.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
-
-    let forest_cid = await accountfs.getForestCidForHandle(handle)
-    forest_cid = CID.parse(forest_cid).bytes
-    await program.components.storage.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
-    await accountfs.load()
-  }
-
   async getOddAccessKey(){
     let program = await this.getProgram()
     var fissionusername = await this.fissionUsernames(undefined); // hacking - as logged in user will not need username
@@ -97,6 +87,64 @@ class OddSession {
     } else if (!available) {
       alert("username is not available");
     }
+  }
+
+  async createNewFissionAccountOnRecover(handle, oldfissionname, oddKey){
+    var program = await this.getProgram();
+    await program.components.storage.removeItem(USERNAME_STORAGE_KEY)
+    var oldHashedUsername = await this.prepareUsername(oldfissionname)
+    
+    var fissionnames = await this.fissionUsernames(handle)
+    var newhashedUsername = fissionnames.hashed;
+    
+    const valid = await program.auth.isUsernameValid(`${newhashedUsername}`)
+    const available = await program.auth.isUsernameAvailable(`${newhashedUsername}`)
+    console.log("username available", available)
+    console.log("username valid", valid)
+    
+    if (valid && available) {
+      console.log("oddKey", oddKey, newhashedUsername, oldHashedUsername)
+      const success = await program.fileSystem.recover({
+        newUsername: newhashedUsername,
+        oldUsername: oldHashedUsername,
+        readKey: oddKey
+      })
+      
+      console.log("success: ", success);
+      var session = await program.auth.session()
+      await this.waitForDataRoot(newhashedUsername)
+      console.log("session: ", session)
+    }
+  }
+
+  async waitForDataRoot(username) {
+    const program = await this.getProgram()
+    const reference = program?.components.reference
+    const EMPTY_CID = "Qmc5m94Gu7z62RC8waSKkZUrCCBJPyHbkpmGzEePxy2oXJ"
+  
+    if (!reference)
+      throw new Error("Program must be initialized to check for data root")
+  
+    let dataRoot = await reference.dataRoot.lookup(username)
+  
+    if (dataRoot.toString() !== EMPTY_CID) return
+  
+    return new Promise((resolve) => {
+      const maxRetries = 50
+      let attempt = 0
+  
+      const dataRootInterval = setInterval(async () => {
+        dataRoot = await reference.dataRoot.lookup(username)
+  
+        if (dataRoot.toString() === EMPTY_CID && attempt < maxRetries) {
+          attempt++
+          return
+        }
+  
+        clearInterval(dataRootInterval)
+        resolve()
+      }, 500)
+    })
   }
 
   async fissionUsernames(username) {

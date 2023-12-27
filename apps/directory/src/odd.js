@@ -1,5 +1,3 @@
-import { retrieve } from '@oddjs/odd/common/root-key';
-import * as uint8arrays from 'uint8arrays';
 import _ from 'lodash';
 import { ContactTable } from "./contact_table";
 import { os, accountfs } from './odd_session.js';
@@ -11,17 +9,9 @@ const account = new Account(os, accountfs)
 
 customElements.define('contact-table', ContactTable);
 
-let program = null
-const USERNAME_STORAGE_KEY = "fullUsername"
-
 async function validSession() {
   let session = await os.getSession()
   return (session !== undefined)
-}
-
-async function getProgram() {
-  program = await os.getProgram()
-  return program
 }
 
 async function signup(username) {
@@ -93,74 +83,11 @@ async function generateRecoveryKit(username){
 
 async function recover(kit) {
   var kitText = await kit.text()
-  var oldFullUsername = kitText.toString().split("username: ")[1].split("\n")[0]
-  var oldHashedUsername = await os.prepareUsername(oldFullUsername)
-  console.log("old username: ...", oldFullUsername)
-  console.log("hashed old username: ", oldHashedUsername)
-
-  var readKey = kitText.toString().split("oddkey: ")[1].split("\n")[0]
-  readKey = uint8arrays.fromString(readKey, 'base64pad');
-  console.log("readKey: ...", readKey)
-  
-  var program = await getProgram();
-  await program.components.storage.removeItem(USERNAME_STORAGE_KEY)
-  var fissionnames = await os.fissionUsernames(oldFullUsername.split("#")[0])
-  var newhashedUsername = fissionnames.hashed;
-  
-  const valid = await program.auth.isUsernameValid(`${newhashedUsername}`)
-  const available = await program.auth.isUsernameAvailable(`${newhashedUsername}`)
-  console.log("username available", available)
-  console.log("username valid", valid)
-  
-  if (valid && available) {
-    await account.recover(kitText)
-    
-    const success = await program.fileSystem.recover({
-      newUsername: newhashedUsername,
-      oldUsername: oldHashedUsername,
-      readKey
-    })
-    
-    console.log("success: ", success);
-    var session = await program.auth.session()
-    await waitForDataRoot(newhashedUsername)
-    console.log("session: ", session)
-    
-    const timeout = setTimeout(() => {
-      clearTimeout(timeout)
-      window.location.href = "/app";
-    }, 5000)
-  }
-}
-
-async function waitForDataRoot(username) {
-  const program = await getProgram()
-  const reference = program?.components.reference
-  const EMPTY_CID = "Qmc5m94Gu7z62RC8waSKkZUrCCBJPyHbkpmGzEePxy2oXJ"
-
-  if (!reference)
-    throw new Error("Program must be initialized to check for data root")
-
-  let dataRoot = await reference.dataRoot.lookup(username)
-
-  if (dataRoot.toString() !== EMPTY_CID) return
-
-  return new Promise((resolve) => {
-    const maxRetries = 50
-    let attempt = 0
-
-    const dataRootInterval = setInterval(async () => {
-      dataRoot = await reference.dataRoot.lookup(username)
-
-      if (dataRoot.toString() === EMPTY_CID && attempt < maxRetries) {
-        attempt++
-        return
-      }
-
-      clearInterval(dataRootInterval)
-      resolve()
-    }, 500)
-  })
+  await account.recover(kitText)
+  const timeout = setTimeout(() => {
+    clearTimeout(timeout)
+    window.location.href = "/app";
+  }, 5000)
 }
 
 export { 

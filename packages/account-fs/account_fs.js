@@ -39,6 +39,7 @@ export class AccountFS {
   async getForestCidForHandle(handle){
     let forest_cid;
     await this.axios_client.get('/forestCID/'+ handle).then(async (response) => {
+      console.log("response", response.status, response.data)
       forest_cid = response.data.cid
     }).catch((e) => {
       console.log(e);
