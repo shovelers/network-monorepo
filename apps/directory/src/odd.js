@@ -1,11 +1,27 @@
 import _ from 'lodash';
 import { ContactTable } from "./contact_table";
-import { os, accountfs } from './odd_session.js';
 import { Contact, ContactRepository } from "./contacts.js";
-import { Account } from "./account.js";
+import { Account , os  } from 'account-session';
+import { createBrowserNode, AccountFS } from 'account-fs'
+
+const SHOVEL_FS_SYNC_HOST = import.meta.env.VITE_SHOVEL_FS_SYNC_HOST || "http://localhost:3000"
+const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
+
+const helia = await createBrowserNode()
+
+let program = await os.getProgram()
+const accountfs = new AccountFS(helia, program.components.storage, NETWORK, SHOVEL_FS_SYNC_HOST)
+await accountfs.load()
+
+window.shovel = {
+  helia: helia,
+  fs: accountfs,
+  odd: program
+}
 
 const contactRepo = new ContactRepository(accountfs)
 const account = new Account(os, accountfs)
+
 
 customElements.define('contact-table', ContactTable);
 

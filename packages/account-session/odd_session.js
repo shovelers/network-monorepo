@@ -3,13 +3,9 @@ import { retrieve } from '@oddjs/odd/common/root-key';
 import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
-import { createBrowserNode, AccountFS } from 'account-fs'
 
 const USERNAME_STORAGE_KEY = "fullUsername"
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
-const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
-const SHOVEL_FS_SYNC_HOST = import.meta.env.VITE_SHOVEL_FS_SYNC_HOST || "http://localhost:3000"
-const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 
 class OddSession {
   constructor(odd) {
@@ -184,15 +180,4 @@ class OddSession {
   }
 }
 
-const helia = await createBrowserNode()
 export const os = new OddSession(odd);
-
-let program = await os.getProgram()
-export const accountfs = new AccountFS(helia, program.components.storage, NETWORK, SHOVEL_FS_SYNC_HOST)
-await accountfs.load()
-
-window.shovel = {
-  helia: helia,
-  fs: accountfs,
-  odd: program
-}

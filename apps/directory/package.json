@@ -16,7 +16,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@oddjs/odd": "^0.37.2",
     "axios": "^1.5.1",
     "daisyui": "^3.7.4",
     "ejs": "^3.1.8",
@@ -24,6 +23,7 @@
     "glob": "^10.3.6",
     "lodash": "^4.17.21",
     "account-fs": "*",
+    "account-session": "*",
     "tailwindcss": "^3.3.3",
     "tsdav": "^2.0.5",
     "vite": "^4.4.9",
