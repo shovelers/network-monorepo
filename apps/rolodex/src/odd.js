@@ -1,15 +1,28 @@
-import { retrieve } from '@oddjs/odd/common/root-key';
-import * as uint8arrays from 'uint8arrays';
 import axios from 'axios';
 import _ from 'lodash';
-import { ContactTable } from "./contact_table";
 import {vCardParser} from './vcard_parser.js';
-import { os } from './odd_session.js';
+import { ContactTable } from "./contact_table";
 import { Contact, ContactRepository } from "./contacts.js";
-import { Account } from "./account.js";
+import { Account , os  } from 'account-session';
+import { createBrowserNode, AccountFS } from 'account-fs'
 
-const contactRepo = new ContactRepository(os)
-const account = new Account(os)
+const SHOVEL_FS_SYNC_HOST = import.meta.env.VITE_SHOVEL_FS_SYNC_HOST || "http://localhost:3000"
+const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
+
+const helia = await createBrowserNode()
+
+let program = await os.getProgram()
+const accountfs = new AccountFS(helia, program.components.storage, NETWORK, SHOVEL_FS_SYNC_HOST)
+await accountfs.load()
+
+window.shovel = {
+  helia: helia,
+  fs: accountfs,
+  odd: program
+}
+
+const contactRepo = new ContactRepository(accountfs)
+const account = new Account(os, accountfs)
 
 customElements.define('contact-table', ContactTable);
 
@@ -17,8 +30,6 @@ const axios_client  = axios.create({
   baseURL: `${window.location.origin}`,
 })
 
-let program = null
-const USERNAME_STORAGE_KEY = "fullUsername"
 
 async function getProgram() {
   program = await os.getProgram()
@@ -112,30 +123,7 @@ async function downloadContactsDataLocally() {
 }
 
 async function generateRecoveryKit(username){
-  let kitData = await account.recoveryKitData()
-  let accessKey = kitData.accessKey
-  let handle = kitData.fissionusername
-
-  var fissionnames = await os.fissionUsernames(username)
-  var program = await getProgram();
-  var accountDID = await program.accountDID(fissionnames.hashed);
-  var crypto = program.components.crypto;
-  var oddAccessKey  = await retrieve({ crypto, accountDID });
-  var encodedOddKey = uint8arrays.toString(oddAccessKey, 'base64pad')
-  const encodedAccessKey = uint8arrays.toString(accessKey, 'base64pad');
-  const content = `
-  # This is your recovery kit. (It's a yaml text file)
-  # Store this somewhere safe.
-  # Anyone with this file will have read access to your private files.
-  # Losing it means you won't be able to recover your account
-  # in case you lose access to all your linked devices.
-  
-  # To use this file, go to ${window.location.origin}/recover/
-  
-  username: ${handle}
-  shovelkey: ${encodedAccessKey}
-  oddkey: ${encodedOddKey}
-  `;
+  const content = await account.recoveryKitContent()
   
   const data = new Blob([content], { type: 'text/plain' })
   var fileURL = window.URL.createObjectURL(data);
@@ -149,48 +137,11 @@ async function generateRecoveryKit(username){
 
 async function recover(kit) {
   var kitText = await kit.text()
-  var oldFullUsername = kitText.toString().split("username: ")[1].split("\n")[0]
-  var oldHashedUsername = await os.prepareUsername(oldFullUsername)
-  console.log("old username: ...", oldFullUsername)
-  console.log("hashed old username: ", oldHashedUsername)
-
-  var shovelKey = kitText.toString().split("shovelkey: ")[1].split("\n")[0]
-  shovelKey = uint8arrays.fromString(shovelKey, 'base64pad'); 
-  
-  var readKey = kitText.toString().split("oddkey: ")[1].split("\n")[0]
-  readKey = uint8arrays.fromString(readKey, 'base64pad');
-  console.log("readKey: ...", readKey)
-  
-  var program = await getProgram();
-  await program.components.storage.removeItem(USERNAME_STORAGE_KEY)
-  var fissionnames = await os.fissionUsernames(oldFullUsername.split("#")[0])
-  var newhashedUsername = fissionnames.hashed;
-  
-  const valid = await program.auth.isUsernameValid(`${newhashedUsername}`)
-  const available = await program.auth.isUsernameAvailable(`${newhashedUsername}`)
-  console.log("username available", available)
-  console.log("username valid", valid)
-  
-  if (valid && available) {
-    if (import.meta.env.VITE_FS == "SHOVEL") {
-      await account.recover(shovelKey, oldFullUsername.split('#')[0])
-    }
-    const success = await program.fileSystem.recover({
-      newUsername: newhashedUsername,
-      oldUsername: oldHashedUsername,
-      readKey
-    })
-    
-    console.log("success: ", success);
-    var session = await program.auth.session()
-    await waitForDataRoot(newhashedUsername)
-    console.log("session: ", session)
-    
-    const timeout = setTimeout(() => {
-      clearTimeout(timeout)
-      window.location.href = "/app";
-    }, 5000)
-  }
+  await account.recover(kitText)
+  const timeout = setTimeout(() => {
+    clearTimeout(timeout)
+    window.location.href = "/app";
+  }, 5000)
 }
 
 async function waitForDataRoot(username) {
