@@ -27,7 +27,10 @@ export class AccountFS {
     await this.startSync()
   }
 
-  async recover(access_key, forest_cid) {
+  async recover(handle, access_key) {    
+    let forest_cid = await this.getForestCidForHandle(handle)
+    forest_cid = CID.parse(forest_cid).bytes
+
     await this.kvStore.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
     await this.kvStore.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
     await this.load()

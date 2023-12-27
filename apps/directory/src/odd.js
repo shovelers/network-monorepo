@@ -98,9 +98,6 @@ async function recover(kit) {
   console.log("old username: ...", oldFullUsername)
   console.log("hashed old username: ", oldHashedUsername)
 
-  var shovelKey = kitText.toString().split("shovelkey: ")[1].split("\n")[0]
-  shovelKey = uint8arrays.fromString(shovelKey, 'base64pad'); 
-  
   var readKey = kitText.toString().split("oddkey: ")[1].split("\n")[0]
   readKey = uint8arrays.fromString(readKey, 'base64pad');
   console.log("readKey: ...", readKey)
@@ -116,9 +113,8 @@ async function recover(kit) {
   console.log("username valid", valid)
   
   if (valid && available) {
-    if (import.meta.env.VITE_FS == "SHOVEL") {
-      await account.recover(shovelKey, oldFullUsername.split('#')[0])
-    }
+    await account.recover(kitText)
+    
     const success = await program.fileSystem.recover({
       newUsername: newhashedUsername,
       oldUsername: oldHashedUsername,

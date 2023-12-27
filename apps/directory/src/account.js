@@ -66,8 +66,14 @@ export class Account {
     return RecoveryKit.toYML(fissionusername, encodedAccessKey, oddAccessKey)
   }
 
-  async recover(access_key, handle) {
-    return await this.store.recover(access_key, handle)
+  async recover(content){
+    var data = RecoveryKit.parseYML(content)
+
+    var shovelKey = uint8arrays.fromString(data.shovelkey, 'base64pad'); 
+    var oddKey = uint8arrays.fromString(data.oddkey, 'base64pad');
+    var handle = data.fissionusername.split("#")[0]
+
+    await this.accountfs.recover(handle, shovelKey)
   }
 }
 
@@ -84,5 +90,13 @@ class RecoveryKit {
   shovelkey: ${encodedAccessKey}
   oddkey: ${encodedOddKey}
   `;
+  }
+
+  static parseYML(content) {
+    var fissionusername = content.toString().split("username: ")[1].split("\n")[0]
+    var shovelKey = content.toString().split("shovelkey: ")[1].split("\n")[0]
+    var oddKey = content.toString().split("oddkey: ")[1].split("\n")[0]
+
+    return {fissionusername: fissionusername, shovelkey: shovelKey, oddkey: oddKey}
   }
 }
