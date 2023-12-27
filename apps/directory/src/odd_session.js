@@ -1,4 +1,5 @@
 import * as odd from "@oddjs/odd";
+import { retrieve } from '@oddjs/odd/common/root-key';
 import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
@@ -59,6 +60,16 @@ class OddSession {
     forest_cid = CID.parse(forest_cid).bytes
     await program.components.storage.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
     await accountfs.load()
+  }
+
+  async getOddAccessKey(){
+    let program = await this.getProgram()
+    var fissionusername = await this.fissionUsernames(undefined); // hacking - as logged in user will not need username
+    var accountDID = await program.accountDID(fissionusername.hashed);
+    var crypto = program.components.crypto;
+    var oddAccessKey  = await retrieve({ crypto, accountDID });
+    var encodedOddKey = uint8arrays.toString(oddAccessKey, 'base64pad')
+    return encodedOddKey
   }
 
   async createFissionUser(handle) {

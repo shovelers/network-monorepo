@@ -1,4 +1,4 @@
-import { CID } from "@oddjs/odd"
+import * as uint8arrays from 'uint8arrays';
 
 class Profile {
   constructor(args) {
@@ -59,11 +59,30 @@ export class Account {
     await session.destroy()
   }
 
-  async recoveryKitData() {
-    return await this.store.recoveryKitData()
+  async recoveryKitContent() {
+    let oddAccessKey = await this.store.getOddAccessKey()
+    var { accessKey, handle, fissionusername } = await this.store.recoveryKitData()
+    const encodedAccessKey = uint8arrays.toString(accessKey, 'base64pad');
+    return RecoveryKit.toYML(fissionusername, encodedAccessKey, oddAccessKey)
   }
 
   async recover(access_key, handle) {
     return await this.store.recover(access_key, handle)
+  }
+}
+
+class RecoveryKit {
+  static toYML(fissionusername, encodedAccessKey, encodedOddKey){
+    return `
+  # This is your recovery kit. (It's a yaml text file)
+  # Store this somewhere safe.
+  # Anyone with this file will have read access to your private files.
+  # Losing it means you won't be able to recover your account
+  # in case you lose access to all your linked devices.
+  
+  username: ${fissionusername}
+  shovelkey: ${encodedAccessKey}
+  oddkey: ${encodedOddKey}
+  `;
   }
 }

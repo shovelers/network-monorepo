@@ -78,43 +78,8 @@ async function signout() {
   await account.signout()
 }
 
-async function producerChallengeProcessor(challenge, userInput) {
-  console.log("challenge pin", challenge.pin)
-  console.log("userinput", userInput)
-
-  // Either show `challenge.pin` or have the user input a PIN and see if they're equal.
-  if (userInput === challenge.pin.join("")) {
-    challenge.confirmPin(); alert("Correct PIN.... Wait for the other device to load account data")
-  } else {
-    challenge.rejectPin(); alert("Wrong PIN")
-  }
-}
-
 async function generateRecoveryKit(username){
-  let kitData = await account.recoveryKitData()
-  let accessKey = kitData.accessKey
-  let handle = kitData.fissionusername
-
-  var fissionnames = await os.fissionUsernames(username)
-  var program = await getProgram();
-  var accountDID = await program.accountDID(fissionnames.hashed);
-  var crypto = program.components.crypto;
-  var oddAccessKey  = await retrieve({ crypto, accountDID });
-  var encodedOddKey = uint8arrays.toString(oddAccessKey, 'base64pad')
-  const encodedAccessKey = uint8arrays.toString(accessKey, 'base64pad');
-  const content = `
-  # This is your recovery kit. (It's a yaml text file)
-  # Store this somewhere safe.
-  # Anyone with this file will have read access to your private files.
-  # Losing it means you won't be able to recover your account
-  # in case you lose access to all your linked devices.
-  
-  # To use this file, go to ${window.location.origin}/recover/
-  
-  username: ${handle}
-  shovelkey: ${encodedAccessKey}
-  oddkey: ${encodedOddKey}
-  `;
+  const content = await account.recoveryKitContent()
   
   const data = new Blob([content], { type: 'text/plain' })
   var fileURL = window.URL.createObjectURL(data);
