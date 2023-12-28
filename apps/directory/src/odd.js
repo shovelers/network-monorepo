@@ -32,7 +32,9 @@ async function validSession() {
 }
 
 async function signup(username) {
-  await account.create(username);
+  await account.create(username,   [
+    {name: "directory.json", initialData: { membershipList: {} }}]
+  );
 
   const timeout = setTimeout(() => {
     clearTimeout(timeout)

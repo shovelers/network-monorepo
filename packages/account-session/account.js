@@ -47,11 +47,13 @@ export class Account {
     })
   }
 
-  async create(handle) {
+  async create(handle, initialFiles) {
     await this.store.createFissionUser(handle)
 
     await this.accountfs.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
-    await this.accountfs.updatePrivateFile("contacts.json", () => { return { contactList: {}, appleContacts: [], googleContacts: {} } })  
+    await initialFiles.forEach(async element => {
+      await this.accountfs.updatePrivateFile(element.name, () => { return element.initialData })
+    });
   }
 
   async signout(){

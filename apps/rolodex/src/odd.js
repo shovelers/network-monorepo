@@ -41,7 +41,10 @@ async function getSession(program) {
 }
 
 async function signup(username) {
-  await account.create(username);
+  await account.create(
+    username,
+    [{name: "contacts.json", initialData: { contactList: {}, appleContacts: [], googleContacts: {} }}]
+  );
 
   const timeout = setTimeout(() => {
     clearTimeout(timeout)
