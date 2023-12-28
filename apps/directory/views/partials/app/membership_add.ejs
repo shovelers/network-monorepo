@@ -1,0 +1,30 @@
+<script type="module">
+  import { addMembership } from '/odd.js';
+  window.addMembership = addMembership;
+</script>
+
+<button id="membership-add-btn" class="btn btn-outline btn-sm" onclick="membership_add_modal.showModal()">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M12.5 16a3.5 3.5 0 1 0 0-7a3.5 3.5 0 0 0 0 7Zm.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0Zm-2-6a3 3 0 1 1-6 0a3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4a2 2 0 0 0 0 4Z"/><path d="M8.256 14a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025c.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Z"/></g></svg>
+  Join
+</button>
+
+<dialog id="membership_add_modal" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Membership Details</h3>
+    <p class="text-xs">Press ESC key or click the button below to close</p>
+    <div class="modal-action flex justify-center items-center">
+      <form id="add-membership-form"
+        onsubmit="event.preventDefault(); await addMembership(); membership_add_modal.close(); clearFields(); return false"
+        class="text-center min-w-full px-4">
+        <div class="flex flex-row space-x-2 pt-4 justify-center">
+          <button type="submit" class="btn btn-outline btn-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M12 2h-2v3h2V2Z"/><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5V2.914a1.5 1.5 0 0 0-.44-1.06L14.147.439A1.5 1.5 0 0 0 13.086 0H1.5ZM4 6a1 1 0 0 1-1-1V1h10v4a1 1 0 0 1-1 1H4ZM3 9h10a1 1 0 0 1 1 1v5H2v-5a1 1 0 0 1 1-1Z"/></g></svg>
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="event.preventDefault(); membership_add_modal.close();">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8L4.646 5.354a.5.5 0 0 1 0-.708z"/></g></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</dialog>

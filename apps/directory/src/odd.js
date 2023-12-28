@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { ContactTable } from "./contact_table";
 import { Contact, ContactRepository } from "./contacts.js";
+import { Membership, Directory } from "./directory.js";
 import { Account , os  } from 'account-session';
 import { createBrowserNode, AccountFS } from 'account-fs'
 
@@ -21,7 +22,7 @@ window.shovel = {
 
 const contactRepo = new ContactRepository(accountfs)
 const account = new Account(os, accountfs)
-
+const directory = new Directory(accountfs, "test")
 
 customElements.define('contact-table', ContactTable);
 
@@ -80,6 +81,20 @@ async function deleteContact(id) {
   return contactRepo.delete(id)
 }
 
+async function addMembership() {
+  //get self profileCid and access key
+  let membership = new Membership()
+  return await directory.create(membership)
+}
+
+async function getMemberships() {
+  return await directory.list()
+}
+
+async function shareDirectory() {
+  return directory.share()
+}
+
 async function signout() {
   await account.signout()
 }
@@ -118,5 +133,8 @@ export {
   addContact, 
   editContact, 
   deleteContact, 
-  filterContacts 
+  filterContacts,
+  addMembership,
+  getMemberships,
+  shareDirectory 
 };
