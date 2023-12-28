@@ -1,6 +1,4 @@
 import _ from 'lodash';
-import { ContactTable } from "./contact_table";
-import { Contact, ContactRepository } from "./contacts.js";
 import { Membership, Directory, DirectoryPOJO, DirectoryReposistory } from "./directory.js";
 import { Account , os  } from 'account-session';
 import { createBrowserNode, AccountFS } from 'account-fs'
@@ -20,12 +18,9 @@ window.shovel = {
   odd: program
 }
 
-const contactRepo = new ContactRepository(accountfs)
 const account = new Account(os, accountfs)
 const directory = new Directory(accountfs, "test")
 const directoryRepo =  new DirectoryReposistory(accountfs)
-
-customElements.define('contact-table', ContactTable);
 
 async function validSession() {
   let session = await os.getSession()
@@ -44,45 +39,8 @@ async function signup(username) {
   }, 5000)
 }
 
-async function getContacts() {
-  return contactRepo.list()
-}
-
-async function filterContacts(filter) {
-  var contacts = await getContacts()
-  var filteredContacts = { "contactList": {}, "appleContacts": []}
-  for (var id in contacts.contactList) {
-    var contact = contacts.contactList[id]
-    if (contact.name.toLowerCase().includes(filter.toLowerCase()) || contact.tags.filter(tag => tag.toLowerCase().includes(filter.toLowerCase())).length > 0) {
-      filteredContacts.contactList[id] = contact
-    }
-    if (contact.text && contact.text.toLowerCase().includes(filter.toLowerCase())) {
-      filteredContacts.contactList[id] = contact
-    }
-    if (contact.links && contact.links.filter(link => link.toLowerCase().includes(filter.toLowerCase())).length > 0) {
-      filteredContacts.contactList[id] = contact
-    }
-  }
-  console.log("filtered contacts", filteredContacts)
-  return filteredContacts
-}
-
 async function updateProfile(handle, name, tags = [], text = '') {
   account.editProfile({handle: handle, name: name, tags: tags, text: text})
-}
-
-async function addContact(name, tags = [], text = "", links = []) {
-  let contact = new Contact({name: name, tags: tags, text: text, links: links})
-  return contactRepo.create(contact)
-}
-
-async function editContact(id, name, tags = [], text='', links = []) {
-  let contact = new Contact({id: id, name: name, tags: tags, text: text, links: links})
-  return contactRepo.edit(contact)
-}
-
-async function deleteContact(id) {
-  return contactRepo.delete(id)
 }
 
 async function createDirectory(name) {
@@ -143,11 +101,6 @@ export {
   updateProfile,
   createDirectory, 
   getDirectories,
-  getContacts, 
-  addContact, 
-  editContact, 
-  deleteContact, 
-  filterContacts,
   addMembership,
   getMemberships,
   shareDirectory 
