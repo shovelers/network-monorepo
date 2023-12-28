@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { ContactTable } from "./contact_table";
 import { Contact, ContactRepository } from "./contacts.js";
-import { Membership, Directory } from "./directory.js";
+import { Membership, Directory, DirectoryPOJO, DirectoryReposistory } from "./directory.js";
 import { Account , os  } from 'account-session';
 import { createBrowserNode, AccountFS } from 'account-fs'
 
@@ -23,6 +23,7 @@ window.shovel = {
 const contactRepo = new ContactRepository(accountfs)
 const account = new Account(os, accountfs)
 const directory = new Directory(accountfs, "test")
+const directoryRepo =  new DirectoryReposistory(accountfs)
 
 customElements.define('contact-table', ContactTable);
 
@@ -32,8 +33,9 @@ async function validSession() {
 }
 
 async function signup(username) {
-  await account.create(username,   [
-    {name: "directory.json", initialData: { membershipList: {} }}]
+  await account.create(username, [
+      {name: "directories.json", initialData: { directoryList: {} }}
+    ]
   );
 
   const timeout = setTimeout(() => {
@@ -83,6 +85,14 @@ async function deleteContact(id) {
   return contactRepo.delete(id)
 }
 
+async function createDirectory(name) {
+  return await directoryRepo.create(new DirectoryPOJO({name: name}))
+}
+
+async function getDirectories() {
+  return await directoryRepo.list()
+}
+
 async function addMembership() {
   //get self profileCid and access key
   let membership = new Membership()
@@ -130,7 +140,9 @@ export {
   signout, 
   generateRecoveryKit, 
   recover,
-  updateProfile, 
+  updateProfile,
+  createDirectory, 
+  getDirectories,
   getContacts, 
   addContact, 
   editContact, 

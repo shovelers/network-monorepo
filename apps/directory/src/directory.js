@@ -22,7 +22,7 @@ export class Membership {
 export class Directory {
   constructor(accountfs, name) {
     this.store = accountfs;
-    this.filename = `${name}.json`;
+    this.filename = `directory-${name}.json`;
   }
 
   async list() {
@@ -30,8 +30,6 @@ export class Directory {
   }
 
   async create(membership) {
-    await this.store.updatePrivateFile(this.filename, () => { return { membershipList: {}} })
-    
     await this.store.updatePrivateFile(this.filename, (content) => {
       content.membershipList[membership.id] = membership.asJSON()
       return content
@@ -40,5 +38,42 @@ export class Directory {
 
   async share() {
     return this.store.shareFile(this.filename)
+  }
+}
+
+export class DirectoryPOJO {
+  constructor(args) {
+    let defaults = {id: crypto.randomUUID(), name: undefined, archived: false}
+    let params = {...defaults, ...args}
+
+    this.id = params.id
+    this.name = params.name
+    this.archived = params.archived
+  }
+
+  asJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      archived: this.archived
+    }
+  }
+}
+
+export class DirectoryReposistory {
+  constructor(accountfs) {
+    this.accountfs = accountfs
+    this.filename = "directories.json"
+  }
+
+  async list() {
+    return this.accountfs.readPrivateFile(this.filename)
+  }
+
+  async create(directory) {
+    await this.accountfs.updatePrivateFile(this.filename, (content) => {
+      content.directoryList[directory.id] = directory.asJSON()
+      return content
+    })
   }
 }
