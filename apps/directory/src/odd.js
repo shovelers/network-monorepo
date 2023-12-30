@@ -51,6 +51,10 @@ async function getDirectories() {
   return await directoryRepo.list()
 }
 
+async function getDirectoryByID(id) {
+  return {}
+}
+
 async function addMembership() {
   //get self profileCid and access key
   let membership = new Membership()
@@ -93,6 +97,7 @@ async function recover(kit) {
 
 export { 
   account,
+  directoryRepo,
   validSession,
   signup, 
   signout, 
@@ -100,6 +105,7 @@ export {
   recover,
   updateProfile,
   createDirectory, 
+  getDirectoryByID,
   getDirectories,
   addMembership,
   getMemberships,

@@ -57,6 +57,12 @@ export class AccountFS {
     }
   }
 
+  async getAccessKeyForPrivateFile(filename) {
+    let forest_cid = await this.kvStore.getItem(SHOVEL_FS_FOREST_CID)
+    let access_key = await this.fs.accessKeyForPrivateFile(filename)
+    return [access_key, forest_cid]
+  }
+
   async updatePrivateFile(filename, mutationFunction) {
     let content = await this.readPrivateFile(filename)
     let newContent = mutationFunction(content)

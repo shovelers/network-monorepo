@@ -1,3 +1,5 @@
+import * as uint8arrays from 'uint8arrays';
+
 export class Membership {
   constructor(args) {
     let defaults = {id: crypto.randomUUID(), profileCid: "testcid", accessKey: "testaccesskey", archived: false}
@@ -49,6 +51,7 @@ export class DirectoryPOJO {
     this.id = params.id
     this.name = params.name
     this.archived = params.archived
+    this.filename = `directory-${params.name}.json`
   }
 
   asJSON() {
@@ -67,7 +70,15 @@ export class DirectoryReposistory {
   }
 
   async list() {
-    return this.accountfs.readPrivateFile(this.filename)
+    let data = await this.accountfs.readPrivateFile(this.filename)
+    return Object.values(data.directoryList).map( element => new DirectoryPOJO(element))
+  }
+
+  async getLink(directory) {
+    const [accessKey, forestCID] = await this.accountfs.getAccessKeyForPrivateFile(directory.filename)
+    const encodedAccessKey = uint8arrays.toString(accessKey.toBytes(), 'base64url');
+    const encodedForestCID = uint8arrays.toString(forestCID, 'base64url')
+    return `/directory/${directory.id}?cid=${encodedForestCID}&key=${encodedAccessKey}`
   }
 
   async create(directory) {
@@ -75,5 +86,7 @@ export class DirectoryReposistory {
       content.directoryList[directory.id] = directory.asJSON()
       return content
     })
+
+    await this.accountfs.updatePrivateFile(directory.filename, () => { return {} })
   }
 }

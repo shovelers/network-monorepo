@@ -1,5 +1,16 @@
 <script type="module">
-  import { getMemberships } from '/odd.js';
+  import { getMemberships, getDirectories, directoryRepo } from '/odd.js';
+
+  window.refreshDirectories = function(){
+    getDirectories().then(async (result) => {
+      await result.forEach(async element => {
+        console.log(element)
+        element.link = await directoryRepo.getLink(element)
+        document.querySelector("#directory-list").innerHTML = document.querySelector("#directory-list").innerHTML + JSON.stringify(element)
+      });
+    })
+  }
+  refreshDirectories();
 
   window.refreshMemberships = function(){
     getMemberships().then((result) => {

@@ -78,4 +78,13 @@ export class PrivateFS {
 
     return new TextDecoder().decode(content.result)
   }
+
+  async accessKeyForPrivateFile(filename) {
+    let file = this.path.concat(filename)
+
+    var node = await this.rootDir.getNode(file, true, this.forest, this.store)
+    var [accessKey, forest ] = await node.store(this.forest, this.store, this.rng)
+
+    return accessKey
+  }
 }
