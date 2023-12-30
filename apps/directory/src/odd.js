@@ -2,6 +2,9 @@ import _ from 'lodash';
 import { Membership, Directory, DirectoryPOJO, DirectoryReposistory } from "./directory.js";
 import { Account , os  } from 'account-session';
 import { createBrowserNode, AccountFS } from 'account-fs'
+import { DirectoryTable } from './directory_table.js';
+
+customElements.define('directory-table', DirectoryTable);
 
 const SHOVEL_FS_SYNC_HOST = import.meta.env.VITE_SHOVEL_FS_SYNC_HOST || "http://localhost:3000"
 const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"

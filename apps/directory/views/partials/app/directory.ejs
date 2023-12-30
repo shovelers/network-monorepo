@@ -3,11 +3,7 @@
 
   window.refreshDirectories = function(){
     getDirectories().then(async (result) => {
-      await result.forEach(async element => {
-        console.log(element)
-        element.link = await directoryRepo.getLink(element)
-        document.querySelector("#directory-list").innerHTML = document.querySelector("#directory-list").innerHTML + JSON.stringify(element)
-      });
+      document.querySelector('directory-table').directories = result;
     })
   }
   refreshDirectories();
@@ -20,6 +16,8 @@
   refreshMemberships();
 </script>
 
-<div id="directory-list" class="overflow-x-auto w-full px-4"></div>
+<div id="directory-list-table" class="overflow-x-auto w-full px-4">
+  <directory-table></directory-table>
+</div>
 <div id="membership-list" class="overflow-x-auto w-full px-4">
 </div>

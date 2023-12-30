@@ -71,7 +71,11 @@ export class DirectoryReposistory {
 
   async list() {
     let data = await this.accountfs.readPrivateFile(this.filename)
-    return Object.values(data.directoryList).map( element => new DirectoryPOJO(element))
+    let directories = Object.values(data.directoryList).map(element => new DirectoryPOJO(element))
+    for(let step = 0; step < directories.length; step++) {
+      directories[step].link = await this.getLink(directories[step])
+    }
+    return directories
   }
 
   async getLink(directory) {
