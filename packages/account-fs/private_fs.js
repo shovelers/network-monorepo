@@ -88,3 +88,22 @@ export class PrivateFS {
     return accessKey
   }
 }
+
+export class PrivateFile {
+  constructor(node) {
+    this.store = new WnfsBlockstore(node)
+  }
+
+  async read(accessKey, forestCID) {
+    const key = AccessKey.fromBytes(accessKey)
+    const forest = await PrivateForest.load(forestCID, this.store)
+    console.log("loaded forest:", forest)
+
+    var node = await PrivateNode.load(key, forest, this.store)
+    console.log("loaded node:", node)
+
+    var file = await node.asFile(forest, this.store)
+
+    return file.getContent(forest, this.store)
+  }
+}

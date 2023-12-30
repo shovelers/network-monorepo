@@ -1,8 +1,9 @@
 import _ from 'lodash';
 import { Membership, Directory, DirectoryPOJO, DirectoryReposistory } from "./directory.js";
 import { Account , os  } from 'account-session';
-import { createBrowserNode, AccountFS } from 'account-fs'
+import { createBrowserNode, AccountFS, PrivateFile } from 'account-fs'
 import { DirectoryTable } from './directory_table.js';
+import * as uint8arrays from 'uint8arrays';
 
 customElements.define('directory-table', DirectoryTable);
 
@@ -54,8 +55,14 @@ async function getDirectories() {
   return await directoryRepo.list()
 }
 
-async function getDirectoryByID(id) {
-  return {}
+async function getDirectory(cid, key) {
+  const decodedAccessKey = uint8arrays.fromString(key, 'base64url');
+  const decodedForestCID = uint8arrays.fromString(cid, 'base64url')
+
+  const directory = new PrivateFile(helia)
+  const content = await directory.read(decodedAccessKey, decodedForestCID)
+  
+  return {content: content}
 }
 
 async function addMembership() {
@@ -108,7 +115,7 @@ export {
   recover,
   updateProfile,
   createDirectory, 
-  getDirectoryByID,
+  getDirectory,
   getDirectories,
   addMembership,
   getMemberships,
