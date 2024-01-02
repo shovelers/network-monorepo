@@ -67,6 +67,7 @@ export async function createBrowserNode() {
 }
 
 export async function dial(node, peer) {
+  console.log("dialing", peer)
   const connection = await node.libp2p.dial(multiaddr(peer));
   const latency = await node.libp2p.services.ping.ping(multiaddr(peer))
   console.log("latency:", latency)
