@@ -40,7 +40,7 @@ export async function createNode(type, blockstore, datastore, config) {
   if (type == STANDALONE) {
     libp2pconfig.addresses = { listen: ['/ip4/0.0.0.0/tcp/3001/ws'] }
     libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
-    libp2pconfig.metrics = config.metrics
+    //libp2pconfig.metrics = config.metrics
   }
 
   const libp2p = await createLibp2p(libp2pconfig)
