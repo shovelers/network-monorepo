@@ -43,6 +43,15 @@ async function signup(username) {
   }, 5000)
 }
 
+async function createAccountAndJoin(username, name) {
+  console.log("account", username, name)
+  await account.create(username, [
+      {name: "directories.json", initialData: { directoryList: {} }}
+    ]
+  );
+  await account.editProfile({name: name}) 
+}
+
 async function updateProfile(handle, name, tags = [], text = '') {
   account.editProfile({handle: handle, name: name, tags: tags, text: text})
 }
@@ -61,7 +70,7 @@ async function getDirectory(cid, key) {
 
   const directory = new PrivateFile(helia)
   const content = await directory.read(decodedAccessKey, decodedForestCID)
-  
+
   return {content: content}
 }
 
@@ -108,6 +117,7 @@ async function recover(kit) {
 export { 
   account,
   directoryRepo,
+  createAccountAndJoin,
   validSession,
   signup, 
   signout, 
