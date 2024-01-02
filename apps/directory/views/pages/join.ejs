@@ -12,7 +12,7 @@
       window.addMembership = addMembership;
 
       let params = (new URL(document.location)).searchParams;
-      joinDirectory(window.location.pathname.split('/').slice(-2)[0], params.get("cid"), params.get("key")).then((result) => {
+      joinDirectory(window.location.pathname.split('/').slice(-2)[0], params.get("key"), params.get("cid")).then((result) => {
         document.querySelector("#directory-list").innerHTML = JSON.stringify(result)
       })
     </script>

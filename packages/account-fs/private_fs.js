@@ -97,13 +97,13 @@ export class PrivateFile {
   async read(accessKey, forestCID) {
     const key = AccessKey.fromBytes(accessKey)
     const forest = await PrivateForest.load(forestCID, this.store)
-    console.log("loaded forest:", forest)
 
     var node = await PrivateNode.load(key, forest, this.store)
     console.log("loaded node:", node)
 
     var file = await node.asFile(forest, this.store)
 
-    return file.getContent(forest, this.store)
+    var content = await file.getContent(forest, this.store)
+    return new TextDecoder().decode(content)
   }
 }

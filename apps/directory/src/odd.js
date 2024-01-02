@@ -83,6 +83,16 @@ async function getDirectory(cid, key) {
 
   const directory = new PrivateFile(helia)
   const content = await directory.read(decodedAccessKey, decodedForestCID)
+  const members = JSON.parse(content)
+
+  const memberProfile = new PrivateFile(helia)
+  await Object.values(members).forEach(async (m) => {
+    const profileContent =  await memberProfile.read(
+      uint8arrays.fromString(m.accessKey, 'base64url'),
+      uint8arrays.fromString(m.profileCid, 'base64url')
+    )
+    console.log("member profile", profileContent)
+  })
 
   return {content: content}
 }
