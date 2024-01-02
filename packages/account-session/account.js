@@ -56,6 +56,13 @@ export class Account {
     });
   }
 
+  async getLink() {
+    const [accessKey, forestCID] = await this.accountfs.getAccessKeyForPrivateFile(this.filename)
+    const encodedAccessKey = uint8arrays.toString(accessKey.toBytes(), 'base64url');
+    const encodedForestCID = uint8arrays.toString(forestCID, 'base64url')
+    return [encodedAccessKey, encodedForestCID]
+  }
+
   async signout(){
     let session = await this.store.getSession()
     await session.destroy()

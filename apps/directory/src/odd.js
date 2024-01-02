@@ -50,6 +50,19 @@ async function createAccountAndJoin(username, name) {
     ]
   );
   await account.editProfile({name: name}) 
+
+  const [accessKey, forestCID] = await account.getLink()
+
+  const link = `${window.location.origin}/directory/${window.location.pathname.split('/').pop()}/join?cid=${forestCID}&key=${accessKey}`
+  console.log("join link", link)
+  return link
+}
+
+async function joinDirectory(directoryID, accessKey, forestCID) {
+  let directory = await directoryRepo.getByID(directoryID)
+  if (directory) {
+    await directoryRepo.join(directory, accessKey, forestCID)
+  }
 }
 
 async function updateProfile(handle, name, tags = [], text = '') {
@@ -119,6 +132,7 @@ export {
   directoryRepo,
   createAccountAndJoin,
   validSession,
+  joinDirectory,
   signup, 
   signout, 
   generateRecoveryKit, 

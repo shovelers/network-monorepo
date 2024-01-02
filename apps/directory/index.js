@@ -25,6 +25,10 @@ server.get("/app", (req, res) => {
   res.render('pages/app')
 });
 
+server.get("/directory/:id/join", (req, res) => {
+  res.render('pages/join')
+})
+
 server.get("/directory/:id", (req, res) => {
   res.render('pages/directory')
 })

@@ -78,11 +78,24 @@ export class DirectoryReposistory {
     return directories
   }
 
+  async getByID(id) {
+    let data = await this.list()
+    return data.filter((element) => element.id == id)[0]
+  }
+
   async getLink(directory) {
     const [accessKey, forestCID] = await this.accountfs.getAccessKeyForPrivateFile(directory.filename)
     const encodedAccessKey = uint8arrays.toString(accessKey.toBytes(), 'base64url');
     const encodedForestCID = uint8arrays.toString(forestCID, 'base64url')
     return `/directory/${directory.id}?cid=${encodedForestCID}&key=${encodedAccessKey}`
+  }
+
+  async join(directory, accessKey, forestCID) {
+    let membership = new Membership({profileCid: forestCID, accessKey: accessKey})
+    this.accountfs.updatePrivateFile(directory.filename, (content) => {
+      content[membership.id] = membership.asJSON()
+      return content
+    })
   }
 
   async create(directory) {
