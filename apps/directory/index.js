@@ -52,7 +52,8 @@ server.post("/directory/:id/request", async (req, res) => {
 
 server.get("/directory/:id/requests", async (req, res) => {
   var data = await redisClient.lRange(req.params.id, 0, -1)
-  res.status(200).json(data)
+  console.log(data)
+  res.render('pages/requests', { data: data })
 })
 
 server.listen(port, (err) => {

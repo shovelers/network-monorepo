@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="/styles/style.css" />
+  <link rel="icon" href="/favicon.ico">
+</head>
+
+  <body class="antialiased bg-base-100">
+    <script type="module">
+      import {joinDirectory} from '/odd.js';
+      window.joinDirectory = joinDirectory
+
+      var data = "<%= data %>"
+      window.key = data.split(':')[0]
+      window.cid = data.split(':')[1]
+    </script>
+
+    <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
+      <div class="w-full h-5/6 p-4 text-center flex flex-row justify-evenly">
+        <div class="py-4 overflow-hidden">
+          <div class="flex flex-col justify-center max-h-full py-4 overflow-y-auto">
+            <div id="request-list"><%= data %></div>
+            <button id="request-accept-btn" class="btn btn-outline btn-sm" onclick="joinDirectory(window.location.pathname.split('/').slice(-2)[0], key, cid)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M12.5 16a3.5 3.5 0 1 0 0-7a3.5 3.5 0 0 0 0 7Zm.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0Zm-2-6a3 3 0 1 1-6 0a3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4a2 2 0 0 0 0 4Z"/><path d="M8.256 14a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025c.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Z"/></g></svg>
+              Accept
+            </button>
+          </div>
+        </div>
+      </div>
+      <%- include('../partials/shovel.ejs') %>
+    </div>
+  </body>
+
+</html>
