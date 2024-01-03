@@ -1,3 +1,4 @@
+import axios from 'axios';
 import _ from 'lodash';
 import { Membership, Directory, DirectoryPOJO, DirectoryReposistory } from "./directory.js";
 import { Account , os  } from 'account-session';
@@ -9,6 +10,10 @@ customElements.define('directory-table', DirectoryTable);
 
 const SHOVEL_FS_SYNC_HOST = import.meta.env.VITE_SHOVEL_FS_SYNC_HOST || "http://localhost:3000"
 const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
+
+const axios_client  = axios.create({
+  baseURL: `${window.location.origin}`,
+})
 
 const helia = await createBrowserNode()
 
@@ -55,6 +60,12 @@ async function createAccountAndJoin(username, name) {
 
   const link = `${window.location.origin}/directory/${window.location.pathname.split('/').pop()}/join?cid=${forestCID}&key=${accessKey}`
   console.log("join link", link)
+
+  await axios_client.post(`/directory/${window.location.pathname.split('/').pop()}/request`, { forestCID: forestCID, accessKey: accessKey } )
+  .then(function (response) {
+    console.log(response);
+  });
+
   return link
 }
 
