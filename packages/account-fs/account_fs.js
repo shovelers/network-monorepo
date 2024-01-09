@@ -18,8 +18,8 @@ export class AccountFS {
   }
 
   async load(){
-    let access_key = await this.kvStore.getItem(SHOVEL_FS_ACCESS_KEY)
-    let forest_cid = await this.kvStore.getItem(SHOVEL_FS_FOREST_CID)
+    let access_key = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
+    let forest_cid = await this.helia.datastore.get(new Key(SHOVEL_FS_FOREST_CID))
 
     await this.startSync()
 
@@ -32,9 +32,6 @@ export class AccountFS {
     let forest_cid = await this.getForestCidForHandle(handle)
     forest_cid = CID.parse(forest_cid).bytes
 
-    await this.kvStore.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
-    await this.kvStore.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
-    
     await this.helia.datastore.put(new Key(SHOVEL_FS_ACCESS_KEY), access_key)
     await this.helia.datastore.put(new Key(SHOVEL_FS_FOREST_CID), forest_cid)
 
@@ -63,7 +60,7 @@ export class AccountFS {
   }
 
   async getAccessKeyForPrivateFile(filename) {
-    let forest_cid = await this.kvStore.getItem(SHOVEL_FS_FOREST_CID)
+    let forest_cid = await this.helia.datastore.get(new Key(SHOVEL_FS_FOREST_CID))
     let access_key = await this.fs.accessKeyForPrivateFile(filename)
     return [access_key, forest_cid]
   }
@@ -72,8 +69,6 @@ export class AccountFS {
     let content = await this.readPrivateFile(filename)
     let newContent = mutationFunction(content)
     var [access_key, forest_cid] = await this.fs.write(filename, JSON.stringify(newContent))
-    await this.kvStore.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
-    await this.kvStore.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
 
     await this.helia.datastore.put(new Key(SHOVEL_FS_ACCESS_KEY), access_key)
     await this.helia.datastore.put(new Key(SHOVEL_FS_FOREST_CID), forest_cid)
