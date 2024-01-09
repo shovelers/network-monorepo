@@ -2,6 +2,7 @@ import { PrivateFS } from "./private_fs.js"
 import { dial } from './helia_node.js'
 import axios from 'axios'
 import { CID } from 'multiformats/cid'
+import { Key } from 'interface-datastore';
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
@@ -33,6 +34,10 @@ export class AccountFS {
 
     await this.kvStore.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
     await this.kvStore.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
+    
+    await this.helia.datastore.put(new Key(SHOVEL_FS_ACCESS_KEY), access_key)
+    await this.helia.datastore.put(new Key(SHOVEL_FS_FOREST_CID), forest_cid)
+
     await this.load()
   }
 
@@ -69,6 +74,10 @@ export class AccountFS {
     var [access_key, forest_cid] = await this.fs.write(filename, JSON.stringify(newContent))
     await this.kvStore.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
     await this.kvStore.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
+
+    await this.helia.datastore.put(new Key(SHOVEL_FS_ACCESS_KEY), access_key)
+    await this.helia.datastore.put(new Key(SHOVEL_FS_FOREST_CID), forest_cid)
+
     this.pin(forest_cid)
     return newContent
   }
