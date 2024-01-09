@@ -7,26 +7,29 @@ import * as uint8arrays from 'uint8arrays';
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
-const USERNAME_STORAGE_KEY = "fullUsername"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 
 export class AccountFS {
-  constructor(helia, kvStore, network, syncHost){
+  constructor(helia, network, syncHost){
     this.helia = helia
     this.fs = new PrivateFS(helia)
-    this.kvStore = kvStore
     this.prefix = (network == "TESTNET") ? "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/" : "/ip4/127.0.0.1/tcp/3001/ws/p2p/"
     this.axios_client  = axios.create({baseURL: syncHost})
   }
 
   async load(){
-    let access_key = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
-    let forest_cid = await this.helia.datastore.get(new Key(SHOVEL_FS_FOREST_CID))
-
     await this.startSync()
 
-    if (access_key && forest_cid){
-      await this.fs.loadForest(access_key, forest_cid)
+    try {
+      let access_key = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
+      let forest_cid = await this.helia.datastore.get(new Key(SHOVEL_FS_FOREST_CID))
+
+      if (access_key && forest_cid){
+        await this.fs.loadForest(access_key, forest_cid)
+      }
+    } catch (err) {
+      console.log("missing datastore keys, need an account")
+      return 
     }
   }
 
@@ -81,9 +84,9 @@ export class AccountFS {
 
   async pin(forest_cid) {
     let cid = CID.decode(forest_cid).toString()
-    // Remove following coupling with odd sdk
+    // Need to model handle as first class citizen on network
     let handle = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
-    handle = uint8arrays.toString(handle, 'base64pad')
+    handle = uint8arrays.toString(handle)
     await this.axios_client.post('/pin', { cid: cid, handle: handle }).then(async (response) => {
       console.log(response.status)
     }).catch((e) => {

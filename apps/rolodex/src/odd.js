@@ -12,7 +12,7 @@ const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 const helia = await createBrowserNode()
 
 let program = await os.getProgram()
-const accountfs = new AccountFS(helia, program.components.storage, NETWORK, SHOVEL_FS_SYNC_HOST)
+const accountfs = new AccountFS(helia, NETWORK, SHOVEL_FS_SYNC_HOST)
 await accountfs.load()
 
 window.shovel = {

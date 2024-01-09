@@ -8,6 +8,7 @@ import { Key } from 'interface-datastore';
 const USERNAME_STORAGE_KEY = "fullUsername"
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
+const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 
 export class AccountSession {
   constructor(os, helia) {
@@ -16,8 +17,14 @@ export class AccountSession {
   }
 
   async registerUser(handle) {
-    let encodeddHandle = uint8arrays.fromString(handle, 'base64pad');
+    let encodeddHandle = uint8arrays.fromString(handle);
     await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
+  }
+
+  async destroy() {
+    await this.helia.datastore.delete(new Key(SHOVEL_FS_ACCESS_KEY))
+    await this.helia.datastore.delete(new Key(SHOVEL_ACCOUNT_HANDLE))
+    await this.helia.datastore.delete(new Key(SHOVEL_FS_FOREST_CID))
   }
 
   async recoveryKitData(){

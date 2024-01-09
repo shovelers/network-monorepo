@@ -66,6 +66,7 @@ export class Account {
   }
 
   async signout(){
+    await this.accountSession.destroy()
     let session = await this.store.getSession()
     await session.destroy()
   }
