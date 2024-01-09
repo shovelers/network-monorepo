@@ -3,10 +3,12 @@ import { dial } from './helia_node.js'
 import axios from 'axios'
 import { CID } from 'multiformats/cid'
 import { Key } from 'interface-datastore';
+import * as uint8arrays from 'uint8arrays';
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const USERNAME_STORAGE_KEY = "fullUsername"
+const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 
 export class AccountFS {
   constructor(helia, kvStore, network, syncHost){
@@ -80,7 +82,8 @@ export class AccountFS {
   async pin(forest_cid) {
     let cid = CID.decode(forest_cid).toString()
     // Remove following coupling with odd sdk
-    let handle = (await this.kvStore.getItem(USERNAME_STORAGE_KEY)).split('#')[0] 
+    let handle = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
+    handle = uint8arrays.toString(handle, 'base64pad')
     await this.axios_client.post('/pin', { cid: cid, handle: handle }).then(async (response) => {
       console.log(response.status)
     }).catch((e) => {
