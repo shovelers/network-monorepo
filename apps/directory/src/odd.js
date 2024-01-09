@@ -24,6 +24,7 @@ await accountfs.load()
 window.shovel = {
   helia: helia,
   fs: accountfs,
+  uint8arrays: uint8arrays,
   odd: program
 }
 
