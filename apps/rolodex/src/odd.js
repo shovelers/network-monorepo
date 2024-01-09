@@ -15,13 +15,14 @@ let program = await os.getProgram()
 const accountfs = new AccountFS(helia, NETWORK, SHOVEL_FS_SYNC_HOST)
 await accountfs.load()
 
+const accountSession =  new AccountSession(os, helia)
+
 window.shovel = {
   helia: helia,
   fs: accountfs,
+  session: accountSession,
   odd: program
 }
-
-const accountSession =  new AccountSession(os, helia)
 
 const contactRepo = new ContactRepository(accountfs)
 const account = new Account(os, accountfs, accountSession)
