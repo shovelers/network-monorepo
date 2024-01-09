@@ -24,9 +24,10 @@ class Profile {
 }
 
 export class Account {
-  constructor(os, accountfs) {
+  constructor(os, accountfs, accountSession) {
     this.store = os
     this.accountfs = accountfs
+    this.accountSession = accountSession
     this.filename = "profile.json"
     this.profile = null
   }
@@ -70,7 +71,7 @@ export class Account {
 
   async recoveryKitContent() {
     let oddAccessKey = await this.store.getOddAccessKey()
-    var { accessKey, handle, fissionusername } = await this.store.recoveryKitData()
+    var { accessKey, handle, fissionusername } = await this.accountSession.recoveryKitData()
     const encodedAccessKey = uint8arrays.toString(accessKey, 'base64pad');
     return RecoveryKit.toYML(fissionusername, encodedAccessKey, oddAccessKey)
   }

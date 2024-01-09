@@ -7,6 +7,20 @@ import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 const USERNAME_STORAGE_KEY = "fullUsername"
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 
+export class AccountSession {
+  constructor(os, helia) {
+    this.os = os
+    this.helia = helia
+  }
+
+  async recoveryKitData(){
+    let program = await os.getProgram()
+    let ak = await program.components.storage.getItem(SHOVEL_FS_ACCESS_KEY)
+    let fu = await program.components.storage.getItem(USERNAME_STORAGE_KEY) 
+    return {accessKey: ak, handle: fu.split('#')[0], fissionusername: fu}
+  }
+}
+
 class OddSession {
   constructor(odd) {
     this.odd = odd;
@@ -39,13 +53,6 @@ class OddSession {
       return p.session;
     }
     return;
-  }
-
-  async recoveryKitData(){
-    let program = await this.getProgram()
-    let ak = await program.components.storage.getItem(SHOVEL_FS_ACCESS_KEY)
-    let fu = await program.components.storage.getItem(USERNAME_STORAGE_KEY) 
-    return {accessKey: ak, handle: fu.split('#')[0], fissionusername: fu}
   }
 
   async getOddAccessKey(){

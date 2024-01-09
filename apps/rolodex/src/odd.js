@@ -3,7 +3,7 @@ import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
 import { Contact, ContactRepository } from "./contacts.js";
-import { Account , os  } from 'account-session';
+import { Account, os, AccountSession  } from 'account-session';
 import { createBrowserNode, AccountFS } from 'account-fs'
 
 const SHOVEL_FS_SYNC_HOST = import.meta.env.VITE_SHOVEL_FS_SYNC_HOST || "http://localhost:3000"
@@ -21,8 +21,10 @@ window.shovel = {
   odd: program
 }
 
+const accountSession =  new AccountSession(os, helia)
+
 const contactRepo = new ContactRepository(accountfs)
-const account = new Account(os, accountfs)
+const account = new Account(os, accountfs, accountSession)
 
 customElements.define('contact-table', ContactTable);
 
