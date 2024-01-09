@@ -4,7 +4,8 @@ import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
 import { Contact, ContactRepository } from "./contacts.js";
 import { Account, os, AccountSession  } from 'account-session';
-import { createBrowserNode, AccountFS } from 'account-fs'
+import { createBrowserNode, AccountFS } from 'account-fs';
+import { Key } from 'interface-datastore';
 
 const SHOVEL_FS_SYNC_HOST = import.meta.env.VITE_SHOVEL_FS_SYNC_HOST || "http://localhost:3000"
 const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
@@ -21,7 +22,8 @@ window.shovel = {
   helia: helia,
   fs: accountfs,
   session: accountSession,
-  odd: program
+  odd: program,
+  Key: Key
 }
 
 const contactRepo = new ContactRepository(accountfs)
