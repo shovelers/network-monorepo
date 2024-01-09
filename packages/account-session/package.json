@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "interface-datastore": "^8.2.9",
     "@oddjs/odd": "^0.37.2"
   }
 }

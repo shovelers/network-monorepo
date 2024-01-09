@@ -3,6 +3,7 @@ import { retrieve } from '@oddjs/odd/common/root-key';
 import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
+import { Key } from 'interface-datastore';
 
 const USERNAME_STORAGE_KEY = "fullUsername"
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
@@ -15,7 +16,7 @@ export class AccountSession {
 
   async recoveryKitData(){
     let program = await os.getProgram()
-    let ak = await program.components.storage.getItem(SHOVEL_FS_ACCESS_KEY)
+    let ak = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
     let fu = await program.components.storage.getItem(USERNAME_STORAGE_KEY) 
     return {accessKey: ak, handle: fu.split('#')[0], fissionusername: fu}
   }
