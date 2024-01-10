@@ -72,8 +72,10 @@ class OddSession {
   async createFissionUser(handle) {
     this.program = await this.getProgram()
     await this.program.components.storage.removeItem(USERNAME_STORAGE_KEY)
+
     var fissionusername = await this.fissionUsernames(handle);
     var hashedUsername = fissionusername.hashed;
+    await this.program.components.storage.setItem(USERNAME_STORAGE_KEY, fissionusername.full)
 
     const valid = await this.program.auth.isUsernameValid(hashedUsername);
     const available = await this.program.auth.isUsernameAvailable(hashedUsername);
@@ -100,12 +102,9 @@ class OddSession {
   async fissionUsernames(username) {
     let program = await this.getProgram()
     console.log(program)
-    let fullUsername = await program.components.storage.getItem(USERNAME_STORAGE_KEY)
-    if (!fullUsername) {
-      const did = await this.createDID(program.components.crypto)
-      fullUsername = `${username}#${did}`
-      await program.components.storage.setItem(USERNAME_STORAGE_KEY, fullUsername)
-    }
+
+    const did = await this.createDID(program.components.crypto)
+    let fullUsername = `${username}#${did}`
   
     var hashedUsername = await this.prepareUsername(fullUsername);
     return {full: fullUsername, hashed: hashedUsername} 
