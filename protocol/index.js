@@ -13,6 +13,11 @@ import { createStandaloneNode } from 'account-fs/standalone.js';
 import morgan from 'morgan';
 import client from 'prom-client'
 import { Key } from 'interface-datastore';
+import { createClient } from 'redis';
+
+const redisURL = process.env.REDIS_URL || "redis://localhost:6379"
+const redisClient =  createClient({ url: redisURL });
+await redisClient.connect()
 
 const port = process.argv[2] || 3000;
 const peer = process.argv[3];
@@ -85,6 +90,32 @@ server.post('/pin', async (req, res) => {
   var pin = await node.pins.add(cid)
   console.log("pin", pin, cid)
   res.status(201).json({})
+});
+
+class Accounts {
+  constructor(redis) {
+    this.redis =  redis
+  }
+
+  async create(fullname) {
+    return await this.redis.sAdd("accounts", fullname)
+  }
+
+  async isMember(fullname) {
+    return await this.redis.sIsMember("accounts", fullname)
+  }
+}
+const accounts = new Accounts(redisClient)
+
+server.post("/accounts", async (req, res) => {
+  var fullname = req.body.fullname
+  const taken = await accounts.isMember(fullname)
+  if (taken) {
+    res.status(400).json({error: "User name taken"})
+  } else {
+    accounts.create(fullname)
+    res.status(201).json({})
+  }
 });
 
 server.get("/forestCID/:handle", async (req, res) => {

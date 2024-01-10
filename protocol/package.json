@@ -29,6 +29,7 @@
     "morgan": "^1.10.0",
     "multiaddr": "^10.0.1",
     "multiformats": "^12.1.0",
+    "redis": "^4.6.12",
     "prom-client": "^15.1.0",
     "account-fs": "*",
     "tailwindcss": "^3.3.2"
