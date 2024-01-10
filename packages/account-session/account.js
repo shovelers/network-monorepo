@@ -72,16 +72,16 @@ export class Account {
   }
 
   async recoveryKitContent() {
-    var { accessKey, handle, fissionusername } = await this.accountSession.recoveryKitData()
+    var { accessKey, handle } = await this.accountSession.recoveryKitData()
     const encodedAccessKey = uint8arrays.toString(accessKey, 'base64pad');
-    return RecoveryKit.toYML(fissionusername, encodedAccessKey)
+    return RecoveryKit.toYML(handle, encodedAccessKey)
   }
 
   async recover(content){
     var data = RecoveryKit.parseYML(content)
 
     var shovelKey = uint8arrays.fromString(data.shovelkey, 'base64pad'); 
-    var handle = data.fissionusername.split("#")[0]
+    var handle = data.handle
 
     await this.store.createFissionUser(handle)
     await this.accountfs.recover(handle, shovelKey)
@@ -89,7 +89,7 @@ export class Account {
 }
 
 class RecoveryKit {
-  static toYML(fissionusername, encodedAccessKey){
+  static toYML(handle, encodedAccessKey){
     return `
   # This is your recovery kit. (It's a yaml text file)
   # Store this somewhere safe.
@@ -97,15 +97,15 @@ class RecoveryKit {
   # Losing it means you won't be able to recover your account
   # in case you lose access to all your linked devices.
   
-  username: ${fissionusername}
+  username: ${handle}
   shovelkey: ${encodedAccessKey}
   `;
   }
 
   static parseYML(content) {
-    var fissionusername = content.toString().split("username: ")[1].split("\n")[0]
+    var handle = content.toString().split("username: ")[1].split("\n")[0]
     var shovelKey = content.toString().split("shovelkey: ")[1].split("\n")[0]
 
-    return {fissionusername: fissionusername, shovelkey: shovelKey}
+    return {handle: handle, shovelkey: shovelKey}
   }
 }

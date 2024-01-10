@@ -1,11 +1,9 @@
 import * as odd from "@oddjs/odd";
-import { retrieve } from '@oddjs/odd/common/root-key';
 import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 import { Key } from 'interface-datastore';
 
-const USERNAME_STORAGE_KEY = "fullUsername"
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
@@ -17,14 +15,11 @@ export class AccountSession {
   }
 
   async registerUser(handle) {
-    let program = await os.getProgram()
-
     let encodeddHandle = uint8arrays.fromString(handle);
     await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
 
     const did = await this.agentDID()
     const fullname = `${handle}#${did}`
-    await program.components.storage.setItem(USERNAME_STORAGE_KEY, fullname)
 
     return fullname
   }
@@ -36,10 +31,9 @@ export class AccountSession {
   }
 
   async recoveryKitData(){
-    let program = await os.getProgram()
     let ak = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
-    let fu = await program.components.storage.getItem(USERNAME_STORAGE_KEY) 
-    return {accessKey: ak, handle: fu.split('#')[0], fissionusername: fu}
+    let hd = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
+    return {accessKey: ak, handle: uint8arrays.toString(hd)}
   }
 
   //Private methods
