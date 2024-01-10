@@ -12,7 +12,6 @@ const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 
 const helia = await createBrowserNode()
 
-let program = await os.getProgram()
 const accountfs = new AccountFS(helia, NETWORK, SHOVEL_FS_SYNC_HOST)
 await accountfs.load()
 
@@ -22,7 +21,6 @@ window.shovel = {
   helia: helia,
   fs: accountfs,
   session: accountSession,
-  odd: program,
   Key: Key
 }
 
@@ -34,16 +32,6 @@ customElements.define('contact-table', ContactTable);
 const axios_client  = axios.create({
   baseURL: `${window.location.origin}`,
 })
-
-
-async function getProgram() {
-  program = await os.getProgram()
-  return program
-}
-
-async function getSession(program) {
-  return await os.getSession()
-}
 
 async function signup(username) {
   await account.create(
@@ -106,18 +94,6 @@ async function signout() {
   await account.signout()
 }
 
-async function producerChallengeProcessor(challenge, userInput) {
-  console.log("challenge pin", challenge.pin)
-  console.log("userinput", userInput)
-
-  // Either show `challenge.pin` or have the user input a PIN and see if they're equal.
-  if (userInput === challenge.pin.join("")) {
-    challenge.confirmPin(); alert("Correct PIN.... Wait for the other device to load account data")
-  } else {
-    challenge.rejectPin(); alert("Wrong PIN")
-  }
-}
-
 async function downloadContactsDataLocally() {
   const content = await getContacts()
   console.log("content: ", content)
@@ -150,36 +126,6 @@ async function recover(kit) {
     clearTimeout(timeout)
     window.location.href = "/app";
   }, 5000)
-}
-
-async function waitForDataRoot(username) {
-  const program = await getProgram()
-  const reference = program?.components.reference
-  const EMPTY_CID = "Qmc5m94Gu7z62RC8waSKkZUrCCBJPyHbkpmGzEePxy2oXJ"
-
-  if (!reference)
-    throw new Error("Program must be initialized to check for data root")
-
-  let dataRoot = await reference.dataRoot.lookup(username)
-
-  if (dataRoot.toString() !== EMPTY_CID) return
-
-  return new Promise((resolve) => {
-    const maxRetries = 50
-    let attempt = 0
-
-    const dataRootInterval = setInterval(async () => {
-      dataRoot = await reference.dataRoot.lookup(username)
-
-      if (dataRoot.toString() === EMPTY_CID && attempt < maxRetries) {
-        attempt++
-        return
-      }
-
-      clearInterval(dataRootInterval)
-      resolve()
-    }, 500)
-  })
 }
 
 async function importContacts(username, password){
@@ -281,11 +227,7 @@ async function addGoogleContactsToContactList(googleContacts){
 }
 
 export { 
-  getSession, 
   account,
-  getProgram, 
-  producerChallengeProcessor, 
-  waitForDataRoot,
   signup, 
   signout, 
   generateRecoveryKit, 

@@ -12,24 +12,11 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { getProgram, getSession, account } from '/odd.js';
+      import { account } from '/odd.js';
 
-      var program = await getProgram();
       var session = await account.activeSession();
       if (session == false) {
         window.location.href = '/home';
-      } else {
-        session = await getSession(program)
-        await session.fs.publish()
-
-        var producer = await program.auth.accountProducer(session.username)
-        console.log("first producer: ", producer)
-        producer.on("challenge", challenge => {
-          window.challenge = challenge;
-        })
-        producer.on("link", ({ approved }) => {
-          if (approved) console.log("Link device successfully")
-        })
       }
     </script>
 
