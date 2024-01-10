@@ -71,6 +71,11 @@ export class Account {
     await session.destroy()
   }
 
+  async activeSession() {
+    let session = await this.store.getSession()
+    return (session !== undefined)
+  }
+
   async recoveryKitContent() {
     var { accessKey, handle } = await this.accountSession.recoveryKitData()
     const encodedAccessKey = uint8arrays.toString(accessKey, 'base64pad');

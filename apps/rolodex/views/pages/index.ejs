@@ -9,12 +9,11 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { signup, getProgram, getSession, recover } from '/odd.js';
+      import { signup, recover, account } from '/odd.js';
       window.signup = signup;
       window.recover = recover;
 
-      var program = await getProgram();
-      var session = await getSession(program);
+      var session = await account.activeSession();
       if (session) {
         window.location.href = '/app';
       }

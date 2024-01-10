@@ -282,6 +282,7 @@ async function addGoogleContactsToContactList(googleContacts){
 
 export { 
   getSession, 
+  account,
   getProgram, 
   producerChallengeProcessor, 
   waitForDataRoot,

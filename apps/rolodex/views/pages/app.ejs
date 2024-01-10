@@ -12,14 +12,14 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { getProgram, getSession } from '/odd.js';
+      import { getProgram, getSession, account } from '/odd.js';
 
       var program = await getProgram();
-      var session = await getSession(program);
-      if (session === undefined) {
+      var session = await account.activeSession();
+      if (session == false) {
         window.location.href = '/home';
       } else {
-        console.log("session: ", session)
+        session = await getSession(program)
         await session.fs.publish()
 
         var producer = await program.auth.accountProducer(session.username)
