@@ -72,17 +72,15 @@ export class Account {
   }
 
   async recoveryKitContent() {
-    let oddAccessKey = await this.store.getOddAccessKey()
     var { accessKey, handle, fissionusername } = await this.accountSession.recoveryKitData()
     const encodedAccessKey = uint8arrays.toString(accessKey, 'base64pad');
-    return RecoveryKit.toYML(fissionusername, encodedAccessKey, oddAccessKey)
+    return RecoveryKit.toYML(fissionusername, encodedAccessKey)
   }
 
   async recover(content){
     var data = RecoveryKit.parseYML(content)
 
     var shovelKey = uint8arrays.fromString(data.shovelkey, 'base64pad'); 
-    var oddKey = uint8arrays.fromString(data.oddkey, 'base64pad');
     var handle = data.fissionusername.split("#")[0]
 
     await this.store.createFissionUser(handle)
@@ -91,7 +89,7 @@ export class Account {
 }
 
 class RecoveryKit {
-  static toYML(fissionusername, encodedAccessKey, encodedOddKey){
+  static toYML(fissionusername, encodedAccessKey){
     return `
   # This is your recovery kit. (It's a yaml text file)
   # Store this somewhere safe.
@@ -101,15 +99,13 @@ class RecoveryKit {
   
   username: ${fissionusername}
   shovelkey: ${encodedAccessKey}
-  oddkey: ${encodedOddKey}
   `;
   }
 
   static parseYML(content) {
     var fissionusername = content.toString().split("username: ")[1].split("\n")[0]
     var shovelKey = content.toString().split("shovelkey: ")[1].split("\n")[0]
-    var oddKey = content.toString().split("oddkey: ")[1].split("\n")[0]
 
-    return {fissionusername: fissionusername, shovelkey: shovelKey, oddkey: oddKey}
+    return {fissionusername: fissionusername, shovelkey: shovelKey}
   }
 }

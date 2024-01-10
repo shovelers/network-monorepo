@@ -69,16 +69,6 @@ class OddSession {
     return;
   }
 
-  async getOddAccessKey(){
-    let program = await this.getProgram()
-    var fissionusername = await this.fissionUsernames(undefined); // hacking - as logged in user will not need username
-    var accountDID = await program.accountDID(fissionusername.hashed);
-    var crypto = program.components.crypto;
-    var oddAccessKey  = await retrieve({ crypto, accountDID });
-    var encodedOddKey = uint8arrays.toString(oddAccessKey, 'base64pad')
-    return encodedOddKey
-  }
-
   async createFissionUser(handle) {
     this.program = await this.getProgram()
     await this.program.components.storage.removeItem(USERNAME_STORAGE_KEY)
