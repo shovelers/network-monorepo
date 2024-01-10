@@ -85,7 +85,7 @@ export class Account {
     var oddKey = uint8arrays.fromString(data.oddkey, 'base64pad');
     var handle = data.fissionusername.split("#")[0]
 
-    await this.store.createNewFissionAccountOnRecover(handle, data.fissionusername, oddKey)
+    await this.store.createFissionUser(handle)
     await this.accountfs.recover(handle, shovelKey)
   }
 }
