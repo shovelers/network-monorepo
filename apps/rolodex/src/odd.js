@@ -15,7 +15,7 @@ const helia = await createBrowserNode()
 const accountfs = new AccountFS(helia, NETWORK, SHOVEL_FS_SYNC_HOST)
 await accountfs.load()
 
-const accountSession =  new AccountSession(os, helia)
+const accountSession =  new AccountSession(os, helia, SHOVEL_FS_SYNC_HOST)
 
 window.shovel = {
   helia: helia,

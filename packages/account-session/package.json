@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "interface-datastore": "^8.2.9",
+    "axios": "^1.5.1",
     "@oddjs/odd": "^0.37.2"
   }
 }

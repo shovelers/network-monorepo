@@ -3,15 +3,17 @@ import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
 import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 import { Key } from 'interface-datastore';
+import axios from 'axios'
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 
 export class AccountSession {
-  constructor(os, helia) {
+  constructor(os, helia, accountHost) {
     this.os = os
     this.helia = helia
+    this.axios_client  = axios.create({baseURL: accountHost})
   }
 
   async registerUser(handle) {
@@ -20,6 +22,13 @@ export class AccountSession {
 
     const did = await this.agentDID()
     const fullname = `${handle}#${did}`
+
+    await this.axios_client.post('/accounts', { fullname: fullname }).then(async (response) => {
+      console.log("account creation status", response.status)
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
 
     return fullname
   }
