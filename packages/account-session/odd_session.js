@@ -17,8 +17,16 @@ export class AccountSession {
   }
 
   async registerUser(handle) {
+    let program = await os.getProgram()
+
     let encodeddHandle = uint8arrays.fromString(handle);
     await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
+
+    const did = await this.agentDID()
+    const fullname = `${handle}#${did}`
+    await program.components.storage.setItem(USERNAME_STORAGE_KEY, fullname)
+
+    return fullname
   }
 
   async destroy() {
@@ -32,6 +40,16 @@ export class AccountSession {
     let ak = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
     let fu = await program.components.storage.getItem(USERNAME_STORAGE_KEY) 
     return {accessKey: ak, handle: fu.split('#')[0], fissionusername: fu}
+  }
+
+  //Private methods
+  async agentDID(){
+    let program = await os.getProgram()
+
+    const pubKey = await program.components.crypto.keystore.publicWriteKey() // publicExchageKey for other did
+    const ksAlg = await program.components.crypto.keystore.getAlgorithm()
+
+    return publicKeyToDid(program.components.crypto, pubKey, ksAlg) 
   }
 }
 
@@ -69,13 +87,9 @@ class OddSession {
     return;
   }
 
-  async createFissionUser(handle) {
+  async createFissionUser(fullname) {
     this.program = await this.getProgram()
-    await this.program.components.storage.removeItem(USERNAME_STORAGE_KEY)
-
-    var fissionusername = await this.fissionUsernames(handle);
-    var hashedUsername = await this.prepareUsername(fissionusername);
-    await this.program.components.storage.setItem(USERNAME_STORAGE_KEY, fissionusername)
+    var hashedUsername = await this.prepareUsername(fullname);
 
     const valid = await this.program.auth.isUsernameValid(hashedUsername);
     const available = await this.program.auth.isUsernameAvailable(hashedUsername);
@@ -99,25 +113,6 @@ class OddSession {
     }
   }
 
-  async fissionUsernames(username) {
-    let program = await this.getProgram()
-    console.log(program)
-
-    const did = await this.createDID(program.components.crypto)
-    return `${username}#${did}`
-  }
-
-  async createDID(crypto){
-    if (await this.program.agentDID()){
-      return this.program.agentDID()
-    } else {
-      const pubKey = await crypto.keystore.publicExchangeKey()
-      const ksAlg = await crypto.keystore.getAlgorithm()
-  
-      return publicKeyToDid(crypto, pubKey, ksAlg)
-    }
-  }
-  
   async prepareUsername(username){
     const normalizedUsername = username.normalize('NFD')
     const hashedUsername = await sha256(

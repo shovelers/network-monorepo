@@ -49,8 +49,8 @@ export class Account {
   }
 
   async create(handle, initialFiles) {
-    await this.store.createFissionUser(handle)
-    await this.accountSession.registerUser(handle)
+    const fullname = await this.accountSession.registerUser(handle)
+    await this.store.createFissionUser(fullname)
 
     await this.accountfs.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
     await initialFiles.forEach(async element => {
