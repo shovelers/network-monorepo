@@ -10,8 +10,9 @@ const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 
 export class AccountFS {
-  constructor(helia, network, syncHost){
+  constructor(helia, session, network, syncHost){
     this.helia = helia
+    this.session = session
     this.fs = new PrivateFS(helia)
     this.prefix = (network == "TESTNET") ? "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/" : "/ip4/127.0.0.1/tcp/3001/ws/p2p/"
     this.axios_client  = axios.create({baseURL: syncHost})
@@ -87,7 +88,13 @@ export class AccountFS {
     // Need to model handle as first class citizen on network
     let handle = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
     handle = uint8arrays.toString(handle)
-    await this.axios_client.post('/pin', { cid: cid, handle: handle }).then(async (response) => {
+
+    const did = await this.session.agentDID()
+    let message = uint8arrays.fromString(JSON.stringify({cid: cid, handle: handle, signer: did })) 
+    let signature = await this.session.sign(message)
+    let encodedSignature = uint8arrays.toString(signature, 'base64')
+
+    await this.axios_client.post('/pin', { cid: cid, handle: handle, message: {cid: cid, handle: handle, signer: did}, signature: encodedSignature }).then(async (response) => {
       console.log(response.status)
     }).catch((e) => {
       console.log(e);

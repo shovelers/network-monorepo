@@ -1,17 +1,18 @@
 import * as odd from "@oddjs/odd";
 import { sha256 } from '@oddjs/odd/components/crypto/implementation/browser'
 import * as uint8arrays from 'uint8arrays';
-import { publicKeyToDid } from '@oddjs/odd/did/transformers';
 import { Key } from 'interface-datastore';
 import axios from 'axios'
+import { RSASigner } from 'iso-signatures/signers/rsa.js'
+import localforage from "localforage";
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
+const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
 export class AccountSession {
   constructor(os, helia, accountHost) {
-    this.os = os
     this.helia = helia
     this.axios_client  = axios.create({baseURL: accountHost})
   }
@@ -45,14 +46,26 @@ export class AccountSession {
     return {accessKey: ak, handle: uint8arrays.toString(hd)}
   }
 
-  //Private methods
+  async signer(){
+    let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+    if (keypair) {
+      return RSASigner.import(keypair)
+    }
+
+    const signer = await RSASigner.generate()
+    await localforage.setItem(SHOVEL_AGENT_WRITE_KEYPAIR, signer.export())
+    
+    return signer
+  }
+
   async agentDID(){
-    let program = await os.getProgram()
+    const signer = await this.signer()
+    return signer.did
+  }
 
-    const pubKey = await program.components.crypto.keystore.publicWriteKey() // publicExchageKey for other did
-    const ksAlg = await program.components.crypto.keystore.getAlgorithm()
-
-    return publicKeyToDid(program.components.crypto, pubKey, ksAlg) 
+  async sign(message){
+    const signer = await this.signer()
+    return signer.sign(message)
   }
 }
 

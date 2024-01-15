@@ -14,6 +14,9 @@ import morgan from 'morgan';
 import client from 'prom-client'
 import { Key } from 'interface-datastore';
 import { createClient } from 'redis';
+import * as uint8arrays from 'uint8arrays';
+import * as verifiers from 'iso-signatures/verifiers/rsa.js'
+import { DIDKey } from 'iso-did/key'
 
 const redisURL = process.env.REDIS_URL || "redis://localhost:6379"
 const redisClient =  createClient({ url: redisURL });
@@ -83,7 +86,21 @@ server.get("/metrics", async (req, res) => {
   res.end();
 })
 
-server.post('/pin', async (req, res) => {
+async function verify(message, signature){
+  const pubKey = DIDKey.fromString(message.signer).publicKey
+  const encodedMessage = uint8arrays.fromString(JSON.stringify({cid: message.cid, handle: message.handle, signer: message.signer})) 
+
+  const decodedSignature = uint8arrays.fromString(signature, 'base64')
+  return await verifiers.verify({message: encodedMessage, signature: decodedSignature, publicKey: pubKey})
+}
+
+server.post('/pin', async (req, res) => { 
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({})
+    return
+  }
+
   var cid = CID.parse(req.body.cid)
   var handle = req.body.handle
   await node.datastore.put(new Key('/handle/' + handle), cid.bytes)

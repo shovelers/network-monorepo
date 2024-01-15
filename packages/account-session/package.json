@@ -9,8 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "interface-datastore": "^8.2.9",
+    "@oddjs/odd": "^0.37.2",
     "axios": "^1.5.1",
-    "@oddjs/odd": "^0.37.2"
+    "interface-datastore": "^8.2.9",
+    "localforage": "^1.10.0"
   }
 }
