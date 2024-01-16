@@ -88,10 +88,9 @@ server.get("/metrics", async (req, res) => {
 
 async function verify(message, signature){
   const pubKey = DIDKey.fromString(message.signer).publicKey
-  const encodedMessage = uint8arrays.fromString(JSON.stringify({cid: message.cid, handle: message.handle, signer: message.signer})) 
-
-  const decodedSignature = uint8arrays.fromString(signature, 'base64')
-  return await verifiers.verify({message: encodedMessage, signature: decodedSignature, publicKey: pubKey})
+  const binMessage = uint8arrays.fromString(JSON.stringify(message)) 
+  const binSignature = uint8arrays.fromString(signature, 'base64')
+  return await verifiers.verify({message: binMessage, signature: binSignature, publicKey: pubKey})
 }
 
 server.post('/pin', async (req, res) => { 
@@ -101,8 +100,8 @@ server.post('/pin', async (req, res) => {
     return
   }
 
-  var cid = CID.parse(req.body.cid)
-  var handle = req.body.handle
+  var cid = CID.parse(req.body.message.cid)
+  var handle = req.body.message.handle
   await node.datastore.put(new Key('/handle/' + handle), cid.bytes)
   var pin = await node.pins.add(cid)
   console.log("pin", pin, cid)

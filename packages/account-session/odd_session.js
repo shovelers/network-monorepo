@@ -22,6 +22,14 @@ class Agent {
     return signer.sign(message)
   }
 
+  async envelop(message){
+    message.signer = await this.DID()
+    let encodedMessage = uint8arrays.fromString(JSON.stringify(message)) 
+    let signature = await this.sign(encodedMessage)
+    let encodedSignature = uint8arrays.toString(signature, 'base64')
+    return { message: message, signature: encodedSignature }
+  }
+
   //Private
   async signer(){
     let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
@@ -47,7 +55,7 @@ export class AccountSession {
     let encodeddHandle = uint8arrays.fromString(handle);
     await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
 
-    const did = await this.agentDID()
+    const did = await this.agent.DID()
     const fullname = `${handle}#${did}`
 
     await this.axios_client.post('/accounts', { fullname: fullname }).then(async (response) => {
@@ -76,13 +84,5 @@ export class AccountSession {
     let ak = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
     let hd = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
     return {accessKey: ak, handle: uint8arrays.toString(hd)}
-  }
-
-  async agentDID(){
-    return (await this.agent.DID())
-  }
-
-  async sign(message){
-    return (await this.agent.sign(message))
   }
 }

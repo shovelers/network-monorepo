@@ -89,12 +89,8 @@ export class AccountFS {
     let handle = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
     handle = uint8arrays.toString(handle)
 
-    const did = await this.session.agentDID()
-    let message = uint8arrays.fromString(JSON.stringify({cid: cid, handle: handle, signer: did })) 
-    let signature = await this.session.sign(message)
-    let encodedSignature = uint8arrays.toString(signature, 'base64')
-
-    await this.axios_client.post('/pin', { cid: cid, handle: handle, message: {cid: cid, handle: handle, signer: did}, signature: encodedSignature }).then(async (response) => {
+    const envelope = await this.session.agent.envelop({cid: cid, handle: handle})
+    await this.axios_client.post('/pin', envelope).then(async (response) => {
       console.log(response.status)
     }).catch((e) => {
       console.log(e);
