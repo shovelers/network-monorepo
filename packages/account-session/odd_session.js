@@ -11,10 +11,38 @@ const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
+class Agent {
+  constructor() {}
+
+  async DID(){
+    const signer = await this.signer()
+    return signer.did
+  }
+
+  async sign(message){
+    const signer = await this.signer()
+    return signer.sign(message)
+  }
+
+  //Private
+  async signer(){
+    let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+    if (keypair) {
+      return RSASigner.import(keypair)
+    }
+
+    const signer = await RSASigner.generate()
+    await localforage.setItem(SHOVEL_AGENT_WRITE_KEYPAIR, signer.export())
+    
+    return signer
+  }
+}
+
 export class AccountSession {
   constructor(os, helia, accountHost) {
     this.helia = helia
     this.axios_client  = axios.create({baseURL: accountHost})
+    this.agent = new Agent()
   }
 
   async registerUser(handle) {
@@ -38,6 +66,12 @@ export class AccountSession {
     await this.helia.datastore.delete(new Key(SHOVEL_FS_ACCESS_KEY))
     await this.helia.datastore.delete(new Key(SHOVEL_ACCOUNT_HANDLE))
     await this.helia.datastore.delete(new Key(SHOVEL_FS_FOREST_CID))
+    await localforage.clear()
+  }
+
+  async activeSession() {
+    let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+    return (keypair != null)
   }
 
   async recoveryKitData(){
@@ -46,26 +80,12 @@ export class AccountSession {
     return {accessKey: ak, handle: uint8arrays.toString(hd)}
   }
 
-  async signer(){
-    let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
-    if (keypair) {
-      return RSASigner.import(keypair)
-    }
-
-    const signer = await RSASigner.generate()
-    await localforage.setItem(SHOVEL_AGENT_WRITE_KEYPAIR, signer.export())
-    
-    return signer
-  }
-
   async agentDID(){
-    const signer = await this.signer()
-    return signer.did
+    return (await this.agent.DID())
   }
 
   async sign(message){
-    const signer = await this.signer()
-    return signer.sign(message)
+    return (await this.agent.sign(message))
   }
 }
 

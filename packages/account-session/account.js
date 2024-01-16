@@ -72,8 +72,7 @@ export class Account {
   }
 
   async activeSession() {
-    let session = await this.store.getSession()
-    return (session !== undefined)
+    return this.accountSession.activeSession()
   }
 
   async recoveryKitContent() {
