@@ -162,9 +162,19 @@ server.put("/accounts", async (req, res) => {
     return
   }
 
-  // add authorisation - requires recokevry kit generation changes
-    // check if handle present 
-    // if recovery kit data was signed by an old account
+  const kit = req.body.message.recoveryKit
+  const verifyGeneratingAgent = await accounts.validAgent(kit.generatingAgent)
+  if (!verifyGeneratingAgent) {
+    res.status(401).json({})
+    return
+  }
+
+  let message = {fullname: kit.generatingAgent, signer: kit.generatingAgent.split('#')[1]}
+  const verifyKitSignature = await verify(message, kit.signature)
+  if (!verifyKitSignature) {
+    res.status(401).json({})
+    return
+  }
 
   var fullname = req.body.message.fullname
   await accounts.addAgent(fullname)

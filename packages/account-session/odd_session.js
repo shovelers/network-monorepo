@@ -76,7 +76,9 @@ export class AccountSession {
     return success
   }
 
-  async recover(handle) {
+  async recover(kit) {
+    var handle = kit.fullname.split('#')[0]
+
     let encodeddHandle = uint8arrays.fromString(handle);
     await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
 
@@ -85,7 +87,7 @@ export class AccountSession {
     const fullname = `${handle}#${did}`
 
     let success = false
-    const envelope = await this.agent.envelop({fullname: fullname})
+    const envelope = await this.agent.envelop({fullname: fullname, recoveryKit: { generatingAgent: kit.fullname, signature: kit.signature }})
     await this.axios_client.put('/accounts', envelope).then(async (response) => {
       console.log("account recovery status", response.status)
       success = true
@@ -118,7 +120,7 @@ export class AccountSession {
     let ak = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
     const encodedAccessKey = uint8arrays.toString(ak, 'base64pad');
 
-    const envolope = await this.agent.envelop({accountKey: encodedAccessKey, fullname: fullname})
+    const envolope = await this.agent.envelop({fullname: fullname})
     return {fullname: fullname, accountKey: encodedAccessKey, signature: envolope.signature}
   }
 
