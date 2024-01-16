@@ -1,4 +1,4 @@
 import { Account } from './account.js'
-import { os, AccountSession } from './odd_session.js'
+import { AccountSession } from './odd_session.js'
 
-export { Account, os, AccountSession }
+export { Account, AccountSession }

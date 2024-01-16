@@ -3,7 +3,7 @@ import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
 import { Contact, ContactRepository } from "./contacts.js";
-import { Account, os, AccountSession  } from 'account-session';
+import { Account, AccountSession  } from 'account-session';
 import { createBrowserNode, AccountFS } from 'account-fs';
 import { Key } from 'interface-datastore';
 
@@ -12,7 +12,7 @@ const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 
 const helia = await createBrowserNode()
 
-const accountSession =  new AccountSession(os, helia, SHOVEL_FS_SYNC_HOST)
+const accountSession =  new AccountSession(helia, SHOVEL_FS_SYNC_HOST)
 
 const accountfs = new AccountFS(helia, accountSession, NETWORK, SHOVEL_FS_SYNC_HOST)
 await accountfs.load()
@@ -25,7 +25,7 @@ window.shovel = {
 }
 
 const contactRepo = new ContactRepository(accountfs)
-const account = new Account(os, accountfs, accountSession)
+const account = new Account(accountfs, accountSession)
 
 customElements.define('contact-table', ContactTable);
 

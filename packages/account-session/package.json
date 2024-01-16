@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@oddjs/odd": "^0.37.2",
     "axios": "^1.5.1",
     "interface-datastore": "^8.2.9",
     "localforage": "^1.10.0"

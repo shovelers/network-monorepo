@@ -24,8 +24,7 @@ class Profile {
 }
 
 export class Account {
-  constructor(os, accountfs, accountSession) {
-    this.store = os
+  constructor(accountfs, accountSession) {
     this.accountfs = accountfs
     this.accountSession = accountSession
     this.filename = "profile.json"
@@ -50,7 +49,6 @@ export class Account {
 
   async create(handle, initialFiles) {
     const fullname = await this.accountSession.registerUser(handle)
-    await this.store.createFissionUser(fullname)
 
     await this.accountfs.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
     await initialFiles.forEach(async element => {
@@ -67,8 +65,6 @@ export class Account {
 
   async signout(){
     await this.accountSession.destroy()
-    let session = await this.store.getSession()
-    await session.destroy()
   }
 
   async activeSession() {
@@ -87,7 +83,6 @@ export class Account {
     var shovelKey = uint8arrays.fromString(data.shovelkey, 'base64pad'); 
     var handle = data.handle
 
-    await this.store.createFissionUser(handle)
     await this.accountfs.recover(handle, shovelKey)
   }
 }
