@@ -124,7 +124,13 @@ class Accounts {
 const accounts = new Accounts(redisClient)
 
 server.post("/accounts", async (req, res) => {
-  var fullname = req.body.fullname
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({})
+    return
+  }
+
+  var fullname = req.body.message.fullname
   const taken = await accounts.isMember(fullname)
   if (taken) {
     res.status(400).json({error: "User name taken"})
