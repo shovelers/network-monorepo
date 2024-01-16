@@ -48,12 +48,15 @@ export class Account {
   }
 
   async create(handle, initialFiles) {
-    const fullname = await this.accountSession.registerUser(handle)
+    const success = await this.accountSession.registerUser(handle)
 
-    await this.accountfs.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
-    await initialFiles.forEach(async element => {
-      await this.accountfs.updatePrivateFile(element.name, () => { return element.initialData })
-    });
+    if (success) {
+      await this.accountfs.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
+      await initialFiles.forEach(async element => {
+        await this.accountfs.updatePrivateFile(element.name, () => { return element.initialData })
+      });
+    }
+    return success
   }
 
   async getLink() {

@@ -58,15 +58,18 @@ export class AccountSession {
     const did = await this.agent.DID()
     const fullname = `${handle}#${did}`
 
+    let success = false
     const envelope = await this.agent.envelop({fullname: fullname})
     await this.axios_client.post('/accounts', envelope).then(async (response) => {
       console.log("account creation status", response.status)
-    }).catch((e) => {
+      success = true
+    }).catch(async (e) => {
       console.log(e);
+      await this.destroy()
       return e
     })
 
-    return fullname
+    return success
   }
 
   async destroy() {

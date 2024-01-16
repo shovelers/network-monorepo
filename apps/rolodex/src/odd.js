@@ -34,7 +34,7 @@ const axios_client  = axios.create({
 })
 
 async function signup(username) {
-  await account.create(
+  const success = await account.create(
     username,
     [{name: "contacts.json", initialData: { contactList: {}, appleContacts: [], googleContacts: {} }}]
   );
