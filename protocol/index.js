@@ -100,6 +100,12 @@ server.post('/pin', async (req, res) => {
     return
   }
 
+  const canPin = await accounts.canPin(`${req.body.message.handle}#${req.body.message.signer}`)
+  if (!canPin) {
+    res.status(401).json({})
+    return
+  }
+
   var cid = CID.parse(req.body.message.cid)
   var handle = req.body.message.handle
   await node.datastore.put(new Key('/handle/' + handle), cid.bytes)
@@ -120,6 +126,10 @@ class Accounts {
 
   async taken(handle) {
     return await this.redis.sIsMember("handles", handle)
+  }
+
+  async canPin(fullname) {
+    return await this.redis.sIsMember("accounts", fullname)
   }
 }
 const accounts = new Accounts(redisClient)
