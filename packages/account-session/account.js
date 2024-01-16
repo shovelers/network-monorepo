@@ -86,7 +86,11 @@ export class Account {
     var shovelKey = uint8arrays.fromString(data.shovelkey, 'base64pad'); 
     var handle = data.handle
 
-    await this.accountfs.recover(handle, shovelKey)
+    const success = await this.accountSession.recover(handle)
+    if (success) {
+      await this.accountfs.recover(handle, shovelKey)
+    }
+    return success
   }
 }
 

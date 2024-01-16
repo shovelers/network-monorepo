@@ -100,7 +100,7 @@ server.post('/pin', async (req, res) => {
     return
   }
 
-  const canPin = await accounts.canPin(`${req.body.message.handle}#${req.body.message.signer}`)
+  const canPin = await accounts.validAgent(`${req.body.message.handle}#${req.body.message.signer}`)
   if (!canPin) {
     res.status(401).json({})
     return
@@ -121,6 +121,10 @@ class Accounts {
 
   async create(fullname) {
     await this.redis.sAdd("handles", fullname.split('#')[0])
+    return await this.addAgent(fullname)
+  }
+
+  async addAgent(fullname) {
     return await this.redis.sAdd("accounts", fullname)
   }
 
@@ -128,7 +132,7 @@ class Accounts {
     return await this.redis.sIsMember("handles", handle)
   }
 
-  async canPin(fullname) {
+  async validAgent(fullname) {
     return await this.redis.sIsMember("accounts", fullname)
   }
 }
@@ -149,6 +153,22 @@ server.post("/accounts", async (req, res) => {
     accounts.create(fullname)
     res.status(201).json({})
   }
+});
+
+server.put("/accounts", async (req, res) => {
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({})
+    return
+  }
+
+  // add authorisation - requires recokevry kit generation changes
+    // check if handle present 
+    // if recovery kit data was signed by an old account
+
+  var fullname = req.body.message.fullname
+  await accounts.addAgent(fullname)
+  res.status(201).json({})
 });
 
 server.get("/forestCID/:handle", async (req, res) => {

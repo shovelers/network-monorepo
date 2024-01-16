@@ -30,6 +30,10 @@ class Agent {
     return { message: message, signature: encodedSignature }
   }
 
+  async destroy() {
+    await localforage.removeItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+  }
+
   //Private
   async signer(){
     let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
@@ -72,11 +76,33 @@ export class AccountSession {
     return success
   }
 
+  async recover(handle) {
+    let encodeddHandle = uint8arrays.fromString(handle);
+    await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
+
+    await this.agent.destroy()
+    const did = await this.agent.DID()
+    const fullname = `${handle}#${did}`
+
+    let success = false
+    const envelope = await this.agent.envelop({fullname: fullname})
+    await this.axios_client.put('/accounts', envelope).then(async (response) => {
+      console.log("account recovery status", response.status)
+      success = true
+    }).catch(async (e) => {
+      console.log(e);
+      await this.destroy()
+      return e
+    })
+
+    return success
+  }
+
   async destroy() {
     await this.helia.datastore.delete(new Key(SHOVEL_FS_ACCESS_KEY))
     await this.helia.datastore.delete(new Key(SHOVEL_ACCOUNT_HANDLE))
     await this.helia.datastore.delete(new Key(SHOVEL_FS_FOREST_CID))
-    await localforage.clear()
+    await this.agent.destroy()
   }
 
   async activeSession() {
