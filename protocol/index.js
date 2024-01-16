@@ -114,11 +114,12 @@ class Accounts {
   }
 
   async create(fullname) {
+    await this.redis.sAdd("handles", fullname.split('#')[0])
     return await this.redis.sAdd("accounts", fullname)
   }
 
-  async isMember(fullname) {
-    return await this.redis.sIsMember("accounts", fullname)
+  async taken(handle) {
+    return await this.redis.sIsMember("handles", handle)
   }
 }
 const accounts = new Accounts(redisClient)
@@ -131,7 +132,7 @@ server.post("/accounts", async (req, res) => {
   }
 
   var fullname = req.body.message.fullname
-  const taken = await accounts.isMember(fullname)
+  const taken = await accounts.taken(fullname.split('#')[0])
   if (taken) {
     res.status(400).json({error: "User name taken"})
   } else {
