@@ -111,8 +111,19 @@ export class AccountSession {
   }
 
   async recoveryKitData(){
+    const handle = await this.handle()
+    const did = await this.agent.DID()
+    const fullname = `${handle}#${did}`
+
     let ak = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
-    let hd = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
-    return {accessKey: ak, handle: uint8arrays.toString(hd)}
+    const encodedAccessKey = uint8arrays.toString(ak, 'base64pad');
+
+    const envolope = await this.agent.envelop({accountKey: encodedAccessKey, fullname: fullname})
+    return {fullname: fullname, accountKey: encodedAccessKey, signature: envolope.signature}
+  }
+
+  async handle() {
+    let handle = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
+    return uint8arrays.toString(handle)
   }
 }

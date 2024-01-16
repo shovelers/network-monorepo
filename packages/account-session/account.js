@@ -75,16 +75,15 @@ export class Account {
   }
 
   async recoveryKitContent() {
-    var { accessKey, handle } = await this.accountSession.recoveryKitData()
-    const encodedAccessKey = uint8arrays.toString(accessKey, 'base64pad');
-    return RecoveryKit.toYML(handle, encodedAccessKey)
+    const data = await this.accountSession.recoveryKitData()
+    return RecoveryKit.toYML(data)
   }
 
   async recover(content){
     var data = RecoveryKit.parseYML(content)
 
-    var shovelKey = uint8arrays.fromString(data.shovelkey, 'base64pad'); 
-    var handle = data.handle
+    var shovelKey = uint8arrays.fromString(data.accountKey, 'base64pad'); 
+    var handle = data.fullname.split('#')[0]
 
     const success = await this.accountSession.recover(handle)
     if (success) {
@@ -95,7 +94,7 @@ export class Account {
 }
 
 class RecoveryKit {
-  static toYML(handle, encodedAccessKey){
+  static toYML(data){
     return `
   # This is your recovery kit. (It's a yaml text file)
   # Store this somewhere safe.
@@ -103,15 +102,18 @@ class RecoveryKit {
   # Losing it means you won't be able to recover your account
   # in case you lose access to all your linked devices.
   
-  username: ${handle}
-  shovelkey: ${encodedAccessKey}
+  fullname: ${data.fullname}
+  accountkey: ${data.accountKey}
+  signature: ${data.signature}
   `;
   }
 
   static parseYML(content) {
-    var handle = content.toString().split("username: ")[1].split("\n")[0]
-    var shovelKey = content.toString().split("shovelkey: ")[1].split("\n")[0]
+    var data = {}
+    data.fullname = content.toString().split("fullname: ")[1].split("\n")[0]
+    data.accountKey = content.toString().split("accountkey: ")[1].split("\n")[0]
+    data.signature = content.toString().split("signature: ")[1].split("\n")[0]
 
-    return {handle: handle, shovelkey: shovelKey}
+    return data
   }
 }
