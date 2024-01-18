@@ -11,6 +11,9 @@ import { identify } from '@libp2p/identify'
 import { webSockets } from '@libp2p/websockets'
 import * as filters from '@libp2p/websockets/filters'
 import { multiaddr } from '@multiformats/multiaddr'
+import { circuitRelayServer, circuitRelayTransport } from '@libp2p/circuit-relay-v2'
+import { webRTC } from '@libp2p/webrtc'
+import { dcutr } from '@libp2p/dcutr'
 
 export const STANDALONE = 1
 const BROWSER = 2
@@ -40,7 +43,16 @@ export async function createNode(type, blockstore, datastore, config) {
   if (type == STANDALONE) {
     libp2pconfig.addresses = { listen: ['/ip4/0.0.0.0/tcp/3001/ws'] }
     libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
+    libp2pconfig.services.relay = circuitRelayServer({reservations: {maxReservations: Infinity}})
     //libp2pconfig.metrics = config.metrics
+  }
+
+  if (type == BROWSER) {
+    libp2pconfig.addresses = { listen: ['/webrtc']}
+    libp2pconfig.transports.push(webRTC())
+    libp2pconfig.transports.push(circuitRelayTransport({discoverRelays: 1}))
+    libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
+    libp2pconfig.services.dcutr = dcutr()
   }
 
   const libp2p = await createLibp2p(libp2pconfig)
