@@ -13,9 +13,11 @@ class Channel {
 const channel = new Channel()
 
 export class Requester {
-  constructor() {
+  constructor(agent) {
+    this.agent = agent
     this.DID = null
     this.requestKeyPair = null
+    this.sessionKey = null
   }
 
   async initiate() {    
@@ -28,6 +30,35 @@ export class Requester {
   }
 
   async negotiate(sessionKeyMessage) {
+    this.sessionKey = await this.parseSessionKey(sessionKeyMessage)
+
+    const pin = Array.from(crypto.getRandomValues(new Uint8Array(6))).map(n => n % 9)
+    const iv = crypto.getRandomValues(new Uint8Array(16))
+
+    // TODO - add signature of DID to prove ownership
+    // TODO - Standardise message envelope
+    const msgBuffer = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      this.sessionKey,
+      uint8arrays.fromString(
+        JSON.stringify({
+          did: await this.agent.DID(),
+          pin: pin
+        }),
+        "utf8"
+      )
+    )
+    const msg = new Uint8Array(msgBuffer)
+
+    const challenge = JSON.stringify({
+      iv: uint8arrays.toString(iv, "base64pad"),
+      msg: uint8arrays.toString(msg, "base64pad")
+    })
+
+    channel.publish(challenge)
+  }
+
+  async parseSessionKey(sessionKeyMessage) {
     const { iv: encodedIV, msg, sessionKey: encodedSessionKey } = JSON.parse(sessionKeyMessage)
     const iv = uint8arrays.fromString(encodedIV, "base64pad")
     const encryptedSessionKey = uint8arrays.fromString(encodedSessionKey, "base64pad")
@@ -63,7 +94,7 @@ export class Requester {
       throw "audience check failed"
     }
 
-    if (envelope.message.sessionKey != uint8arrays.toString(new Uint8Array(sessionKeyBuffer))) {
+    if (envelope.message.sessionKey != uint8arrays.toString(new Uint8Array(sessionKeyBuffer), "base64pad")) {
       throw "session key mismatch"
     }
 
@@ -72,7 +103,7 @@ export class Requester {
       throw "envelope signature check failed"
     }
 
-    channel.publish(envelope)
+    return sessionKey
   }
 
   //Private

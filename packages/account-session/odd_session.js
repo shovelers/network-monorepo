@@ -12,7 +12,7 @@ const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
 class Agent {
   constructor() {
-    this.requester = new Requester()
+    this.requester = new Requester(this)
     this.approver = new Approver(this)
   }
 
