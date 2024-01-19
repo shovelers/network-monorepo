@@ -3,6 +3,7 @@ import { Key } from 'interface-datastore';
 import axios from 'axios'
 import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
+import { Requester, Approver } from './link.js';
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
@@ -10,7 +11,10 @@ const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
 class Agent {
-  constructor() {}
+  constructor() {
+    this.requester = new Requester()
+    this.approver = new Approver(this)
+  }
 
   async DID(){
     const signer = await this.signer()
