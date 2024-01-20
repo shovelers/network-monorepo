@@ -3,7 +3,8 @@ import { Key } from 'interface-datastore';
 import axios from 'axios'
 import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
-import { Requester, Approver } from './link.js';
+import { Approver } from './linking/approver.js';
+import { Requester } from './linking/requester.js';
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
