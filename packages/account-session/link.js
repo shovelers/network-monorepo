@@ -59,6 +59,15 @@ export class Requester {
     return { challenge, pin }
   }
 
+  async complete(envelope) {
+    const message = await Envelope.open(envelope, this.sessionKey)
+    if (message.status == "CONFIRMED") {
+      // TODO Save access key
+      console.log(message.accessKey)
+    }
+    console.log(message.status)
+  }
+
   async parseSessionKey(sessionKeyMessage) {
     const { iv: encodedIV, msg, sessionKey: encodedSessionKey } = JSON.parse(sessionKeyMessage)
     const iv = uint8arrays.fromString(encodedIV, "base64pad")
@@ -136,6 +145,36 @@ async function verify(message, signature){
   return await verifiers.verify({message: binMessage, signature: binSignature, publicKey: pubKey})
 }
 
+class Envelope {
+  static async pack(message, sessionKey){
+    const iv = crypto.getRandomValues(new Uint8Array(16))
+
+    const msgBuffer = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      sessionKey,
+      uint8arrays.fromString(JSON.stringify(message),"utf8")
+    )
+    const msg = new Uint8Array(msgBuffer)
+
+    return JSON.stringify({
+      iv: uint8arrays.toString(iv, "base64pad"),
+      msg: uint8arrays.toString(msg, "base64pad")
+    })
+  }
+  
+  static async open(envelope, sessionKey) {
+    const { iv: encodedIV, msg } = JSON.parse(envelope)
+    const iv = uint8arrays.fromString(encodedIV, "base64pad")
+
+    const messageBuffer = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv },
+      sessionKey,
+      uint8arrays.fromString(msg, "base64pad"),
+    )
+    return JSON.parse(uint8arrays.toString(new Uint8Array(messageBuffer), "utf8"))
+  }
+}
+
 export class Approver {
   constructor(agent) {
     this.agent = agent
@@ -164,8 +203,8 @@ export class Approver {
 
     let approver = this
     return {
-      confirm: async () => { await approver.confirm() },
-      reject: async () => { await approver.reject() },
+      confirm: async () => { return await approver.confirm() },
+      reject: async () => { return await approver.reject() },
       message: message
     }
   }
@@ -173,14 +212,14 @@ export class Approver {
   async confirm() {
     // TODO session.AddAgent
     const rootKey = await this.agent.accessKey()
-    const confirmMessage = await this.envelop({accessKey: rootKey, status: "CONFIRMED"})
+    const confirmMessage = await Envelope.pack({accessKey: rootKey, status: "CONFIRMED"}, this.sessionKey)
     
     await channel.publish(confirmMessage)
     return confirmMessage
   }
 
   async reject() {
-    const rejectMessage = await this.envelop({ status: "REJECTED" })
+    const rejectMessage = await Envelope.pack({ status: "REJECTED" }, this.sessionKey)
     
     await channel.publish(rejectMessage)
     return rejectMessage
@@ -243,27 +282,6 @@ export class Approver {
       sessionKey,
       sessionKeyMessage
     }
-  }
-
-  async envelop(messageJSON){
-    const iv = crypto.getRandomValues(new Uint8Array(16))
-
-    const msgBuffer = await crypto.subtle.encrypt(
-      { name: "AES-GCM", iv },
-      this.sessionKey,
-      uint8arrays.fromString(
-        JSON.stringify(messageJSON),
-        "utf8"
-      )
-    )
-    const msg = new Uint8Array(msgBuffer)
-
-    const message = JSON.stringify({
-      iv: uint8arrays.toString(iv, "base64pad"),
-      msg: uint8arrays.toString(msg, "base64pad")
-    })
-
-    return message
   }
 }
 
