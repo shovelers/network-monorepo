@@ -31,29 +31,13 @@ export class Requester {
 
   async negotiate(sessionKeyMessage) {
     this.sessionKey = await this.parseSessionKey(sessionKeyMessage)
-
     const pin = Array.from(crypto.getRandomValues(new Uint8Array(6))).map(n => n % 9)
-    const iv = crypto.getRandomValues(new Uint8Array(16))
 
     // TODO - add signature of DID to prove ownership
-    // TODO - Standardise message envelope
-    const msgBuffer = await crypto.subtle.encrypt(
-      { name: "AES-GCM", iv },
-      this.sessionKey,
-      uint8arrays.fromString(
-        JSON.stringify({
-          did: await this.agent.DID(),
-          pin: pin
-        }),
-        "utf8"
-      )
-    )
-    const msg = new Uint8Array(msgBuffer)
-
-    const challenge = JSON.stringify({
-      iv: uint8arrays.toString(iv, "base64pad"),
-      msg: uint8arrays.toString(msg, "base64pad")
-    })
+    const challenge = await Envelope.pack({
+      did: await this.agent.DID(),
+      pin: pin
+    }, this.sessionKey)
 
     channel.publish(challenge)
     return { challenge, pin }
@@ -190,22 +174,14 @@ export class Approver {
   }
 
   async negotiate(challenge) {
-    const { iv: encodedIV, msg } = JSON.parse(challenge)
-    const iv = uint8arrays.fromString(encodedIV, "base64pad")
-
-    const messageBuffer = await crypto.subtle.decrypt(
-      { name: "AES-GCM", iv },
-      this.sessionKey,
-      uint8arrays.fromString(msg, "base64pad"),
-    )
-    const message = JSON.parse(uint8arrays.toString(new Uint8Array(messageBuffer), "utf8"))
-    this.message = message
+    this.message = await Envelope.open(challenge, this.sessionKey)
+    // TODO do something with challenge pin
 
     let approver = this
     return {
       confirm: async () => { return await approver.confirm() },
       reject: async () => { return await approver.reject() },
-      message: message
+      message: this.message
     }
   }
 
