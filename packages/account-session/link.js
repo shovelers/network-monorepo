@@ -56,6 +56,7 @@ export class Requester {
     })
 
     channel.publish(challenge)
+    return { challenge, pin }
   }
 
   async parseSessionKey(sessionKeyMessage) {
@@ -138,15 +139,54 @@ async function verify(message, signature){
 export class Approver {
   constructor(agent) {
     this.agent = agent
+    this.sessionKey = null
+    this.message = null
   }
 
   async initiate(requestDID) {
-    const {sessionKey, sessionKeyMessage} = await this.sessionKey(requestDID)
+    const {sessionKey, sessionKeyMessage} = await this.generateSessionKey(requestDID)
+    this.sessionKey =  sessionKey
     await channel.publish(sessionKeyMessage)
     return {sessionKey, sessionKeyMessage}
   }
 
-  async sessionKey(requestDID) {
+  async negotiate(challenge) {
+    const { iv: encodedIV, msg } = JSON.parse(challenge)
+    const iv = uint8arrays.fromString(encodedIV, "base64pad")
+
+    const messageBuffer = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv },
+      this.sessionKey,
+      uint8arrays.fromString(msg, "base64pad"),
+    )
+    const message = JSON.parse(uint8arrays.toString(new Uint8Array(messageBuffer), "utf8"))
+    this.message = message
+
+    let approver = this
+    return {
+      confirm: async () => { await approver.confirm() },
+      reject: async () => { await approver.reject() },
+      message: message
+    }
+  }
+
+  async confirm() {
+    // TODO session.AddAgent
+    const rootKey = await this.agent.accessKey()
+    const confirmMessage = await this.envelop({accessKey: rootKey, status: "CONFIRMED"})
+    
+    await channel.publish(confirmMessage)
+    return confirmMessage
+  }
+
+  async reject() {
+    const rejectMessage = await this.envelop({ status: "REJECTED" })
+    
+    await channel.publish(rejectMessage)
+    return rejectMessage
+  }
+
+  async generateSessionKey(requestDID) {
     const sessionKey = await crypto.subtle.generateKey(
       {
         name: 'AES-GCM', length: 256,
@@ -205,11 +245,32 @@ export class Approver {
     }
   }
 
+  async envelop(messageJSON){
+    const iv = crypto.getRandomValues(new Uint8Array(16))
+
+    const msgBuffer = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      this.sessionKey,
+      uint8arrays.fromString(
+        JSON.stringify(messageJSON),
+        "utf8"
+      )
+    )
+    const msg = new Uint8Array(msgBuffer)
+
+    const message = JSON.stringify({
+      iv: uint8arrays.toString(iv, "base64pad"),
+      msg: uint8arrays.toString(msg, "base64pad")
+    })
+
+    return message
+  }
 }
 
 const BASE58_DID_PREFIX = "did:key:z"
 const rsaMagicBytes = new Uint8Array([ 0x00, 0xf5, 0x02 ])
 
+// TODO check if can be replaced with ISO DID
 class DIDKey {
   static async publicKeytoDID(publicKey){
     const prefixedBuf = uint8arrays.concat([ rsaMagicBytes, publicKey ])

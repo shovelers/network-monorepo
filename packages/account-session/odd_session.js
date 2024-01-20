@@ -11,7 +11,8 @@ const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
 class Agent {
-  constructor() {
+  constructor(helia) {
+    this.helia = helia
     this.requester = new Requester(this)
     this.approver = new Approver(this)
   }
@@ -38,6 +39,11 @@ class Agent {
     await localforage.removeItem(SHOVEL_AGENT_WRITE_KEYPAIR)
   }
 
+  async accessKey() {
+    let ak = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
+    return uint8arrays.toString(ak, 'base64pad') 
+  }
+
   //Private
   async signer(){
     let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
@@ -56,7 +62,7 @@ export class AccountSession {
   constructor(helia, accountHost) {
     this.helia = helia
     this.axios_client  = axios.create({baseURL: accountHost})
-    this.agent = new Agent()
+    this.agent = new Agent(helia)
   }
 
   async registerUser(handle) {
