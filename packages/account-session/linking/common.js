@@ -1,15 +1,5 @@
 import * as uint8arrays from 'uint8arrays';
 
-class Channel {
-  constructor() {}
-
-  async publish(message) {
-    console.log(message)
-  }
-}
-
-export const channel = new Channel()
-
 export class Envelope {
   static async pack(message, sessionKey){
     const iv = crypto.getRandomValues(new Uint8Array(16))

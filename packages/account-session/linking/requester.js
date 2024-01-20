@@ -1,7 +1,7 @@
 import * as uint8arrays from 'uint8arrays';
 import { DIDKey as ISODIDKey } from 'iso-did/key'
 import * as verifiers from 'iso-signatures/verifiers/rsa.js'
-import { Envelope, DIDKey, channel } from './common.js';
+import { Envelope, DIDKey } from './common.js';
 
 async function verify(message, signature){
   const pubKey = ISODIDKey.fromString(message.signer).publicKey
@@ -11,17 +11,35 @@ async function verify(message, signature){
 }
 
 export class Requester {
-  constructor(agent) {
+  constructor(agent, channel) {
     this.agent = agent
+    this.channel = channel
     this.DID = null
     this.requestKeyPair = null
     this.sessionKey = null
+    this.state = null
+  }
+
+  async handler(message) {
+    switch (this.state) {
+      case "INITIATE":
+        this.state = "NEGOTIATE"
+        this.negotiate(message)
+        break
+      case "NEGOTIATE":
+        this.state = "TERMINATE"
+        this.complete(message)
+        break
+      case "TERMINATE":
+        break
+    }
   }
 
   async initiate() {    
     const {requestKeyPair, requestDID } = await this.requestDID()
     const message = requestDID
-    await channel.publish(message)
+    this.state = "INITIATE"
+    await this.channel.publish(message)
     this.requestKeyPair =  requestKeyPair
     this.DID = requestDID
     return {requestKeyPair, requestDID}
@@ -37,7 +55,7 @@ export class Requester {
       pin: pin
     }, this.sessionKey)
 
-    channel.publish(challenge)
+    this.channel.publish(challenge)
     return { challenge, pin }
   }
 

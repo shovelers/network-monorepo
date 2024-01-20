@@ -1,29 +1,48 @@
 import * as uint8arrays from 'uint8arrays';
-import { Envelope, DIDKey, channel } from './common.js';
+import { Envelope, DIDKey } from './common.js';
 
 export class Approver {
-  constructor(agent) {
+  constructor(agent, channel) {
     this.agent = agent
+    this.channel = channel
     this.sessionKey = null
-    this.message = null
+    this.state = null
+  }
+
+  async handler(message) {
+    switch (this.state) {
+      case null:
+        this.state = "INITIATE"
+        this.initiate(message)
+        break
+      case "INITIATE":
+        this.state = "NEGOTIATE"
+        this.negotiate(message)
+        this.state = "TERMINATE"
+        break
+      case "NEGOTIATE":
+        break
+      case "TERMINATE":
+        break
+    }
   }
 
   async initiate(requestDID) {
     const {sessionKey, sessionKeyMessage} = await this.generateSessionKey(requestDID)
     this.sessionKey =  sessionKey
-    await channel.publish(sessionKeyMessage)
+    await this.channel.publish(sessionKeyMessage)
     return {sessionKey, sessionKeyMessage}
   }
 
   async negotiate(challenge) {
-    this.message = await Envelope.open(challenge, this.sessionKey)
+    const message = await Envelope.open(challenge, this.sessionKey)
     // TODO do something with challenge pin
 
     let approver = this
     return {
       confirm: async () => { return await approver.confirm() },
       reject: async () => { return await approver.reject() },
-      message: this.message
+      message: message
     }
   }
 
@@ -32,14 +51,14 @@ export class Approver {
     const rootKey = await this.agent.accessKey()
     const confirmMessage = await Envelope.pack({accessKey: rootKey, status: "CONFIRMED"}, this.sessionKey)
     
-    await channel.publish(confirmMessage)
+    await this.channel.publish(confirmMessage)
     return confirmMessage
   }
 
   async reject() {
     const rejectMessage = await Envelope.pack({ status: "REJECTED" }, this.sessionKey)
     
-    await channel.publish(rejectMessage)
+    await this.channel.publish(rejectMessage)
     return rejectMessage
   }
 

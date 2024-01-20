@@ -5,17 +5,62 @@ import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
 import { Approver } from './linking/approver.js';
 import { Requester } from './linking/requester.js';
+import { multiaddr } from '@multiformats/multiaddr'
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
+class Channel {
+  constructor(helia, channelName) {
+    this.helia = helia
+    this.channelName = channelName
+  }
+
+  async publish(message) {
+    this.helia.libp2p.services.pubsub.publish(this.channelName, new TextEncoder().encode(message))
+    console.log(message)
+  }
+}
+
 class Agent {
   constructor(helia) {
     this.helia = helia
-    this.requester = new Requester(this)
-    this.approver = new Approver(this)
+  }
+
+  async actAsApprover() {
+    let handle = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
+    const channelName = uint8arrays.toString(handle)
+
+    const channel = new Channel(this.helia, channelName)
+    this.approver = new Approver(this, channel)
+
+    this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
+      console.log(`${message.detail.topic}:`, new TextDecoder().decode(message.detail.data))
+      if (message.detail.topic == channelName) {
+        this.approver.handler(new TextDecoder().decode(message.detail.data))
+      }
+    })
+    
+    this.helia.libp2p.services.pubsub.subscribe(channelName)
+  }
+
+  async actAsRequester(address, channelName) {
+    const channel = new Channel(this.helia, channelName)
+    this.requester = new Requester(this, channel)
+
+    this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
+      console.log(`${message.detail.topic}:`, new TextDecoder().decode(message.detail.data))
+      if (message.detail.topic == channelName) {
+        this.requester.handler(new TextDecoder().decode(message.detail.data))
+      }
+    })
+
+    await this.helia.libp2p.dial(multiaddr(address));
+    
+    this.helia.libp2p.services.pubsub.subscribe(channelName)
+    this.requester.initiate()
   }
 
   async DID(){

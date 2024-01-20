@@ -13,6 +13,7 @@
     "interface-datastore": "^8.2.9",
     "iso-did": "^1.5.0",
     "iso-signatures": "^0.3.0",
+    "@multiformats/multiaddr": "^12.1.11",
     "localforage": "^1.10.0"
   }
 }
