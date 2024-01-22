@@ -38,6 +38,9 @@ export async function createNode(type, blockstore, datastore, config) {
         runOnTransientConnection: false,
       }),
     },
+    connectionManager: {
+      minConnections: 0
+    }
   }
 
   if (type == STANDALONE) {
