@@ -25,6 +25,15 @@
   }
   refreshProfile();
 
+  window.startDeviceLink = function(){
+    var url = `${window.location.origin}/link?username=`
+    document.querySelector("#device_link_modal > .modal-box > .modal-action > div").innerHTML = url
+    var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
+    document.querySelector("#device_link_modal > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
+    // TODO start approver
+    device_link_modal.showModal()
+  }
+
   appleCredsPresent().then(function (result){
     if(result.response){
       document.getElementById("apple_username").value = result.value.username
@@ -73,6 +82,10 @@
   <button class="btn btn-outline btn-sm w-2/3" onclick="generateRecoveryKit(document.getElementById('handle').innerHTML)">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647l.646-.647a.5.5 0 0 1 .708 0l.646.647l.646-.647a.5.5 0 0 1 .708 0l.646.647l.793-.793l-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z" /><path d="M4 8a1 1 0 1 1-2 0a1 1 0 0 1 2 0z" /></g></svg>
     Recovery Key
+  </button>
+  <button class="btn btn-outline btn-sm w-2/3" onclick="startDeviceLink()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M8.465 11.293c1.133-1.133 3.109-1.133 4.242 0l.707.707l1.414-1.414l-.707-.707c-.943-.944-2.199-1.465-3.535-1.465s-2.592.521-3.535 1.465L4.929 12a5.008 5.008 0 0 0 0 7.071a4.983 4.983 0 0 0 3.535 1.462A4.982 4.982 0 0 0 12 19.071l.707-.707l-1.414-1.414l-.707.707a3.007 3.007 0 0 1-4.243 0a3.005 3.005 0 0 1 0-4.243z"/><path fill="currentColor" d="m12 4.929l-.707.707l1.414 1.414l.707-.707a3.007 3.007 0 0 1 4.243 0a3.005 3.005 0 0 1 0 4.243l-2.122 2.121c-1.133 1.133-3.109 1.133-4.242 0L10.586 12l-1.414 1.414l.707.707c.943.944 2.199 1.465 3.535 1.465s2.592-.521 3.535-1.465L19.071 12a5.008 5.008 0 0 0 0-7.071a5.006 5.006 0 0 0-7.071 0"/></svg>
+    Link Device
   </button>
   <button class="btn btn-outline btn-sm w-2/3" onclick="downloadContactsDataLocally()">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773C16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318C1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593c.143-.863.698-1.723 1.464-2.383z"/><path d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708l3 3z"/></g></svg>
@@ -131,6 +144,26 @@
     </div>
   </div>
 </dialog>
+<dialog id="device_link_modal" class="modal">
+  <div class="modal-box">
+    <p class="text-xs">1. Scan QR OR copy this link and paste on another device</br>2. Input the pin & submit</p>
+    <div class="modal-action flex flex-col justify-center items-center space-y-2">
+      <div>link with username</div>
+      <div class="qr w-64 h-64"></div>
+      <form class="flex flex-row space-x-2" onsubmit="event.preventDefault(); producerChallengeProcessor(challenge, document.querySelector('#link_device_modal > .modal-box > .modal-action > form > input').value); return false">
+        <input type="text" placeholder="put pin" class="input input-bordered input-sm w-full max-w-xs" />
+        <button type="submit" class="btn btn-outline btn-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0a5.5 5.5 0 0 1 11 0z" /></svg>
+          submit
+        </button>
+      </form>
+      <form method="dialog">
+        <button class="btn btn-outline btn-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8L4.646 5.354a.5.5 0 0 1 0-.708z"/></g></svg>
+        </button>
+      </form>
+    </div>
+  </div>
 <dialog id="logout_modal" class="modal">
   <div class="modal-box">
     <p class="text-lg font-bold">Beware!!</p>
