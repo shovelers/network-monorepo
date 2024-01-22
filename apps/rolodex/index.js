@@ -26,6 +26,10 @@ server.get("/app", (req, res) => {
   res.render('pages/app')
 });
 
+server.get("/link", (req, res) => {
+  res.render('pages/link', { username: req.query.username })
+});
+
 server.get("/apple_contacts", async (req, res) => {
   try {
     const client = await createDAVClient({

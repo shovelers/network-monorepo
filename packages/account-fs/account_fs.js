@@ -15,6 +15,7 @@ export class AccountFS {
     this.session = session
     this.fs = new PrivateFS(helia)
     this.prefix = (network == "TESTNET") ? "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/" : "/ip4/127.0.0.1/tcp/3001/ws/p2p/"
+    this.syncServer = null
     this.axios_client  = axios.create({baseURL: syncHost})
   }
 
@@ -100,8 +101,8 @@ export class AccountFS {
 
   async startSync(){
     await this.axios_client.get('/bootstrap').then(async (response) => {
-      const peerAddress = this.prefix + response.data.peerId
-      await dial(this.helia, peerAddress)
+      this.syncServer = this.prefix + response.data.peerId
+      await dial(this.helia, this.syncServer)
     }).catch((e) => {
       console.log(e);
       return e

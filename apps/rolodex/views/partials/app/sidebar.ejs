@@ -25,8 +25,9 @@
   }
   refreshProfile();
 
+  var handle = await shovel.session.handle()
   window.startDeviceLink = function(){
-    var url = `${window.location.origin}/link?username=`
+    var url = `${window.location.origin}/link?handle=${handle}&peerId=${shovel.helia.libp2p.peerId.string}`
     document.querySelector("#device_link_modal > .modal-box > .modal-action > div").innerHTML = url
     var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
     document.querySelector("#device_link_modal > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
