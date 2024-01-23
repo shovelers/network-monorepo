@@ -11,7 +11,7 @@ async function verify(message, signature){
 }
 
 export class Requester {
-  constructor(agent, channel) {
+  constructor(agent, channel, onComplete) {
     this.agent = agent
     this.channel = channel
     this.DID = null
@@ -19,6 +19,7 @@ export class Requester {
     this.sessionKey = null
     this.state = null
     this.pinTarget = new PinEvent()
+    this.onComplete = onComplete
   }
 
   async handler(message) {
@@ -65,7 +66,7 @@ export class Requester {
   async complete(envelope) {
     const message = await Envelope.open(envelope, this.sessionKey)
     if (message.status == "CONFIRMED") {
-      // TODO Save access key
+      this.onComplete.call("", message)
       console.log(message.accessKey)
     }
     console.log(message.status)

@@ -50,7 +50,8 @@ class Agent {
 
   async actAsRequester(address, channelName) {
     const channel = new Channel(this.helia, channelName)
-    this.requester = new Requester(this, channel)
+    let agent = this
+    this.requester = new Requester(this, channel, async (message) => { return await agent.createSession(channelName, message)})
 
     this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
       console.log(`${message.detail.topic}:`, new TextDecoder().decode(message.detail.data))
@@ -103,6 +104,15 @@ class Agent {
     await localforage.setItem(SHOVEL_AGENT_WRITE_KEYPAIR, signer.export())
     
     return signer
+  }
+
+  async createSession(handle, accessKey) {
+    let encodedAccessKey = uint8arrays.fromString(accessKey.accessKey, "base64pad")
+    let encodeddHandle = uint8arrays.fromString(handle);
+    await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
+    await this.helia.datastore.put(new Key(SHOVEL_FS_ACCESS_KEY), encodedAccessKey)
+    // await this.helia.datastore.put(new Key(SHOVEL_FS_FOREST_CID))
+
   }
 }
 
