@@ -25,16 +25,18 @@ class Channel {
 }
 
 class Agent {
-  constructor(helia) {
+  constructor(helia, session) {
     this.helia = helia
+    this.session = session
   }
 
   async actAsApprover() {
     let handle = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
     const channelName = uint8arrays.toString(handle)
 
+    let session = this.session
     const channel = new Channel(this.helia, channelName)
-    this.approver = new Approver(this, channel)
+    this.approver = new Approver(this, channel, async () => { return await session.linkDevice() })
 
     this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
       console.log(`${message.detail.topic}:`, new TextDecoder().decode(message.detail.data))
@@ -108,7 +110,7 @@ export class AccountSession {
   constructor(helia, accountHost) {
     this.helia = helia
     this.axios_client  = axios.create({baseURL: accountHost})
-    this.agent = new Agent(helia)
+    this.agent = new Agent(helia, this)
   }
 
   async registerUser(handle) {
@@ -130,6 +132,21 @@ export class AccountSession {
     })
 
     return success
+  }
+
+  async linkDevice() {
+    let success = false
+    let handle = await this.handle()
+    let agentDID = await this.agent.DID()
+    const envelope = await this.agent.envelop({agentDID: agentDID})
+    await this.axios_client.put(`accounts/${handle}/agents` , envelope).then(async (response) => {
+      success = true
+    }).catch(async (e) => {
+      console.log(e);
+      return e
+    })
+
+    return success 
   }
 
   async recover(kit) {

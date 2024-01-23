@@ -155,6 +155,18 @@ server.post("/accounts", async (req, res) => {
   }
 });
 
+server.put("/accounts/:handle/agents", async (req, res) => {
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({})
+    return
+  }
+  var agentDID = req.body.message.agentDID
+  var fullname = `${req.params["handle"]}#${agentDID}`
+  await accounts.addAgent(fullname)
+  res.status(201).json({}) 
+})
+
 server.put("/accounts", async (req, res) => {
   const verified = await verify(req.body.message, req.body.signature)
   if (!verified) {

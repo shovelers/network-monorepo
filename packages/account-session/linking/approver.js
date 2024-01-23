@@ -2,12 +2,13 @@ import * as uint8arrays from 'uint8arrays';
 import { Envelope, DIDKey, PinEvent } from './common.js';
 
 export class Approver {
-  constructor(agent, channel) {
+  constructor(agent, channel, onComplete) {
     this.agent = agent
     this.channel = channel
     this.sessionKey = null
     this.state = null
     this.pinTarget = new PinEvent()
+    this.onComplete = onComplete
   }
 
   async handler(message) {
@@ -50,6 +51,7 @@ export class Approver {
 
   async confirm() {
     // TODO session.AddAgent
+    await this.onComplete.call()
     const rootKey = await this.agent.accessKey()
     const confirmMessage = await Envelope.pack({accessKey: rootKey, status: "CONFIRMED"}, this.sessionKey)
     
