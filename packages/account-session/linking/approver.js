@@ -1,5 +1,5 @@
 import * as uint8arrays from 'uint8arrays';
-import { Envelope, DIDKey, PinEvent } from './common.js';
+import { Envelope, DIDKey, Notification } from './common.js';
 
 export class Approver {
   constructor(agent, channel, onComplete) {
@@ -7,7 +7,7 @@ export class Approver {
     this.channel = channel
     this.sessionKey = null
     this.state = null
-    this.pinTarget = new PinEvent()
+    this.notification = new Notification()
     this.onComplete = onComplete
   }
 
@@ -40,7 +40,7 @@ export class Approver {
     const message = await Envelope.open(challenge, this.sessionKey)
 
     let approver = this
-    this.pinTarget.emitGenerateEvent(message)
+    this.notification.emitEvent("pinRecieved", message)
 
     return {
       confirm: async () => { return await approver.confirm() },

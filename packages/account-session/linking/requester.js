@@ -1,7 +1,7 @@
 import * as uint8arrays from 'uint8arrays';
 import { DIDKey as ISODIDKey } from 'iso-did/key'
 import * as verifiers from 'iso-signatures/verifiers/rsa.js'
-import { Envelope, DIDKey, PinEvent } from './common.js';
+import { Envelope, DIDKey, Notification } from './common.js';
 
 async function verify(message, signature){
   const pubKey = ISODIDKey.fromString(message.signer).publicKey
@@ -18,7 +18,7 @@ export class Requester {
     this.requestKeyPair = null
     this.sessionKey = null
     this.state = null
-    this.pinTarget = new PinEvent()
+    this.notification = new Notification()
     this.onComplete = onComplete
   }
 
@@ -59,14 +59,15 @@ export class Requester {
 
     this.channel.publish(challenge)
 
-    this.pinTarget.emitGenerateEvent(pin)
+    this.notification.emitEvent("pinGenerated", pin)
     return { challenge, pin }
   }
 
   async complete(envelope) {
     const message = await Envelope.open(envelope, this.sessionKey)
     if (message.status == "CONFIRMED") {
-      this.onComplete.call("", message)
+      await this.onComplete.call("", message)
+      this.notification.emitEvent("complete", "")
     }
     console.log(message.status)
   }

@@ -32,7 +32,7 @@
     var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
     document.querySelector("#device_link_modal > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
     shovel.session.agent.actAsApprover().then(() => {
-      shovel.session.agent.approver.pinTarget.addEventListener("pinGenerated", (event) => {
+      shovel.session.agent.approver.notification.addEventListener("pinRecieved", (event) => {
         window.pin = event.detail.pin
       })
     })

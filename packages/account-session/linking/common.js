@@ -60,12 +60,12 @@ export class DIDKey {
   }
 }
 
-export class PinEvent extends EventTarget {
+export class Notification extends EventTarget {
   constructor() {
     super();
   }
 
-  emitGenerateEvent(pin) {
-    this.dispatchEvent(new CustomEvent("pinGenerated", { detail: pin }));
+  emitEvent(name, message) {
+    this.dispatchEvent(new CustomEvent(name, { detail: message }));
   }
 }
