@@ -50,13 +50,13 @@ export class Approver {
   }
 
   async confirm() {
-    // TODO session.AddAgent
     await this.onComplete.call()
     const rootKey = await this.agent.accessKey()
     const forestCID = await this.agent.forestCID()
     const confirmMessage = await Envelope.pack({accessKey: rootKey, forestCID: forestCID, status: "CONFIRMED"}, this.sessionKey)
     
     await this.channel.publish(confirmMessage)
+    this.notification.emitEvent("complete", "CONFIRMED")
     return confirmMessage
   }
 
@@ -64,6 +64,7 @@ export class Approver {
     const rejectMessage = await Envelope.pack({ status: "REJECTED" }, this.sessionKey)
     
     await this.channel.publish(rejectMessage)
+    this.notification.emitEvent("complete", "REJECTED")
     return rejectMessage
   }
 

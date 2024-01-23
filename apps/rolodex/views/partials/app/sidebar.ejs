@@ -35,6 +35,12 @@
       shovel.session.agent.approver.notification.addEventListener("pinRecieved", (event) => {
         window.pin = event.detail.pin
       })
+      shovel.session.agent.approver.notification.addEventListener("complete", (event) => {
+        if (event.detail == "CONFIRMED"){
+          device_link_modal.close()
+          alert("Device Linked!") 
+        }
+      })
     })
 
     device_link_modal.showModal()
