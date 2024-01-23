@@ -36,7 +36,7 @@ class Agent {
 
     let session = this.session
     const channel = new Channel(this.helia, channelName)
-    this.approver = new Approver(this, channel, async () => { return await session.linkDevice() })
+    this.approver = new Approver(this, channel, async (message) => { return await session.linkDevice(message) })
 
     this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
       console.log(`${message.detail.topic}:`, new TextDecoder().decode(message.detail.data))
@@ -149,10 +149,11 @@ export class AccountSession {
     return success
   }
 
-  async linkDevice() {
+  async linkDevice(message) {
     let success = false
     let handle = await this.handle()
-    let agentDID = await this.agent.DID()
+    console.log("message with pin and did", message)
+    let agentDID = await message.did
     const envelope = await this.agent.envelop({agentDID: agentDID})
     await this.axios_client.put(`accounts/${handle}/agents` , envelope).then(async (response) => {
       success = true

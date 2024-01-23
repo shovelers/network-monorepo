@@ -40,7 +40,11 @@ export class Approver {
     const message = await Envelope.open(challenge, this.sessionKey)
 
     let approver = this
-    this.notification.emitEvent("pinRecieved", message)
+    this.notification.emitEvent("pinRecieved", {
+      confirm: async () => { return await approver.confirm(message) },
+      reject: async () => { return await approver.reject() },
+      message: message
+    })
 
     return {
       confirm: async () => { return await approver.confirm() },
@@ -49,8 +53,9 @@ export class Approver {
     }
   }
 
-  async confirm() {
-    await this.onComplete.call()
+  async confirm(message) {
+    console.log("message in approve#confirm", message)
+    await this.onComplete.call("", message)
     const rootKey = await this.agent.accessKey()
     const forestCID = await this.agent.forestCID()
     const confirmMessage = await Envelope.pack({accessKey: rootKey, forestCID: forestCID, status: "CONFIRMED"}, this.sessionKey)

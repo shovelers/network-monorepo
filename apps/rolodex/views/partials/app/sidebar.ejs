@@ -26,6 +26,8 @@
   refreshProfile();
 
   var handle = await shovel.session.handle()
+  var confirm
+  var reject
   window.startDeviceLink = async function(){
     var url = `${window.location.origin}/link?handle=${handle}&peerId=${shovel.helia.libp2p.peerId.string}`
     document.querySelector("#device_link_modal > .modal-box > .modal-action > div").innerHTML = url
@@ -33,7 +35,9 @@
     document.querySelector("#device_link_modal > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
     shovel.session.agent.actAsApprover().then(() => {
       shovel.session.agent.approver.notification.addEventListener("pinRecieved", (event) => {
-        window.pin = event.detail.pin
+        window.pin = event.detail.message.pin
+        confirm = event.detail.confirm
+        reject = event.detail.reject
       })
       shovel.session.agent.approver.notification.addEventListener("complete", (event) => {
         if (event.detail == "CONFIRMED"){
@@ -47,9 +51,9 @@
   }
   window.challengeProcessor = function (input){
     if(input === window.pin.join("")) {
-      shovel.session.agent.approver.confirm() 
+      confirm.call() 
     } else {
-      shovel.session.agent.approver.reject()
+      reject.call()
     }
   }
 
