@@ -59,3 +59,13 @@ export class DIDKey {
     return magicalBuf.slice(rsaMagicBytes.length)
   }
 }
+
+export class PinEvent extends EventTarget {
+  constructor() {
+    super();
+  }
+
+  emitGenerateEvent(pin) {
+    this.dispatchEvent(new CustomEvent("pinGenerated", { detail: pin }));
+  }
+}

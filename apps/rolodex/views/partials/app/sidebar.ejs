@@ -31,7 +31,8 @@
     document.querySelector("#device_link_modal > .modal-box > .modal-action > div").innerHTML = url
     var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
     document.querySelector("#device_link_modal > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
-    // TODO start approver
+    shovel.session.agent.actAsApprover()
+
     device_link_modal.showModal()
   }
 
