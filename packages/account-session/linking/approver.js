@@ -53,7 +53,8 @@ export class Approver {
     // TODO session.AddAgent
     await this.onComplete.call()
     const rootKey = await this.agent.accessKey()
-    const confirmMessage = await Envelope.pack({accessKey: rootKey, status: "CONFIRMED"}, this.sessionKey)
+    const forestCID = await this.agent.forestCID()
+    const confirmMessage = await Envelope.pack({accessKey: rootKey, forestCID: forestCID, status: "CONFIRMED"}, this.sessionKey)
     
     await this.channel.publish(confirmMessage)
     return confirmMessage

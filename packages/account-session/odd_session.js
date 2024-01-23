@@ -93,6 +93,11 @@ class Agent {
     return uint8arrays.toString(ak, 'base64pad') 
   }
 
+  async forestCID() {
+    let cid = await this.helia.datastore.get(new Key(SHOVEL_FS_FOREST_CID))
+    return uint8arrays.toString(cid, 'base64pad') 
+  }
+
   //Private
   async signer(){
     let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
@@ -106,13 +111,13 @@ class Agent {
     return signer
   }
 
-  async createSession(handle, accessKey) {
-    let encodedAccessKey = uint8arrays.fromString(accessKey.accessKey, "base64pad")
+  async createSession(handle, message) {
+    let encodedAccessKey = uint8arrays.fromString(message.accessKey, "base64pad")
     let encodeddHandle = uint8arrays.fromString(handle);
+    let encodedForestCID = uint8arrays.fromString(message.forestCID, "base64pad")
     await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
     await this.helia.datastore.put(new Key(SHOVEL_FS_ACCESS_KEY), encodedAccessKey)
-    // await this.helia.datastore.put(new Key(SHOVEL_FS_FOREST_CID))
-
+    await this.helia.datastore.put(new Key(SHOVEL_FS_FOREST_CID), encodedForestCID)
   }
 }
 

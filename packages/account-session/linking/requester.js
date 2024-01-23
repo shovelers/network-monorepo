@@ -67,7 +67,6 @@ export class Requester {
     const message = await Envelope.open(envelope, this.sessionKey)
     if (message.status == "CONFIRMED") {
       this.onComplete.call("", message)
-      console.log(message.accessKey)
     }
     console.log(message.status)
   }
