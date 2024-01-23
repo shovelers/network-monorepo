@@ -26,14 +26,25 @@
   refreshProfile();
 
   var handle = await shovel.session.handle()
-  window.startDeviceLink = function(){
+  window.startDeviceLink = async function(){
     var url = `${window.location.origin}/link?handle=${handle}&peerId=${shovel.helia.libp2p.peerId.string}`
     document.querySelector("#device_link_modal > .modal-box > .modal-action > div").innerHTML = url
     var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
     document.querySelector("#device_link_modal > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
-    shovel.session.agent.actAsApprover()
+    shovel.session.agent.actAsApprover().then(() => {
+      shovel.session.agent.approver.pinTarget.addEventListener("pinGenerated", (event) => {
+        window.pin = event.detail.pin
+      })
+    })
 
     device_link_modal.showModal()
+  }
+  window.challengeProcessor = function (input){
+    if(input === window.pin.join("")) {
+      shovel.session.agent.approver.confirm() 
+    } else {
+      shovel.session.agent.approver.reject()
+    }
   }
 
   appleCredsPresent().then(function (result){
@@ -152,7 +163,7 @@
     <div class="modal-action flex flex-col justify-center items-center space-y-2">
       <div>link with username</div>
       <div class="qr w-64 h-64"></div>
-      <form class="flex flex-row space-x-2" onsubmit="event.preventDefault(); producerChallengeProcessor(challenge, document.querySelector('#link_device_modal > .modal-box > .modal-action > form > input').value); return false">
+      <form class="flex flex-row space-x-2" onsubmit="event.preventDefault(); challengeProcessor(document.querySelector('#device_link_modal > .modal-box > .modal-action > form > input').value); return false">
         <input type="text" placeholder="put pin" class="input input-bordered input-sm w-full max-w-xs" />
         <button type="submit" class="btn btn-outline btn-sm">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0a5.5 5.5 0 0 1 11 0z" /></svg>
