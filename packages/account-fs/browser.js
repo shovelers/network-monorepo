@@ -1,7 +1,7 @@
 import { createBrowserNode } from './fs/helia_node.js';
 import { AccountFS } from './fs/account_fs.js';
 import { Account } from './agent/account.js'
-import { Agent } from './agent/odd_session.js'
+import { Agent } from './agent/agent.js'
 
 const connection = {
   "LOCAL": {network: "LOCAL"},

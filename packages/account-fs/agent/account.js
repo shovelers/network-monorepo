@@ -24,9 +24,9 @@ class Profile {
 }
 
 export class Account {
-  constructor(accountfs, accountSession) {
+  constructor(accountfs, agent) {
     this.accountfs = accountfs
-    this.accountSession = accountSession
+    this.agent = agent
     this.filename = "profile.json"
     this.profile = null
   }
@@ -48,7 +48,7 @@ export class Account {
   }
 
   async create(handle, initialFiles) {
-    const success = await this.accountSession.registerUser(handle)
+    const success = await this.agent.registerUser(handle)
 
     if (success) {
       await this.accountfs.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
@@ -67,15 +67,15 @@ export class Account {
   }
 
   async signout(){
-    await this.accountSession.destroy()
+    await this.agent.destroy()
   }
 
   async activeSession() {
-    return this.accountSession.activeSession()
+    return this.agent.activeSession()
   }
 
   async recoveryKitContent() {
-    const data = await this.accountSession.recoveryKitData()
+    const data = await this.agent.recoveryKitData()
     return RecoveryKit.toYML(data)
   }
 
@@ -85,7 +85,7 @@ export class Account {
     var shovelKey = uint8arrays.fromString(data.accountKey, 'base64pad'); 
     var handle = data.fullname.split('#')[0]
 
-    const success = await this.accountSession.recover(data)
+    const success = await this.agent.recover(data)
     if (success) {
       await this.accountfs.recover(handle, shovelKey)
     }
