@@ -14,7 +14,7 @@ async function programInit(network) {
 
   const agent =  new Agent(helia, connection[network].sync_host)
 
-  const accountfs = new AccountFS(helia, agent, connection[network].network, connection[network].sync_host)
+  const accountfs = new AccountFS(helia, agent, connection[network].dial_prefix, connection[network].sync_host)
   await accountfs.load()
 
   return  {

@@ -3,11 +3,11 @@ import { dial } from './helia_node.js'
 import axios from 'axios'
 
 export class AccountFS {
-  constructor(helia, agent, network, syncHost){
+  constructor(helia, agent, dialPrefix, syncHost){
     this.helia = helia
     this.agent = agent
     this.fs = new PrivateFS(helia)
-    this.prefix = (network == "TESTNET") ? "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/" : "/ip4/127.0.0.1/tcp/3001/ws/p2p/"
+    this.prefix = dialPrefix
     this.syncServer = null
     this.axios_client  = axios.create({baseURL: syncHost})
   }
