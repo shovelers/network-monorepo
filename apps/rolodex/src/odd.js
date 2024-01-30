@@ -11,7 +11,7 @@ const program = await programInit(NETWORK)
 window.shovel = program
 
 const contactRepo = new ContactRepository(program.fs)
-const account = new Account(program.fs, program.session)
+const account = new Account(program.fs, program.agent)
 
 customElements.define('contact-table', ContactTable);
 

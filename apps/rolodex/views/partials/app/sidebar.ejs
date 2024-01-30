@@ -25,7 +25,7 @@
   }
   refreshProfile();
 
-  var handle = await shovel.session.handle()
+  var handle = await shovel.agent.handle()
   var confirm
   var reject
   window.startDeviceLink = async function(){
@@ -33,13 +33,13 @@
     document.querySelector("#device_link_modal > .modal-box > .modal-action > div").innerHTML = url
     var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
     document.querySelector("#device_link_modal > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
-    shovel.session.agent.actAsApprover().then(() => {
-      shovel.session.agent.approver.notification.addEventListener("pinRecieved", (event) => {
+    shovel.agent.actAsApprover().then(() => {
+      shovel.agent.approver.notification.addEventListener("pinRecieved", (event) => {
         window.pin = event.detail.message.pin
         confirm = event.detail.confirm
         reject = event.detail.reject
       })
-      shovel.session.agent.approver.notification.addEventListener("complete", (event) => {
+      shovel.agent.approver.notification.addEventListener("complete", (event) => {
         if (event.detail == "CONFIRMED"){
           device_link_modal.close()
           alert("Device Linked!") 

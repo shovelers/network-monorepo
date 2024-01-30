@@ -24,19 +24,19 @@ class Channel {
   }
 }
 
-class Agent {
-  constructor(helia, session) {
+export class Agent {
+  constructor(helia, accountHost) {
     this.helia = helia
-    this.session = session
+    this.axios_client  = axios.create({baseURL: accountHost})
   }
 
   async actAsApprover() {
     let handle = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
     const channelName = uint8arrays.toString(handle)
 
-    let session = this.session
+    let agent = this
     const channel = new Channel(this.helia, channelName)
-    this.approver = new Approver(this, channel, async (message) => { return await session.linkDevice(message) })
+    this.approver = new Approver(this, channel, async (message) => { return await agent.linkDevice(message) })
 
     this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
       console.log(`${message.detail.topic}:`, new TextDecoder().decode(message.detail.data))
@@ -84,10 +84,6 @@ class Agent {
     return { message: message, signature: encodedSignature }
   }
 
-  async destroy() {
-    await localforage.removeItem(SHOVEL_AGENT_WRITE_KEYPAIR)
-  }
-
   async accessKey() {
     let ak = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
     return uint8arrays.toString(ak, 'base64pad') 
@@ -98,7 +94,6 @@ class Agent {
     return uint8arrays.toString(cid, 'base64pad') 
   }
 
-  //Private
   async signer(){
     let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
     if (keypair) {
@@ -119,24 +114,16 @@ class Agent {
     await this.helia.datastore.put(new Key(SHOVEL_FS_ACCESS_KEY), encodedAccessKey)
     await this.helia.datastore.put(new Key(SHOVEL_FS_FOREST_CID), encodedForestCID)
   }
-}
-
-export class AccountSession {
-  constructor(helia, accountHost) {
-    this.helia = helia
-    this.axios_client  = axios.create({baseURL: accountHost})
-    this.agent = new Agent(helia, this)
-  }
 
   async registerUser(handle) {
     let encodeddHandle = uint8arrays.fromString(handle);
     await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
 
-    const did = await this.agent.DID()
+    const did = await this.DID()
     const fullname = `${handle}#${did}`
 
     let success = false
-    const envelope = await this.agent.envelop({fullname: fullname})
+    const envelope = await this.envelop({fullname: fullname})
     await this.axios_client.post('/accounts', envelope).then(async (response) => {
       console.log("account creation status", response.status)
       success = true
@@ -154,7 +141,7 @@ export class AccountSession {
     let handle = await this.handle()
     console.log("message with pin and did", message)
     let agentDID = await message.did
-    const envelope = await this.agent.envelop({agentDID: agentDID})
+    const envelope = await this.envelop({agentDID: agentDID})
     await this.axios_client.put(`accounts/${handle}/agents` , envelope).then(async (response) => {
       success = true
     }).catch(async (e) => {
@@ -168,15 +155,16 @@ export class AccountSession {
   async recover(kit) {
     var handle = kit.fullname.split('#')[0]
 
+    await this.destroy()
+
     let encodeddHandle = uint8arrays.fromString(handle);
     await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
 
-    await this.agent.destroy()
-    const did = await this.agent.DID()
+    const did = await this.DID()
     const fullname = `${handle}#${did}`
 
     let success = false
-    const envelope = await this.agent.envelop({fullname: fullname, recoveryKit: { generatingAgent: kit.fullname, signature: kit.signature }})
+    const envelope = await this.envelop({fullname: fullname, recoveryKit: { generatingAgent: kit.fullname, signature: kit.signature }})
     await this.axios_client.put('/accounts', envelope).then(async (response) => {
       console.log("account recovery status", response.status)
       success = true
@@ -193,7 +181,7 @@ export class AccountSession {
     await this.helia.datastore.delete(new Key(SHOVEL_FS_ACCESS_KEY))
     await this.helia.datastore.delete(new Key(SHOVEL_ACCOUNT_HANDLE))
     await this.helia.datastore.delete(new Key(SHOVEL_FS_FOREST_CID))
-    await this.agent.destroy()
+    await localforage.removeItem(SHOVEL_AGENT_WRITE_KEYPAIR)
   }
 
   async activeSession() {
@@ -203,13 +191,13 @@ export class AccountSession {
 
   async recoveryKitData(){
     const handle = await this.handle()
-    const did = await this.agent.DID()
+    const did = await this.DID()
     const fullname = `${handle}#${did}`
 
     let ak = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
     const encodedAccessKey = uint8arrays.toString(ak, 'base64pad');
 
-    const envolope = await this.agent.envelop({fullname: fullname})
+    const envolope = await this.envelop({fullname: fullname})
     return {fullname: fullname, accountKey: encodedAccessKey, signature: envolope.signature}
   }
 

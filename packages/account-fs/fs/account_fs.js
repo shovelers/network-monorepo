@@ -10,9 +10,9 @@ const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 
 export class AccountFS {
-  constructor(helia, session, network, syncHost){
+  constructor(helia, agent, network, syncHost){
     this.helia = helia
-    this.session = session
+    this.agent = agent
     this.fs = new PrivateFS(helia)
     this.prefix = (network == "TESTNET") ? "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/" : "/ip4/127.0.0.1/tcp/3001/ws/p2p/"
     this.syncServer = null
@@ -90,7 +90,7 @@ export class AccountFS {
     let handle = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
     handle = uint8arrays.toString(handle)
 
-    const envelope = await this.session.agent.envelop({cid: cid, handle: handle})
+    const envelope = await this.agent.envelop({cid: cid, handle: handle})
     await this.axios_client.post('/pin', envelope).then(async (response) => {
       console.log(response.status)
     }).catch((e) => {

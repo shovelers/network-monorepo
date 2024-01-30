@@ -1,7 +1,7 @@
 import { createBrowserNode } from './fs/helia_node.js';
 import { AccountFS } from './fs/account_fs.js';
 import { Account } from './agent/account.js'
-import { AccountSession } from './agent/odd_session.js'
+import { Agent } from './agent/odd_session.js'
 
 const connection = {
   "LOCAL": {network: "LOCAL"},
@@ -12,15 +12,15 @@ const connection = {
 async function programInit(network) {
   const helia = await createBrowserNode()
 
-  const accountSession =  new AccountSession(helia, connection[network].sync_host)
+  const agent =  new Agent(helia, connection[network].sync_host)
 
-  const accountfs = new AccountFS(helia, accountSession, connection[network].network, connection[network].sync_host)
+  const accountfs = new AccountFS(helia, agent, connection[network].network, connection[network].sync_host)
   await accountfs.load()
 
   return  {
     helia: helia,
     fs: accountfs,
-    session: accountSession
+    agent: agent
   }
 }
 

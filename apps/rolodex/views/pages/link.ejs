@@ -16,16 +16,16 @@
 
       if (handle && peerId) {
         console.log("sync", shovel.fs.syncServer)
-        shovel.session.agent.actAsRequester(`${shovel.fs.syncServer}/p2p-circuit/webrtc/p2p/${peerId}`, handle)
+        shovel.agent.actAsRequester(`${shovel.fs.syncServer}/p2p-circuit/webrtc/p2p/${peerId}`, handle)
       } else {
         console.log("Invalid URL")
       }
 
-      shovel.session.agent.requester.notification.addEventListener("pinGenerated", (event) => {
+      shovel.agent.requester.notification.addEventListener("pinGenerated", (event) => {
         let pin = event.detail
         document.getElementById("pin").innerHTML = `${pin[0]}${pin[1]}${pin[2]}${pin[3]}${pin[4]}${pin[5]}`
       })
-      shovel.session.agent.requester.notification.addEventListener("complete", (event) => {
+      shovel.agent.requester.notification.addEventListener("complete", (event) => {
         window.location.href = '/app'
       })
 
