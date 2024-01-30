@@ -56,8 +56,8 @@ export class Approver {
   async confirm(message) {
     console.log("message in approve#confirm", message)
     await this.onComplete.call("", message)
-    const rootKey = await this.agent.accessKey()
-    const forestCID = await this.agent.forestCID()
+    const rootKey = uint8arrays.toString(await this.agent.accessKey(), 'base64pad')
+    const forestCID = uint8arrays.toString(await this.agent.forestCID(), 'base64pad')
     const confirmMessage = await Envelope.pack({accessKey: rootKey, forestCID: forestCID, status: "CONFIRMED"}, this.sessionKey)
     
     await this.channel.publish(confirmMessage)

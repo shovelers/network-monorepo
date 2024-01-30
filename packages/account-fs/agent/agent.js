@@ -1,5 +1,4 @@
 import * as uint8arrays from 'uint8arrays';
-import { Key } from 'interface-datastore';
 import axios from 'axios'
 import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
@@ -31,8 +30,7 @@ export class Agent {
   }
 
   async actAsApprover() {
-    let handle = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
-    const channelName = uint8arrays.toString(handle)
+    const channelName = await this.handle()
 
     let agent = this
     const channel = new Channel(this.helia, channelName)
@@ -84,16 +82,6 @@ export class Agent {
     return { message: message, signature: encodedSignature }
   }
 
-  async accessKey() {
-    let ak = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
-    return uint8arrays.toString(ak, 'base64pad') 
-  }
-
-  async forestCID() {
-    let cid = await this.helia.datastore.get(new Key(SHOVEL_FS_FOREST_CID))
-    return uint8arrays.toString(cid, 'base64pad') 
-  }
-
   async signer(){
     let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
     if (keypair) {
@@ -107,17 +95,13 @@ export class Agent {
   }
 
   async createSession(handle, message) {
-    let encodedAccessKey = uint8arrays.fromString(message.accessKey, "base64pad")
-    let encodeddHandle = uint8arrays.fromString(handle);
-    let encodedForestCID = uint8arrays.fromString(message.forestCID, "base64pad")
-    await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
-    await this.helia.datastore.put(new Key(SHOVEL_FS_ACCESS_KEY), encodedAccessKey)
-    await this.helia.datastore.put(new Key(SHOVEL_FS_FOREST_CID), encodedForestCID)
+    await localforage.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
+    await localforage.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(message.accessKey, 'base64pad'))
+    await localforage.setItem(SHOVEL_FS_FOREST_CID, uint8arrays.fromString(message.forestCID, 'base64pad'))
   }
 
   async registerUser(handle) {
-    let encodeddHandle = uint8arrays.fromString(handle);
-    await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
+    await localforage.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
 
     const did = await this.DID()
     const fullname = `${handle}#${did}`
@@ -157,8 +141,7 @@ export class Agent {
 
     await this.destroy()
 
-    let encodeddHandle = uint8arrays.fromString(handle);
-    await this.helia.datastore.put(new Key(SHOVEL_ACCOUNT_HANDLE), encodeddHandle)
+    await localforage.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
 
     const did = await this.DID()
     const fullname = `${handle}#${did}`
@@ -178,10 +161,10 @@ export class Agent {
   }
 
   async destroy() {
-    await this.helia.datastore.delete(new Key(SHOVEL_FS_ACCESS_KEY))
-    await this.helia.datastore.delete(new Key(SHOVEL_ACCOUNT_HANDLE))
-    await this.helia.datastore.delete(new Key(SHOVEL_FS_FOREST_CID))
+    await localforage.removeItem(SHOVEL_FS_ACCESS_KEY)
+    await localforage.removeItem(SHOVEL_FS_FOREST_CID)
     await localforage.removeItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+    await localforage.removeItem(SHOVEL_ACCOUNT_HANDLE)
   }
 
   async activeSession() {
@@ -194,15 +177,21 @@ export class Agent {
     const did = await this.DID()
     const fullname = `${handle}#${did}`
 
-    let ak = await this.helia.datastore.get(new Key(SHOVEL_FS_ACCESS_KEY))
-    const encodedAccessKey = uint8arrays.toString(ak, 'base64pad');
+    let ak = await this.accessKey()
 
     const envolope = await this.envelop({fullname: fullname})
-    return {fullname: fullname, accountKey: encodedAccessKey, signature: envolope.signature}
+    return {fullname: fullname, accountKey: uint8arrays.toString(ak, 'base64pad'), signature: envolope.signature}
   }
 
   async handle() {
-    let handle = await this.helia.datastore.get(new Key(SHOVEL_ACCOUNT_HANDLE))
-    return uint8arrays.toString(handle)
+    return await localforage.getItem(SHOVEL_ACCOUNT_HANDLE)
+  }
+
+  async accessKey() {
+    return await localforage.getItem(SHOVEL_FS_ACCESS_KEY)
+  }
+
+  async forestCID() {
+    return await localforage.getItem(SHOVEL_FS_FOREST_CID)
   }
 }
