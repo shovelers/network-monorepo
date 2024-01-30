@@ -1,4 +1,4 @@
-import { createNode, STANDALONE } from './helia_node.js';
+import { createNode, STANDALONE } from './fs/helia_node.js';
 import { FsBlockstore } from 'blockstore-fs'
 import { FsDatastore } from 'datastore-fs'
 //import { prometheusMetrics } from '@libp2p/prometheus-metrics'
