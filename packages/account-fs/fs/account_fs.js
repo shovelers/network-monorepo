@@ -33,28 +33,6 @@ export class AccountFS {
     }
   }
 
-  async recover(handle, access_key) {    
-    let forest_cid = await this.getForestCidForHandle(handle)
-    forest_cid = CID.parse(forest_cid).bytes
-
-    await localforage.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
-    await localforage.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
-
-    await this.load()
-  }
-
-  async getForestCidForHandle(handle){
-    let forest_cid;
-    await this.axios_client.get('/forestCID/'+ handle).then(async (response) => {
-      console.log("response", response.status, response.data)
-      forest_cid = response.data.cid
-    }).catch((e) => {
-      console.log(e);
-      return e
-    })
-    return forest_cid; 
-  }
-
   async readPrivateFile(filename) {
     try {
       let content = await this.fs.read(filename)

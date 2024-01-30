@@ -190,7 +190,11 @@ server.put("/accounts", async (req, res) => {
 
   var fullname = req.body.message.fullname
   await accounts.addAgent(fullname)
-  res.status(201).json({})
+
+  var cid = await node.datastore.get(new Key('/handle/' + fullname.split('#')[0]))
+  cid = CID.decode(cid)
+
+  res.status(201).json({cid: cid.toString()})
 });
 
 server.get("/forestCID/:handle", async (req, res) => {

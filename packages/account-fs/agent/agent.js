@@ -5,6 +5,7 @@ import localforage from "localforage";
 import { Approver } from './linking/approver.js';
 import { Requester } from './linking/requester.js';
 import { multiaddr } from '@multiformats/multiaddr'
+import { CID } from 'multiformats/cid'
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
@@ -142,6 +143,7 @@ export class Agent {
     await this.destroy()
 
     await localforage.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
+    await localforage.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(kit.accountKey, 'base64pad'))
 
     const did = await this.DID()
     const fullname = `${handle}#${did}`
@@ -149,7 +151,7 @@ export class Agent {
     let success = false
     const envelope = await this.envelop({fullname: fullname, recoveryKit: { generatingAgent: kit.fullname, signature: kit.signature }})
     await this.axios_client.put('/accounts', envelope).then(async (response) => {
-      console.log("account recovery status", response.status)
+      await localforage.setItem(SHOVEL_FS_FOREST_CID, CID.parse(response.data.cid).bytes)
       success = true
     }).catch(async (e) => {
       console.log(e);

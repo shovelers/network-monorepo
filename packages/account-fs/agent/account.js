@@ -82,12 +82,9 @@ export class Account {
   async recover(content){
     var data = RecoveryKit.parseYML(content)
 
-    var shovelKey = uint8arrays.fromString(data.accountKey, 'base64pad'); 
-    var handle = data.fullname.split('#')[0]
-
     const success = await this.agent.recover(data)
     if (success) {
-      await this.accountfs.recover(handle, shovelKey)
+      await this.accountfs.load()
     }
     return success
   }
