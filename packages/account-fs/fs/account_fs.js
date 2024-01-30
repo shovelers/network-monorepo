@@ -1,11 +1,6 @@
 import { PrivateFS } from "./private_fs.js"
 import { dial } from './helia_node.js'
 import axios from 'axios'
-import { CID } from 'multiformats/cid'
-import localforage from "localforage";
-
-const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
-const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 
 export class AccountFS {
   constructor(helia, agent, network, syncHost){
@@ -53,24 +48,8 @@ export class AccountFS {
     let newContent = mutationFunction(content)
     var [access_key, forest_cid] = await this.fs.write(filename, JSON.stringify(newContent))
 
-    await localforage.setItem(SHOVEL_FS_ACCESS_KEY, access_key)
-    await localforage.setItem(SHOVEL_FS_FOREST_CID, forest_cid)
-
-    this.pin(forest_cid)
+    await this.agent.pin(access_key,forest_cid)
     return newContent
-  }
-
-  async pin(forest_cid) {
-    let cid = CID.decode(forest_cid).toString()
-    let handle = await this.agent.handle()
-
-    const envelope = await this.agent.envelop({cid: cid, handle: handle})
-    await this.axios_client.post('/pin', envelope).then(async (response) => {
-      console.log(response.status)
-    }).catch((e) => {
-      console.log(e);
-      return e
-    })
   }
 
   async startSync(){

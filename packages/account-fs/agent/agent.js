@@ -162,6 +162,22 @@ export class Agent {
     return success
   }
 
+  async pin(accessKey, forestCID) {
+    await localforage.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
+    await localforage.setItem(SHOVEL_FS_FOREST_CID, forestCID)
+
+    let cid = CID.decode(forestCID).toString()
+    let handle = await this.handle()
+
+    const envelope = await this.envelop({cid: cid, handle: handle})
+    await this.axios_client.post('/pin', envelope).then(async (response) => {
+      console.log(response.status)
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
+  }
+
   async destroy() {
     await localforage.removeItem(SHOVEL_FS_ACCESS_KEY)
     await localforage.removeItem(SHOVEL_FS_FOREST_CID)
