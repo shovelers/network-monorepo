@@ -3,8 +3,7 @@ import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
 import { Contact, ContactRepository } from "./contacts.js";
-import { Account, AccountSession  } from 'account-session';
-import { createBrowserNode, AccountFS } from 'account-fs';
+import { createBrowserNode, AccountFS, Account, AccountSession } from 'account-fs';
 import { Key } from 'interface-datastore';
 
 const SHOVEL_FS_SYNC_HOST = import.meta.env.VITE_SHOVEL_FS_SYNC_HOST || "http://localhost:3000"

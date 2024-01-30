@@ -34,6 +34,9 @@
     "datastore-idb": "^2.1.6",
     "blockstore-fs": "^1.1.8",
     "datastore-fs": "^9.1.6",
+    "iso-did": "^1.5.0",
+    "iso-signatures": "^0.3.0",
+    "localforage": "^1.10.0",
     "wnfs": "^0.1.29-alpha1"
   }
 }
