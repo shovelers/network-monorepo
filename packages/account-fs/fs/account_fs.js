@@ -21,11 +21,11 @@ export class AccountFS {
     await this.startSync()
 
     try {
-      let access_key = await localforage.getItem(SHOVEL_FS_ACCESS_KEY)
-      let forest_cid = await localforage.getItem(SHOVEL_FS_FOREST_CID)
+      let accessKey = await this.agent.accessKey()
+      let forestCID = await this.agent.forestCID()
 
-      if (access_key && forest_cid){
-        await this.fs.loadForest(access_key, forest_cid)
+      if (accessKey && forestCID){
+        await this.fs.loadForest(accessKey, forestCID)
       }
     } catch (err) {
       console.log("missing datastore keys, need an account")
@@ -43,9 +43,9 @@ export class AccountFS {
   }
 
   async getAccessKeyForPrivateFile(filename) {
-    let forest_cid = await localforage.getItem(SHOVEL_FS_FOREST_CID)
-    let access_key = await this.fs.accessKeyForPrivateFile(filename)
-    return [access_key, forest_cid]
+    let forestCID = await this.agent.forestCID()
+    let accessKey = await this.fs.accessKeyForPrivateFile(filename)
+    return [accessKey, forestCID]
   }
 
   async updatePrivateFile(filename, mutationFunction) {
