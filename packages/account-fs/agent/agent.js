@@ -28,6 +28,7 @@ export class Agent {
   constructor(helia, accountHost) {
     this.helia = helia
     this.axios_client  = axios.create({baseURL: accountHost})
+    this.runtime = new Runtime(BROWSER_RUNTIME)
   }
 
   async actAsApprover() {
@@ -84,25 +85,25 @@ export class Agent {
   }
 
   async signer(){
-    let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+    let keypair = await this.runtime.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
     if (keypair) {
       return RSASigner.import(keypair)
     }
 
     const signer = await RSASigner.generate()
-    await localforage.setItem(SHOVEL_AGENT_WRITE_KEYPAIR, signer.export())
+    await this.runtime.setItem(SHOVEL_AGENT_WRITE_KEYPAIR, signer.export())
     
     return signer
   }
 
   async createSession(handle, message) {
-    await localforage.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
-    await localforage.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(message.accessKey, 'base64pad'))
-    await localforage.setItem(SHOVEL_FS_FOREST_CID, uint8arrays.fromString(message.forestCID, 'base64pad'))
+    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
+    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(message.accessKey, 'base64pad'))
+    await this.runtime.setItem(SHOVEL_FS_FOREST_CID, uint8arrays.fromString(message.forestCID, 'base64pad'))
   }
 
   async registerUser(handle) {
-    await localforage.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
+    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
 
     const did = await this.DID()
     const fullname = `${handle}#${did}`
@@ -142,8 +143,8 @@ export class Agent {
 
     await this.destroy()
 
-    await localforage.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
-    await localforage.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(kit.accountKey, 'base64pad'))
+    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
+    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(kit.accountKey, 'base64pad'))
 
     const did = await this.DID()
     const fullname = `${handle}#${did}`
@@ -151,7 +152,7 @@ export class Agent {
     let success = false
     const envelope = await this.envelop({fullname: fullname, recoveryKit: { generatingAgent: kit.fullname, signature: kit.signature }})
     await this.axios_client.put('/accounts', envelope).then(async (response) => {
-      await localforage.setItem(SHOVEL_FS_FOREST_CID, CID.parse(response.data.cid).bytes)
+      await this.runtime.setItem(SHOVEL_FS_FOREST_CID, CID.parse(response.data.cid).bytes)
       success = true
     }).catch(async (e) => {
       console.log(e);
@@ -163,8 +164,8 @@ export class Agent {
   }
 
   async pin(accessKey, forestCID) {
-    await localforage.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
-    await localforage.setItem(SHOVEL_FS_FOREST_CID, forestCID)
+    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
+    await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
 
     let cid = CID.decode(forestCID).toString()
     let handle = await this.handle()
@@ -179,14 +180,14 @@ export class Agent {
   }
 
   async destroy() {
-    await localforage.removeItem(SHOVEL_FS_ACCESS_KEY)
-    await localforage.removeItem(SHOVEL_FS_FOREST_CID)
-    await localforage.removeItem(SHOVEL_AGENT_WRITE_KEYPAIR)
-    await localforage.removeItem(SHOVEL_ACCOUNT_HANDLE)
+    await this.runtime.removeItem(SHOVEL_FS_ACCESS_KEY)
+    await this.runtime.removeItem(SHOVEL_FS_FOREST_CID)
+    await this.runtime.removeItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+    await this.runtime.removeItem(SHOVEL_ACCOUNT_HANDLE)
   }
 
   async activeSession() {
-    let keypair = await localforage.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+    let keypair = await this.runtime.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
     return (keypair != null)
   }
 
@@ -202,14 +203,36 @@ export class Agent {
   }
 
   async handle() {
-    return await localforage.getItem(SHOVEL_ACCOUNT_HANDLE)
+    return await this.runtime.getItem(SHOVEL_ACCOUNT_HANDLE)
   }
 
   async accessKey() {
-    return await localforage.getItem(SHOVEL_FS_ACCESS_KEY)
+    return await this.runtime.getItem(SHOVEL_FS_ACCESS_KEY)
   }
 
   async forestCID() {
-    return await localforage.getItem(SHOVEL_FS_FOREST_CID)
+    return await this.runtime.getItem(SHOVEL_FS_FOREST_CID)
+  }
+}
+
+
+const BROWSER_RUNTIME=1
+const SERVER_RUNTIME=2
+// localforage vs config json, Unknown device-linking/Agent add - assuming config file as given
+
+class Runtime {
+  constructor(type) {
+  }
+
+  async getItem(key) {
+    return await localforage.getItem(key)
+  }
+ 
+  async setItem(key, value) {
+    return await localforage.setItem(key, value)
+  }
+
+  async removeItem(key) {
+    return await localforage.removeItem(key)
   }
 }
