@@ -68,11 +68,14 @@ const dag = await dagCbor(node)
 //pubsub setup
 const topic = "events"
 //event processor
+console.log("adding event processor...")
 node.libp2p.services.pubsub.addEventListener("message", async (evt) => {
   console.log(`evt read from topic: ${evt.detail.topic} :`, new TextDecoder().decode(evt.detail.data))
-  await eventProcessor(dag, new TextDecoder().decode(evt.detail.data), Heads);
+  // await eventProcessor(dag, new TextDecoder().decode(evt.detail.data), Heads);
 })
 await node.libp2p.services.pubsub.subscribe(topic)
+await node.libp2p.services.pubsub.subscribe("pras")
+await node.libp2p.services.pubsub.subscribe("random")
 
 server.get("/bootstrap", async (req, res) => {
   res.status(200).json({

@@ -45,17 +45,17 @@ export async function createNode(type, blockstore, datastore, config) {
 
   if (type == STANDALONE) {
     libp2pconfig.addresses = { listen: ['/ip4/0.0.0.0/tcp/3001/ws'] }
-    libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
-    libp2pconfig.services.relay = circuitRelayServer({reservations: {maxReservations: Infinity}})
+    libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true, canRelayMessage:true })
+    // libp2pconfig.services.relay = circuitRelayServer({reservations: {maxReservations: Infinity}})
     //libp2pconfig.metrics = config.metrics
   }
 
   if (type == BROWSER) {
-    libp2pconfig.addresses = { listen: ['/webrtc']}
-    libp2pconfig.transports.push(webRTC())
-    libp2pconfig.transports.push(circuitRelayTransport({discoverRelays: 1}))
+    // libp2pconfig.addresses = { listen: ['/webrtc']}
+    // libp2pconfig.transports.push(webRTC())
+    // libp2pconfig.transports.push(circuitRelayTransport({discoverRelays: 1}))
     libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
-    libp2pconfig.services.dcutr = dcutr()
+    // libp2pconfig.services.dcutr = dcutr()
   }
 
   const libp2p = await createLibp2p(libp2pconfig)
