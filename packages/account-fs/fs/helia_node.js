@@ -17,6 +17,7 @@ import { dcutr } from '@libp2p/dcutr'
 
 export const STANDALONE = 1
 const BROWSER = 2
+export const APP = 3
 
 export async function createNode(type, blockstore, datastore, config) {
   var libp2pconfig = {
@@ -56,6 +57,11 @@ export async function createNode(type, blockstore, datastore, config) {
     libp2pconfig.transports.push(circuitRelayTransport({discoverRelays: 1}))
     libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
     libp2pconfig.services.dcutr = dcutr()
+  }
+
+  if (type == APP) {
+    libp2pconfig.addresses = { listen: ['/ip4/0.0.0.0/tcp/3002/ws'] }
+    libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
   }
 
   const libp2p = await createLibp2p(libp2pconfig)

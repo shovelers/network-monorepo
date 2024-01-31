@@ -25,10 +25,10 @@ class Channel {
 }
 
 export class Agent {
-  constructor(helia, accountHost) {
+  constructor(helia, accountHost, runtime_type) {
     this.helia = helia
     this.axios_client  = axios.create({baseURL: accountHost})
-    this.runtime = new Runtime(BROWSER_RUNTIME)
+    this.runtime = new Runtime(runtime_type)
   }
 
   async actAsApprover() {
@@ -216,23 +216,45 @@ export class Agent {
 }
 
 
-const BROWSER_RUNTIME=1
-const SERVER_RUNTIME=2
+export const BROWSER_RUNTIME=1
+export const SERVER_RUNTIME=2
 // localforage vs config json, Unknown device-linking/Agent add - assuming config file as given
 
 class Runtime {
   constructor(type) {
+    this.type = type
   }
 
   async getItem(key) {
-    return await localforage.getItem(key)
+    switch(this.type){
+      case BROWSER_RUNTIME:
+        return await localforage.getItem(key)
+      case SERVER_RUNTIME:
+        throw "NotImplementedInRuntime"
+      default:
+        throw "InvalidRuntime"
+    }
   }
  
   async setItem(key, value) {
-    return await localforage.setItem(key, value)
+    switch(this.type){
+      case BROWSER_RUNTIME:
+        return await localforage.setItem(key, value)
+      case SERVER_RUNTIME:
+        throw "NotImplementedInRuntime"
+      default:
+        throw "InvalidRuntime"
+    }
   }
 
   async removeItem(key) {
-    return await localforage.removeItem(key)
+    switch(this.type){
+      case BROWSER_RUNTIME:
+        return await localforage.removeItem(key)
+      case SERVER_RUNTIME:
+        throw "NotImplementedInRuntime"
+      default:
+        throw "InvalidRuntime"
+    }
   }
 }
