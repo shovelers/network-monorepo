@@ -24,13 +24,7 @@ class Channel {
   }
 }
 
-export class Agent {
-  constructor(helia, accountHost, runtime_type) {
-    this.helia = helia
-    this.axios_client  = axios.create({baseURL: accountHost})
-    this.runtime = new Runtime(runtime_type)
-  }
-
+export const MessageCapability = {
   async actAsApprover() {
     const channelName = await this.handle()
 
@@ -46,12 +40,12 @@ export class Agent {
     })
     
     this.helia.libp2p.services.pubsub.subscribe(channelName)
-  }
+  },
 
   async actAsRequester(address, channelName) {
     const channel = new Channel(this.helia, channelName)
     let agent = this
-    this.requester = new Requester(this, channel, async (message) => { return await agent.createSession(channelName, message)})
+    this.requester = new Requester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(channelName, message)})
 
     this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
       console.log(`${message.detail.topic}:`, new TextDecoder().decode(message.detail.data))
@@ -64,6 +58,132 @@ export class Agent {
     
     this.helia.libp2p.services.pubsub.subscribe(channelName)
     this.requester.initiate()
+  }
+}
+
+export const AccountCapability = {
+  async registerUser(handle) {
+    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
+
+    const did = await this.DID()
+    const fullname = `${handle}#${did}`
+
+    let success = false
+    const envelope = await this.envelop({fullname: fullname})
+    await this.axios_client.post('/accounts', envelope).then(async (response) => {
+      console.log("account creation status", response.status)
+      success = true
+    }).catch(async (e) => {
+      console.log(e);
+      await this.destroy()
+      return e
+    })
+
+    return success
+  },
+
+  async linkDevice(message) {
+    let success = false
+    let handle = await this.handle()
+    console.log("message with pin and did", message)
+    let agentDID = await message.did
+    const envelope = await this.envelop({agentDID: agentDID})
+    await this.axios_client.put(`accounts/${handle}/agents` , envelope).then(async (response) => {
+      success = true
+    }).catch(async (e) => {
+      console.log(e);
+      return e
+    })
+
+    return success 
+  },
+
+  async recover(kit) {
+    var handle = kit.fullname.split('#')[0]
+
+    await this.destroy()
+
+    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
+    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(kit.accountKey, 'base64pad'))
+
+    const did = await this.DID()
+    const fullname = `${handle}#${did}`
+
+    let success = false
+    const envelope = await this.envelop({fullname: fullname, recoveryKit: { generatingAgent: kit.fullname, signature: kit.signature }})
+    await this.axios_client.put('/accounts', envelope).then(async (response) => {
+      await this.runtime.setItem(SHOVEL_FS_FOREST_CID, CID.parse(response.data.cid).bytes)
+      success = true
+    }).catch(async (e) => {
+      console.log(e);
+      await this.destroy()
+      return e
+    })
+
+    return success
+  },
+
+  async destroy() {
+    await this.runtime.removeItem(SHOVEL_FS_ACCESS_KEY)
+    await this.runtime.removeItem(SHOVEL_FS_FOREST_CID)
+    await this.runtime.removeItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+    await this.runtime.removeItem(SHOVEL_ACCOUNT_HANDLE)
+  },
+
+  async activeSession() {
+    let keypair = await this.runtime.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+    return (keypair != null)
+  },
+
+  async recoveryKitData(){
+    const handle = await this.handle()
+    const did = await this.DID()
+    const fullname = `${handle}#${did}`
+
+    let ak = await this.accessKey()
+
+    const envolope = await this.envelop({fullname: fullname})
+    return {fullname: fullname, accountKey: uint8arrays.toString(ak, 'base64pad'), signature: envolope.signature}
+  },
+
+  async createSessionOnDeviceLink(handle, message) {
+    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
+    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(message.accessKey, 'base64pad'))
+    await this.runtime.setItem(SHOVEL_FS_FOREST_CID, uint8arrays.fromString(message.forestCID, 'base64pad'))
+  }
+}
+
+export const StorageCapability = {
+  async pin(accessKey, forestCID) {
+    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
+    await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
+
+    let cid = CID.decode(forestCID).toString()
+    let handle = await this.handle()
+
+    const envelope = await this.envelop({cid: cid, handle: handle})
+    await this.axios_client.post('/pin', envelope).then(async (response) => {
+      console.log(response.status)
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
+  },
+
+  async accessKey() {
+    return await this.runtime.getItem(SHOVEL_FS_ACCESS_KEY)
+  },
+
+  async forestCID() {
+    return await this.runtime.getItem(SHOVEL_FS_FOREST_CID)
+  }
+}
+
+export class Agent {
+  constructor(helia, accountHost, runtime_type) {
+    this.helia = helia
+    this.axios_client  = axios.create({baseURL: accountHost})
+    this.runtime = new Runtime(runtime_type)
   }
 
   async DID(){
@@ -96,125 +216,26 @@ export class Agent {
     return signer
   }
 
-  async createSession(handle, message) {
-    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
-    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(message.accessKey, 'base64pad'))
-    await this.runtime.setItem(SHOVEL_FS_FOREST_CID, uint8arrays.fromString(message.forestCID, 'base64pad'))
-  }
-
-  async registerUser(handle) {
-    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
-
-    const did = await this.DID()
-    const fullname = `${handle}#${did}`
-
-    let success = false
-    const envelope = await this.envelop({fullname: fullname})
-    await this.axios_client.post('/accounts', envelope).then(async (response) => {
-      console.log("account creation status", response.status)
-      success = true
-    }).catch(async (e) => {
-      console.log(e);
-      await this.destroy()
-      return e
-    })
-
-    return success
-  }
-
-  async linkDevice(message) {
-    let success = false
-    let handle = await this.handle()
-    console.log("message with pin and did", message)
-    let agentDID = await message.did
-    const envelope = await this.envelop({agentDID: agentDID})
-    await this.axios_client.put(`accounts/${handle}/agents` , envelope).then(async (response) => {
-      success = true
-    }).catch(async (e) => {
-      console.log(e);
-      return e
-    })
-
-    return success 
-  }
-
-  async recover(kit) {
-    var handle = kit.fullname.split('#')[0]
-
-    await this.destroy()
-
-    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
-    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(kit.accountKey, 'base64pad'))
-
-    const did = await this.DID()
-    const fullname = `${handle}#${did}`
-
-    let success = false
-    const envelope = await this.envelop({fullname: fullname, recoveryKit: { generatingAgent: kit.fullname, signature: kit.signature }})
-    await this.axios_client.put('/accounts', envelope).then(async (response) => {
-      await this.runtime.setItem(SHOVEL_FS_FOREST_CID, CID.parse(response.data.cid).bytes)
-      success = true
-    }).catch(async (e) => {
-      console.log(e);
-      await this.destroy()
-      return e
-    })
-
-    return success
-  }
-
-  async pin(accessKey, forestCID) {
-    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
-    await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
-
-    let cid = CID.decode(forestCID).toString()
-    let handle = await this.handle()
-
-    const envelope = await this.envelop({cid: cid, handle: handle})
-    await this.axios_client.post('/pin', envelope).then(async (response) => {
-      console.log(response.status)
-    }).catch((e) => {
-      console.log(e);
-      return e
-    })
-  }
-
-  async destroy() {
-    await this.runtime.removeItem(SHOVEL_FS_ACCESS_KEY)
-    await this.runtime.removeItem(SHOVEL_FS_FOREST_CID)
-    await this.runtime.removeItem(SHOVEL_AGENT_WRITE_KEYPAIR)
-    await this.runtime.removeItem(SHOVEL_ACCOUNT_HANDLE)
-  }
-
-  async activeSession() {
-    let keypair = await this.runtime.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
-    return (keypair != null)
-  }
-
-  async recoveryKitData(){
-    const handle = await this.handle()
-    const did = await this.DID()
-    const fullname = `${handle}#${did}`
-
-    let ak = await this.accessKey()
-
-    const envolope = await this.envelop({fullname: fullname})
-    return {fullname: fullname, accountKey: uint8arrays.toString(ak, 'base64pad'), signature: envolope.signature}
-  }
-
   async handle() {
     return await this.runtime.getItem(SHOVEL_ACCOUNT_HANDLE)
   }
-
-  async accessKey() {
-    return await this.runtime.getItem(SHOVEL_FS_ACCESS_KEY)
-  }
-
-  async forestCID() {
-    return await this.runtime.getItem(SHOVEL_FS_FOREST_CID)
-  }
 }
 
+
+/*
+Agent
+  Capabilities - 
+    Account - Register, LinkDevice, Recover
+    Storage - Pin, Data on WNFS and/or Device
+    Message - actAs*
+  Runtime -
+    Browser -
+      Capabilties - All 3
+      Device storage is IndexDB
+    Server -
+      Capabilities - Message for Handshakes, potenitally Storage. Never Account
+      Device storage is static configs on local
+*/
 
 export const BROWSER_RUNTIME=1
 export const SERVER_RUNTIME=2

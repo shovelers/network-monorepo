@@ -1,6 +1,6 @@
 import { AccountFS } from './fs/account_fs.js';
 import { Account } from './agent/account.js'
-import { Agent, SERVER_RUNTIME } from './agent/agent.js'
+import { Agent, SERVER_RUNTIME, MessageCapability } from './agent/agent.js'
 import { createNode, APP } from './fs/helia_node.js';
 import { FsBlockstore } from 'blockstore-fs'
 import { FsDatastore } from 'datastore-fs'
@@ -25,6 +25,7 @@ async function programInit(helia, network) {
   //TODO check for network to be present in connection keys
   
   const agent =  new Agent(helia, connection[network].sync_host, SERVER_RUNTIME)
+  Object.assign(Agent.prototype, MessageCapability);
 
   const accountfs = new AccountFS(helia, agent, connection[network].dial_prefix, connection[network].sync_host)
   await accountfs.load()
