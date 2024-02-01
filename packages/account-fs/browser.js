@@ -1,7 +1,7 @@
 import { createBrowserNode } from './fs/helia_node.js';
 import { AccountFS } from './fs/account_fs.js';
 import { Account } from './agent/account.js'
-import { Agent, BROWSER_RUNTIME, AccountCapability, StorageCapability, MessageCapability } from './agent/agent.js'
+import { Agent, BROWSER_RUNTIME, AccountCapability, StorageCapability, MessageCapability, Runtime } from './agent/agent.js'
 
 const connection = {
   //"LOCAL": {network: "LOCAL"},
@@ -14,7 +14,8 @@ async function programInit(network) {
 
   const helia = await createBrowserNode()
 
-  const agent =  new Agent(helia, connection[network].sync_host, BROWSER_RUNTIME)
+  const runtime = new Runtime(BROWSER_RUNTIME, {})
+  const agent =  new Agent(helia, connection[network].sync_host, runtime)
   Object.assign(Agent.prototype, AccountCapability);
   Object.assign(Agent.prototype, MessageCapability);
   Object.assign(Agent.prototype, StorageCapability);

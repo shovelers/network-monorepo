@@ -1,0 +1,16 @@
+{
+  "name": "scripts",
+  "version": "0.0.1",
+  "description": "",
+  "main": "agent_create.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "dependencies": {
+    "iso-did": "^1.5.0",
+    "iso-signatures": "^0.3.0"
+  },
+  "license": "ISC"
+}

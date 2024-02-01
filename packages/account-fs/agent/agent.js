@@ -6,6 +6,8 @@ import { Approver } from './linking/approver.js';
 import { Requester } from './linking/requester.js';
 import { multiaddr } from '@multiformats/multiaddr'
 import { CID } from 'multiformats/cid'
+import { DIDKey } from 'iso-did/key';
+import { spki } from 'iso-signatures/spki'
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
@@ -180,10 +182,10 @@ export const StorageCapability = {
 }
 
 export class Agent {
-  constructor(helia, accountHost, runtime_type) {
+  constructor(helia, accountHost, runtime) {
     this.helia = helia
     this.axios_client  = axios.create({baseURL: accountHost})
-    this.runtime = new Runtime(runtime_type)
+    this.runtime = runtime
   }
 
   async DID(){
@@ -229,11 +231,13 @@ export const BROWSER_RUNTIME=1
 export const SERVER_RUNTIME=2
 // localforage vs config json, Unknown device-linking/Agent add - assuming config file as given
 
-class Runtime {
-  constructor(type) {
+export class Runtime {
+  constructor(type, config) {
     this.type = type
+    this.config = config
   }
 
+  // Read config from file
   // SERVER_RUNTIME - Keypair importJWK and fail on missing
   async signer(){
     switch(this.type){
@@ -248,7 +252,27 @@ class Runtime {
         
         return signer
       case SERVER_RUNTIME:
-        throw "NotImplementedInRuntime"
+        const jwk = await this.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+        if (!jwk) {
+          throw "MissingAgentKeyPair"
+        }
+        const publicKeyJWK = await crypto.subtle.importKey(
+          'jwk',
+          { ...jwk, d: undefined },
+          {
+            name: 'RSASSA-PKCS1-v1_5',
+            hash: 'SHA-256',
+          },
+          true,
+          ['verify']
+        )
+    
+        const publicKey = await crypto.subtle.exportKey('spki', publicKeyJWK)
+        const decodedPublicKey = spki.decode(new Uint8Array(publicKey))
+
+        const did = DIDKey.fromPublicKey('RSA', decodedPublicKey)
+
+        return await RSASigner.importJwk(jwk, did)
       default:
         throw "InvalidRuntime"
     }
@@ -259,7 +283,7 @@ class Runtime {
       case BROWSER_RUNTIME:
         return await localforage.getItem(key)
       case SERVER_RUNTIME:
-        throw "NotImplementedInRuntime"
+        return this.config[key]
       default:
         throw "InvalidRuntime"
     }
