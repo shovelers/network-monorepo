@@ -187,12 +187,12 @@ export class Agent {
   }
 
   async DID(){
-    const signer = await this.signer()
+    const signer = await this.runtime.signer()
     return signer.did
   }
 
   async sign(message){
-    const signer = await this.signer()
+    const signer = await this.runtime.signer()
     return signer.sign(message)
   }
 
@@ -202,18 +202,6 @@ export class Agent {
     let signature = await this.sign(encodedMessage)
     let encodedSignature = uint8arrays.toString(signature, 'base64')
     return { message: message, signature: encodedSignature }
-  }
-
-  async signer(){
-    let keypair = await this.runtime.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
-    if (keypair) {
-      return RSASigner.import(keypair)
-    }
-
-    const signer = await RSASigner.generate()
-    await this.runtime.setItem(SHOVEL_AGENT_WRITE_KEYPAIR, signer.export())
-    
-    return signer
   }
 
   async handle() {
@@ -244,6 +232,26 @@ export const SERVER_RUNTIME=2
 class Runtime {
   constructor(type) {
     this.type = type
+  }
+
+  // SERVER_RUNTIME - Keypair importJWK and fail on missing
+  async signer(){
+    switch(this.type){
+      case BROWSER_RUNTIME: 
+        let keypair = await this.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
+        if (keypair) {
+          return RSASigner.import(keypair)
+        }
+
+        const signer = await RSASigner.generate()
+        await this.setItem(SHOVEL_AGENT_WRITE_KEYPAIR, signer.export())
+        
+        return signer
+      case SERVER_RUNTIME:
+        throw "NotImplementedInRuntime"
+      default:
+        throw "InvalidRuntime"
+    }
   }
 
   async getItem(key) {
