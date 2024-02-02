@@ -4,6 +4,8 @@ import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
 import { LinkingApprover } from './handshakes/linking/approver.js';
 import { LinkingRequester } from './handshakes/linking/requester.js';
+import { JoinApprover } from './handshakes/join/approver.js';
+import { JoinRequester } from './handshakes/join/requester.js';
 import { multiaddr } from '@multiformats/multiaddr'
 import { CID } from 'multiformats/cid'
 import { DIDKey } from 'iso-did/key';
@@ -44,6 +46,24 @@ export const MessageCapability = {
     this.approver = new LinkingApprover(this, channel, async (message) => { return await agent.linkDevice(message) })
 
     await channel.subscribe(this.approver)
+  },
+
+  async actAsJoinApprover(channelName) {
+    let agent = this
+    const channel = new Channel(this.helia, channelName)
+    this.approver = new JoinApprover(this, channel, async (message) => { })
+
+    await channel.subscribe(this.approver)
+  },
+
+  async actAsJoinRequester(address, channelName) {
+    let agent = this
+    const channel = new Channel(this.helia, channelName)
+    this.requester = new JoinRequester(this, channel, async (message) => { })
+
+    await this.helia.libp2p.dial(multiaddr(address));
+    await channel.subscribe(this.requester)
+    return this.requester
   },
 
   async actAsRequester(address, channelName) {

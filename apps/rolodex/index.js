@@ -11,21 +11,25 @@ const server = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// TODO - set TESTNET for deployment
 const NETWORK = process.env.VITE_NETWORK || "DEVNET"
 
+// TODO mount filesystem
 const homeDir = process.env.PROTOCOL_DB_HOME || path.join(__dirname, 'protocol_db')
 await fs.mkdir(path.join(homeDir, 'blocks'), { recursive: true })
 await fs.mkdir(path.join(homeDir, 'data'), { recursive: true })
 const helia = await createAppNode(path.join(homeDir, 'blocks'), path.join(homeDir, 'data'))
 
+// TODO - generate for deployment
 const runtimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'agent_runtime_config.json'), 'utf8'))
 const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
 const agent = new Agent(helia, connection[NETWORK], runtime)
 Object.assign(Agent.prototype, MessageCapability);
 
 const channelName = `${await agent.handle()}-membership`
-await agent.actAsApprover(channelName)
+await agent.actAsJoinApprover(channelName)
 
+// TODO - configure from env vars for deployment
 const address = (await helia.libp2p.getMultiaddrs())[0].toString()
 
 server.use(express.urlencoded({ extended: true }))
