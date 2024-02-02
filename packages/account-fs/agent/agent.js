@@ -2,8 +2,8 @@ import * as uint8arrays from 'uint8arrays';
 import axios from 'axios'
 import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
-import { Approver } from './linking/approver.js';
-import { Requester } from './linking/requester.js';
+import { LinkingApprover } from './handshakes/linking/approver.js';
+import { LinkingRequester } from './handshakes/linking/requester.js';
 import { multiaddr } from '@multiformats/multiaddr'
 import { CID } from 'multiformats/cid'
 import { DIDKey } from 'iso-did/key';
@@ -41,7 +41,7 @@ export const MessageCapability = {
   async actAsApprover(channelName) {
     let agent = this
     const channel = new Channel(this.helia, channelName)
-    this.approver = new Approver(this, channel, async (message) => { return await agent.linkDevice(message) })
+    this.approver = new LinkingApprover(this, channel, async (message) => { return await agent.linkDevice(message) })
 
     await channel.subscribe(this.approver)
   },
@@ -49,7 +49,7 @@ export const MessageCapability = {
   async actAsRequester(address, channelName) {
     let agent = this
     const channel = new Channel(this.helia, channelName)
-    this.requester = new Requester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(message)})
+    this.requester = new LinkingRequester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(message)})
 
     await this.helia.libp2p.dial(multiaddr(address));
     await channel.subscribe(this.requester)
