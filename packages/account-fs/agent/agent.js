@@ -17,11 +17,22 @@ const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 class Channel {
   constructor(helia, channelName) {
     this.helia = helia
-    this.channelName = channelName
+    this.name = channelName
+  }
+
+  async subscribe(actor) {
+    this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
+      console.log(`${message.detail.topic}:`, new TextDecoder().decode(message.detail.data))
+      if (message.detail.topic == this.name) {
+        actor.handler(new TextDecoder().decode(message.detail.data))
+      }
+    })
+
+    this.helia.libp2p.services.pubsub.subscribe(this.name)
   }
 
   async publish(message) {
-    this.helia.libp2p.services.pubsub.publish(this.channelName, new TextEncoder().encode(message))
+    this.helia.libp2p.services.pubsub.publish(this.name, new TextEncoder().encode(message))
     console.log(message)
   }
 }
@@ -34,14 +45,7 @@ export const MessageCapability = {
     const channel = new Channel(this.helia, channelName)
     this.approver = new Approver(this, channel, async (message) => { return await agent.linkDevice(message) })
 
-    this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
-      console.log(`${message.detail.topic}:`, new TextDecoder().decode(message.detail.data))
-      if (message.detail.topic == channelName) {
-        this.approver.handler(new TextDecoder().decode(message.detail.data))
-      }
-    })
-    
-    this.helia.libp2p.services.pubsub.subscribe(channelName)
+    await channel.subscribe(this.approver)
   },
 
   async actAsRequester(address, channelName) {
@@ -49,16 +53,8 @@ export const MessageCapability = {
     let agent = this
     this.requester = new Requester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(channelName, message)})
 
-    this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
-      console.log(`${message.detail.topic}:`, new TextDecoder().decode(message.detail.data))
-      if (message.detail.topic == channelName) {
-        this.requester.handler(new TextDecoder().decode(message.detail.data))
-      }
-    })
-
     await this.helia.libp2p.dial(multiaddr(address));
-    
-    this.helia.libp2p.services.pubsub.subscribe(channelName)
+    await channel.subscribe(this.requester)
     this.requester.initiate()
   }
 }

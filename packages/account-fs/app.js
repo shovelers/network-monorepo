@@ -21,6 +21,6 @@ const connection = {
   "TESTNET": {network: "TESTNET", sync_host: "https://testnet.shovel.company:8001", dial_prefix: "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/"}
 }
 
-export { Agent, Runtime, connection, createAppNode, SERVER_RUNTIME }
+export { Agent, Runtime, connection, createAppNode, SERVER_RUNTIME, MessageCapability }
 
 
