@@ -49,11 +49,14 @@ export const MessageCapability = {
   async actAsRequester(address, channelName) {
     let agent = this
     const channel = new Channel(this.helia, channelName)
-    this.requester = new Requester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(channelName, message)})
+    this.requester = new Requester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(message)})
 
     await this.helia.libp2p.dial(multiaddr(address));
     await channel.subscribe(this.requester)
-    this.requester.initiate()
+    const timeout = setTimeout(() => {
+      clearTimeout(timeout)
+      this.requester.initiate()
+    }, 500)
   }
 }
 
@@ -142,8 +145,8 @@ export const AccountCapability = {
     return {fullname: fullname, accountKey: uint8arrays.toString(ak, 'base64pad'), signature: envolope.signature}
   },
 
-  async createSessionOnDeviceLink(handle, message) {
-    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
+  async createSessionOnDeviceLink(message) {
+    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, message.handle)
     await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(message.accessKey, 'base64pad'))
     await this.runtime.setItem(SHOVEL_FS_FOREST_CID, uint8arrays.fromString(message.forestCID, 'base64pad'))
   }
