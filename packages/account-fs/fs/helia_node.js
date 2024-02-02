@@ -46,7 +46,7 @@ export async function createNode(type, blockstore, datastore, config) {
 
   if (type == STANDALONE) {
     libp2pconfig.addresses = { listen: ['/ip4/0.0.0.0/tcp/3001/ws'] }
-    libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
+    libp2pconfig.services.pubsub = gossipsub({ })
     libp2pconfig.services.relay = circuitRelayServer({reservations: {maxReservations: Infinity}})
     //libp2pconfig.metrics = config.metrics
   }
@@ -55,13 +55,13 @@ export async function createNode(type, blockstore, datastore, config) {
     libp2pconfig.addresses = { listen: ['/webrtc']}
     libp2pconfig.transports.push(webRTC())
     libp2pconfig.transports.push(circuitRelayTransport({discoverRelays: 1}))
-    libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
+    libp2pconfig.services.pubsub = gossipsub({ })
     libp2pconfig.services.dcutr = dcutr()
   }
 
   if (type == APP) {
     libp2pconfig.addresses = { listen: ['/ip4/0.0.0.0/tcp/3002/ws'] }
-    libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
+    libp2pconfig.services.pubsub = gossipsub({ })
   }
 
   const libp2p = await createLibp2p(libp2pconfig)

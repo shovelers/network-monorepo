@@ -23,14 +23,9 @@ const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
 const agent = new Agent(helia, connection[NETWORK], runtime)
 Object.assign(Agent.prototype, MessageCapability);
 
-const accountfs = new AccountFS(helia, agent, connection[NETWORK].dial_prefix, connection[NETWORK].sync_host)
-await accountfs.startSync()
-
 const channelName = `${await agent.handle()}-membership`
 await agent.actAsApprover(channelName)
-const peerId = helia.libp2p.peerId.string
 
-console.log(await helia.libp2p.getMultiaddrs())
 const address = (await helia.libp2p.getMultiaddrs())[0].toString()
 
 server.use(express.urlencoded({ extended: true }))
@@ -39,11 +34,11 @@ server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')))
 
 server.get("/", (req, res) => {
-  res.render('pages/index', { channelName: channelName, peerId: peerId, address: address })
+  res.render('pages/index', { channelName: channelName, address: address })
 });
 
 server.get("/home", (req, res) => {
-  res.render('pages/index', { channelName: channelName, peerId: peerId, address: address })
+  res.render('pages/index', { channelName: channelName, address: address })
 });
 
 server.get("/app", (req, res) => {
