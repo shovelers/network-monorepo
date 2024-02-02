@@ -38,9 +38,7 @@ class Channel {
 }
 
 export const MessageCapability = {
-  async actAsApprover() {
-    const channelName = await this.handle()
-
+  async actAsApprover(channelName) {
     let agent = this
     const channel = new Channel(this.helia, channelName)
     this.approver = new Approver(this, channel, async (message) => { return await agent.linkDevice(message) })
@@ -49,8 +47,8 @@ export const MessageCapability = {
   },
 
   async actAsRequester(address, channelName) {
-    const channel = new Channel(this.helia, channelName)
     let agent = this
+    const channel = new Channel(this.helia, channelName)
     this.requester = new Requester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(channelName, message)})
 
     await this.helia.libp2p.dial(multiaddr(address));
