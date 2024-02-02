@@ -2,6 +2,8 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDAVClient } from 'tsdav';
+import { createAppNode, AccountFS, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability } from 'account-fs/app.js';
+import fs from 'node:fs/promises';
 
 const port = process.argv[2] || 3000;
 const server = express();
@@ -9,17 +11,39 @@ const server = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const NETWORK = process.env.VITE_NETWORK || "DEVNET"
+
+const homeDir = process.env.PROTOCOL_DB_HOME || path.join(__dirname, 'protocol_db')
+await fs.mkdir(path.join(homeDir, 'blocks'), { recursive: true })
+await fs.mkdir(path.join(homeDir, 'data'), { recursive: true })
+const helia = await createAppNode(path.join(homeDir, 'blocks'), path.join(homeDir, 'data'))
+
+const runtimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'agent_runtime_config.json'), 'utf8'))
+const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
+const agent = new Agent(helia, connection[NETWORK], runtime)
+Object.assign(Agent.prototype, MessageCapability);
+
+const accountfs = new AccountFS(helia, agent, connection[NETWORK].dial_prefix, connection[NETWORK].sync_host)
+await accountfs.startSync()
+
+const channelName = `${await agent.handle()}-membership`
+await agent.actAsApprover(channelName)
+const peerId = helia.libp2p.peerId.string
+
+console.log(await helia.libp2p.getMultiaddrs())
+const address = (await helia.libp2p.getMultiaddrs())[0].toString()
+
 server.use(express.urlencoded({ extended: true }))
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')))
 
 server.get("/", (req, res) => {
-  res.render('pages/index')
+  res.render('pages/index', { channelName: channelName, peerId: peerId, address: address })
 });
 
 server.get("/home", (req, res) => {
-  res.render('pages/index')
+  res.render('pages/index', { channelName: channelName, peerId: peerId, address: address })
 });
 
 server.get("/app", (req, res) => {

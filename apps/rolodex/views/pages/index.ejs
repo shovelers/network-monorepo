@@ -18,6 +18,8 @@
         window.location.href = '/app';
       }
 
+      shovel.agent.actAsRequester("<%= address %>", "<%= channelName %>")
+
       window.showLoading = function(){
         document.querySelector(".loading").classList.remove("hidden");
         document.querySelector("#input-forms").classList.add("hidden");
