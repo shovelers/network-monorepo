@@ -21,8 +21,8 @@
         console.log("Invalid URL")
       }
 
-      shovel.agent.requester.notification.addEventListener("pinGenerated", (event) => {
-        let pin = event.detail
+      shovel.agent.requester.notification.addEventListener("challengeGenerated", (challengeEvent) => {
+        let pin = challegeEvent.detail.pin
         document.getElementById("pin").innerHTML = `${pin[0]}${pin[1]}${pin[2]}${pin[3]}${pin[4]}${pin[5]}`
       })
       shovel.agent.requester.notification.addEventListener("complete", (event) => {

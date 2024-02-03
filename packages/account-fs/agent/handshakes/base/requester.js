@@ -47,8 +47,22 @@ export class Requester {
     return {requestKeyPair, requestDID}
   }
 
-  async negotiate(sessionKeyMessage) {
+  async challenge() {
     throw "ImplementInSpecificHandshake"
+  }
+
+  async negotiate(sessionKeyMessage) {
+    this.sessionKey = await this.parseSessionKey(sessionKeyMessage)    
+    const challenge = await this.challenge()
+
+    // TODO - add signature of DID to prove ownership
+    const message = await Envelope.pack({
+      did: await this.agent.DID(),
+      challenge: challenge
+    }, this.sessionKey)
+
+    this.notification.emitEvent("challengeGenerated", challenge)
+    this.channel.publish(message)
   }
 
   async complete(envelope) {

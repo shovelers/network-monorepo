@@ -33,11 +33,17 @@ export class Approver {
     const {sessionKey, sessionKeyMessage} = await this.generateSessionKey(requestDID)
     this.sessionKey =  sessionKey
     await this.channel.publish(sessionKeyMessage)
-    return {sessionKey, sessionKeyMessage}
   }
 
-  async negotiate(challenge) {
-    throw "ImplementInSpecificHandshake"
+  async negotiate(message) {
+    const challengeMessage = await Envelope.open(message, this.sessionKey)
+
+    let approver = this
+    this.notification.emitEvent("challengeRecieved", {
+      confirm: async () => { return await approver.confirm(challengeMessage) },
+      reject: async () => { return await approver.reject() },
+      message: challengeMessage
+    })
   }
 
   async confirm(message) {

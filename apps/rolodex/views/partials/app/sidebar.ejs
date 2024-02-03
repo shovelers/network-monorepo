@@ -34,10 +34,10 @@
     var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
     document.querySelector("#device_link_modal > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
     shovel.agent.actAsApprover(handle).then(() => {
-      shovel.agent.approver.notification.addEventListener("pinRecieved", (event) => {
-        window.pin = event.detail.message.pin
-        confirm = event.detail.confirm
-        reject = event.detail.reject
+      shovel.agent.approver.notification.addEventListener("challengeRecieved", (challengeEvent) => {
+        window.pin = challengeEvent.detail.message.challenge.pin
+        confirm = challengeEvent.detail.confirm
+        reject = challengeEvent.detail.reject
       })
       shovel.agent.approver.notification.addEventListener("complete", (event) => {
         if (event.detail == "CONFIRMED"){

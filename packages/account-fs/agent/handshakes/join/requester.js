@@ -1,7 +1,7 @@
 import { Requester } from '../base/requester.js';
 
 export class JoinRequester extends Requester {
-  async negotiate(sessionKeyMessage) {
+  async challenge() {
     throw "ImplementInSpecificHandshake"
   }
 

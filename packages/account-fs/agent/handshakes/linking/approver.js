@@ -3,23 +3,6 @@ import { Envelope } from '../base/common.js';
 import * as uint8arrays from 'uint8arrays';
 
 export class LinkingApprover extends Approver {
-  async negotiate(challenge) {
-    const message = await Envelope.open(challenge, this.sessionKey)
-
-    let approver = this
-    this.notification.emitEvent("pinRecieved", {
-      confirm: async () => { return await approver.confirm(message) },
-      reject: async () => { return await approver.reject() },
-      message: message
-    })
-
-    return {
-      confirm: async () => { return await approver.confirm() },
-      reject: async () => { return await approver.reject() },
-      message: message
-    }
-  }
-
   async confirm(message) {
     console.log("message in approve#confirm", message)
     await this.onComplete.call("", message)
