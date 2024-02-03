@@ -1,5 +1,4 @@
 import { Requester } from '../base/requester.js';
-import { Envelope } from '../base/common.js';
 
 export class LinkingRequester extends Requester {
   async challenge() {

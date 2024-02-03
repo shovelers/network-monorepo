@@ -1,5 +1,4 @@
 import { Approver } from '../base/approver.js';
-import { Envelope } from '../base/common.js';
 import * as uint8arrays from 'uint8arrays';
 
 export class LinkingApprover extends Approver {

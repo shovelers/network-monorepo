@@ -29,6 +29,12 @@ Object.assign(Agent.prototype, MessageCapability);
 const channelName = `${await agent.handle()}-membership`
 await agent.actAsJoinApprover(channelName)
 
+agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
+  // TODO Implementing auto-confim - check challenge to implement reject
+  // TODO save did and handle in DB/WNFS
+  await challengeEvent.detail.confirm.call()
+})
+
 // TODO - configure from env vars for deployment
 const address = (await helia.libp2p.getMultiaddrs())[0].toString()
 

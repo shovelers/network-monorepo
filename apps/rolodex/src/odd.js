@@ -20,6 +20,10 @@ const axios_client  = axios.create({
 })
 
 async function signup(username, requester) {
+  requester.notification.addEventListener("challengeGenerated", (challengeEvent) => {
+    console.log(challengeEvent.detail)
+  })
+  
   await requester.initiate()
 
   const success = await account.create(
