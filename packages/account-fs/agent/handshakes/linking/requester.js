@@ -6,13 +6,4 @@ export class LinkingRequester extends Requester {
     const pin = Array.from(crypto.getRandomValues(new Uint8Array(6))).map(n => n % 9)
     return {pin: pin}
   }
-
-  async complete(envelope) {
-    const message = await Envelope.open(envelope, this.sessionKey)
-    if (message.status == "CONFIRMED") {
-      await this.onComplete.call("", message)
-      this.notification.emitEvent("complete", "")
-    }
-    console.log(message.status)
-  }
 }

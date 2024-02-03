@@ -2,10 +2,7 @@ import { Requester } from '../base/requester.js';
 
 export class JoinRequester extends Requester {
   async challenge() {
-    throw "ImplementInSpecificHandshake"
-  }
-
-  async complete(envelope) {
-    throw "ImplementInSpecificHandshake"
+    const handle = await this.agent.handle()
+    return { profile: { handle: handle } }
   }
 }

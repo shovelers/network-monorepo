@@ -47,11 +47,25 @@ export class Approver {
   }
 
   async confirm(message) {
+    console.log("message in approve#confirm", message)
+    await this.onComplete.call("", message)
+    const data = await this.confirmData()
+
+    const confirmMessage = await Envelope.pack({data: data, status: "CONFIRMED"}, this.sessionKey)
+    
+    await this.channel.publish(confirmMessage)
+    this.notification.emitEvent("complete", "CONFIRMED")
+  }
+
+  async confirmData() {
     throw "ImplementInSpecificHandshake"
   }
 
   async reject() {
-    throw "ImplementInSpecificHandshake"
+    const rejectMessage = await Envelope.pack({ status: "REJECTED" }, this.sessionKey)
+    
+    await this.channel.publish(rejectMessage)
+    this.notification.emitEvent("complete", "REJECTED")
   }
 
   async generateSessionKey(requestDID) {

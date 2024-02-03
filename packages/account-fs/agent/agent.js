@@ -69,7 +69,7 @@ export const MessageCapability = {
   async actAsRequester(address, channelName) {
     let agent = this
     const channel = new Channel(this.helia, channelName)
-    this.requester = new LinkingRequester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(message)})
+    this.requester = new LinkingRequester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(message.data)})
 
     await this.helia.libp2p.dial(multiaddr(address));
     await channel.subscribe(this.requester)
