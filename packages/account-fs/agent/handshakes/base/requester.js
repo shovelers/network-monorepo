@@ -39,30 +39,32 @@ export class Requester {
 
   async initiate() {    
     const {requestKeyPair, requestDID } = await this.requestDID()
-    const message = requestDID
+    const message = { id: requestDID }
     this.state = "INITIATE"
-    await this.channel.publish(message)
     this.requestKeyPair =  requestKeyPair
     this.DID = requestDID
-    return {requestKeyPair, requestDID}
+    await this.channel.publish(JSON.stringify(message))
+    return requestDID
   }
 
   async challenge() {
     throw "ImplementInSpecificHandshake"
   }
 
-  async negotiate(sessionKeyMessage) {
-    this.sessionKey = await this.parseSessionKey(sessionKeyMessage)    
+  async negotiate(message) {
+    this.sessionKey = await this.parseSessionKey(message)    
     const challenge = await this.challenge()
 
+    const id = JSON.parse(message).id
+
     // TODO - add signature of DID to prove ownership
-    const message = await Envelope.pack({
+    const response = await Envelope.pack({
       did: await this.agent.DID(),
       challenge: challenge
-    }, this.sessionKey)
+    }, this.sessionKey, id)
 
     this.notification.emitEvent("challengeGenerated", challenge)
-    this.channel.publish(message)
+    this.channel.publish(response)
   }
 
   async complete(envelope) {

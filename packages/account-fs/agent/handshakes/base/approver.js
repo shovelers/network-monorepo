@@ -29,8 +29,9 @@ export class Approver {
     }
   }
 
-  async initiate(requestDID) {
-    const {sessionKey, sessionKeyMessage} = await this.generateSessionKey(requestDID)
+  async initiate(message) {
+    const request = JSON.parse(message)
+    const {sessionKey, sessionKeyMessage} = await this.generateSessionKey(request)
     this.sessionKey =  sessionKey
     await this.channel.publish(sessionKeyMessage)
   }
@@ -40,18 +41,19 @@ export class Approver {
 
     let approver = this
     this.notification.emitEvent("challengeRecieved", {
-      confirm: async () => { return await approver.confirm(challengeMessage) },
-      reject: async () => { return await approver.reject() },
+      confirm: async () => { return await approver.confirm(message, challengeMessage) },
+      reject: async () => { return await approver.reject(message) },
       message: challengeMessage
     })
   }
 
-  async confirm(message) {
-    console.log("message in approve#confirm", message)
-    await this.onComplete.call("", message)
+  async confirm(message, challenge) {
+    console.log("message in approve#confirm", challenge)
+    await this.onComplete.call("", challenge)
     const data = await this.confirmData()
 
-    const confirmMessage = await Envelope.pack({data: data, status: "CONFIRMED"}, this.sessionKey)
+    const id = JSON.parse(message).id
+    const confirmMessage = await Envelope.pack({data: data, status: "CONFIRMED"}, this.sessionKey, id)
     
     await this.channel.publish(confirmMessage)
     this.notification.emitEvent("complete", "CONFIRMED")
@@ -61,14 +63,16 @@ export class Approver {
     throw "ImplementInSpecificHandshake"
   }
 
-  async reject() {
-    const rejectMessage = await Envelope.pack({ status: "REJECTED" }, this.sessionKey)
+  async reject(message) {
+    const id = JSON.parse(message).id
+    const rejectMessage = await Envelope.pack({ status: "REJECTED" }, this.sessionKey, id)
     
     await this.channel.publish(rejectMessage)
     this.notification.emitEvent("complete", "REJECTED")
   }
 
-  async generateSessionKey(requestDID) {
+  async generateSessionKey(message) {
+    const requestDID = message.id
     const sessionKey = await crypto.subtle.generateKey(
       {
         name: 'AES-GCM', length: 256,
@@ -116,6 +120,7 @@ export class Approver {
     const msg = new Uint8Array(msgBuffer)
 
     const sessionKeyMessage = JSON.stringify({
+      id: message.id,
       iv: uint8arrays.toString(iv, "base64pad"),
       msg: uint8arrays.toString(msg, "base64pad"),
       sessionKey: uint8arrays.toString(encryptedSessionKey, "base64pad")
