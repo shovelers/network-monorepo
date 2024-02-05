@@ -18,6 +18,8 @@
         window.location.href = '/app';
       }
 
+      window.requester = await shovel.agent.actAsJoinRequester("<%= address %>", "<%= channelName %>")
+
       window.showLoading = function(){
         document.querySelector(".loading").classList.remove("hidden");
         document.querySelector("#input-forms").classList.add("hidden");
@@ -30,7 +32,7 @@
       </div>
       <div class="loading loading-infinity loading-lg hidden"></div>
       <div id="input-forms" class="space-y-8 bg-base-200 p-12 rounded-lg">
-        <form id="signup-form" onsubmit="event.preventDefault(); signup(document.getElementById('handle').value); showLoading();" class="space-y-1 text-center">
+        <form id="signup-form" onsubmit="event.preventDefault(); signup(document.getElementById('handle').value, requester); showLoading();" class="space-y-1 text-center">
           <label for="user_name" class="font-bold">Username</label>
           <input type="text" id="handle" name="handle" class="border border-gray-300 px-2 py-1 rounded-lg">
           <button type="submit" class="btn btn-outline btn-sm">

@@ -2,8 +2,10 @@ import * as uint8arrays from 'uint8arrays';
 import axios from 'axios'
 import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
-import { Approver } from './linking/approver.js';
-import { Requester } from './linking/requester.js';
+import { LinkingApprover } from './handshakes/linking/approver.js';
+import { LinkingRequester } from './handshakes/linking/requester.js';
+import { JoinApprover } from './handshakes/join/approver.js';
+import { JoinRequester } from './handshakes/join/requester.js';
 import { multiaddr } from '@multiformats/multiaddr'
 import { CID } from 'multiformats/cid'
 import { DIDKey } from 'iso-did/key';
@@ -41,19 +43,40 @@ export const MessageCapability = {
   async actAsApprover(channelName) {
     let agent = this
     const channel = new Channel(this.helia, channelName)
-    this.approver = new Approver(this, channel, async (message) => { return await agent.linkDevice(message) })
+    this.approver = new LinkingApprover(this, channel, async (message) => { return await agent.linkDevice(message) })
 
     await channel.subscribe(this.approver)
+  },
+
+  async actAsJoinApprover(channelName) {
+    let agent = this
+    const channel = new Channel(this.helia, channelName)
+    this.approver = new JoinApprover(this, channel, async (message) => { })
+
+    await channel.subscribe(this.approver)
+  },
+
+  async actAsJoinRequester(address, channelName) {
+    let agent = this
+    const channel = new Channel(this.helia, channelName)
+    this.requester = new JoinRequester(this, channel, async (message) => { })
+
+    await this.helia.libp2p.dial(multiaddr(address));
+    await channel.subscribe(this.requester)
+    return this.requester
   },
 
   async actAsRequester(address, channelName) {
     let agent = this
     const channel = new Channel(this.helia, channelName)
-    this.requester = new Requester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(channelName, message)})
+    this.requester = new LinkingRequester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(message.data)})
 
     await this.helia.libp2p.dial(multiaddr(address));
     await channel.subscribe(this.requester)
-    this.requester.initiate()
+    const timeout = setTimeout(() => {
+      clearTimeout(timeout)
+      this.requester.initiate()
+    }, 500)
   }
 }
 
@@ -142,8 +165,8 @@ export const AccountCapability = {
     return {fullname: fullname, accountKey: uint8arrays.toString(ak, 'base64pad'), signature: envolope.signature}
   },
 
-  async createSessionOnDeviceLink(handle, message) {
-    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
+  async createSessionOnDeviceLink(message) {
+    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, message.handle)
     await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(message.accessKey, 'base64pad'))
     await this.runtime.setItem(SHOVEL_FS_FOREST_CID, uint8arrays.fromString(message.forestCID, 'base64pad'))
   }

@@ -39,28 +39,32 @@ export class Requester {
 
   async initiate() {    
     const {requestKeyPair, requestDID } = await this.requestDID()
-    const message = requestDID
+    const message = { id: requestDID }
     this.state = "INITIATE"
-    await this.channel.publish(message)
     this.requestKeyPair =  requestKeyPair
     this.DID = requestDID
-    return {requestKeyPair, requestDID}
+    await this.channel.publish(JSON.stringify(message))
+    return requestDID
   }
 
-  async negotiate(sessionKeyMessage) {
-    this.sessionKey = await this.parseSessionKey(sessionKeyMessage)
-    const pin = Array.from(crypto.getRandomValues(new Uint8Array(6))).map(n => n % 9)
+  async challenge() {
+    throw "ImplementInSpecificHandshake"
+  }
+
+  async negotiate(message) {
+    this.sessionKey = await this.parseSessionKey(message)    
+    const challenge = await this.challenge()
+
+    const id = JSON.parse(message).id
 
     // TODO - add signature of DID to prove ownership
-    const challenge = await Envelope.pack({
+    const response = await Envelope.pack({
       did: await this.agent.DID(),
-      pin: pin
-    }, this.sessionKey)
+      challenge: challenge
+    }, this.sessionKey, id)
 
-    this.channel.publish(challenge)
-
-    this.notification.emitEvent("pinGenerated", pin)
-    return { challenge, pin }
+    this.notification.emitEvent("challengeGenerated", challenge)
+    this.channel.publish(response)
   }
 
   async complete(envelope) {

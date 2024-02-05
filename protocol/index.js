@@ -96,13 +96,13 @@ async function verify(message, signature){
 server.post('/pin', async (req, res) => { 
   const verified = await verify(req.body.message, req.body.signature)
   if (!verified) {
-    res.status(401).json({})
+    res.status(401).json({error: "InvalidSignature"})
     return
   }
 
   const canPin = await accounts.validAgent(`${req.body.message.handle}#${req.body.message.signer}`)
   if (!canPin) {
-    res.status(401).json({})
+    res.status(401).json({error: "InvalidAgent"})
     return
   }
 
@@ -150,7 +150,7 @@ server.post("/accounts", async (req, res) => {
   if (taken) {
     res.status(400).json({error: "User name taken"})
   } else {
-    accounts.create(fullname)
+    await accounts.create(fullname)
     res.status(201).json({})
   }
 });
