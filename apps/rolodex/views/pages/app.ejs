@@ -18,6 +18,12 @@
       if (session == false) {
         window.location.href = '/home';
       }
+
+      var handle = await shovel.agent.handle()
+
+      // TODO - fix channel - "(broker-handle)-(approver-handle)-relationship"
+      // TODO - dial broker address 
+      const approver = await shovel.agent.actAsRelationshipApprover("<%= address %>", `<%= broker %>-${handle}-relationship`)
     </script>
 
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">

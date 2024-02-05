@@ -81,7 +81,12 @@
   }
 
   window.addConnection = function(){
-    alert("connection added with " + document.getElementById('connection-handle').value)
+    // TODO check if valid handle to connect
+    var connectHandle = document.getElementById('connection-handle').value
+
+    // TODO - fix channel - "(broker-handle)-(approver-handle)-relationship"
+    // TODO - dial broker address or it could be approver, requires approver peerId
+    shovel.agent.actAsRelationshipRequester("<%= address %>", `<%= broker %>-${connectHandle}-relationship`)
   }
 </script>
 

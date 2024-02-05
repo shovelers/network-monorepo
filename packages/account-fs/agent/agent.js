@@ -66,6 +66,18 @@ export const MessageCapability = {
     return this.requester
   },
 
+  async actAsRelationshipApprover(address, channelName) {
+    console.log("approver", address, channelName)
+  },
+
+  async actAsRelationshipRequester(address, channelName) {
+    console.log("requester", address, channelName)
+  },
+
+  async actAsRelationshipBroker(channelName) {
+    console.log("broker", channelName)
+  },
+
   async actAsRequester(address, channelName) {
     let agent = this
     const channel = new Channel(this.helia, channelName)

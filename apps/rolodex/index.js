@@ -32,6 +32,10 @@ agent.approver.notification.addEventListener("challengeRecieved", async (challen
   await challengeEvent.detail.confirm.call()
 })
 
+const broker = await agent.handle()
+// TODO - fix channel - "(broker-handle)-(approver-handle)-relationship" 
+await agent.actAsRelationshipBroker(`${broker}-relationship`)
+
 // TODO - configure from env vars for deployment
 const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
 
@@ -49,7 +53,7 @@ server.get("/home", (req, res) => {
 });
 
 server.get("/app", (req, res) => {
-  res.render('pages/app')
+  res.render('pages/app', { broker: broker, address: address })
 });
 
 server.get("/link", (req, res) => {
