@@ -6,6 +6,9 @@
 app = "shovel-rolodex"
 primary_region = "sin"
 
+[env]
+  ROLODEX_DNS_MULTADDR_PREFIX = "/dns4/app-rolodex.shovel.company/tcp/443/tls/ws/p2p/"
+
 [build]
 
 [http_service]
