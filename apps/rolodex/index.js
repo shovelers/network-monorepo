@@ -15,12 +15,9 @@ const __dirname = path.dirname(__filename);
 const NETWORK = process.env.VITE_NETWORK || "DEVNET"
 
 // TODO mount filesystem
-const homeDir = process.env.PROTOCOL_DB_HOME || path.join(__dirname, 'protocol_db')
-await fs.mkdir(path.join(homeDir, 'blocks'), { recursive: true })
-await fs.mkdir(path.join(homeDir, 'data'), { recursive: true })
-const helia = await createAppNode(path.join(homeDir, 'blocks'), path.join(homeDir, 'data'))
+const helia = await createAppNode()
 
-// TODO - generate for deployment
+// TODO - remove from git and generate for deployment
 const runtimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'agent_runtime_config.json'), 'utf8'))
 const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
 const agent = new Agent(helia, connection[NETWORK], runtime)
@@ -36,7 +33,7 @@ agent.approver.notification.addEventListener("challengeRecieved", async (challen
 })
 
 // TODO - configure from env vars for deployment
-const address = (await helia.libp2p.getMultiaddrs())[0].toString()
+const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
 
 server.use(express.urlencoded({ extended: true }))
 server.set('views', path.join(__dirname, 'views'));
