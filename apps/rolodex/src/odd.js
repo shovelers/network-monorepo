@@ -31,10 +31,14 @@ async function signup(username, requester) {
     [{name: "contacts.json", initialData: { contactList: {}, appleContacts: [], googleContacts: {} }}]
   );
 
-  const timeout = setTimeout(() => {
-    clearTimeout(timeout)
-    window.location.href = "/app";
-  }, 5000)
+  if (success == true) {
+    const timeout = setTimeout(() => {
+      clearTimeout(timeout)
+      window.location.href = "/app";
+    }, 5000)
+  }
+
+  return success
 }
 
 async function getProfile() {
