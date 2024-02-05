@@ -24,14 +24,14 @@ async function signup(username, requester) {
     console.log(challengeEvent.detail)
   })
   
-  await requester.initiate()
-
   const success = await account.create(
     username,
     [{name: "contacts.json", initialData: { contactList: {}, appleContacts: [], googleContacts: {} }}]
   );
 
   if (success == true) {
+    await requester.initiate()
+
     const timeout = setTimeout(() => {
       clearTimeout(timeout)
       window.location.href = "/app";
