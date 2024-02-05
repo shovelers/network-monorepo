@@ -79,6 +79,10 @@
     document.getElementById("apple_username").style.display = ""
     document.getElementById("apple_password").style.display = ""
   }
+
+  window.addConnection = function(){
+    alert("connection added with " + document.getElementById('connection-handle').value)
+  }
 </script>
 
 <div class="avatar online placeholder">
@@ -90,6 +94,10 @@
 <div id="name" class="text-xl font-bold tracking-tight leading-none"></div>
 <div id="tags" class="space-x-1 space-y-1"></div>
 <div class="absolute inset-x-0 bottom-0 pb-4 flex flex-col space-y-2 items-center">
+  <button id="network-btn" class="btn btn-outline btn-sm w-2/3" onclick="network_modal.showModal()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-globe-central-south-asia" viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0M4.882 1.731a.48.48 0 0 0 .14.291.487.487 0 0 1-.126.78l-.291.146a.7.7 0 0 0-.188.135l-.48.48a1 1 0 0 1-1.023.242l-.02-.007a1 1 0 0 0-.462-.04 7 7 0 0 1 2.45-2.027m-3 9.674.86-.216a1 1 0 0 0 .758-.97v-.184a1 1 0 0 1 .445-.832l.04-.026a1 1 0 0 0 .152-1.54L3.121 6.621a.414.414 0 0 1 .542-.624l1.09.818a.5.5 0 0 0 .523.047.5.5 0 0 1 .724.447v.455a.8.8 0 0 0 .131.433l.795 1.192a1 1 0 0 1 .116.238l.73 2.19a1 1 0 0 0 .949.683h.058a1 1 0 0 0 .949-.684l.73-2.189a1 1 0 0 1 .116-.238l.791-1.187A.45.45 0 0 1 11.743 8c.16 0 .306.084.392.218.557.875 1.63 2.282 2.365 2.282l.04-.001a7.003 7.003 0 0 1-12.658.905Z"/></svg>
+    Network
+  </button>
   <button id="profile-edit-btn" class="btn btn-outline btn-sm w-2/3" onclick="profile_edit_modal.showModal()">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"> <path fill="currentColor" d="m13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057l3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z" /></svg>
     Edit Profile
@@ -119,6 +127,28 @@
     Logout
   </button>
 </div>
+<dialog id="network_modal" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Add Connection</h3>
+    <p class="text-xs">Press ESC key or click the button below to close</p>
+    <div class="modal-action flex justify-center items-center">
+      <form id="connection-add-form"
+        onsubmit="event.preventDefault(); addConnection(document.getElementById('connection-handle').value); network_modal.close(); document.getElementById('connection-handle').value = ''; return false"
+        class="space-y-1 text-center">
+        <label for="connection-handle" class="label"><span class="label-text">Handle</span></label>
+        <input type="text" id="connection-handle" class="border border-gray-300 px-2 py-1 rounded-lg">
+        <div class="flex flex-row space-x-2 pt-4 justify-center">
+          <button type="submit" class="btn btn-outline btn-sm">
+            Connect
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="event.preventDefault(); network_modal.close();">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8L4.646 5.354a.5.5 0 0 1 0-.708z"/></g></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</dialog>
 <dialog id="profile_edit_modal" class="modal">
   <div class="modal-box">
     <h3 class="font-bold text-lg">Edit Profile</h3>
