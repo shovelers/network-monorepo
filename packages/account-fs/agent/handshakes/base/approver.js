@@ -1,25 +1,22 @@
 import * as uint8arrays from 'uint8arrays';
 import { Envelope, DIDKey, Notification } from './common.js';
 
-export class Approver {
-  constructor(agent, channel, onComplete) {
+export class Handshake {
+  constructor(agent, channel, id, notification, onComplete) {
     this.agent = agent
     this.channel = channel
-    this.sessionKey = null
-    this.state = null
-    this.notification = new Notification()
+    this.id = id
+    this.state = "INITIATE"
+    this.notification = notification
     this.onComplete = onComplete
+    this.sessionKey = null
   }
 
   async handler(message) {
     switch (this.state) {
-      case null:
-        this.state = "INITIATE"
-        this.initiate(message)
-        break
       case "INITIATE":
         this.state = "NEGOTIATE"
-        this.negotiate(message)
+        await this.negotiate(message)
         this.state = "TERMINATE"
         break
       case "NEGOTIATE":
@@ -32,7 +29,7 @@ export class Approver {
   async initiate(message) {
     const request = JSON.parse(message)
     const {sessionKey, sessionKeyMessage} = await this.generateSessionKey(request)
-    this.sessionKey =  sessionKey
+    this.sessionKey = sessionKey
     await this.channel.publish(sessionKeyMessage)
   }
 
@@ -129,6 +126,26 @@ export class Approver {
     return {
       sessionKey,
       sessionKeyMessage
+    }
+  }
+}
+
+export class Approver {
+  constructor(agent, channel, onComplete) {
+    this.agent = agent
+    this.channel = channel
+    this.notification = new Notification()
+    this.onComplete = onComplete
+    this.handshake = null
+  }
+
+  async handler(message) {
+    if (this.handshake == null) {
+      const request = JSON.parse(message)
+      this.handshake = new Handshake(this.agent, this.channel, request.id, this.notification, this.onComplete)
+      await this.handshake.initiate(message)
+    } else {
+      await this.handshake.handler(message)
     }
   }
 }
