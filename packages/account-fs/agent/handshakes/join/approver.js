@@ -7,13 +7,7 @@ export class JoinHandshake extends Handshake {
 }
 
 export class JoinApprover extends Approver {
-  async handler(message) {
-    if (this.handshake == null) {
-      const request = JSON.parse(message)
-      this.handshake = new JoinHandshake(this.agent, this.channel, request.id, this.notification, this.onComplete)
-      await this.handshake.initiate(message)
-    } else {
-      await this.handshake.handler(message)
-    }
+  newHandshake(id) {
+    return new JoinHandshake(this.agent, this.channel, id, this.notification, this.onComplete)
   }
 }

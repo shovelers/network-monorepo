@@ -6,22 +6,23 @@ export class Handshake {
     this.agent = agent
     this.channel = channel
     this.id = id
-    this.state = "INITIATE"
+    this.state = "CREATED"
     this.notification = notification
     this.onComplete = onComplete
     this.sessionKey = null
   }
 
-  async handler(message) {
+  async handle(message) {
     switch (this.state) {
-      case "INITIATE":
-        this.state = "NEGOTIATE"
+      case "CREATED": 
+        await this.initiate(message)
+        break
+      case "INITIATED":
         await this.negotiate(message)
-        this.state = "TERMINATE"
         break
-      case "NEGOTIATE":
+      case "NEGOTIATED":
         break
-      case "TERMINATE":
+      case "TERMINATED":
         break
     }
   }
@@ -31,6 +32,7 @@ export class Handshake {
     const {sessionKey, sessionKeyMessage} = await this.generateSessionKey(request)
     this.sessionKey = sessionKey
     await this.channel.publish(sessionKeyMessage)
+    this.state = "INITIATED"
   }
 
   async negotiate(message) {
@@ -42,6 +44,7 @@ export class Handshake {
       reject: async () => { return await approver.reject(message) },
       message: challengeMessage
     })
+    this.state = "NEGOTIATED"
   }
 
   async confirm(message, challenge) {
@@ -54,6 +57,7 @@ export class Handshake {
     
     await this.channel.publish(confirmMessage)
     this.notification.emitEvent("complete", "CONFIRMED")
+    this.state = "TERMINATED"
   }
 
   async confirmData() {
@@ -66,6 +70,7 @@ export class Handshake {
     
     await this.channel.publish(rejectMessage)
     this.notification.emitEvent("complete", "REJECTED")
+    this.state = "TERMINATED"
   }
 
   async generateSessionKey(message) {
@@ -136,16 +141,21 @@ export class Approver {
     this.channel = channel
     this.notification = new Notification()
     this.onComplete = onComplete
-    this.handshake = null
+    this.handshakes = []
   }
 
   async handler(message) {
-    if (this.handshake == null) {
-      const request = JSON.parse(message)
-      this.handshake = new Handshake(this.agent, this.channel, request.id, this.notification, this.onComplete)
-      await this.handshake.initiate(message)
-    } else {
-      await this.handshake.handler(message)
-    }
+    const request = JSON.parse(message)
+    let handshake = this.handshakes.find((h) => h.id == request.id)
+
+    if (!handshake) {
+      handshake = this.newHandshake(request.id)
+      this.handshakes.push(handshake)
+    } 
+    await handshake.handle(message)
+  }
+
+  newHandshake(id) {
+    return new Handshake(this.agent, this.channel, id, this.notification, this.onComplete)
   }
 }

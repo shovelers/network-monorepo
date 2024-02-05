@@ -11,13 +11,7 @@ export class LinkingHandshake extends Handshake {
 }
 
 export class LinkingApprover extends Approver {
-  async handler(message) {
-    if (this.handshake == null) {
-      const request = JSON.parse(message)
-      this.handshake = new LinkingHandshake(this.agent, this.channel, request.id, this.notification, this.onComplete)
-      await this.handshake.initiate(message)
-    } else {
-      await this.handshake.handler(message)
-    }
+  newHandshake(id) {
+    return new LinkingHandshake(this.agent, this.channel, id, this.notification, this.onComplete)
   }
 }
