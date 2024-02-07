@@ -7,7 +7,7 @@ export class Channel {
 
   async subscribe(actor) {
     this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
-      console.log(`${message.detail.topic}`, new TextDecoder().decode(message.detail.data))
+      // console.log(`${message.detail.topic}`, new TextDecoder().decode(message.detail.data))
       if (message.detail.topic == this.name) {
         actor.handler(new TextDecoder().decode(message.detail.data))
       }

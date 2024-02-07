@@ -50,13 +50,13 @@ export class Requester {
   }
 
   async negotiate(message) {
-    const { id, iv, sessionKey } = JSON.parse(message)
+    const { id, iv, msg, sessionKey } = JSON.parse(message)
     if (!id || !iv || !sessionKey) {
       console.log("ignoring invalid negotiate message")
       return
     }
 
-    this.sessionKey = await this.parseSessionKey(message)    
+    this.sessionKey = await this.parseSessionKey(iv, msg, sessionKey)    
     const challenge = await this.challenge()
 
     // TODO - add signature of DID to prove ownership
@@ -86,8 +86,7 @@ export class Requester {
     console.log(message.status)
   }
 
-  async parseSessionKey(sessionKeyMessage) {
-    const { iv: encodedIV, msg, sessionKey: encodedSessionKey } = JSON.parse(sessionKeyMessage)
+  async parseSessionKey(encodedIV, msg, encodedSessionKey) {
     const iv = uint8arrays.fromString(encodedIV, "base64pad")
     const encryptedSessionKey = uint8arrays.fromString(encodedSessionKey, "base64pad")
 

@@ -1,7 +1,17 @@
 import { Approver, Handshake } from './base/approver.js';
 import { Requester } from './base/requester.js';
 import { Channel } from './channel.js';
-import { DIDKey, Notification } from './base/common.js';
+import { Envelope, DIDKey, Notification } from './base/common.js';
+import { DIDKey as ISODIDKey } from 'iso-did/key'
+import * as verifiers from 'iso-signatures/verifiers/rsa.js'
+import * as uint8arrays from 'uint8arrays';
+
+async function verify(message, signature){
+  const pubKey = ISODIDKey.fromString(message.signer).publicKey
+  const binMessage = uint8arrays.fromString(JSON.stringify(message)) 
+  const binSignature = uint8arrays.fromString(signature, 'base64')
+  return await verifiers.verify({message: binMessage, signature: binSignature, publicKey: pubKey})
+}
 
 export class RelateHandshake extends Handshake {
   async confirmData() {
@@ -27,8 +37,34 @@ class BrokerHandshake {
   }
 
   async handle(message) {
+    if (!this.sessionKey) {
+      await this.negotiate(message)
+    } else {
+      await this.read(message)
+    }
+  }
+
+  async negotiate(message) {
+    const { id, iv, msg, brokerSessionKey } = JSON.parse(message)
+    if (!id || !iv || !msg || !brokerSessionKey) {
+      console.log("ignoring invalid negotiate message")
+      return
+    }
+
+    this.sessionKey = await this.parseSessionKey(iv, msg, brokerSessionKey)
+    console.log("snoop", this.id, this.sessionKey)
+  }
+
+  async read(envelope) {
+    const { id, iv, msg } = JSON.parse(envelope)
+    if (!id || !iv || !msg) {
+      console.log("ignoring invalid complete message")
+      return
+    }
+
     // TODO - can store messages to implement relationship chain
-    console.log("snooped", message)
+    const message = await Envelope.open(envelope, this.sessionKey)
+    console.log("snoop", message)
   }
 
   async initiate(message) {
@@ -39,6 +75,49 @@ class BrokerHandshake {
     // TODO add proof of brokerDID from a valid broker or pass the permanent brokerDID instead of a throwaway
 
     await this.channel.publish(JSON.stringify(message))
+  }
+
+  async parseSessionKey(encodedIV, msg, encodedSessionKey) {
+    const iv = uint8arrays.fromString(encodedIV, "base64pad")
+    const encryptedSessionKey = uint8arrays.fromString(encodedSessionKey, "base64pad")
+
+    const sessionKeyBuffer = await crypto.subtle.decrypt(
+      {
+        name: "RSA-OAEP"
+      },
+      this.keyPair.privateKey,
+      encryptedSessionKey
+    )
+  
+    const sessionKey = await crypto.subtle.importKey(
+      "raw",
+      new Uint8Array(sessionKeyBuffer),
+      {
+        name: "AES-GCM",
+        length: 256,
+      },
+      true,
+      [ "encrypt", "decrypt" ]
+    )
+
+    const envelopeBuffer = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      sessionKey,
+      uint8arrays.fromString(msg, "base64pad"),
+    )
+
+    const envelope = JSON.parse(uint8arrays.toString(new Uint8Array(envelopeBuffer)))
+
+    if (envelope.message.sessionKey != uint8arrays.toString(new Uint8Array(sessionKeyBuffer), "base64pad")) {
+      throw "session key mismatch"
+    }
+
+    const verified = await verify(envelope.message, envelope.signature)
+    if (!verified) {
+      throw "envelope signature check failed"
+    }
+
+    return sessionKey
   }
 
     //Private
@@ -79,6 +158,7 @@ export class RelateBroker {
     if (!handshake) {
       handshake = await this.newHandshake(message)
       this.handshakes.push(handshake)
+      return
     } 
     await handshake.handle(message)
   }
