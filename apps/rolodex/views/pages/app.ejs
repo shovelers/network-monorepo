@@ -24,6 +24,12 @@
       // TODO - fix channel - "(broker-handle)-(approver-handle)-relationship"
       // TODO - dial broker address 
       const approver = await shovel.agent.actAsRelationshipApprover("<%= address %>", `<%= broker %>-${handle}-relationship`)
+  
+      shovel.agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
+        // TODO Implementing auto-confim - check challenge to implement reject
+        // TODO save did and handle in DB/WNFS
+        await challengeEvent.detail.confirm.call()
+      })
     </script>
 
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">

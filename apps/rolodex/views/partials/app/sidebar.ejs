@@ -86,7 +86,7 @@
 
     // TODO - fix channel - "(broker-handle)-(approver-handle)-relationship"
     // TODO - dial broker address or it could be approver, requires approver peerId
-    shovel.agent.actAsRelationshipRequester("<%= address %>", `<%= broker %>-${connectHandle}-relationship`)
+    shovel.agent.actAsRelationshipRequester("<%= address %>", `<%= broker %>-${connectHandle}-relationship`, "<%= broker %>-forwarding")
   }
 </script>
 

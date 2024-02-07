@@ -9,7 +9,8 @@ export class Handshake {
     this.state = "CREATED"
     this.notification = notification
     this.onComplete = onComplete
-    this.sessionKey = null
+    this.sessionKey = undefined
+    this.brokerDID = undefined
   }
 
   async handle(message) {
@@ -75,6 +76,7 @@ export class Handshake {
 
   async generateSessionKey(message) {
     const requestDID = message.id
+    this.brokerDID = message.brokerDID
     const sessionKey = await crypto.subtle.generateKey(
       {
         name: 'AES-GCM', length: 256,
@@ -86,23 +88,9 @@ export class Handshake {
     const buffer = await crypto.subtle.exportKey("raw", sessionKey)
     const exportedSessionKey = new Uint8Array(buffer)
 
-    const publicKey = DIDKey.DIDtoPublicKey(requestDID)
-    const requesterPublicKey = await crypto.subtle.importKey(
-      "spki",
-      publicKey,
-      { name: "RSA-OAEP", hash: "SHA-256" },
-      false,
-      [ "encrypt" ]
-    )
-
-    const arrayBuffer = await crypto.subtle.encrypt(
-      {
-        name: "RSA-OAEP"
-      },
-      requesterPublicKey,
-      exportedSessionKey
-    )
-    const encryptedSessionKey = new Uint8Array(arrayBuffer)
+    const encryptedSessionKey = await this.encryptSessionKey(exportedSessionKey, requestDID)
+    const encryptedBrokerSessionKey = (this.brokerDID) ? await this.encryptSessionKey(exportedSessionKey, this.brokerDID) : undefined
+    const brokerSessionKey = (encryptedBrokerSessionKey) ? uint8arrays.toString(encryptedBrokerSessionKey, "base64pad") : undefined
 
     const data = {
       // issuer: //agentDID,
@@ -125,13 +113,34 @@ export class Handshake {
       id: message.id,
       iv: uint8arrays.toString(iv, "base64pad"),
       msg: uint8arrays.toString(msg, "base64pad"),
-      sessionKey: uint8arrays.toString(encryptedSessionKey, "base64pad")
+      sessionKey: uint8arrays.toString(encryptedSessionKey, "base64pad"),
+      brokerSessionKey: brokerSessionKey
     })
   
     return {
       sessionKey,
       sessionKeyMessage
     }
+  }
+
+  async encryptSessionKey(exportedSessionKey, did) {
+    const publicKey = DIDKey.DIDtoPublicKey(did)
+    const requesterPublicKey = await crypto.subtle.importKey(
+      "spki",
+      publicKey,
+      { name: "RSA-OAEP", hash: "SHA-256" },
+      false,
+      [ "encrypt" ]
+    )
+
+    const arrayBuffer = await crypto.subtle.encrypt(
+      {
+        name: "RSA-OAEP"
+      },
+      requesterPublicKey,
+      exportedSessionKey
+    )
+    return new Uint8Array(arrayBuffer)
   }
 }
 

@@ -6,6 +6,8 @@ import { LinkingApprover } from './handshakes/linking/approver.js';
 import { LinkingRequester } from './handshakes/linking/requester.js';
 import { JoinApprover } from './handshakes/join/approver.js';
 import { JoinRequester } from './handshakes/join/requester.js';
+import { RelateApprover, RelateRequester, RelateBroker } from './handshakes/relate.js';
+import { Channel } from './handshakes/channel.js';
 import { multiaddr } from '@multiformats/multiaddr'
 import { CID } from 'multiformats/cid'
 import { DIDKey } from 'iso-did/key';
@@ -15,29 +17,6 @@ const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
-
-class Channel {
-  constructor(helia, channelName) {
-    this.helia = helia
-    this.name = channelName
-  }
-
-  async subscribe(actor) {
-    this.helia.libp2p.services.pubsub.addEventListener('message', (message) => {
-      console.log(`${message.detail.topic}:`, new TextDecoder().decode(message.detail.data))
-      if (message.detail.topic == this.name) {
-        actor.handler(new TextDecoder().decode(message.detail.data))
-      }
-    })
-
-    this.helia.libp2p.services.pubsub.subscribe(this.name)
-  }
-
-  async publish(message) {
-    this.helia.libp2p.services.pubsub.publish(this.name, new TextEncoder().encode(message))
-    console.log(message)
-  }
-}
 
 export const MessageCapability = {
   async actAsApprover(channelName) {
@@ -67,15 +46,35 @@ export const MessageCapability = {
   },
 
   async actAsRelationshipApprover(address, channelName) {
-    console.log("approver", address, channelName)
+    let agent = this
+    const channel = new Channel(this.helia, channelName)
+    this.approver = new RelateApprover(this, channel, async (message) => { })
+
+    await this.helia.libp2p.dial(multiaddr(address));
+    await channel.subscribe(this.approver)
   },
 
-  async actAsRelationshipRequester(address, channelName) {
-    console.log("requester", address, channelName)
+  async actAsRelationshipRequester(address, channelName, forwardingChannel) {
+    let agent = this
+    const channel = new Channel(this.helia, channelName, forwardingChannel)
+    this.requester = new RelateRequester(this, channel, async (message) => { })
+
+    console.log("dialing", address, channelName)
+    await this.helia.libp2p.dial(multiaddr(address));
+    await channel.subscribe(this.requester)
+    const timeout = setTimeout(() => {
+      clearTimeout(timeout)
+      this.requester.initiate()
+    }, 500)
   },
 
-  async actAsRelationshipBroker(channelName) {
-    console.log("broker", channelName)
+  async actAsRelationshipBroker() {
+    const forwardingChannel = `${await this.handle()}-forwarding`
+
+    const channel = new Channel(this.helia, forwardingChannel)
+    this.broker = new RelateBroker(this.helia)
+
+    await channel.subscribe(this.broker)
   },
 
   async actAsRequester(address, channelName) {

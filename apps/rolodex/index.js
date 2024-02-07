@@ -11,7 +11,6 @@ const server = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// TODO - set TESTNET for deployment
 const NETWORK = process.env.VITE_NETWORK || "DEVNET"
 
 // TODO mount filesystem
@@ -33,10 +32,8 @@ agent.approver.notification.addEventListener("challengeRecieved", async (challen
 })
 
 const broker = await agent.handle()
-// TODO - fix channel - "(broker-handle)-(approver-handle)-relationship" 
-await agent.actAsRelationshipBroker(`${broker}-relationship`)
+await agent.actAsRelationshipBroker()
 
-// TODO - configure from env vars for deployment
 const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
 
 server.use(express.urlencoded({ extended: true }))

@@ -24,15 +24,13 @@ export class Requester {
 
   async handler(message) {
     switch (this.state) {
-      case "INITIATE":
-        this.state = "NEGOTIATE"
+      case "INITIATED":
         this.negotiate(message)
         break
-      case "NEGOTIATE":
-        this.state = "TERMINATE"
+      case "NEGOTIATED":
         this.complete(message)
         break
-      case "TERMINATE":
+      case "TERMINATED":
         break
     }
   }
@@ -40,10 +38,10 @@ export class Requester {
   async initiate() {    
     const {requestKeyPair, requestDID } = await this.requestDID()
     const message = { id: requestDID }
-    this.state = "INITIATE"
     this.requestKeyPair =  requestKeyPair
     this.DID = requestDID
-    await this.channel.publish(JSON.stringify(message))
+    await this.channel.publishViaForwarder(JSON.stringify(message))
+    this.state = "INITIATED"
     return requestDID
   }
 
@@ -52,10 +50,14 @@ export class Requester {
   }
 
   async negotiate(message) {
+    const { id, iv, sessionKey } = JSON.parse(message)
+    if (!id || !iv || !sessionKey) {
+      console.log("ignoring invalid negotiate message")
+      return
+    }
+
     this.sessionKey = await this.parseSessionKey(message)    
     const challenge = await this.challenge()
-
-    const id = JSON.parse(message).id
 
     // TODO - add signature of DID to prove ownership
     const response = await Envelope.pack({
@@ -65,14 +67,22 @@ export class Requester {
 
     this.notification.emitEvent("challengeGenerated", challenge)
     this.channel.publish(response)
+    this.state = "NEGOTIATED"
   }
 
   async complete(envelope) {
+    const { id, iv, msg } = JSON.parse(envelope)
+    if (!id || !iv || !msg) {
+      console.log("ignoring invalid complete message")
+      return
+    }
+
     const message = await Envelope.open(envelope, this.sessionKey)
     if (message.status == "CONFIRMED") {
       await this.onComplete.call("", message)
       this.notification.emitEvent("complete", "")
     }
+    this.state = "TERMINATED"
     console.log(message.status)
   }
 
