@@ -4,8 +4,9 @@ import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
 import { LinkingApprover, LinkingRequester } from './handshakes/link.js';
 import { JoinApprover, JoinRequester } from './handshakes/join.js';
-import { RelateApprover, RelateRequester, RelateBroker } from './handshakes/relate.js';
-import { Channel } from './handshakes/channel.js';
+import { RelateApprover, RelateRequester } from './handshakes/relate.js';
+import { Broker } from './handshakes/base/broker.js';
+import { Channel } from './handshakes/base/channel.js';
 import { multiaddr } from '@multiformats/multiaddr'
 import { CID } from 'multiformats/cid'
 import { DIDKey } from 'iso-did/key';
@@ -70,7 +71,7 @@ export const MessageCapability = {
     const forwardingChannel = `${await this.handle()}-forwarding`
 
     const channel = new Channel(this.helia, forwardingChannel)
-    this.broker = new RelateBroker(this, channel)
+    this.broker = new Broker(this, channel)
 
     await channel.subscribe(this.broker)
   },
