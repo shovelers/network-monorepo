@@ -70,7 +70,7 @@ export const MessageCapability = {
     const forwardingChannel = `${await this.handle()}-forwarding`
 
     const channel = new Channel(this.helia, forwardingChannel)
-    this.broker = new RelateBroker(this.helia)
+    this.broker = new RelateBroker(this, channel)
 
     await channel.subscribe(this.broker)
   },
