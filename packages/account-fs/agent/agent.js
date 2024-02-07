@@ -2,10 +2,8 @@ import * as uint8arrays from 'uint8arrays';
 import axios from 'axios'
 import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
-import { LinkingApprover } from './handshakes/linking/approver.js';
-import { LinkingRequester } from './handshakes/linking/requester.js';
-import { JoinApprover } from './handshakes/join/approver.js';
-import { JoinRequester } from './handshakes/join/requester.js';
+import { LinkingApprover, LinkingRequester } from './handshakes/link.js';
+import { JoinApprover, JoinRequester } from './handshakes/join.js';
 import { RelateApprover, RelateRequester, RelateBroker } from './handshakes/relate.js';
 import { Channel } from './handshakes/channel.js';
 import { multiaddr } from '@multiformats/multiaddr'
