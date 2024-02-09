@@ -5,16 +5,15 @@ export class PrivateFS {
   constructor(node) {
     this.store = new WnfsBlockstore(node)
     this.path = ["private"]
+    this.rng = new Rng()
   }
 
   async initalise() {
-    const rng = new Rng()
-    const initialForest = new PrivateForest(rng)
-    const privateDir = new PrivateDirectory(initialForest.emptyName(), new Date(), rng)
+    const initialForest = new PrivateForest(this.rng)
+    const privateDir = new PrivateDirectory(initialForest.emptyName(), new Date(), this.rng)
   
-    var { rootDir, forest } = await privateDir.mkdir(this.path, true, new Date(), initialForest, this.store, rng);
+    var { rootDir, forest } = await privateDir.mkdir(this.path, true, new Date(), initialForest, this.store, this.rng);
 
-    this.rng = rng
     this.rootDir = rootDir
     this.forest = forest
   }
@@ -30,8 +29,7 @@ export class PrivateFS {
 
     //load the node as_dir to get the rootDir 
     var rootDir = await node.asDir(forest, this.store)
-
-    this.rng = new Rng()
+ 
     this.forest = forest
     this.rootDir = rootDir
   }
