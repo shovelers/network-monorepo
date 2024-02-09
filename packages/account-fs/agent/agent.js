@@ -17,6 +17,23 @@ const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
+export const SearchCapability = {
+  async search(query) {
+    // Load Rolodex folder
+    // Read files and build index
+    // Search and return a list of contacts for the query
+    // Contact type - Rolodex Network or Imported Contacts from other networks/naming service
+    // Contact data structure to support invite action and profile details for display
+    //   Invite Handshake for Rolodex Network
+    //   DeepLink for Imported Contact
+    return
+  },
+
+  // similarity search with another Handle on rolodex network or other networks
+  // useful for mutual friends. membership etc.
+  // async similarity(handle){}
+}
+
 export const MessageCapability = {
   async actAsApprover(channelName) {
     let agent = this
