@@ -1,4 +1,4 @@
-import { createBrowserNode } from './fs/helia_node.js';
+import { createBrowserNode } from './agent/helia_node.js';
 import { Account } from './agent/account.js'
 import { Agent, BROWSER_RUNTIME, AccountCapability, StorageCapability, MessageCapability, SearchCapability, Runtime } from './agent/agent.js'
 

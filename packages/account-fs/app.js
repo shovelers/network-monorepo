@@ -1,5 +1,5 @@
 import { Agent, Runtime, SERVER_RUNTIME, MessageCapability } from './agent/agent.js'
-import { createNode, APP } from './fs/helia_node.js';
+import { createNode, APP } from './agent/helia_node.js';
 import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
 //import { prometheusMetrics } from '@libp2p/prometheus-metrics'

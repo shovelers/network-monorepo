@@ -11,8 +11,8 @@ import { multiaddr } from '@multiformats/multiaddr'
 import { CID } from 'multiformats/cid'
 import { DIDKey } from 'iso-did/key';
 import { spki } from 'iso-signatures/spki'
-import { dial } from '../fs/helia_node.js'
-import { PrivateFS } from "../fs/private_fs.js"
+import { dial } from './helia_node.js'
+import { PrivateFS } from "./fs/private_fs.js"
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
