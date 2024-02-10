@@ -9,7 +9,7 @@ const connection = {
   "TESTNET": {network: "TESTNET", sync_host: "https://testnet.shovel.company:8001", dial_prefix: "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/"}
 }
 
-async function programInit(network) {
+async function programInit(network, appHandle) {
   //TODO check for network to be present in connection keys
 
   const helia = await createBrowserNode()
@@ -21,7 +21,7 @@ async function programInit(network) {
   Object.assign(Agent.prototype, StorageCapability);
   Object.assign(Agent.prototype, SearchCapability);
 
-  const accountfs = new AccountFS(helia, agent, connection[network].dial_prefix, connection[network].sync_host)
+  const accountfs = new AccountFS(helia, agent, connection[network].dial_prefix, connection[network].sync_host, appHandle)
   await accountfs.load()
 
   return  {

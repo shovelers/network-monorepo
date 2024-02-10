@@ -3,10 +3,10 @@ import { dial } from './helia_node.js'
 import axios from 'axios'
 
 export class AccountFS {
-  constructor(helia, agent, dialPrefix, syncHost){
+  constructor(helia, agent, dialPrefix, syncHost, appHandle){
     this.helia = helia
     this.agent = agent
-    this.fs = new PrivateFS(helia)
+    this.fs = new PrivateFS(helia, appHandle)
     this.prefix = dialPrefix
     this.syncServer = null
     this.axios_client  = axios.create({baseURL: syncHost})

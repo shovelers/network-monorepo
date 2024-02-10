@@ -7,7 +7,8 @@ import { programInit, Account } from 'account-fs';
 
 const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 
-const program = await programInit(NETWORK)
+// TODO - remove passing of App handle, instead infer from IndexDB after join handshake from app agent
+const program = await programInit(NETWORK, "rolodex")
 window.shovel = program
 
 const contactRepo = new ContactRepository(program.fs)
