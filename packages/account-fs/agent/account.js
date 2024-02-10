@@ -24,15 +24,14 @@ class Profile {
 }
 
 export class Account {
-  constructor(accountfs, agent) {
-    this.accountfs = accountfs
+  constructor(agent) {
     this.agent = agent
     this.filename = "profile.json"
     this.profile = null
   }
 
   async getProfile(){
-    this.profile = await this.accountfs.readPrivateFile(this.filename)
+    this.profile = await this.agent.readPrivateFile(this.filename)
     return this.profile
   }
 
@@ -41,7 +40,7 @@ export class Account {
       await this.getProfile()
     }
 
-    await this.accountfs.updatePrivateFile(this.filename, (content) => {
+    await this.agent.updatePrivateFile(this.filename, (content) => {
       content = {...this.profile, ...params}
       return content
     })
@@ -51,16 +50,17 @@ export class Account {
     const success = await this.agent.registerUser(handle)
 
     if (success) {
-      await this.accountfs.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
+      await this.agent.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
       await initialFiles.forEach(async element => {
-        await this.accountfs.updatePrivateFile(element.name, () => { return element.initialData })
+        await this.agent.updatePrivateFile(element.name, () => { return element.initialData })
       });
     }
     return success
   }
 
   async getLink() {
-    const [accessKey, forestCID] = await this.accountfs.getAccessKeyForPrivateFile(this.filename)
+    let forestCID = await this.agent.forestCID()
+    const accessKey = await this.agent.getAccessKeyForPrivateFile(this.filename)
     const encodedAccessKey = uint8arrays.toString(accessKey.toBytes(), 'base64url');
     const encodedForestCID = uint8arrays.toString(forestCID, 'base64url')
     return [encodedAccessKey, encodedForestCID]
@@ -84,7 +84,7 @@ export class Account {
 
     const success = await this.agent.recover(data)
     if (success) {
-      await this.accountfs.load()
+      await this.agent.load()
     }
     return success
   }

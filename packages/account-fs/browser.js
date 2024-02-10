@@ -1,5 +1,4 @@
 import { createBrowserNode } from './fs/helia_node.js';
-import { AccountFS } from './fs/account_fs.js';
 import { Account } from './agent/account.js'
 import { Agent, BROWSER_RUNTIME, AccountCapability, StorageCapability, MessageCapability, SearchCapability, Runtime } from './agent/agent.js'
 
@@ -15,19 +14,16 @@ async function programInit(network, appHandle) {
   const helia = await createBrowserNode()
 
   const runtime = new Runtime(BROWSER_RUNTIME, {})
-  const agent =  new Agent(helia, connection[network].sync_host, connection[network].dial_prefix, runtime)
+  const agent =  new Agent(helia, connection[network].sync_host, connection[network].dial_prefix, runtime, appHandle)
   Object.assign(Agent.prototype, AccountCapability);
   Object.assign(Agent.prototype, MessageCapability);
   Object.assign(Agent.prototype, StorageCapability);
   Object.assign(Agent.prototype, SearchCapability);
   await agent.bootstrap()
-
-  const accountfs = new AccountFS(helia, agent, appHandle)
-  await accountfs.load()
+  await agent.load()
 
   return  {
     helia: helia,
-    fs: accountfs,
     agent: agent
   }
 }

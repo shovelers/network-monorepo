@@ -12,6 +12,7 @@ import { CID } from 'multiformats/cid'
 import { DIDKey } from 'iso-did/key';
 import { spki } from 'iso-signatures/spki'
 import { dial } from '../fs/helia_node.js'
+import { PrivateFS } from "../fs/private_fs.js"
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
@@ -203,6 +204,42 @@ export const AccountCapability = {
 }
 
 export const StorageCapability = {
+  async load(){
+    try {
+      let accessKey = await this.accessKey()
+      let forestCID = await this.forestCID()
+
+      if (accessKey && forestCID){
+        await this.fs.loadForest(accessKey, forestCID)
+      }
+    } catch (err) {
+      console.log("missing datastore keys, need an account")
+      return 
+    }
+  },
+
+  async readPrivateFile(filename) {
+    try {
+      let content = await this.fs.read(filename)
+      return JSON.parse(content)
+    } catch (error) {
+      console.log("missing file: ", filename)
+    }
+  },
+
+  async getAccessKeyForPrivateFile(filename) {
+    return await this.fs.accessKeyForPrivateFile(filename)
+  },
+
+  async updatePrivateFile(filename, mutationFunction) {
+    let content = await this.readPrivateFile(filename)
+    let newContent = mutationFunction(content)
+    var [access_key, forest_cid] = await this.fs.write(filename, JSON.stringify(newContent))
+
+    await this.pin(access_key,forest_cid)
+    return newContent
+  },
+
   async pin(accessKey, forestCID) {
     await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
     await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
@@ -229,12 +266,13 @@ export const StorageCapability = {
 }
 
 export class Agent {
-  constructor(helia, accountHost, dialPrefix, runtime) {
+  constructor(helia, accountHost, dialPrefix, runtime, appHandle) {
     this.helia = helia
     this.axios_client  = axios.create({baseURL: accountHost})
     this.runtime = runtime
     this.prefix = dialPrefix
     this.syncServer = null
+    this.fs = new PrivateFS(helia, appHandle)
   }
 
   async DID(){

@@ -11,8 +11,8 @@ const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 const program = await programInit(NETWORK, "rolodex")
 window.shovel = program
 
-const contactRepo = new ContactRepository(program.fs)
-const account = new Account(program.fs, program.agent)
+const contactRepo = new ContactRepository(program.agent)
+const account = new Account(program.agent)
 
 customElements.define('contact-table', ContactTable);
 

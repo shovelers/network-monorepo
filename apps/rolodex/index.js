@@ -19,7 +19,7 @@ const helia = await createAppNode()
 // TODO - remove from git and generate for deployment
 const runtimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'agent_runtime_config.json'), 'utf8'))
 const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
-const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime)
+const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime, "rolodex")
 Object.assign(Agent.prototype, MessageCapability);
 
 const channelName = `${await agent.handle()}-membership`
