@@ -1,20 +1,13 @@
 import { PrivateFS } from "./private_fs.js"
-import { dial } from './helia_node.js'
-import axios from 'axios'
 
 export class AccountFS {
-  constructor(helia, agent, dialPrefix, syncHost, appHandle){
+  constructor(helia, agent, appHandle){
     this.helia = helia
     this.agent = agent
     this.fs = new PrivateFS(helia, appHandle)
-    this.prefix = dialPrefix
-    this.syncServer = null
-    this.axios_client  = axios.create({baseURL: syncHost})
   }
 
   async load(){
-    await this.startSync()
-
     try {
       let accessKey = await this.agent.accessKey()
       let forestCID = await this.agent.forestCID()
@@ -50,15 +43,5 @@ export class AccountFS {
 
     await this.agent.pin(access_key,forest_cid)
     return newContent
-  }
-
-  async startSync(){
-    await this.axios_client.get('/bootstrap').then(async (response) => {
-      this.syncServer = this.prefix + response.data.peerId
-      await dial(this.helia, this.syncServer)
-    }).catch((e) => {
-      console.log(e);
-      return e
-    })
   }
 }

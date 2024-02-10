@@ -15,8 +15,8 @@
       var peerId = url.searchParams.get("peerId")
 
       if (handle && peerId) {
-        console.log("sync", shovel.fs.syncServer)
-        shovel.agent.actAsRequester(`${shovel.fs.syncServer}/p2p-circuit/webrtc/p2p/${peerId}`, handle)
+        console.log("sync", shovel.agent.syncServer)
+        shovel.agent.actAsRequester(`${shovel.agent.syncServer}/p2p-circuit/webrtc/p2p/${peerId}`, handle)
       } else {
         console.log("Invalid URL")
       }

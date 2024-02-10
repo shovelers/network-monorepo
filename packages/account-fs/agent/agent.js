@@ -11,6 +11,7 @@ import { multiaddr } from '@multiformats/multiaddr'
 import { CID } from 'multiformats/cid'
 import { DIDKey } from 'iso-did/key';
 import { spki } from 'iso-signatures/spki'
+import { dial } from '../fs/helia_node.js'
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
@@ -20,6 +21,8 @@ const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 export const SearchCapability = {
   async search(query) {
     // Load Rolodex folder
+    //    const accountfs = new AccountFS(helia, agent, connection[network].dial_prefix, connection[network].sync_host, 'rolodex')      
+    //    AccountFS.readPrivateFile('contacts.js)
     // Read files and build index
     // Search and return a list of contacts for the query
     // Contact type - Rolodex Network or Imported Contacts from other networks/naming service
@@ -226,10 +229,12 @@ export const StorageCapability = {
 }
 
 export class Agent {
-  constructor(helia, accountHost, runtime) {
+  constructor(helia, accountHost, dialPrefix, runtime) {
     this.helia = helia
     this.axios_client  = axios.create({baseURL: accountHost})
     this.runtime = runtime
+    this.prefix = dialPrefix
+    this.syncServer = null
   }
 
   async DID(){
@@ -252,6 +257,16 @@ export class Agent {
 
   async handle() {
     return await this.runtime.getItem(SHOVEL_ACCOUNT_HANDLE)
+  }
+
+  async bootstrap(){
+    await this.axios_client.get('/bootstrap').then(async (response) => {
+      this.syncServer = this.prefix + response.data.peerId
+      await dial(this.helia, this.syncServer)
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
   }
 }
 

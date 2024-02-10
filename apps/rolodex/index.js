@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDAVClient } from 'tsdav';
-import { createAppNode, AccountFS, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability } from 'account-fs/app.js';
+import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability } from 'account-fs/app.js';
 import fs from 'node:fs/promises';
 
 const port = process.argv[2] || 3000;
@@ -19,7 +19,7 @@ const helia = await createAppNode()
 // TODO - remove from git and generate for deployment
 const runtimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'agent_runtime_config.json'), 'utf8'))
 const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
-const agent = new Agent(helia, connection[NETWORK], runtime)
+const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime)
 Object.assign(Agent.prototype, MessageCapability);
 
 const channelName = `${await agent.handle()}-membership`

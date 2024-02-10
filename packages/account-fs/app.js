@@ -1,5 +1,3 @@
-import { AccountFS } from './fs/account_fs.js';
-import { Account } from './agent/account.js'
 import { Agent, Runtime, SERVER_RUNTIME, MessageCapability } from './agent/agent.js'
 import { createNode, APP } from './fs/helia_node.js';
 import { MemoryBlockstore } from 'blockstore-core'
@@ -21,4 +19,4 @@ const connection = {
   "TESTNET": {network: "TESTNET", sync_host: "https://testnet.shovel.company:8001", dial_prefix: "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/"}
 }
 
-export { Agent, Runtime,AccountFS, connection, createAppNode, SERVER_RUNTIME, MessageCapability }
+export { Agent, Runtime, connection, createAppNode, SERVER_RUNTIME, MessageCapability }

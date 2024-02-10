@@ -15,13 +15,14 @@ async function programInit(network, appHandle) {
   const helia = await createBrowserNode()
 
   const runtime = new Runtime(BROWSER_RUNTIME, {})
-  const agent =  new Agent(helia, connection[network].sync_host, runtime)
+  const agent =  new Agent(helia, connection[network].sync_host, connection[network].dial_prefix, runtime)
   Object.assign(Agent.prototype, AccountCapability);
   Object.assign(Agent.prototype, MessageCapability);
   Object.assign(Agent.prototype, StorageCapability);
   Object.assign(Agent.prototype, SearchCapability);
+  await agent.bootstrap()
 
-  const accountfs = new AccountFS(helia, agent, connection[network].dial_prefix, connection[network].sync_host, appHandle)
+  const accountfs = new AccountFS(helia, agent, appHandle)
   await accountfs.load()
 
   return  {
