@@ -11,7 +11,7 @@ async function verify(message, signature){
 }
 
 export class Requester {
-  constructor(agent, channel, onComplete) {
+  constructor(agent, channel) {
     this.agent = agent
     this.channel = channel
     this.DID = null
@@ -19,7 +19,6 @@ export class Requester {
     this.sessionKey = null
     this.state = null
     this.notification = new Notification()
-    this.onComplete = onComplete
   }
 
   async handler(message) {
@@ -79,9 +78,9 @@ export class Requester {
 
     const message = await Envelope.open(envelope, this.sessionKey)
     if (message.status == "CONFIRMED") {
-      await this.onComplete.call("", message)
       this.notification.emitEvent("complete", "")
     }
+    this.notification.emitEvent(message.status, message)
     this.state = "TERMINATED"
     console.log(message.status)
   }

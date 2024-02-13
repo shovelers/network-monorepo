@@ -141,7 +141,10 @@ export const MessageCapability = {
   async actAsJoinRequester(address, channelName) {
     let agent = this
     const channel = new Channel(this.helia, channelName)
-    this.requester = new JoinRequester(this, channel, async (message) => { })
+    this.requester = new JoinRequester(this, channel)
+    this.requester.notification.addEventListener("CONFIRMED", async (message) => {
+      console.log(message.detail)
+    })
 
     await this.helia.libp2p.dial(multiaddr(address));
     await channel.subscribe(this.requester)
@@ -164,8 +167,11 @@ export const MessageCapability = {
     let agent = this
     const channel = new Channel(this.helia, channelName, forwardingChannel)
     // TODO save contact that is received in message
-    this.requester = new RelateRequester(this, channel, async (message) => { console.log(message) })
+    this.requester = new RelateRequester(this, channel)
     this.requester.challenge = function () { return { person: person } }
+    this.requester.notification.addEventListener("CONFIRMED", async (message) => {
+      console.log(message.detail)
+    })
 
     console.log("dialing", address, channelName)
     await this.helia.libp2p.dial(multiaddr(address));
@@ -188,7 +194,10 @@ export const MessageCapability = {
   async actAsRequester(address, channelName) {
     let agent = this
     const channel = new Channel(this.helia, channelName)
-    this.requester = new LinkingRequester(this, channel, async (message) => { return await agent.createSessionOnDeviceLink(message.data)})
+    this.requester = new LinkingRequester(this, channel)
+    this.requester.notification.addEventListener("CONFIRMED", async (message) => {
+      return await agent.createSessionOnDeviceLink(message.detail.data)
+    })
 
     await this.helia.libp2p.dial(multiaddr(address));
     await channel.subscribe(this.requester)
