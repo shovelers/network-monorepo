@@ -169,9 +169,6 @@ export const MessageCapability = {
     // TODO save contact that is received in message
     this.requester = new RelateRequester(this, channel)
     this.requester.challenge = function () { return { person: person } }
-    this.requester.notification.addEventListener("CONFIRMED", async (message) => {
-      console.log(message.detail)
-    })
 
     console.log("dialing", address, channelName)
     await this.helia.libp2p.dial(multiaddr(address));
@@ -180,6 +177,7 @@ export const MessageCapability = {
       clearTimeout(timeout)
       this.requester.initiate()
     }, 500)
+    return this.requester
   },
 
   async actAsRelationshipBroker() {

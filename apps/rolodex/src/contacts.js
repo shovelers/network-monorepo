@@ -11,11 +11,15 @@ export class Contact {
     this.googleContactID = params.googleContactID
     this.appleContactID = params.appleContactID
     this.archived = params.archived
+    this.PRODID = params.PRODID  // Validate - Required
+    this.UID = params.UID        // Validate - Required 
   }
 
   asJSON() {
     return {
       id: this.id,
+      PRODID: this.PRODID,
+      UID: this.UID,
       name: this.name,
       tags: this.tags,
       links: this.links,

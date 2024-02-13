@@ -83,8 +83,15 @@ async function updateProfile(handle, name, tags = [], text = '') {
 }
 
 async function addContact(name, tags = [], text = "", links = []) {
-  let contact = new Contact({name: name, tags: tags, text: text, links: links})
+  let contact = new Contact({name: name, tags: tags, text: text, links: links, PRODID: "DCN:rolodex"})
+  contact.UID = contact.id
   return contactRepo.create(contact)
+}
+
+// TODO - handle duplicate connections
+async function addConnection(person) {
+  let contact = new Contact({name: person.FN, PRODID: person.PRODID, UID: person.UID})
+  return contactRepo.create(contact) 
 }
 
 // TODO - fix bug where contact edit clears appleContactID etc.
@@ -182,7 +189,8 @@ async function addAppleContactsToContactList(appleContacts){
     var name = parsedAppleContact.displayName
     var uid = parsedAppleContact.UID
     if (!existingAppleContactIDs.includes(uid)) {
-      contactList.push(new Contact({name: name, appleContactID: uid}))
+      // TODO set PROPID from vcard parsing
+      contactList.push(new Contact({name: name, appleContactID: uid, UID: uid, PRODID: 'APPLE'}))
     }
   }
   await contactRepo.bulkCreate(contactList)
@@ -225,7 +233,7 @@ async function addGoogleContactsToContactList(googleContacts){
     }
     var uid = googleContact.resourceName
     if (!existingGoogleContactIDs.includes(uid)) {
-      contactList.push(new Contact({name: name, googleContactID: uid}))
+      contactList.push(new Contact({name: name, googleContactID: uid, UID: uid, PRODID: 'GOOGLE'}))
     }
   }
 
@@ -243,6 +251,7 @@ export {
   updateProfile, 
   getContacts, 
   addContact, 
+  addConnection,
   editContact, 
   deleteContact, 
   filterContacts, 

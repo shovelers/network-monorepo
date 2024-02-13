@@ -1,5 +1,5 @@
 <script type="module">
-  import { getProfile, updateProfile, signout, generateRecoveryKit, importContacts, appleCredsPresent, importGoogleContacts, getContactForRelate, downloadContactsDataLocally } from '/odd.js';
+  import { getProfile, updateProfile, signout, generateRecoveryKit, importContacts, appleCredsPresent, importGoogleContacts, getContactForRelate, addConnection, downloadContactsDataLocally } from '/odd.js';
   window.updateProfile = updateProfile;
   window.signout = signout;
   window.generateRecoveryKit = generateRecoveryKit;
@@ -80,12 +80,16 @@
     document.getElementById("apple_password").style.display = ""
   }
 
-  window.addConnection = async function(){
+  window.addConnectionButton = async function(){
     // TODO check if valid handle to connect
     var connectHandle = document.getElementById('connection-handle').value
     let person = await getContactForRelate()
     // TODO Transfer profile.json in such a way, that it mimics forever contact app semantics
-    shovel.agent.actAsRelationshipRequester("<%= address %>", `<%= broker %>-${connectHandle}-relationship`, "<%= broker %>-forwarding", person)
+    let requester = await shovel.agent.actAsRelationshipRequester("<%= address %>", `<%= broker %>-${connectHandle}-relationship`, "<%= broker %>-forwarding", person)
+    requester.notification.addEventListener("CONFIRMED", async (event) => {
+      console.log(event.detail)
+      await addConnection(event.detail.data.person)
+    })
   }
 </script>
 
@@ -137,7 +141,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="connection-add-form"
-        onsubmit="event.preventDefault(); addConnection(document.getElementById('connection-handle').value); network_modal.close(); document.getElementById('connection-handle').value = ''; return false"
+        onsubmit="event.preventDefault(); addConnectionButton(document.getElementById('connection-handle').value); network_modal.close(); document.getElementById('connection-handle').value = ''; return false"
         class="space-y-1 text-center">
         <label for="connection-handle" class="label"><span class="label-text">Handle</span></label>
         <input type="text" id="connection-handle" class="border border-gray-300 px-2 py-1 rounded-lg">
