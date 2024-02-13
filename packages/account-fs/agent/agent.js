@@ -42,10 +42,11 @@ const PRODIDs = {
 class Person {
   PRODID;
   UID;
-  N;
+  FN;
   CATEGORIES;
   URL;
   NOTE;
+  // TODO: Fix following field on contact import
   // TEL;
   // EMAIL;
   // XML;
@@ -53,10 +54,11 @@ class Person {
   constructor(fields) {
     this.PRODID = fields.PRODID
     this.UID = fields.UID
-    this.N = fields.N
+    this.FN = fields.FN
     this.CATEGORIES = fields.CATEGORIES
     this.URL = fields.URL
     this.NOTE = fields.NOTE
+    this.VERSION = "4.0"
   }
 }
 
@@ -88,7 +90,7 @@ export const SearchCapability = {
     //   DeepLink for Imported Contact
     return filteredContacts.map(function(contact) {
       let person = new Person({
-        N: contact.name,
+        FN: contact.name,
         CATEGORIES: contact.tags,
         URL: contact.links, 
         NOTE: contact.text
