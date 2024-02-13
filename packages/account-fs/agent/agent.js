@@ -89,24 +89,14 @@ export const SearchCapability = {
     //   Invite Handshake for Rolodex Network
     //   DeepLink for Imported Contact
     return filteredContacts.map(function(contact) {
-      let person = new Person({
+      return new Person({
+        PRODID: contact.PRODID,
+        UID: contact.UID,
         FN: contact.name,
         CATEGORIES: contact.tags,
         URL: contact.links, 
         NOTE: contact.text
       })
-
-      if (contact.appleContactID) {
-        person.PRODID = PRODIDs["APPLE"]
-        person.UID = contact.appleContactID
-      } else if (contact.googleContactID) {
-        person.PRODID = PRODIDs["GOOGLE"]
-        person.UID = contact.googleContactID
-      } else {
-        person.PRODID = PRODIDs["DCN"]
-        person.UID = contact.name
-      }
-      return person
     })
   },
 
