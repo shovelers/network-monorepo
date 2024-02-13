@@ -7,6 +7,7 @@ export class Handshake {
     this.channel = channel
     this.id = id
     this.state = "CREATED"
+    // TODO remove onComplete callback and standardise on event emitter notification
     this.notification = notification
     this.onComplete = onComplete
     this.sessionKey = undefined
@@ -41,17 +42,18 @@ export class Handshake {
 
     let approver = this
     this.notification.emitEvent("challengeRecieved", {
-      confirm: async () => { return await approver.confirm(message, challengeMessage) },
+      confirm: async (confirmData) => { return await approver.confirm(message, challengeMessage, confirmData) },
       reject: async () => { return await approver.reject(message) },
       message: challengeMessage
     })
     this.state = "NEGOTIATED"
   }
 
-  async confirm(message, challenge) {
+  async confirm(message, challenge, confirmData) {
     console.log("message in approve#confirm", challenge)
     await this.onComplete.call("", challenge)
-    const data = await this.confirmData()
+    // TODO remove one of the following method of getting confirm data
+    const data = confirmData || await this.confirmData()
 
     const id = JSON.parse(message).id
     const confirmMessage = await Envelope.pack({data: data, status: "CONFIRMED"}, this.sessionKey, id)

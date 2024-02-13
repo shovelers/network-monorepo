@@ -1,5 +1,5 @@
 <script type="module">
-  import { getProfile, updateProfile, signout, generateRecoveryKit, importContacts, appleCredsPresent, importGoogleContacts, downloadContactsDataLocally } from '/odd.js';
+  import { getProfile, updateProfile, signout, generateRecoveryKit, importContacts, appleCredsPresent, importGoogleContacts, getContactForRelate, downloadContactsDataLocally } from '/odd.js';
   window.updateProfile = updateProfile;
   window.signout = signout;
   window.generateRecoveryKit = generateRecoveryKit;
@@ -83,14 +83,7 @@
   window.addConnection = async function(){
     // TODO check if valid handle to connect
     var connectHandle = document.getElementById('connection-handle').value
-
-    let profile = await getProfile()
-    let person = {
-      FN: profile.name,
-      UID: `DCN:${profile.handle}`,
-      PRODID: "DCN:<%= broker %>"
-    }
-
+    let person = await getContactForRelate()
     // TODO Transfer profile.json in such a way, that it mimics forever contact app semantics
     shovel.agent.actAsRelationshipRequester("<%= address %>", `<%= broker %>-${connectHandle}-relationship`, "<%= broker %>-forwarding", person)
   }

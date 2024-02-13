@@ -50,6 +50,15 @@ async function getContacts() {
   return contactRepo.list()
 }
 
+async function getContactForRelate() {
+  let profile = await getProfile()
+  return {
+    FN: profile.name,
+    UID: `DCN:${profile.handle}`,
+    PRODID: "DCN:rolodex" // TODO figure how to get app handle
+  }
+}
+
 async function filterContacts(filter) {
   var contacts = await getContacts()
   var filteredContacts = { "contactList": {}, "appleContacts": []}
@@ -240,5 +249,6 @@ export {
   importContacts,
   importGoogleContacts,
   appleCredsPresent,
+  getContactForRelate,
   downloadContactsDataLocally
 };

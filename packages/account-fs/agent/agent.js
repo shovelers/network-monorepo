@@ -142,7 +142,7 @@ export const MessageCapability = {
     return this.requester
   },
 
-  async actAsRelationshipApprover(address, channelName) {
+  async actAsRelationshipApprover(address, channelName, person) {
     let agent = this
     const channel = new Channel(this.helia, channelName)
     this.approver = new RelateApprover(this, channel, async (message) => { })
@@ -154,7 +154,8 @@ export const MessageCapability = {
   async actAsRelationshipRequester(address, channelName, forwardingChannel, person) {
     let agent = this
     const channel = new Channel(this.helia, channelName, forwardingChannel)
-    this.requester = new RelateRequester(this, channel, async (message) => { })
+    // TODO save contact that is received in message
+    this.requester = new RelateRequester(this, channel, async (message) => { console.log(message) })
     this.requester.challenge = function () { return { person: person } }
 
     console.log("dialing", address, channelName)

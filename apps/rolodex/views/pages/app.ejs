@@ -12,7 +12,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { account } from '/odd.js';
+      import { account, getContactForRelate } from '/odd.js';
 
       var session = await account.activeSession();
       if (session == false) {
@@ -27,9 +27,10 @@
   
       shovel.agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
         console.log(challengeEvent.detail)
+        let person = await getContactForRelate()
         // TODO Implementing auto-confim - check challenge to implement reject
         // TODO save did and handle in DB/WNFS
-        await challengeEvent.detail.confirm.call()
+        await challengeEvent.detail.confirm({person: person})
       })
     </script>
 
