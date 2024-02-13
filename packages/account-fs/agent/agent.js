@@ -151,10 +151,11 @@ export const MessageCapability = {
     await channel.subscribe(this.approver)
   },
 
-  async actAsRelationshipRequester(address, channelName, forwardingChannel) {
+  async actAsRelationshipRequester(address, channelName, forwardingChannel, person) {
     let agent = this
     const channel = new Channel(this.helia, channelName, forwardingChannel)
     this.requester = new RelateRequester(this, channel, async (message) => { })
+    this.requester.challenge = function () { return { person: person } }
 
     console.log("dialing", address, channelName)
     await this.helia.libp2p.dial(multiaddr(address));

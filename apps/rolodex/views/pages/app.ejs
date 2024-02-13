@@ -26,6 +26,7 @@
       const approver = await shovel.agent.actAsRelationshipApprover("<%= address %>", `<%= broker %>-${handle}-relationship`)
   
       shovel.agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
+        console.log(challengeEvent.detail)
         // TODO Implementing auto-confim - check challenge to implement reject
         // TODO save did and handle in DB/WNFS
         await challengeEvent.detail.confirm.call()
