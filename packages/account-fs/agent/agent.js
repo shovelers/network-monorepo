@@ -65,7 +65,7 @@ export const SearchCapability = {
     // Load Rolodex folder
     // Read files and build index
     const contacts = await this.readPrivateFile('contacts.json')
-    
+
     // Search and return a list of contacts for the query
     const queryString = query.toLowerCase()
     var filteredContacts = []
@@ -86,14 +86,26 @@ export const SearchCapability = {
     // Contact data structure to support invite action and profile details for display
     //   Invite Handshake for Rolodex Network
     //   DeepLink for Imported Contact
-    return filteredContacts.map(contact => new Person({
-      PRODID: PRODIDs["APPLE"],
-      UID: contact.appleContactID,
-      N: contact.name,
-      CATEGORIES: contact.tags,
-      URL: contact.links, 
-      NOTE: contact.text
-    }))
+    return filteredContacts.map(function(contact) {
+      let person = new Person({
+        N: contact.name,
+        CATEGORIES: contact.tags,
+        URL: contact.links, 
+        NOTE: contact.text
+      })
+
+      if (contact.appleContactID) {
+        person.PRODID = PRODIDs["APPLE"]
+        person.UID = contact.appleContactID
+      } else if (contact.googleContactID) {
+        person.PRODID = PRODIDs["GOOGLE"]
+        person.UID = contact.googleContactID
+      } else {
+        person.PRODID = PRODIDs["DCN"]
+        person.UID = contact.name
+      }
+      return person
+    })
   },
 
   // similarity search with another Handle on rolodex network or other networks

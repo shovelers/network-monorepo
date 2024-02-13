@@ -78,6 +78,7 @@ async function addContact(name, tags = [], text = "", links = []) {
   return contactRepo.create(contact)
 }
 
+// TODO - fix bug where contact edit clears appleContactID etc.
 async function editContact(id, name, tags = [], text='', links = []) {
   let contact = new Contact({id: id, name: name, tags: tags, text: text, links: links})
   return contactRepo.edit(contact)
