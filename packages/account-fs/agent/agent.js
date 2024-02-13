@@ -19,18 +19,81 @@ const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
+const PRODIDs = {
+  "APPLE": "APPLE",
+  "GOOGLE": "GOOGLE",
+  "DCN": "DCN"
+}
+
+/*
+  "PRODID": "GOOGLE",
+  "UID": contact.googleContactID,
+
+  "PRODID": "DCN",
+  "UID": `DCN:${contact.handle}`, || `DCN:${contact.fullname}` 
+
+  "PRODID": "FARCASTER",
+  "UID": `FARCASTER:${contact.fid}`, || `DCN:${contact.handle}` 
+
+  "PRODID": "APPLE",
+  "UID": contact.appleContactID,
+*/
+
+class Person {
+  PRODID;
+  UID;
+  N;
+  CATEGORIES;
+  URL;
+  NOTE;
+  // TEL;
+  // EMAIL;
+  // XML;
+
+  constructor(fields) {
+    this.PRODID = fields.PRODID
+    this.UID = fields.UID
+    this.N = fields.N
+    this.CATEGORIES = fields.CATEGORIES
+    this.URL = fields.URL
+    this.NOTE = fields.NOTE
+  }
+}
+
 export const SearchCapability = {
   async search(query) {
     // Load Rolodex folder
-    //    const accountfs = new AccountFS(helia, agent, connection[network].dial_prefix, connection[network].sync_host, 'rolodex')      
-    //    AccountFS.readPrivateFile('contacts.js)
     // Read files and build index
+    const contacts = await this.readPrivateFile('contacts.json')
+    
     // Search and return a list of contacts for the query
+    const queryString = query.toLowerCase()
+    var filteredContacts = []
+    for (var id in contacts.contactList) {
+      var contact = contacts.contactList[id]
+      if (contact.name.toLowerCase().includes(queryString) || contact.tags.filter(tag => tag.toLowerCase().includes(queryString)).length > 0) {
+        filteredContacts.push(contact)
+      }
+      if (contact.text && contact.text.toLowerCase().includes(queryString)) {
+        filteredContacts.push(contact)
+      }
+      if (contact.links && (contact.links.filter(link => link.toLowerCase().includes(queryString)).length > 0)) {
+        filteredContacts.push(contact)
+      }
+    }
+
     // Contact type - Rolodex Network or Imported Contacts from other networks/naming service
     // Contact data structure to support invite action and profile details for display
     //   Invite Handshake for Rolodex Network
     //   DeepLink for Imported Contact
-    return
+    return filteredContacts.map(contact => new Person({
+      PRODID: PRODIDs["APPLE"],
+      UID: contact.appleContactID,
+      N: contact.name,
+      CATEGORIES: contact.tags,
+      URL: contact.links, 
+      NOTE: contact.text
+    }))
   },
 
   // similarity search with another Handle on rolodex network or other networks
