@@ -8,8 +8,6 @@ export class Contact {
     this.tags = params.tags
     this.links = params.links
     this.text = params.text
-    this.googleContactID = params.googleContactID
-    this.appleContactID = params.appleContactID
     this.archived = params.archived
     this.PRODID = params.PRODID  // Validate - Required
     this.UID = params.UID        // Validate - Required 
@@ -24,8 +22,6 @@ export class Contact {
       tags: this.tags,
       links: this.links,
       text: this.text,
-      googleContactID: this.googleContactID,
-      appleContactID: this.appleContactID,
       archived: this.archived
     }
   }

@@ -94,7 +94,7 @@ async function addConnection(person) {
   return contactRepo.create(contact) 
 }
 
-// TODO - fix bug where contact edit clears appleContactID etc.
+// TODO - fix bug where contact edit clears PRODID etc.
 async function editContact(id, name, tags = [], text='', links = []) {
   let contact = new Contact({id: id, name: name, tags: tags, text: text, links: links})
   return contactRepo.edit(contact)
@@ -176,7 +176,7 @@ async function addAppleContactsToContactList(appleContacts){
   //check if the uid to appleContacts[i] is == to any of the appleContactIDs in contactList
   //if not, add it to contactList
   var contacts = await contactRepo.list()
-  var existingAppleContactIDs = Object.values(contacts.contactList).filter((contact) => !contact.archived).map(contact => contact.appleContactID)
+  var existingAppleContactIDs = Object.values(contacts.contactList).filter((contact) => !contact.archived).map(contact => contact.UID)
   var contactList = []
   for (var i = 0; i < appleContacts.length; i++) {
     var appleContact = appleContacts[i]
@@ -190,7 +190,7 @@ async function addAppleContactsToContactList(appleContacts){
     var uid = parsedAppleContact.UID
     if (!existingAppleContactIDs.includes(uid)) {
       // TODO set PROPID from vcard parsing
-      contactList.push(new Contact({name: name, appleContactID: uid, UID: uid, PRODID: 'APPLE'}))
+      contactList.push(new Contact({name: name, UID: uid, PRODID: 'APPLE'}))
     }
   }
   await contactRepo.bulkCreate(contactList)
@@ -219,7 +219,7 @@ async function importGoogleContacts(refresh) {
 
 async function addGoogleContactsToContactList(googleContacts){
   var contacts = await contactRepo.list()
-  var existingGoogleContactIDs = Object.values(contacts.contactList).filter((contact) => !contact.archived).map(contact => contact.googleContactID)
+  var existingGoogleContactIDs = Object.values(contacts.contactList).filter((contact) => !contact.archived).map(contact => contact.UID)
 
   var contactList = []
   for (var i = 0; i < googleContacts.length; i++) {
@@ -233,7 +233,7 @@ async function addGoogleContactsToContactList(googleContacts){
     }
     var uid = googleContact.resourceName
     if (!existingGoogleContactIDs.includes(uid)) {
-      contactList.push(new Contact({name: name, googleContactID: uid, UID: uid, PRODID: 'GOOGLE'}))
+      contactList.push(new Contact({name: name, UID: uid, PRODID: 'GOOGLE'}))
     }
   }
 
