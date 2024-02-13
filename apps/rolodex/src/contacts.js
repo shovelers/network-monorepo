@@ -28,26 +28,26 @@ export class Contact {
 }
 
 export class ContactRepository {
-  constructor(os) {
-    this.store = os
+  constructor(agent) {
+    this.agent = agent
     this.filename = "contacts.json"
   }
 
   async list(){
-    return this.store.readPrivateFile(this.filename)
+    return this.agent.readPrivateFile(this.filename)
   }
 
   async filter(){}
 
   async create(contact){
-    await this.store.updatePrivateFile(this.filename, (content) => {
+    await this.agent.updatePrivateFile(this.filename, (content) => {
       content.contactList[contact.id] = contact.asJSON()
       return content
     })
   }
 
   async bulkCreate(contacts){
-    await this.store.updatePrivateFile(this.filename, (content) => {
+    await this.agent.updatePrivateFile(this.filename, (content) => {
       contacts.forEach(element => {
         content.contactList[element.id] = element.asJSON()
       });
@@ -56,14 +56,14 @@ export class ContactRepository {
   }
 
   async edit(contact){
-    await this.store.updatePrivateFile(this.filename, (content) => {
+    await this.agent.updatePrivateFile(this.filename, (content) => {
       content.contactList[contact.id] = contact.asJSON()
       return content
     }) 
   }
 
   async delete(contactID){
-    await this.store.updatePrivateFile(this.filename, (content) => {
+    await this.agent.updatePrivateFile(this.filename, (content) => {
       content.contactList[contactID].archived = true
       console.log("archived contact", content.contactList[contactID])
       return content
