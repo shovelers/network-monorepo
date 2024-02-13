@@ -2,14 +2,12 @@ import * as uint8arrays from 'uint8arrays';
 import { Envelope, DIDKey, Notification } from './common.js';
 
 export class Handshake {
-  constructor(agent, channel, id, notification, onComplete) {
+  constructor(agent, channel, id, notification) {
     this.agent = agent
     this.channel = channel
     this.id = id
     this.state = "CREATED"
-    // TODO remove onComplete callback and standardise on event emitter notification
     this.notification = notification
-    this.onComplete = onComplete
     this.sessionKey = undefined
     this.brokerDID = undefined
   }
@@ -51,7 +49,6 @@ export class Handshake {
 
   async confirm(message, challenge, confirmData) {
     console.log("message in approve#confirm", challenge)
-    await this.onComplete.call("", challenge)
     // TODO remove one of the following method of getting confirm data
     const data = confirmData || await this.confirmData()
 
@@ -59,6 +56,7 @@ export class Handshake {
     const confirmMessage = await Envelope.pack({data: data, status: "CONFIRMED"}, this.sessionKey, id)
     
     await this.channel.publish(confirmMessage)
+    this.notification.emitEvent("CONFIRMED", challenge)
     this.notification.emitEvent("complete", "CONFIRMED")
     this.state = "TERMINATED"
   }
@@ -147,11 +145,10 @@ export class Handshake {
 }
 
 export class Approver {
-  constructor(agent, channel, onComplete) {
+  constructor(agent, channel) {
     this.agent = agent
     this.channel = channel
     this.notification = new Notification()
-    this.onComplete = onComplete
     this.handshakes = []
   }
 
@@ -167,6 +164,6 @@ export class Approver {
   }
 
   newHandshake(id) {
-    return new Handshake(this.agent, this.channel, id, this.notification, this.onComplete)
+    return new Handshake(this.agent, this.channel, id, this.notification)
   }
 }

@@ -9,7 +9,7 @@ export class RelateHandshake extends Handshake {
 
 export class RelateApprover extends Approver {
   newHandshake(id) {
-    return new RelateHandshake(this.agent, this.channel, id, this.notification, this.onComplete)
+    return new RelateHandshake(this.agent, this.channel, id, this.notification)
   }
 }
 

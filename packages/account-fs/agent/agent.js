@@ -119,7 +119,10 @@ export const MessageCapability = {
   async actAsApprover(channelName) {
     let agent = this
     const channel = new Channel(this.helia, channelName)
-    this.approver = new LinkingApprover(this, channel, async (message) => { return await agent.linkDevice(message) })
+    this.approver = new LinkingApprover(this, channel, async (message) => {  })
+    this.approver.notification.addEventListener("CONFIRMED", async (message) => {
+      return await agent.linkDevice(message.detail)
+    })
 
     await channel.subscribe(this.approver)
   },
@@ -128,6 +131,9 @@ export const MessageCapability = {
     let agent = this
     const channel = new Channel(this.helia, channelName)
     this.approver = new JoinApprover(this, channel, async (message) => { })
+    this.approver.notification.addEventListener("CONFIRMED", async (message) => {
+      console.log(message.detail)
+    })
 
     await channel.subscribe(this.approver)
   },
@@ -146,6 +152,9 @@ export const MessageCapability = {
     let agent = this
     const channel = new Channel(this.helia, channelName)
     this.approver = new RelateApprover(this, channel, async (message) => { })
+    this.approver.notification.addEventListener("CONFIRMED", async (message) => {
+      console.log(message.detail)
+    })
 
     await this.helia.libp2p.dial(multiaddr(address));
     await channel.subscribe(this.approver)

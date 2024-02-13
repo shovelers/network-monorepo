@@ -29,7 +29,7 @@
         console.log(challengeEvent.detail)
         let person = await getContactForRelate()
         // TODO Implementing auto-confim - check challenge to implement reject
-        // TODO save did and handle in DB/WNFS
+        // TODO save person in DB/WNFS
         await challengeEvent.detail.confirm({person: person})
       })
     </script>

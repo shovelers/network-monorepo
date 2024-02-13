@@ -9,7 +9,7 @@ export class JoinHandshake extends Handshake {
 
 export class JoinApprover extends Approver {
   newHandshake(id) {
-    return new JoinHandshake(this.agent, this.channel, id, this.notification, this.onComplete)
+    return new JoinHandshake(this.agent, this.channel, id, this.notification)
   }
 }
 

@@ -13,7 +13,7 @@ export class LinkingHandshake extends Handshake {
 
 export class LinkingApprover extends Approver {
   newHandshake(id) {
-    return new LinkingHandshake(this.agent, this.channel, id, this.notification, this.onComplete)
+    return new LinkingHandshake(this.agent, this.channel, id, this.notification)
   }
 }
 
