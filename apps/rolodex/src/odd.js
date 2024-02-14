@@ -2,8 +2,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
-import { Contact, ContactRepository } from "./contacts.js";
-import { programInit, Account } from 'account-fs';
+import { programInit, Account, Contact, ContactRepository } from 'account-fs';
 
 const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 
@@ -27,7 +26,7 @@ async function signup(username, requester) {
   
   const success = await account.create(
     username,
-    [{name: "contacts.json", initialData: { contactList: {}, appleContacts: [], googleContacts: {} }}]
+    [{name: "contacts.json", initialData: { contactList: {} }}]
   );
 
   if (success == true) {

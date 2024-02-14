@@ -23,6 +23,7 @@ class Profile {
   }
 }
 
+//TODO move profile file/object to Roloedx, and reduce to DCN account management
 export class Account {
   constructor(agent) {
     this.agent = agent
