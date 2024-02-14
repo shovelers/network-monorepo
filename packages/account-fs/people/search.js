@@ -1,49 +1,4 @@
-// Implement SearchCapability declared in account-fs
-
-const PRODIDs = {
-  "APPLE": "APPLE",
-  "GOOGLE": "GOOGLE",
-  "DCN": "DCN"
-}
-
-/*
-  "PRODID": "GOOGLE",
-  "UID": contact.googleContactID,
-
-  "PRODID": "DCN",
-  "UID": `DCN:${contact.handle}`, || `DCN:${contact.fullname}` 
-
-  "PRODID": "FARCASTER",
-  "UID": `FARCASTER:${contact.fid}`, || `DCN:${contact.handle}` 
-
-  "PRODID": "APPLE",
-  "UID": contact.appleContactID,
-*/
-
-class Person {
-  PRODID;
-  UID;
-  FN;
-  CATEGORIES;
-  URL;
-  NOTE;
-  TEL;
-  EMAIL;
-  // TODO: Fix following field on contact import
-  // XML;
-
-  constructor(fields) {
-    this.PRODID = fields.PRODID
-    this.UID = fields.UID
-    this.FN = fields.FN
-    this.CATEGORIES = fields.CATEGORIES
-    this.URL = fields.URL
-    this.NOTE = fields.NOTE
-    this.TEL = fields.TEL
-    this.EMAIL = fields.EMAIL
-    this.VERSION = "4.0"
-  }
-}
+import { Person } from "./person"
 
 export const SearchCapability = {
   async search(query) {
@@ -53,17 +8,22 @@ export const SearchCapability = {
 
     // Search and return a list of contacts for the query
     const queryString = query.toLowerCase()
+    //TODO: move filter to repository
     var filteredContacts = []
     for (var id in contacts.contactList) {
-      var contact = contacts.contactList[id]
-      if (contact.name.toLowerCase().includes(queryString) || contact.tags.filter(tag => tag.toLowerCase().includes(queryString)).length > 0) {
-        filteredContacts.push(contact)
+      var person = contacts.contactList[id]
+      if (person.archived) { continue }
+      if (person.FN.toLowerCase().includes(queryString) || person.CATEGORIES.split(',').filter(tag => tag.toLowerCase().includes(queryString)).length > 0) {
+        filteredContacts.push(person)
+        continue
       }
-      if (contact.text && contact.text.toLowerCase().includes(queryString)) {
-        filteredContacts.push(contact)
+      if (person.NOTE && person.NOTE.toLowerCase().includes(queryString)) {
+        filteredContacts.push(person)
+        continue
       }
-      if (contact.links && (contact.links.filter(link => link.toLowerCase().includes(queryString)).length > 0)) {
-        filteredContacts.push(contact)
+      if (person.URL && (person.URL.split(',').filter(link => link.toLowerCase().includes(queryString)).length > 0)) {
+        filteredContacts.push(person)
+        continue
       }
     }
 
@@ -77,7 +37,11 @@ export const SearchCapability = {
         UID: contact.UID,
         TEL: contact.TEL,
         EMAIL: contact.EMAIL,
-        FN: contact.name,
+        FN: contact.FN,
+        //TODO: remove below fields from search results, when searched from other apps
+        CATEGORIES: contact.CATEGORIES,
+        URL: contact.URL,
+        NOTE: contact.NOTE
       })
     })
   },

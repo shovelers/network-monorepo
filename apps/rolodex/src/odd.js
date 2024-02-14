@@ -2,7 +2,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
-import { programInit, Account, Contact, ContactRepository } from 'account-fs';
+import { programInit, Account, Person, PeopleRepository } from 'account-fs';
 
 const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 
@@ -10,7 +10,7 @@ const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 const program = await programInit(NETWORK, "rolodex")
 window.shovel = program
 
-const contactRepo = new ContactRepository(program.agent)
+const contactRepo = new PeopleRepository(program.agent)
 const account = new Account(program.agent)
 
 customElements.define('contact-table', ContactTable);
@@ -46,7 +46,8 @@ async function getProfile() {
 }
 
 async function getContacts() {
-  return contactRepo.list()
+  var list = await contactRepo.list()
+  return {contactList: list}
 }
 
 async function getContactForRelate() {
@@ -58,23 +59,12 @@ async function getContactForRelate() {
   }
 }
 
+async function getContactByUID(uid) {
+  return await contactRepo.find(uid)
+}
+
 async function filterContacts(filter) {
-  var contacts = await getContacts()
-  var filteredContacts = { "contactList": {}, "appleContacts": []}
-  for (var id in contacts.contactList) {
-    var contact = contacts.contactList[id]
-    if (contact.name.toLowerCase().includes(filter.toLowerCase()) || contact.tags.filter(tag => tag.toLowerCase().includes(filter.toLowerCase())).length > 0) {
-      filteredContacts.contactList[id] = contact
-    }
-    if (contact.text && contact.text.toLowerCase().includes(filter.toLowerCase())) {
-      filteredContacts.contactList[id] = contact
-    }
-    if (contact.links && contact.links.filter(link => link.toLowerCase().includes(filter.toLowerCase())).length > 0) {
-      filteredContacts.contactList[id] = contact
-    }
-  }
-  console.log("filtered contacts", filteredContacts)
-  return filteredContacts
+  return { contactList: await program.agent.search(filter) }
 }
 
 async function updateProfile(handle, name, tags = [], text = '') {
@@ -82,21 +72,20 @@ async function updateProfile(handle, name, tags = [], text = '') {
 }
 
 async function addContact(name, tags = [], text = "", links = []) {
-  let contact = new Contact({name: name, tags: tags, text: text, links: links, PRODID: "DCN:rolodex"})
-  contact.UID = contact.id
-  return contactRepo.create(contact)
+  let person = new Person({FN: name, CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()})
+  return contactRepo.create(person)
 }
 
 // TODO - handle duplicate connections
 async function addConnection(person) {
-  let contact = new Contact({name: person.FN, PRODID: person.PRODID, UID: person.UID})
-  return contactRepo.create(contact) 
+  let connection = new Person({FN: person.name, PRODID: person.PRODID, UID: person.UID})
+  return contactRepo.create(connection) 
 }
 
 // TODO - fix bug where contact edit clears PRODID etc.
 async function editContact(id, name, tags = [], text='', links = []) {
-  let contact = new Contact({id: id, name: name, tags: tags, text: text, links: links})
-  return contactRepo.edit(contact)
+  let person = new Person({FN: name, CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: id})
+  return contactRepo.edit(person)
 }
 
 async function deleteContact(id) {
@@ -191,7 +180,7 @@ async function addAppleContactsToContactList(appleContacts){
     var EMAIL = parsedAppleContact.email ? parsedAppleContact.email[0].value : undefined
     if (!existingAppleContactIDs.includes(uid)) {
       // TODO set PROPID from vcard parsing
-      contactList.push(new Contact({name: name, UID: uid, PRODID: 'APPLE', EMAIL: EMAIL, TEL: TEL}))
+      contactList.push(new Person({FN: name, PRODID: "APPLE", UID: uid, EMAIL: EMAIL, TEL: TEL}))
     }
   }
   await contactRepo.bulkCreate(contactList)
@@ -236,7 +225,7 @@ async function addGoogleContactsToContactList(googleContacts){
     var TEL = googleContact.phoneNumbers ? googleContact.phoneNumbers[0].canonicalForm : undefined
     var uid = googleContact.resourceName
     if (!existingGoogleContactIDs.includes(uid)) {
-      contactList.push(new Contact({name: name, UID: uid, PRODID: 'GOOGLE', EMAIL: EMAIL, TEL: TEL}))
+      contactList.push(new Person({FN: name, PRODID: "GOOGLE", UID: uid, EMAIL: EMAIL, TEL: TEL}))
     }
   }
 
@@ -253,6 +242,7 @@ export {
   getProfile, 
   updateProfile, 
   getContacts, 
+  getContactByUID,
   addContact, 
   addConnection,
   editContact, 
