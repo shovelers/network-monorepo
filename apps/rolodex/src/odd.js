@@ -188,9 +188,11 @@ async function addAppleContactsToContactList(appleContacts){
     }
     var name = parsedAppleContact.displayName
     var uid = parsedAppleContact.UID
+    var TEL = parsedAppleContact.telephone ? parsedAppleContact.telephone[0].value : undefined
+    var EMAIL = parsedAppleContact.email ? parsedAppleContact.email[0].value : undefined
     if (!existingAppleContactIDs.includes(uid)) {
       // TODO set PROPID from vcard parsing
-      contactList.push(new Contact({name: name, UID: uid, PRODID: 'APPLE'}))
+      contactList.push(new Contact({name: name, UID: uid, PRODID: 'APPLE', EMAIL: EMAIL, TEL: TEL}))
     }
   }
   await contactRepo.bulkCreate(contactList)
@@ -204,9 +206,8 @@ async function importGoogleContacts(refresh) {
     callback: async (tokenResponse) => {
       const profile = await axios_client.get('https://www.googleapis.com/oauth2/v2/userinfo', {headers: { Authorization: `Bearer ${tokenResponse.access_token}`}})
       const response = await axios_client.get('https://people.googleapis.com/v1/people/me/connections',
-        {params: { personFields: 'names', sortOrder: 'LAST_MODIFIED_DESCENDING', pageSize: 200 }, headers: { Authorization: `Bearer ${tokenResponse.access_token}` }}
+        {params: { personFields: 'names,emailAddresses,phoneNumbers', sortOrder: 'LAST_MODIFIED_DESCENDING', pageSize: 200 }, headers: { Authorization: `Bearer ${tokenResponse.access_token}` }}
       )
-
       console.log("google contacts ", response.data);
 
       await addGoogleContactsToContactList(response.data.connections)
@@ -231,9 +232,12 @@ async function addGoogleContactsToContactList(googleContacts){
       console.log("error for contact: ", googleContact, "error: ", error)
       continue
     }
+    // TODO search for primary fields
+    var EMAIL = googleContact.emailAddresses ? googleContact.emailAddresses[0].value : undefined
+    var TEL = googleContact.phoneNumbers ? googleContact.phoneNumbers[0].canonicalForm : undefined
     var uid = googleContact.resourceName
     if (!existingGoogleContactIDs.includes(uid)) {
-      contactList.push(new Contact({name: name, UID: uid, PRODID: 'GOOGLE'}))
+      contactList.push(new Contact({name: name, UID: uid, PRODID: 'GOOGLE', EMAIL: EMAIL, TEL: TEL}))
     }
   }
 

@@ -11,6 +11,8 @@ export class Contact {
     this.archived = params.archived
     this.PRODID = params.PRODID  // Validate - Required
     this.UID = params.UID        // Validate - Required 
+    this.TEL = params.TEL
+    this.EMAIL = params.EMAIL
   }
 
   asJSON() {
@@ -18,6 +20,8 @@ export class Contact {
       id: this.id,
       PRODID: this.PRODID,
       UID: this.UID,
+      TEL: this.TEL,
+      EMAIL: this.EMAIL,
       name: this.name,
       tags: this.tags,
       links: this.links,

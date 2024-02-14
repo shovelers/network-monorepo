@@ -46,9 +46,9 @@ class Person {
   CATEGORIES;
   URL;
   NOTE;
+  TEL;
+  EMAIL;
   // TODO: Fix following field on contact import
-  // TEL;
-  // EMAIL;
   // XML;
 
   constructor(fields) {
@@ -58,6 +58,8 @@ class Person {
     this.CATEGORIES = fields.CATEGORIES
     this.URL = fields.URL
     this.NOTE = fields.NOTE
+    this.TEL = fields.TEL
+    this.EMAIL = fields.EMAIL
     this.VERSION = "4.0"
   }
 }
@@ -92,6 +94,8 @@ export const SearchCapability = {
       return new Person({
         PRODID: contact.PRODID,
         UID: contact.UID,
+        TEL: contact.TEL,
+        EMAIL: contact.EMAIL,
         FN: contact.name,
         CATEGORIES: contact.tags,
         URL: contact.links, 
