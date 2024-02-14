@@ -47,6 +47,7 @@ async function getProfile() {
 
 async function getContacts() {
   var list = await contactRepo.list()
+  console.log("all", list)
   return {contactList: list}
 }
 
@@ -78,7 +79,7 @@ async function addContact(name, tags = [], text = "", links = []) {
 
 // TODO - handle duplicate connections
 async function addConnection(person) {
-  let connection = new Person({FN: person.name, PRODID: person.PRODID, UID: person.UID})
+  let connection = new Person({FN: person.FN, PRODID: person.PRODID, UID: person.UID})
   return contactRepo.create(connection) 
 }
 

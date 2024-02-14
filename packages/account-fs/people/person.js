@@ -31,12 +31,12 @@ export class Person {
   // XML;
 
   constructor(fields) {
-    this.PRODID = fields.PRODID
-    this.UID = fields.UID
-    this.FN = fields.FN
-    this.CATEGORIES = fields.CATEGORIES
-    this.URL = fields.URL
-    this.NOTE = fields.NOTE
+    this.PRODID = fields.PRODID  //required
+    this.UID = fields.UID        //required
+    this.FN = fields.FN          //required
+    this.CATEGORIES = fields.CATEGORIES || ""
+    this.URL = fields.URL || ""
+    this.NOTE = fields.NOTE || ""
     this.TEL = fields.TEL
     this.EMAIL = fields.EMAIL
     this.VERSION = "4.0"
