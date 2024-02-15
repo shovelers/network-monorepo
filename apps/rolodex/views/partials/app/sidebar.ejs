@@ -85,7 +85,7 @@
     var connectHandle = document.getElementById('connection-handle').value
     let person = await getContactForRelate()
     // TODO Transfer profile.json in such a way, that it mimics forever contact app semantics
-    let requester = await shovel.agent.actAsRelationshipRequester("<%= address %>", `<%= broker %>-${connectHandle}-relationship`, "<%= broker %>-forwarding", person)
+    let requester = await shovel.agent.actAsRelationshipRequester("<%= address %>", "<%= broker %>", `${connectHandle}`, person)
     requester.notification.addEventListener("CONFIRMED", async (event) => {
       console.log(event.detail)
       await addConnection(event.detail.data.person)

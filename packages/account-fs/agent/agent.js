@@ -20,8 +20,9 @@ const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
 export const MessageCapability = {
-  async actAsApprover(channelName) {
+  async actAsApprover(approverHandle) {
     let agent = this
+    let channelName = approverHandle 
     const channel = new Channel(this.helia, channelName)
     this.approver = new LinkingApprover(this, channel, async (message) => {  })
     this.approver.notification.addEventListener("CONFIRMED", async (message) => {
@@ -31,8 +32,25 @@ export const MessageCapability = {
     await channel.subscribe(this.approver)
   },
 
-  async actAsJoinApprover(channelName) {
+  async actAsRequester(address, approverHandle) {
     let agent = this
+    let channelName = approverHandle
+    const channel = new Channel(this.helia, channelName)
+    this.requester = new LinkingRequester(this, channel)
+    this.requester.notification.addEventListener("CONFIRMED", async (message) => {
+      return await agent.createSessionOnDeviceLink(message.detail.data)
+    })
+
+    await this.helia.libp2p.dial(multiaddr(address));
+    await channel.subscribe(this.requester)
+    const timeout = setTimeout(() => {
+      clearTimeout(timeout)
+      this.requester.initiate()
+    }, 500)
+  },
+
+  async actAsJoinApprover(approverHandle) {
+    const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)
     this.approver = new JoinApprover(this, channel, async (message) => { })
     this.approver.notification.addEventListener("CONFIRMED", async (message) => {
@@ -42,8 +60,8 @@ export const MessageCapability = {
     await channel.subscribe(this.approver)
   },
 
-  async actAsJoinRequester(address, channelName) {
-    let agent = this
+  async actAsJoinRequester(address, approverHandle) {
+    const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)
     this.requester = new JoinRequester(this, channel)
     this.requester.notification.addEventListener("CONFIRMED", async (message) => {
@@ -55,8 +73,8 @@ export const MessageCapability = {
     return this.requester
   },
 
-  async actAsRelationshipApprover(address, channelName, person) {
-    let agent = this
+  async actAsRelationshipApprover(address, brokerHandle, approverHandle, person) {
+    let channelName = `${brokerHandle}-${approverHandle}-relationship`
     const channel = new Channel(this.helia, channelName)
     this.approver = new RelateApprover(this, channel, async (message) => { })
     this.approver.notification.addEventListener("CONFIRMED", async (message) => {
@@ -67,8 +85,9 @@ export const MessageCapability = {
     await channel.subscribe(this.approver)
   },
 
-  async actAsRelationshipRequester(address, channelName, forwardingChannel, person) {
-    let agent = this
+  async actAsRelationshipRequester(address, brokerHandle, approverHandle, person ) {
+    let channelName = `${brokerHandle}-${approverHandle}-relationship`
+    let forwardingChannel = `${brokerHandle}-forwarding`
     const channel = new Channel(this.helia, channelName, forwardingChannel)
     // TODO save contact that is received in message
     this.requester = new RelateRequester(this, channel)
@@ -91,22 +110,6 @@ export const MessageCapability = {
     this.broker = new Broker(this, channel)
 
     await channel.subscribe(this.broker)
-  },
-
-  async actAsRequester(address, channelName) {
-    let agent = this
-    const channel = new Channel(this.helia, channelName)
-    this.requester = new LinkingRequester(this, channel)
-    this.requester.notification.addEventListener("CONFIRMED", async (message) => {
-      return await agent.createSessionOnDeviceLink(message.detail.data)
-    })
-
-    await this.helia.libp2p.dial(multiaddr(address));
-    await channel.subscribe(this.requester)
-    const timeout = setTimeout(() => {
-      clearTimeout(timeout)
-      this.requester.initiate()
-    }, 500)
   }
 }
 

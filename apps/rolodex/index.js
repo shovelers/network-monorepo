@@ -22,8 +22,8 @@ const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
 const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime, "rolodex")
 Object.assign(Agent.prototype, MessageCapability);
 
-const channelName = `${await agent.handle()}-membership`
-await agent.actAsJoinApprover(channelName)
+const appHandle = await agent.handle()
+await agent.actAsJoinApprover(appHandle)
 
 agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
   // TODO Implementing auto-confim - check challenge to implement reject
@@ -42,11 +42,11 @@ server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')))
 
 server.get("/", (req, res) => {
-  res.render('pages/index', { channelName: channelName, address: address })
+  res.render('pages/index', { address: address, appHandle: appHandle })
 });
 
 server.get("/home", (req, res) => {
-  res.render('pages/index', { channelName: channelName, address: address })
+  res.render('pages/index', { address: address, appHandle: appHandle })
 });
 
 server.get("/app", (req, res) => {

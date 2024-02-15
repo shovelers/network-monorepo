@@ -19,11 +19,11 @@
         window.location.href = '/home';
       }
 
-      var handle = await shovel.agent.handle()
+      var agentHandle = await shovel.agent.handle()
 
       // TODO - fix channel - "(broker-handle)-(approver-handle)-relationship"
       // TODO - dial broker address 
-      const approver = await shovel.agent.actAsRelationshipApprover("<%= address %>", `<%= broker %>-${handle}-relationship`)
+      const approver = await shovel.agent.actAsRelationshipApprover("<%= address %>", "<%= broker %>", `${agentHandle}`)
   
       shovel.agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
         console.log(challengeEvent.detail)
