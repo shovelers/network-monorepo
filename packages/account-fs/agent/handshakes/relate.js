@@ -14,6 +14,10 @@ export class RelateApprover extends Approver {
 }
 
 export class RelateRequester extends Requester {
+  type() {
+    return "RELATE"
+  }
+  
   async challenge() {
     return { }
   }

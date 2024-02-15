@@ -52,8 +52,8 @@ export class Handshake {
     // TODO remove one of the following method of getting confirm data
     const data = confirmData || await this.confirmData()
 
-    const id = JSON.parse(message).id
-    const confirmMessage = await Envelope.pack({data: data, status: "CONFIRMED"}, this.sessionKey, id)
+    const { id, type } = JSON.parse(message)
+    const confirmMessage = await Envelope.pack({data: data, status: "CONFIRMED"}, this.sessionKey, id, type)
     
     await this.channel.publish(confirmMessage)
     this.notification.emitEvent("CONFIRMED", challenge)
@@ -76,6 +76,7 @@ export class Handshake {
 
   async generateSessionKey(message) {
     const requestDID = message.id
+    const handshakeType = message.type
     this.brokerDID = message.brokerDID
     const sessionKey = await crypto.subtle.generateKey(
       {
@@ -111,6 +112,7 @@ export class Handshake {
 
     const sessionKeyMessage = JSON.stringify({
       id: message.id,
+      type: handshakeType,
       iv: uint8arrays.toString(iv, "base64pad"),
       msg: uint8arrays.toString(msg, "base64pad"),
       sessionKey: uint8arrays.toString(encryptedSessionKey, "base64pad"),

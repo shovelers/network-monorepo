@@ -36,7 +36,7 @@ export class Requester {
 
   async initiate() {    
     const {requestKeyPair, requestDID } = await this.requestDID()
-    const message = { id: requestDID }
+    const message = { id: requestDID, type: this.type() }
     this.requestKeyPair =  requestKeyPair
     this.DID = requestDID
     await this.channel.publishViaForwarder(JSON.stringify(message))
@@ -44,13 +44,17 @@ export class Requester {
     return requestDID
   }
 
+  type() {
+    throw "ImplementInSpecificHandshake"
+  }
+
   async challenge() {
     throw "ImplementInSpecificHandshake"
   }
 
   async negotiate(message) {
-    const { id, iv, msg, sessionKey } = JSON.parse(message)
-    if (!id || !iv || !sessionKey) {
+    const { id, type, iv, msg, sessionKey } = JSON.parse(message)
+    if (!id || !type || !iv || !sessionKey) {
       console.log("ignoring invalid negotiate message")
       return
     }
@@ -62,7 +66,7 @@ export class Requester {
     const response = await Envelope.pack({
       did: await this.agent.DID(),
       challenge: challenge
-    }, this.sessionKey, id)
+    }, this.sessionKey, id, type)
 
     this.notification.emitEvent("challengeGenerated", challenge)
     this.channel.publish(response)
@@ -70,8 +74,8 @@ export class Requester {
   }
 
   async complete(envelope) {
-    const { id, iv, msg } = JSON.parse(envelope)
-    if (!id || !iv || !msg) {
+    const { id, type, iv, msg } = JSON.parse(envelope)
+    if (!id || !type || !iv || !msg) {
       console.log("ignoring invalid complete message")
       return
     }

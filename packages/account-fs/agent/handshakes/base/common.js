@@ -1,7 +1,7 @@
 import * as uint8arrays from 'uint8arrays';
 
 export class Envelope {
-  static async pack(message, sessionKey, id){
+  static async pack(message, sessionKey, id, type){
     const iv = crypto.getRandomValues(new Uint8Array(16))
 
     const msgBuffer = await crypto.subtle.encrypt(
@@ -13,6 +13,7 @@ export class Envelope {
 
     return JSON.stringify({
       id: id,
+      type: type,
       iv: uint8arrays.toString(iv, "base64pad"),
       msg: uint8arrays.toString(msg, "base64pad")
     })

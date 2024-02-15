@@ -14,6 +14,10 @@ export class JoinApprover extends Approver {
 }
 
 export class JoinRequester extends Requester {
+  type() {
+    return "JOIN"
+  }
+
   async challenge() {
     const handle = await this.agent.handle()
     return { profile: { handle: handle } }

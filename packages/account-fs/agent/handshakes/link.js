@@ -18,6 +18,10 @@ export class LinkingApprover extends Approver {
 }
 
 export class LinkingRequester extends Requester {
+  type() {
+    return "LINK"
+  }
+  
   async challenge() {
     const pin = Array.from(crypto.getRandomValues(new Uint8Array(6))).map(n => n % 9)
     return {pin: pin}
