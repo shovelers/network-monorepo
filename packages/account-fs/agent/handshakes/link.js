@@ -1,4 +1,4 @@
-import { Approver, Handshake } from './base/approver.js';
+import { Handshake } from './base/handshake.js';
 import { Requester } from './base/requester.js';
 import * as uint8arrays from 'uint8arrays';
 
@@ -11,17 +11,11 @@ export class LinkingHandshake extends Handshake {
   }
 }
 
-export class LinkingApprover extends Approver {
-  newHandshake(id) {
-    return new LinkingHandshake(this.agent, this.channel, id, this.notification)
-  }
-}
-
 export class LinkingRequester extends Requester {
   type() {
     return "LINK"
   }
-  
+
   async challenge() {
     const pin = Array.from(crypto.getRandomValues(new Uint8Array(6))).map(n => n % 9)
     return {pin: pin}

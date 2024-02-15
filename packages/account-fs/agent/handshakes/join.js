@@ -1,15 +1,9 @@
-import { Approver, Handshake } from './base/approver.js';
+import { Handshake } from './base/handshake.js';
 import { Requester } from './base/requester.js';
 
 export class JoinHandshake extends Handshake {
   async confirmData() {
     return { }
-  }
-}
-
-export class JoinApprover extends Approver {
-  newHandshake(id) {
-    return new JoinHandshake(this.agent, this.channel, id, this.notification)
   }
 }
 

@@ -2,10 +2,11 @@ import * as uint8arrays from 'uint8arrays';
 import axios from 'axios'
 import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
-import { LinkingApprover, LinkingRequester } from './handshakes/link.js';
-import { JoinApprover, JoinRequester } from './handshakes/join.js';
-import { RelateApprover, RelateRequester } from './handshakes/relate.js';
+import { LinkingRequester } from './handshakes/link.js';
+import { JoinRequester } from './handshakes/join.js';
+import { RelateRequester } from './handshakes/relate.js';
 import { Broker } from './handshakes/base/broker.js';
+import { Approver } from './handshakes/base/approver.js';
 import { Channel } from './handshakes/base/channel.js';
 import { multiaddr } from '@multiformats/multiaddr'
 import { CID } from 'multiformats/cid'
@@ -24,7 +25,7 @@ export const MessageCapability = {
     let agent = this
     let channelName = approverHandle 
     const channel = new Channel(this.helia, channelName)
-    this.approver = new LinkingApprover(this, channel, async (message) => {  })
+    this.approver = new Approver(this, channel, async (message) => {  })
     this.approver.notification.addEventListener("CONFIRMED", async (message) => {
       return await agent.linkDevice(message.detail)
     })
@@ -52,7 +53,7 @@ export const MessageCapability = {
   async actAsJoinApprover(approverHandle) {
     const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)
-    this.approver = new JoinApprover(this, channel, async (message) => { })
+    this.approver = new Approver(this, channel, async (message) => { })
     this.approver.notification.addEventListener("CONFIRMED", async (message) => {
       console.log(message.detail)
     })
@@ -76,7 +77,7 @@ export const MessageCapability = {
   async actAsRelationshipApprover(address, brokerHandle, approverHandle, person) {
     let channelName = `${brokerHandle}-${approverHandle}-relationship`
     const channel = new Channel(this.helia, channelName)
-    this.approver = new RelateApprover(this, channel, async (message) => { })
+    this.approver = new Approver(this, channel, async (message) => { })
     this.approver.notification.addEventListener("CONFIRMED", async (message) => {
       console.log(message.detail)
     })
