@@ -1,4 +1,4 @@
-import { createNode, STANDALONE } from './agent/helia_node.js';
+import { createNode, HUB } from './agent/helia_node.js';
 import { FsBlockstore } from 'blockstore-fs'
 import { FsDatastore } from 'datastore-fs'
 //import { prometheusMetrics } from '@libp2p/prometheus-metrics'
@@ -9,5 +9,5 @@ export async function createStandaloneNode(blockPath, filePath) {
 
   // const config = {metrics: prometheusMetrics()}
   const config = {}
-  return await createNode(STANDALONE, blockstore, datastore, config)
+  return await createNode(HUB, blockstore, datastore, config)
 }

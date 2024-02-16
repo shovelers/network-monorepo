@@ -15,7 +15,7 @@ import { circuitRelayServer, circuitRelayTransport } from '@libp2p/circuit-relay
 import { webRTC } from '@libp2p/webrtc'
 import { dcutr } from '@libp2p/dcutr'
 
-export const STANDALONE = 1
+export const HUB = 1
 const BROWSER = 2
 export const APP = 3
 
@@ -44,7 +44,7 @@ export async function createNode(type, blockstore, datastore, config) {
     }
   }
 
-  if (type == STANDALONE) {
+  if (type == HUB) {
     libp2pconfig.addresses = { listen: ['/ip4/0.0.0.0/tcp/3001/ws'] }
     libp2pconfig.services.pubsub = gossipsub({ })
     libp2pconfig.services.relay = circuitRelayServer({reservations: {maxReservations: Infinity}})

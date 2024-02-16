@@ -4,7 +4,7 @@ import cors from 'cors';
 import fs from 'node:fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { createStandaloneNode } from 'account-fs/standalone.js';
+import { createStandaloneNode } from 'account-fs/hub.js';
 import morgan from 'morgan';
 import client from 'prom-client'
 import { Key } from 'interface-datastore';
