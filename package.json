@@ -1,10 +1,10 @@
 {
   "name": "monorepo",
-  "version": "0.0.0",
-  "description": "DCN protocol",
+  "version": "0.4.0",
+  "description": "DCN",
   "main": "index.js",
   "workspaces": [
-    "./protocol",
+    "./hub",
     "./packages/*",
     "./apps/*",
     "./docs",

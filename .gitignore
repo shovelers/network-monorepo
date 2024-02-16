@@ -10,7 +10,7 @@ packages/client-web/dist
 apps/*/public/dist/
 apps/*/public/styles/style.css
 apps/helia_pds/public/
-protocol/protocol_db/
+hub/protocol_db/
 apps/*/protocol_db/
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

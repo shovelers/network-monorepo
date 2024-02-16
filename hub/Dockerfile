@@ -23,10 +23,10 @@ RUN apt-get update -qq && \
 COPY --link . .
 
 # Install node modules
-RUN npm install --include=dev -w protocol
+RUN npm install --include=dev -w hub
 
 # Build application
-RUN npm run build -w protocol
+RUN npm run build -w hub
 
 # Remove development dependencies
 RUN npm prune --omit=dev
@@ -41,4 +41,4 @@ COPY --from=build /app /app
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
 EXPOSE 3001
-CMD [ "npm", "run", "start", "-w", "protocol" ]
+CMD [ "npm", "run", "start", "-w", "hub" ]

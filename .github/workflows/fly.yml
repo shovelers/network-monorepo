@@ -23,17 +23,17 @@ jobs:
           --config apps/rolodex/fly.toml --dockerfile apps/rolodex/Dockerfile
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-  deploy_protocol:
-    name: Deploy Protocol
+  deploy_hub:
+    name: Deploy Hub
     runs-on: ubuntu-latest
     environment:
       name: prod-fly-io
-      url: https://testnet-protocol.shovel.company/
+      url: https://testnet.shovel.company/
     steps:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: Deploy Protocol
+      - name: Deploy Hub
         run: |
-          flyctl deploy --remote-only --ha=false  --config protocol/fly.toml --dockerfile protocol/Dockerfile
+          flyctl deploy --remote-only --ha=false  --config hub/fly.toml --dockerfile hub/Dockerfile
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_DCN }}
