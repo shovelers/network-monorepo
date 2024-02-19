@@ -77,7 +77,7 @@ server.post('/pin', async (req, res) => {
   var cid = CID.parse(req.body.message.cid)
   var handle = req.body.message.handle
   await node.datastore.put(new Key('/handle/' + handle), cid.bytes)
-  var pin = await node.pins.add(cid)
+  var pin = node.pins.add(cid)
   console.log("pin", pin, cid)
   res.status(201).json({})
 });
