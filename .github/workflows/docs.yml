@@ -3,7 +3,7 @@ on:
   # Trigger the workflow every time you push to the `main` branch
   # Using a different branch name? Replace `main` with your branch’s name
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths:
       - 'docs/**'
   # Allows you to run this workflow manually from the Actions tab on GitHub.
@@ -25,6 +25,7 @@ jobs:
         uses: withastro/action@v0
         with:
           path: "docs/"
+          package-manager: "npm"
             # node-version: 16 # The specific version of Node that should be used to build your site. Defaults to 16. (optional)
             # package-manager: yarn # The Node package manager that should be used to install dependencies and build your site. Automatically detected based on your lockfile. (optional)
 
