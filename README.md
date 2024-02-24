@@ -14,30 +14,32 @@ The fundamental unit of DCN is **Account**, whose actions are executed through t
 
 ## MonoRepo overview
 
+```
 .
 ├── apps                    # Sample Applications built on the network
-│   ├── rolodex/            # Implenetation of a [CRM app](https://rolodex.shovel.company/) running live on testnet
+│   ├── rolodex/            # Implenetation of a CRM app running live on testnet
 │   └── ...
-├── docs                    # Source repo for [hosted Documentation](https://network.shovel.company/)
+├── docs                    # Source repo for hosted Documentation
 ├── hub                     # Source repo for Decentralised Hub of the network
 ├── packages                # Packages to be used in building Hub and Apps
 ├── scripts                 # Scripts for admin activities
 └── README.md
-
+```
+```
 .
 ├── ...
 ├── packages/account-fs     # Core package to be used by every participant of the network
 │   ├── agent               # Implentation of Agent of the network
 │   │   ├── fs/             # Implenetation of Account-fs storage (layer 1 from diagram)
-│   │   ├── handshakes/     # Implenetation of Handshake (layer 2 from diagram)
+│   │   ├── handshakes/     # Implenetation of Handshake (layer 2 from the diagram)
 │   │   └── ...
-│   ├── people/             # Implenetation of People Search API (layer 3 from diagram)
-│   ├── app.js              # Bootstrapping agent on an App server hosted in cloud
+│   ├── people/             # Implenetation of People Search API (layer 3 from the diagram)
+│   ├── app.js              # Bootstrapping agent on an App server hosted in the cloud
 │   ├── browser.js          # Bootstrapping an Account's Agent embedded in the browser
 │   ├── hub.js              # Boostrapping network and storage for the Hub
 │   └── ...                 # etc.
 └── ...
-
+```
 ## Start Building
 
 * Read our [Whitepaper](https://shovelco.notion.site/Decentralised-Contact-Network-Summary-v0-4-6d8885c11cc9415d90f21a16fd007b93?pvs=4)
