@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'apps/**'
+      - 'hub/**'
 jobs:
   deploy_rolodex:
     name: Deploy Rolodex
