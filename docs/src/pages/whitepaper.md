@@ -1,8 +1,5 @@
 ---
 layout: '../layouts/markdownLayout.astro'
-title: 'Astro in brief'
-author: 'Himanshu'
-description: 'Find out what makes Astro awesome!'
 ---
 <div class="text-sm">
   <a href="#1-background">1. Background</a></br>
@@ -14,7 +11,7 @@ description: 'Find out what makes Astro awesome!'
 
 ## 1. Background
 Building a successful social app is a complex process of iterating fast over different ‘user interaction’ patterns. These interaction patterns define the app, which makes them unique. But these apps also [share many building blocks](https://twitter.com/nikitabier/status/1661733445163417601?s=20). Reusing these building blocks can accelerate these iterations.  
-![Nikita Bier Tweet](../../public/reusableComponentsSocial.png)
+![Nikita Bier Tweet](/reusableComponentsSocial.png)
 A new breed of social apps are emerging around the [social utility of a network](https://www.workingtheorys.com/p/social-utility), which got lost in the age of “social media”. A common trait of these apps is going beyond   monetisation - via data hoarding - by providing users control of their data.
 
 Users controlling their data, shorten the time-to-market by reducing the cold-start issue of building critical mass of friends/ followers as the users themselves carry their social graph across apps. This user-control of data also protects app builders from impediments of success such as data compliance requirements for PII (Personally Identifiable Information).
@@ -34,7 +31,7 @@ The fundamental unit of DCN is **Account**, whose actions are executed through t
 - **People Search API** is a special-purpose search engine for agents to query contacts & graphs stored in account-fs and in turn enable search, similarity, and recommendations.
 
 The network can be visualised as three layers, with distinct capabilities and responsibilities, namely:
-![Architeure Diagram](../../public/layers.png)
+![Architeure Diagram](/layers.png)
 
 ### **3.1 Account-FS**
 <span class="text-orange-400 font-semibold">User-Controlled Identity, Account & Storage Layer</span> 
@@ -85,7 +82,7 @@ Network consists of agents and hubs with different capabilities, runtime environ
     2. **App Agent** (Run on application server)
         - communication capabilities for `user<>app` handshakes & messaging
 
-![User-Level Network](../../public/user_level_network.png)
+![User-Level Network](/user_level_network.png)
 Each of these agents and hub runs an embedded Helia node to store data and make connections with each other.
 
 ## 5. Applications
