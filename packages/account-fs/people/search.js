@@ -41,7 +41,8 @@ export const SearchCapability = {
         //TODO: remove below fields from search results, when searched from other apps
         CATEGORIES: contact.CATEGORIES,
         URL: contact.URL,
-        NOTE: contact.NOTE
+        NOTE: contact.NOTE,
+        XML: contact.XML
       })
     })
   },

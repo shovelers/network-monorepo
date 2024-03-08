@@ -3,6 +3,7 @@ import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
 import { programInit, Account, Person, PeopleRepository } from 'account-fs';
+import * as uint8arrays from 'uint8arrays';
 
 const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 
@@ -53,10 +54,17 @@ async function getContacts() {
 
 async function getContactForRelate() {
   let profile = await getProfile()
+  //XML = {filename:handle.accesskey}
+    //handle to fetch latest forestCID from hub using the /forestCID/:handle API & load the forest
+    //access key to read the file content
+  let contactsAccessKey = await program.agent.getAccessKeyForPrivateFile(contactRepo.filename)
+  let encodedContactsAccessKey = uint8arrays.toString(contactsAccessKey.toBytes(), 'base64url');
+ 
   return {
     FN: profile.name,
     UID: `DCN:${profile.handle}`,
-    PRODID: "DCN:rolodex" // TODO figure how to get app handle
+    PRODID: "DCN:rolodex", // TODO figure how to get app handle
+    XML: `{${contactRepo.filename}:${profile.handle}.${encodedContactsAccessKey}}`
   }
 }
 
@@ -79,7 +87,7 @@ async function addContact(name, tags = [], text = "", links = []) {
 
 // TODO - handle duplicate connections
 async function addConnection(person) {
-  let connection = new Person({FN: person.FN, PRODID: person.PRODID, UID: person.UID})
+  let connection = new Person({FN: person.FN, PRODID: person.PRODID, UID: person.UID, XML: person.XML})
   return contactRepo.create(connection) 
 }
 
