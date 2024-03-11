@@ -58,13 +58,13 @@ async function getContactForRelate() {
     //handle to fetch latest forestCID from hub using the /forestCID/:handle API & load the forest
     //access key to read the file content
   let contactsAccessKey = await program.agent.getAccessKeyForPrivateFile(contactRepo.filename)
-  let encodedContactsAccessKey = uint8arrays.toString(contactsAccessKey.toBytes(), 'base64url');
+  let encodedContactsAccessKey = uint8arrays.toString(contactsAccessKey.toBytes(), 'base64');
  
   return {
     FN: profile.name,
     UID: `DCN:${profile.handle}`,
     PRODID: "DCN:rolodex", // TODO figure how to get app handle
-    XML: `{${contactRepo.filename}:${profile.handle}.${encodedContactsAccessKey}}`
+    XML: `${contactRepo.filename}:${profile.handle}.${encodedContactsAccessKey}`
   }
 }
 

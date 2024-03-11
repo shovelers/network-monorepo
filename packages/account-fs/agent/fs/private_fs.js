@@ -98,8 +98,7 @@ export class PrivateFile {
     const forest = await PrivateForest.load(forestCID, this.store)
 
     var node = await PrivateNode.load(key, forest, this.store)
-    console.log("loaded node:", node)
-
+    node = await node.searchLatest(forest, this.store)
     var file = await node.asFile(forest, this.store)
 
     var content = await file.getContent(forest, this.store)

@@ -13,7 +13,7 @@ import { CID } from 'multiformats/cid'
 import { DIDKey } from 'iso-did/key';
 import { spki } from 'iso-signatures/spki'
 import { dial } from './helia_node.js'
-import { PrivateFS } from "./fs/private_fs.js"
+import { PrivateFS, PrivateFile } from "./fs/private_fs.js"
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
@@ -228,6 +228,15 @@ export const StorageCapability = {
     } catch (error) {
       console.log("missing file: ", filename)
     }
+  },
+
+  async readPrivateFileByPointer(accessKey, forestCID){
+    //fetches the CID from the network if not available locally
+      //Primarily used for fetching data shared by other users to the client
+    let privateFile = new PrivateFile(this.helia)
+    let content = await privateFile.read(uint8arrays.fromString(accessKey, 'base64'), forestCID)
+    console.log("content fetched", content)
+    return content
   },
 
   async getAccessKeyForPrivateFile(filename) {
