@@ -27,7 +27,8 @@
     "tsdav": "^2.0.5",
     "vite": "^4.4.9",
     "vite-plugin-wasm": "^3.3.0",
-    "interface-datastore": "^8.2.9"
+    "interface-datastore": "^8.2.9",
+    "uint8arrays": "^5.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

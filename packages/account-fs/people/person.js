@@ -28,7 +28,7 @@ export class Person {
   TEL;
   EMAIL;
   // TODO: Define how to use XML for profile
-  // XML;
+  XML;
 
   constructor(fields) {
     this.PRODID = fields.PRODID  //required
@@ -39,6 +39,7 @@ export class Person {
     this.NOTE = fields.NOTE || ""
     this.TEL = fields.TEL
     this.EMAIL = fields.EMAIL
+    this.XML = fields.XML
     this.VERSION = "4.0"
   }
 
@@ -52,6 +53,7 @@ export class Person {
       CATEGORIES: this.CATEGORIES,
       URL: this.URL,
       NOTE: this.NOTE,
+      XML: this.XML
     }
   }
 }
