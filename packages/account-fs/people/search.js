@@ -11,23 +11,10 @@ export const SearchCapability = {
     // Search and return a list of contacts for the query
     const queryString = query.toLowerCase()
     //TODO: move filter to repository
-    var filteredContacts = []
+    var filteredContacts = this.fullTextMatch(contacts, query)
     var contactsWithDepth = []
     for (var id in contacts.contactList) {
       var person = contacts.contactList[id]
-      if (person.archived) { continue }
-      if (person.FN.toLowerCase().includes(queryString) || person.CATEGORIES.split(',').filter(tag => tag.toLowerCase().includes(queryString)).length > 0) {
-        filteredContacts.push(person)
-        continue
-      }
-      if (person.NOTE && person.NOTE.toLowerCase().includes(queryString)) {
-        filteredContacts.push(person)
-        continue
-      }
-      if (person.URL && (person.URL.split(',').filter(link => link.toLowerCase().includes(queryString)).length > 0)) {
-        filteredContacts.push(person)
-        continue
-      }
       if (person.XML) {
         contactsWithDepth.push(person)
       }
@@ -75,23 +62,7 @@ export const SearchCapability = {
       var fetchedContacts = await this.readPrivateFileByPointer(accessKey, CID.parse(forestCID).bytes)
       fetchedContacts = JSON.parse(fetchedContacts)
       //filter contats to get contacts matching criterion
-      var filteredContacts = []
-      for (var id in fetchedContacts.contactList) {
-        var person = fetchedContacts.contactList[id]
-        if (person.archived) { console.log("filtered :",person); continue }
-        if (person.FN.toLowerCase().includes(queryString) || person.CATEGORIES.split(',').filter(tag => tag.toLowerCase().includes(queryString)).length > 0) {
-          filteredContacts.push(person)
-          continue
-        }
-        if (person.NOTE && person.NOTE.toLowerCase().includes(queryString)) {
-          filteredContacts.push(person)
-          continue
-        }
-        if (person.URL && (person.URL.split(',').filter(link => link.toLowerCase().includes(queryString)).length > 0)) {
-          filteredContacts.push(person)
-          continue
-        }
-      }
+      var filteredContacts = this.fullTextMatch(fetchedContacts, query)
       //create Person Object and add XML = via: person.UID so that the UI can show this info in the search results
       console.log("filtered Contacts before XML:", filteredContacts)
       filteredContacts.map(function(contact) {
@@ -115,8 +86,28 @@ export const SearchCapability = {
         console.log(e);
         return e
       })
-  }
+  },
 
+  fullTextMatch (contacts, queryString) {
+    var filteredContacts = []
+    for (var id in contacts.contactList) {
+      var person = contacts.contactList[id]
+      if (person.archived) { continue }
+      if (person.FN.toLowerCase().includes(queryString) || person.CATEGORIES.split(',').filter(tag => tag.toLowerCase().includes(queryString)).length > 0) {
+        filteredContacts.push(person)
+        continue
+      }
+      if (person.NOTE && person.NOTE.toLowerCase().includes(queryString)) {
+        filteredContacts.push(person)
+        continue
+      }
+      if (person.URL && (person.URL.split(',').filter(link => link.toLowerCase().includes(queryString)).length > 0)) {
+        filteredContacts.push(person)
+        continue
+      }
+    }
+    return filteredContacts
+  }
   // similarity search with another Handle on rolodex network or other networks
   // useful for mutual friends. membership etc.
   // async similarity(handle){}
