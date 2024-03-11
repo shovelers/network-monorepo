@@ -95,7 +95,7 @@ export const SearchCapability = {
       //create Person Object and add XML = via: person.UID so that the UI can show this info in the search results
       console.log("filtered Contacts before XML:", filteredContacts)
       filteredContacts.map(function(contact) {
-        console.log(`adding value for handle: ${handle}`)
+        contact["XML"] = `via:${handle}`
         return new Person({
           PRODID: contact.PRODID,
           UID: contact.UID,
@@ -106,7 +106,7 @@ export const SearchCapability = {
           CATEGORIES: contact.CATEGORIES,
           URL: contact.URL,
           NOTE: contact.NOTE,
-          XML: "test",
+          XML: contact.XML
         })
       })
       console.log("filtered from fetch, person objects :", filteredContacts)
