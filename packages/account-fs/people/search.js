@@ -12,6 +12,7 @@ export const SearchCapability = {
     const queryString = query.toLowerCase()
     //TODO: move filter to repository
     var filteredContacts = this.fullTextMatch(contacts, query)
+    // Find contats who have shared their contactbook with us for second degree search
     var contactsWithDepth = []
     for (var id in contacts.contactList) {
       var person = contacts.contactList[id]
@@ -24,20 +25,7 @@ export const SearchCapability = {
     // Contact data structure to support invite action and profile details for display
     //   Invite Handshake for Rolodex Network
     //   DeepLink for Imported Contact
-    filteredContacts.map(function(contact) {
-      return new Person({
-        PRODID: contact.PRODID,
-        UID: contact.UID,
-        TEL: contact.TEL,
-        EMAIL: contact.EMAIL,
-        FN: contact.FN,
-        //TODO: remove below fields from search results, when searched from other apps
-        CATEGORIES: contact.CATEGORIES,
-        URL: contact.URL,
-        NOTE: contact.NOTE,
-        XML: contact.XML
-      })
-    })
+    filteredContacts = this.typecastToPerson(filteredContacts)
 
     //for each contactWithDepth fetchSharedContacts and append to filteredContacts and return filteredContacts
     for await (const element of contactsWithDepth) {
@@ -64,23 +52,7 @@ export const SearchCapability = {
       //filter contats to get contacts matching criterion
       var filteredContacts = this.fullTextMatch(fetchedContacts, query)
       //create Person Object and add XML = via: person.UID so that the UI can show this info in the search results
-      console.log("filtered Contacts before XML:", filteredContacts)
-      filteredContacts.map(function(contact) {
-        contact["XML"] = `via:${handle}`
-        return new Person({
-          PRODID: contact.PRODID,
-          UID: contact.UID,
-          TEL: contact.TEL,
-          EMAIL: contact.EMAIL,
-          FN: contact.FN,
-          //TODO: remove below fields from search results, when searched from other apps
-          CATEGORIES: contact.CATEGORIES,
-          URL: contact.URL,
-          NOTE: contact.NOTE,
-          XML: contact.XML
-        })
-      })
-      console.log("filtered from fetch, person objects :", filteredContacts)
+      filteredContacts = this.typecastToPerson(filteredContacts, handle)
       return filteredContacts
     }).catch((e) => {
         console.log(e);
@@ -88,6 +60,7 @@ export const SearchCapability = {
       })
   },
 
+  //matches the query with text in contact fileds
   fullTextMatch (contacts, queryString) {
     var filteredContacts = []
     for (var id in contacts.contactList) {
@@ -107,6 +80,26 @@ export const SearchCapability = {
       }
     }
     return filteredContacts
+  },
+
+  //typecast response to Person object
+  typecastToPerson(filteredContacts, handle) {
+    return filteredContacts.map(function(contact) {
+      //adds via info in XML for seach results from connect's contacts
+      if (handle) { contact["XML"] = `via:${handle}` }
+      return new Person({
+        PRODID: contact.PRODID,
+        UID: contact.UID,
+        TEL: contact.TEL,
+        EMAIL: contact.EMAIL,
+        FN: contact.FN,
+        //TODO: remove below fields from search results, when searched from other apps
+        CATEGORIES: contact.CATEGORIES,
+        URL: contact.URL,
+        NOTE: contact.NOTE,
+        XML: contact.XML
+      })
+    })
   }
   // similarity search with another Handle on rolodex network or other networks
   // useful for mutual friends. membership etc.
