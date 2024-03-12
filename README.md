@@ -56,5 +56,5 @@ Currently, 'rolodex' requires the 'hub' to be up as well for it to work.
 
 ## Start Building
 
-* Read our [Whitepaper](https://shovelco.notion.site/Decentralised-Contact-Network-Summary-v0-4-6d8885c11cc9415d90f21a16fd007b93?pvs=4)
+* Read our [Whitepaper](https://network.shovel.company/whitepaper)
 * Come join us on our [Discord](https://discord.gg/PmzsJeembE)
