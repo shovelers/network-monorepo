@@ -78,7 +78,7 @@ server.post('/pin', async (req, res) => {
   var handle = req.body.message.handle
   await node.datastore.put(new Key('/handle/' + handle), cid.bytes)
   var pin = node.pins.add(cid)
-  console.log("pin", pin, cid)
+  console.log("pin", cid)
   res.status(201).json({})
 });
 
@@ -188,3 +188,5 @@ server.listen(port, (err) => {
     `> Ready`
   );
 });
+
+process.on('warning', e => console.warn(e.stack));
