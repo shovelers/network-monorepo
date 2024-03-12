@@ -40,6 +40,20 @@ The fundamental unit of DCN is **Account**, whose actions are executed through t
 │   └── ...                 # etc.
 └── ...
 ```
+
+## Local setup 
+
+To bring up the 'rolodex' application, follow the below steps 
+-  Run ```npm install``` at the project directory to install the dependencies.
+-  Run ```npm start -w hub``` at the project directory to bring up the hub.
+-  Run ```npm start -w rolodex 4000``` at the project directory to bring up the rolodex application on port 4000. The application will be up on http://localhost:4000/
+
+Currently, 'rolodex' requires the 'hub' to be up as well for it to work. 
+
+### Major Dependencies
+- 'Hub' requires [Redis](https://redis.io/docs/install/install-redis/) to run, the assumption is that redis will run on port 6379. One can refer the 'package.json' file of 'hub' for the appropriate redis version to be installed.
+
+
 ## Start Building
 
 * Read our [Whitepaper](https://shovelco.notion.site/Decentralised-Contact-Network-Summary-v0-4-6d8885c11cc9415d90f21a16fd007b93?pvs=4)
