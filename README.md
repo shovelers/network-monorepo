@@ -40,6 +40,17 @@ The fundamental unit of DCN is **Account**, whose actions are executed through t
 │   └── ...                 # etc.
 └── ...
 ```
+
+## Local setup 
+
+To bring up the 'rolodex' application, follow the following steps
+-  Run ```npm install``` at the network-monorepo level to install the dependencies
+-  Run ```npm start -w hub``` at the network-monorepo level to bring up the hub
+-  Run ```npm start -w rolodex 4000``` at the network-monorepo level to bring up the rolodex application on port 4000. The application will be up on http://localhost:4000/
+
+Currently, 'rolodex' requires the 'hub' to be up as well for it to work. 
+
+
 ## Start Building
 
 * Read our [Whitepaper](https://shovelco.notion.site/Decentralised-Contact-Network-Summary-v0-4-6d8885c11cc9415d90f21a16fd007b93?pvs=4)
