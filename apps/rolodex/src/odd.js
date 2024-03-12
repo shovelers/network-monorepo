@@ -173,7 +173,7 @@ async function addAppleContactsToContactList(appleContacts){
   //check if the uid to appleContacts[i] is == to any of the appleContactIDs in contactList
   //if not, add it to contactList
   var contacts = await contactRepo.list()
-  var existingAppleContactIDs = Object.values(contacts.contactList).filter((contact) => !contact.archived).map(contact => contact.UID)
+  var existingAppleContactIDs = Object.values(contacts).filter((contact) => !contact.archived).map(contact => contact.UID)
   var contactList = []
   for (var i = 0; i < appleContacts.length; i++) {
     var appleContact = appleContacts[i]
@@ -217,7 +217,7 @@ async function importGoogleContacts(refresh) {
 
 async function addGoogleContactsToContactList(googleContacts){
   var contacts = await contactRepo.list()
-  var existingGoogleContactIDs = Object.values(contacts.contactList).filter((contact) => !contact.archived).map(contact => contact.UID)
+  var existingGoogleContactIDs = Object.values(contacts).filter((contact) => !contact.archived).map(contact => contact.UID)
 
   var contactList = []
   for (var i = 0; i < googleContacts.length; i++) {
