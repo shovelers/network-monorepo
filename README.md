@@ -50,6 +50,9 @@ To bring up the 'rolodex' application, follow the below steps
 
 Currently, 'rolodex' requires the 'hub' to be up as well for it to work. 
 
+### Major Dependencies
+- 'Hub' requires [Redis](https://redis.io/docs/install/install-redis/) to run, the assumption is that redis will run on port 6379. One can refer the 'package.json' file of 'hub' for the appropriate redis version to be installed.
+
 
 ## Start Building
 
