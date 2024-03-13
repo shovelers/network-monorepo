@@ -20,14 +20,14 @@
 
       const requester = await shovel.agent.actAsJoinRequester("<%= address %>", "<%= appHandle %>")
 
-      function showLoading(){
+      window.showLoading = function(){
         document.querySelector(".loading").classList.remove("hidden");
         document.querySelector("#input-forms").classList.add("hidden");
       }
 
       window.signupForm =  async function(handle){
         var success = await signup(handle, requester)
-        if (success) {showLoading()}
+        if (success) {window.showLoading()}
         else { alert("Username Already Taken")}
       }
 

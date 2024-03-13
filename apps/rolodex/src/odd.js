@@ -242,6 +242,14 @@ async function addGoogleContactsToContactList(googleContacts){
   console.log("Imported Contacts Count: ", contactList.length)
 }
 
+async function portOldContacts(contacts){
+  list = []
+  Object.values(contacts.contactList).forEach(async (value) =>
+    list.push(new Person({FN: value.name, CATEGORIES: value.tags.join(), NOTE: value.text, URL: value.links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()}))
+  )
+  await contactRepo.bulkCreate(list)
+}
+
 export { 
   account,
   signup, 
@@ -261,5 +269,6 @@ export {
   importGoogleContacts,
   appleCredsPresent,
   getContactForRelate,
-  downloadContactsDataLocally
+  downloadContactsDataLocally,
+  portOldContacts
 };
