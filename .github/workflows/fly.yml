@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/**'
       - 'hub/**'
+      - 'packages/**'
 jobs:
   deploy_rolodex:
     name: Deploy Rolodex
