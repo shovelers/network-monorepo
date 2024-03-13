@@ -8,7 +8,6 @@ import { RelateRequester } from './handshakes/relate.js';
 import { Broker } from './handshakes/base/broker.js';
 import { Approver } from './handshakes/base/approver.js';
 import { Channel } from './handshakes/base/channel.js';
-import { multiaddr } from '@multiformats/multiaddr'
 import { CID } from 'multiformats/cid'
 import { DIDKey } from 'iso-did/key';
 import { spki } from 'iso-signatures/spki'
@@ -42,7 +41,7 @@ export const MessageCapability = {
       return await agent.createSessionOnDeviceLink(message.detail.data)
     })
 
-    await this.helia.libp2p.dial(multiaddr(address));
+    await dial(this.helia, address)
     await channel.subscribe(this.requester)
     const timeout = setTimeout(() => {
       clearTimeout(timeout)
@@ -69,7 +68,7 @@ export const MessageCapability = {
       console.log(message.detail)
     })
 
-    await this.helia.libp2p.dial(multiaddr(address));
+    await dial(this.helia, address)
     await channel.subscribe(this.requester)
     return this.requester
   },
@@ -82,7 +81,7 @@ export const MessageCapability = {
       console.log(message.detail)
     })
 
-    await this.helia.libp2p.dial(multiaddr(address));
+    await dial(this.helia, address)
     await channel.subscribe(this.approver)
   },
 
@@ -94,8 +93,7 @@ export const MessageCapability = {
     this.requester = new RelateRequester(this, channel)
     this.requester.challenge = function () { return { person: person } }
 
-    console.log("dialing", address, channelName)
-    await this.helia.libp2p.dial(multiaddr(address));
+    await dial(this.helia, address)
     await channel.subscribe(this.requester)
     const timeout = setTimeout(() => {
       clearTimeout(timeout)
