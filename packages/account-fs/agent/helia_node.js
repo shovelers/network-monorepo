@@ -3,8 +3,6 @@ import { bitswap } from 'helia/block-brokers'
 import { noise } from '@chainsafe/libp2p-noise'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { gossipsub } from '@chainsafe/libp2p-gossipsub'
-import { IDBBlockstore } from 'blockstore-idb'
-import { IDBDatastore } from 'datastore-idb'
 import { createLibp2p } from 'libp2p'
 import { ping } from '@libp2p/ping'
 import { identify } from '@libp2p/identify'
@@ -16,7 +14,7 @@ import { webRTC } from '@libp2p/webrtc'
 import { dcutr } from '@libp2p/dcutr'
 
 export const HUB = 1
-const BROWSER = 2
+export const BROWSER = 2
 export const APP = 3
 
 export async function createNode(type, blockstore, datastore, config) {
@@ -75,16 +73,6 @@ export async function createNode(type, blockstore, datastore, config) {
       bitswap()
     ]
   })
-}
-
-export async function createBrowserNode() {
-  const blockstore = new IDBBlockstore('blockstore/shovel')
-  await blockstore.open()
-
-  const datastore = new IDBDatastore('datastore/shovel')
-  await datastore.open()
-
-  return await createNode(BROWSER, blockstore, datastore)
 }
 
 export async function dial(node, peer) {

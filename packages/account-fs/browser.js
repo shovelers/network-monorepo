@@ -1,14 +1,26 @@
-import { createBrowserNode } from './agent/helia_node.js';
+import { createNode, BROWSER } from './agent/helia_node.js';
 import { Account } from './agent/account.js'
 import { Agent, BROWSER_RUNTIME, AccountCapability, StorageCapability, MessageCapability, Runtime } from './agent/agent.js'
 import { SearchCapability } from './people/search.js'
 import { PeopleRepository } from "./people/people.js";
 import { Person } from "./people/person.js";
+import { IDBBlockstore } from 'blockstore-idb'
+import { IDBDatastore } from 'datastore-idb'
 
 const connection = {
   //"LOCAL": {network: "LOCAL"},
   "DEVNET": {network: "DEVNET", sync_host: "http://localhost:3000", dial_prefix: "/ip4/127.0.0.1/tcp/3001/ws/p2p/"},
   "TESTNET": {network: "TESTNET", sync_host: "https://testnet.shovel.company:8001", dial_prefix: "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/"}
+}
+
+async function createBrowserNode() {
+  const blockstore = new IDBBlockstore('blockstore/shovel')
+  await blockstore.open()
+
+  const datastore = new IDBDatastore('datastore/shovel')
+  await datastore.open()
+
+  return await createNode(BROWSER, blockstore, datastore)
 }
 
 async function programInit(network, appHandle) {
