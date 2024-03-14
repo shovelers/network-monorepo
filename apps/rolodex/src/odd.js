@@ -5,7 +5,6 @@ import { ContactTable } from "./contact_table";
 import { programInit, Account, Person, PeopleRepository } from 'account-fs';
 import * as uint8arrays from 'uint8arrays';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
-import { ParsedMessage } from '@spruceid/siwe-parser';
 
 const farcasterClient = createAppClient({
   relay: 'https://relay.farcaster.xyz',
@@ -260,7 +259,6 @@ async function portOldContacts(contacts){
 export { 
   account,
   farcasterClient,
-  ParsedMessage,
   signup, 
   signout, 
   generateRecoveryKit, 

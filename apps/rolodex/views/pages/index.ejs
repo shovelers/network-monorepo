@@ -10,7 +10,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { signup, recover, account, farcasterClient, ParsedMessage } from '/odd.js';
+      import { signup, recover, account, farcasterClient } from '/odd.js';
       window.signup = signup;
       window.recover = recover;
 
@@ -33,28 +33,35 @@
       }
 
      window.startFarcasterSignup = async function(){
-       const agentDID = await account.agent.DID()
-       const channel = await farcasterClient.createChannel({
-         siweUri: 'http://localhost:4000/home',
+      const agentDID = await account.agent.DID()
+      const channel = await farcasterClient.createChannel({
+        siweUri: 'http://localhost:4000/home',
+        domain: 'localhost:4000',
+        requestId: agentDID
+      });
+
+      const url = channel.data.url
+      var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
+      document.querySelector("#signup_by_farcaster > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
+
+      signup_by_farcaster.showModal()
+
+      farcasterClient.watchStatus({
+        channelToken: channel.data.channelToken,
+      }).then((status) => {
+        farcasterClient.verifySignInMessage({
+         nonce: status.data.nonce,
          domain: 'localhost:4000',
-         requestId: agentDID
-       });
-
-       const url = channel.data.url
-       var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
-       document.querySelector("#signup_by_farcaster > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
-
-       signup_by_farcaster.showModal()
-
-       farcasterClient.watchStatus({
-         channelToken: channel.data.channelToken,
-       }).then((status) => {
-         // TODO verify signature with farcasterClient.verifySignInMessage
-         console.log(status)
-         const message = new ParsedMessage(status.data.message)
-         console.log(`did:pkh:eip155:${message.chainId}:${message.address}`, status.data.username)
-         signup(status.data.username, requester)
-       })
+         message: status.data.message,
+         signature: status.data.signature
+        }).then((response) => {
+         console.log(response)
+         if (response.success) {
+           console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username)
+           signup(status.data.username, requester)
+         }
+        })
+      })
 
        window.farcasterClient = farcasterClient
        window.channel = channel
