@@ -33,10 +33,11 @@
       }
 
      window.startFarcasterSignup = async function(){
+       const agentDID = await account.agent.DID()
        const channel = await farcasterClient.createChannel({
          siweUri: 'http://localhost:4000/home',
          domain: 'localhost:4000',
-         requestId: 'did:key:123456'
+         requestId: agentDID
        });
 
        const url = channel.data.url
@@ -50,6 +51,8 @@
        }).then((status) => {
          // TODO verify signature with farcasterClient.verifySignInMessage
          console.log(status)
+         const chainId = status.data.message.split("Chain ID: ")[1].split("\n")[0]
+         console.log(`did:pkh:eip155:${chainId}:${status.data.custody}`, status.data.username)
          signup(status.data.username, requester)
        })
 
