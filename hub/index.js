@@ -176,9 +176,14 @@ server.get("/forestCID/:handle", async (req, res) => {
 });
 
 server.get("/", async (req, res) => {
+  const accountsCount = await redisClient.sCard("accounts");
+  const agentsCount = await redisClient.sCard("handles"); 
+
   res.render('pages/index', {
     registries: 0,
-    relationships: 0
+    relationships: 0,
+    accounts : accountsCount,
+    agents: agentsCount
   })
 });
 
