@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "@farcaster/auth-client": "^0.1.0",
+    "@spruceid/siwe-parser": "^2.0.2",
     "account-fs": "*",
     "axios": "^1.5.1",
     "daisyui": "^3.7.4",

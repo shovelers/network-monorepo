@@ -10,7 +10,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { signup, recover, account, farcasterClient } from '/odd.js';
+      import { signup, recover, account, farcasterClient, ParsedMessage } from '/odd.js';
       window.signup = signup;
       window.recover = recover;
 
@@ -51,8 +51,8 @@
        }).then((status) => {
          // TODO verify signature with farcasterClient.verifySignInMessage
          console.log(status)
-         const chainId = status.data.message.split("Chain ID: ")[1].split("\n")[0]
-         console.log(`did:pkh:eip155:${chainId}:${status.data.custody}`, status.data.username)
+         const message = new ParsedMessage(status.data.message)
+         console.log(`did:pkh:eip155:${message.chainId}:${message.address}`, status.data.username)
          signup(status.data.username, requester)
        })
 
