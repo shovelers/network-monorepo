@@ -180,8 +180,7 @@ server.get("/", async (req, res) => {
   const agentsCount = await redisClient.sCard("handles"); 
 
   res.render('pages/index', {
-    registries: 0,
-    relationships: 0,
+   
     accounts : accountsCount,
     agents: agentsCount
   })
