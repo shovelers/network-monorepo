@@ -3,13 +3,14 @@
   <head>
     <link rel="stylesheet" href="./styles/style.css" />
     <link rel="icon" href="/favicon.ico">
+    <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
   </head>
 
   <%- include('../partials/google_analytics.ejs') %>
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { signup, recover, account } from '/odd.js';
+      import { signup, recover, account, farcasterClient } from '/odd.js';
       window.signup = signup;
       window.recover = recover;
 
@@ -20,16 +21,51 @@
 
       const requester = await shovel.agent.actAsJoinRequester("<%= address %>", "<%= appHandle %>")
 
-      function showLoading(){
+      window.showLoading = function(){
         document.querySelector(".loading").classList.remove("hidden");
         document.querySelector("#input-forms").classList.add("hidden");
       }
 
       window.signupForm =  async function(handle){
         var success = await signup(handle, requester)
-        if (success) {showLoading()}
+        if (success) {window.showLoading()}
         else { alert("Username Already Taken")}
       }
+
+     window.startFarcasterSignup = async function(){
+      const agentDID = await account.agent.DID()
+      const channel = await farcasterClient.createChannel({
+        siweUri: 'http://localhost:4000/home',
+        domain: 'localhost:4000',
+        requestId: agentDID
+      });
+
+      const url = channel.data.url
+      var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
+      document.querySelector("#signup_by_farcaster > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
+
+      signup_by_farcaster.showModal()
+
+      farcasterClient.watchStatus({
+        channelToken: channel.data.channelToken,
+      }).then((status) => {
+        farcasterClient.verifySignInMessage({
+         nonce: status.data.nonce,
+         domain: 'localhost:4000',
+         message: status.data.message,
+         signature: status.data.signature
+        }).then((response) => {
+         console.log(response)
+         if (response.success) {
+           console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username)
+           signup(status.data.username, requester)
+         }
+        })
+      })
+
+       window.farcasterClient = farcasterClient
+       window.channel = channel
+     }
 
     </script>
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
@@ -56,7 +92,19 @@
             Recover
           </button>
         </form>
+        <button type="submit" class="hidden btn btn-outline btn-sm" onclick="startFarcasterSignup()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M18.24.24H5.76A5.76 5.76 0 0 0 0 6v12a5.76 5.76 0 0 0 5.76 5.76h12.48A5.76 5.76 0 0 0 24 18V6A5.76 5.76 0 0 0 18.24.24m.816 17.166v.504a.49.49 0 0 1 .543.48v.568h-5.143v-.569A.49.49 0 0 1 15 17.91v-.504c0-.22.153-.402.358-.458l-.01-4.364c-.158-1.737-1.64-3.098-3.443-3.098c-1.804 0-3.285 1.361-3.443 3.098l-.01 4.358c.228.042.532.208.54.464v.504a.49.49 0 0 1 .543.48v.568H4.392v-.569a.49.49 0 0 1 .543-.479v-.504c0-.253.201-.454.454-.472V9.039h-.49l-.61-2.031H6.93V5.042h9.95v1.966h2.822l-.61 2.03h-.49v7.896c.252.017.453.22.453.472"/></svg>
+          Sign-up with Warpcast
+        </button>
       </div>
+      <dialog id="signup_by_farcaster" class="modal">
+        <div class="modal-box">
+          <p class="text-xs">Scan QR on your device and approve from Warpcast</p>
+          <div class="modal-action flex flex-col justify-center items-center space-y-2">
+            <div class="qr w-64 h-64"></div>
+          </div>
+        </div>
+      </dialog>
       <%- include('../partials/shovel.ejs') %>
     </div>
   </body>

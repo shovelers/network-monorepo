@@ -4,6 +4,12 @@ import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
 import { programInit, Account, Person, PeopleRepository } from 'account-fs';
 import * as uint8arrays from 'uint8arrays';
+import { createAppClient, viemConnector } from '@farcaster/auth-client';
+
+const farcasterClient = createAppClient({
+  relay: 'https://relay.farcaster.xyz',
+  ethereum: viemConnector(),
+});
 
 const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 
@@ -242,8 +248,17 @@ async function addGoogleContactsToContactList(googleContacts){
   console.log("Imported Contacts Count: ", contactList.length)
 }
 
+async function portOldContacts(contacts){
+  list = []
+  Object.values(contacts.contactList).forEach(async (value) =>
+    list.push(new Person({FN: value.name, CATEGORIES: value.tags.join(), NOTE: value.text, URL: value.links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()}))
+  )
+  await contactRepo.bulkCreate(list)
+}
+
 export { 
   account,
+  farcasterClient,
   signup, 
   signout, 
   generateRecoveryKit, 
@@ -261,5 +276,6 @@ export {
   importGoogleContacts,
   appleCredsPresent,
   getContactForRelate,
-  downloadContactsDataLocally
+  downloadContactsDataLocally,
+  portOldContacts
 };

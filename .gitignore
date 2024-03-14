@@ -134,4 +134,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 apps/*/public/odd.js
-apps/directory/public/assets/
+apps/*/public/assets/

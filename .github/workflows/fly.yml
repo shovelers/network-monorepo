@@ -6,6 +6,8 @@ on:
     paths:
       - 'apps/**'
       - 'hub/**'
+      - 'packages/**'
+      - '.github/workflows/fly.yml'
 jobs:
   deploy_rolodex:
     name: Deploy Rolodex

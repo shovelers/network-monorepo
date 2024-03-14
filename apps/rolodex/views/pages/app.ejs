@@ -12,12 +12,14 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { account, getContactForRelate, addConnection } from '/odd.js';
+      import { account, getContactForRelate, addConnection, portOldContacts} from '/odd.js';
 
       var session = await account.activeSession();
       if (session == false) {
         window.location.href = '/home';
       }
+
+      window.portOldContacts = portOldContacts
 
       var agentHandle = await shovel.agent.handle()
 

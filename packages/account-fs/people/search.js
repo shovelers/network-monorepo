@@ -18,6 +18,7 @@ export const SearchCapability = {
       var person = contacts.contactList[id]
       if (person.XML) {
         contactsWithDepth.push(person)
+        continue
       }
     }
 
@@ -28,10 +29,11 @@ export const SearchCapability = {
     filteredContacts = this.typecastToPerson(filteredContacts)
 
     //for each contactWithDepth fetchSharedContacts and append to filteredContacts and return filteredContacts
-    for await (const element of contactsWithDepth) {
+    console.log("contactsWithDepth :", contactsWithDepth)
+    for (const element of contactsWithDepth) {
       let result = await this.filterFromSharedContacts(element, query)
       console.log("result after fetch and filter :", result)
-      return filteredContacts.concat(result)
+      filteredContacts = filteredContacts.concat(result)
     }
     console.log("filtered after concat :", filteredContacts)
     return filteredContacts
