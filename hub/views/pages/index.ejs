@@ -8,13 +8,15 @@
     <div class="flex flex-col justify-evenly items-center h-screen bg-neutral">
       <div class="text-5xl font-bold tracking-tight underline underline-offset-4 decoration-4 decoration-accent">Protocol Explorer</div>
       <div class="flex flex-row space-x-4">
+        
+
         <div class="stats shadow">
           <div class="stat place-items-center">
             <div class="stat-figure text-secondary">
-              <i class="fa fa-connectdevelop" aria-hidden="true"></i>
+              <i class="fa fa-user" aria-hidden="true"></i>
             </div>
-            <div class="stat-title">Registries</div>
-            <div class="stat-value"><%= registries %></div>
+            <div class="stat-title">Accounts</div>
+            <div class="stat-value"><%= accounts %></div>
             <div class="stat-desc">Total across apps</div>
           </div>
         </div>
@@ -22,13 +24,14 @@
         <div class="stats shadow">
           <div class="stat place-items-center">
             <div class="stat-figure text-secondary">
-              <i class="fa fa-handshake-o" aria-hidden="true"></i>
+              <i class="fa fa-users" aria-hidden="true"></i>
             </div>
-            <div class="stat-title">Relationships</div>
-            <div class="stat-value"><%= relationships %></div>
+            <div class="stat-title">Agents</div>
+            <div class="stat-value"><%= agents %></div>
             <div class="stat-desc">Total across apps</div>
           </div>
         </div>
+
       </div>
     </div>
   </body>
