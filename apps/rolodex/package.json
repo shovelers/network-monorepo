@@ -10,6 +10,7 @@
     "start": "npm run build && node index.js",
     "server": "node index.js",
     "dev": "npm run build-dev && node index.js",
+    "tauri": "tauri",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -33,6 +34,7 @@
     "vite-plugin-wasm": "^3.3.0"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^1.5.11",
     "nodemon": "^3.0.1"
   }
 }

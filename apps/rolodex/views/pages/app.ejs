@@ -12,12 +12,51 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { account, getContactForRelate, addConnection, portOldContacts} from '/odd.js';
+      import { account, getContactForRelate, addConnection, portOldContacts, addContact, getContacts, getContactByUID, editContact, deleteContact, filterContacts,
+        getProfile, updateProfile, signout, generateRecoveryKit, importContacts, appleCredsPresent, importGoogleContacts, downloadContactsDataLocally} from '/odd.js';
+      window.addContact = addContact;
+      window.getContacts = getContacts;
+      window.editContact = editContact;
+      window.deleteContact = deleteContact;
+      window.filterContacts = filterContacts;
+      window.updateProfile = updateProfile;
+      window.signout = signout;
+      window.generateRecoveryKit = generateRecoveryKit;
+      window.importContacts = importContacts;
+      window.importGoogleContacts = importGoogleContacts;
+      window.downloadContactsDataLocally = downloadContactsDataLocally;
+      window.getProfile = getProfile;
 
       var session = await account.activeSession();
       if (session == false) {
         window.location.href = '/home';
       }
+
+      window.refreshContacts = function(){
+        console.log(window)
+        console.log(window.getContacts)
+        window.getContacts().then((result) => {
+          document.querySelector("contact-table").contacts = result
+        })
+      }
+      refreshContacts();
+      
+      window.refreshProfile = function(){
+        window.getProfile().then((result) => {
+        console.log("result: ", result)
+        document.getElementById("handle").innerHTML = result.handle
+        document.getElementById("name").innerHTML = "Name: " + result.name
+        document.getElementById("tags").innerHTML = '';
+        for (let tag of result.tags) {
+          if (tag == '') continue;
+          document.getElementById("tags").innerHTML += `<span class="badge badge-neutral">${tag}</span>`;
+        }
+        document.getElementById("profile-name").value = result.name
+        document.getElementById("profile-tags").value = result.tags || []
+        document.getElementById("profile-text").value = result.text || ''
+        document.querySelector(".avatar > div > span").innerHTML = result.handle.charAt(0).toUpperCase()
+      })}
+      refreshProfile();
 
       window.portOldContacts = portOldContacts
 

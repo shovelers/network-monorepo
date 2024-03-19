@@ -1,31 +1,5 @@
 <script type="module">
-  import { getProfile, updateProfile, signout, generateRecoveryKit, importContacts, appleCredsPresent, importGoogleContacts, getContactForRelate, addConnection, downloadContactsDataLocally } from '/odd.js';
-  window.updateProfile = updateProfile;
-  window.signout = signout;
-  window.generateRecoveryKit = generateRecoveryKit;
-  window.importContacts = importContacts;
-  window.importGoogleContacts = importGoogleContacts;
-  window.downloadContactsDataLocally = downloadContactsDataLocally;
-
-  window.refreshProfile = function(){
-    getProfile().then((result) => {
-      console.log("result: ", result)
-      document.getElementById("handle").innerHTML = result.handle
-      document.getElementById("name").innerHTML = "Name: " + result.name
-      document.getElementById("tags").innerHTML = '';
-      for (let tag of result.tags) {
-        if (tag == '') continue;
-        document.getElementById("tags").innerHTML += `<span class="badge badge-neutral">${tag}</span>`;
-      }
-      document.getElementById("profile-name").value = result.name
-      document.getElementById("profile-tags").value = result.tags || []
-      document.getElementById("profile-text").value = result.text || ''
-      document.querySelector(".avatar > div > span").innerHTML = result.handle.charAt(0).toUpperCase()
-    })
-  }
-  refreshProfile();
-
-  var handle = await shovel.agent.handle()
+  var handle = await window.shovel.agent.handle()
   var confirm
   var reject
   window.startDeviceLink = async function(){
@@ -142,7 +116,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="connection-add-form"
-        onsubmit="event.preventDefault(); addConnectionButton(document.getElementById('connection-handle').value); network_modal.close(); document.getElementById('connection-handle').value = ''; return false"
+        onsubmit="event.preventDefault(); window.addConnectionButton(document.getElementById('connection-handle').value); network_modal.close(); document.getElementById('connection-handle').value = ''; return false"
         class="space-y-1 text-center">
         <label for="connection-handle" class="label"><span class="label-text">Handle</span></label>
         <input type="text" id="connection-handle" class="border border-gray-300 px-2 py-1 rounded-lg">
@@ -164,7 +138,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="profile-updatae-form"
-        onsubmit="event.preventDefault(); updateProfile(document.getElementById('handle').innerHTML, document.getElementById('profile-name').value, tagsArray(document.getElementById('profile-tags').value), document.getElementById('profile-text').value).then(function(){console.log('i am here'); refreshProfile()}); profile_edit_modal.close(); return false"
+        onsubmit="event.preventDefault(); window.updateProfile(document.getElementById('handle').innerHTML, document.getElementById('profile-name').value, tagsArray(document.getElementById('profile-tags').value), document.getElementById('profile-text').value).then(function(){console.log('i am here'); window.refreshProfile()}); profile_edit_modal.close(); return false"
         class="space-y-1 text-center">
         <label for="profile-name" class="label"><span class="label-text">Name</span></label>
         <input type="text" id="profile-name" class="border border-gray-300 px-2 py-1 rounded-lg" value="name">
@@ -189,7 +163,7 @@
     <p class="text-base">Generate app specific password <a href="https://appleid.apple.com/" class="link" target="_blank">here</a></p>
     <p class="text-xs italic">Rolodex DOES NOT store to any of your data, it stays encrypted on your device & in your private vault on IPFS</p>
     <div class="modal-action flex flex-col justify-center items-center space-y-2">
-      <form class="flex flex-col space-y-2 items-center" onsubmit="event.preventDefault(); importContacts(document.querySelector('#apple_username').value, document.querySelector('#apple_password').value); showLoading(); setTimeout(()=>{import_contacts_modal.close(); refreshContacts(); hideLoading();}, 5000); return false">
+      <form class="flex flex-col space-y-2 items-center" onsubmit="event.preventDefault(); window.importContacts(document.querySelector('#apple_username').value, document.querySelector('#apple_password').value); showLoading(); setTimeout(()=>{import_contacts_modal.close(); refreshContacts(); hideLoading();}, 5000); return false">
         <input type="text" id="apple_username" placeholder="Apple ID" class="input input-bordered input-sm w-full max-w-xs" />
         <input type="password" id="apple_password" placeholder="App Specific Password" class="input input-bordered input-sm w-full max-w-xs" />
         <div class="loading loading-infinity loading-lg hidden"></div>
