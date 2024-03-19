@@ -1,13 +1,14 @@
 <script type="module">
-  var handle = await window.shovel.agent.handle()
   var confirm
   var reject
+  console.log("checking js loading")
   window.startDeviceLink = async function(){
+    var handle = await window.shovel.agent.handle()
     var url = `${window.location.origin}/link?handle=${handle}&peerId=${shovel.helia.libp2p.peerId.string}`
     document.querySelector("#device_link_modal > .modal-box > .modal-action > div").innerHTML = url
     var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
     document.querySelector("#device_link_modal > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
-    shovel.agent.actAsApprover(handle).then(() => {
+    window.shovel.agent.actAsApprover(handle).then(() => {
       shovel.agent.approver.notification.addEventListener("challengeRecieved", (challengeEvent) => {
         window.pin = challengeEvent.detail.message.challenge.pin
         confirm = challengeEvent.detail.confirm
@@ -31,16 +32,20 @@
     }
   }
 
-  appleCredsPresent().then(function (result){
-    if(result.response){
-      document.getElementById("apple_username").value = result.value.username
-      document.getElementById("apple_password").value = result.value.password
-      document.querySelector("#import_contacts_modal > .modal-box > .modal-action > form > div > button").innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914a.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></g></svg>
-      import again
-      `
-    }
-  })
+  window.onAppleImportClick = function () {
+    import_contacts_modal.showModal()
+    
+    window.appleCredsPresent().then(function (result){
+      if(result.response){
+        document.getElementById("apple_username").value = result.value.username
+        document.getElementById("apple_password").value = result.value.password
+        document.querySelector("#import_contacts_modal > .modal-box > .modal-action > form > div > button").innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914a.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></g></svg>
+        import again
+        `
+      }
+    })
+  }
 
   window.showLoading = function(){
     document.querySelector(".loading").classList.remove("hidden");
@@ -57,13 +62,13 @@
   window.addConnectionButton = async function(){
     // TODO check if valid handle to connect
     var connectHandle = document.getElementById('connection-handle').value
-    let person = await getContactForRelate()
+    let person = await window.getContactForRelate()
     console.log("person with XML :", person)
     // TODO Transfer profile.json in such a way, that it mimics forever contact app semantics
-    let requester = await shovel.agent.actAsRelationshipRequester("<%= address %>", "<%= broker %>", `${connectHandle}`, person)
+    let requester = await window.shovel.agent.actAsRelationshipRequester("<%= address %>", "<%= broker %>", `${connectHandle}`, person)
     requester.notification.addEventListener("CONFIRMED", async (event) => {
       console.log(event.detail)
-      await addConnection(event.detail.data.person)
+      await window.addConnection(event.detail.data.person)
     })
   }
 </script>
@@ -85,7 +90,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"> <path fill="currentColor" d="m13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057l3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z" /></svg>
     Edit Profile
   </button>
-  <button class="btn btn-outline btn-sm w-2/3" onclick="import_contacts_modal.showModal()">
+  <button class="btn btn-outline btn-sm w-2/3" onclick="onAppleImportClick()">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><defs><path id="biApple0" d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516c.024.034 1.52.087 2.475-1.258c.955-1.345.762-2.391.728-2.43Zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422c.212-2.189 1.675-2.789 1.698-2.854c.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116c-.508.139-1.653.589-1.968.607c-.316.018-1.256-.522-2.267-.665c-.647-.125-1.333.131-1.824.328c-.49.196-1.422.754-2.074 2.237c-.652 1.482-.311 3.83-.067 4.56c.244.729.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899c.319.232 1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472c.357.013 1.061.154 1.782.539c.571.197 1.111.115 1.652-.105c.541-.221 1.324-1.059 2.238-2.758c.347-.79.505-1.217.473-1.282Z"/></defs><g fill="currentColor"><use href="#biApple0"/><use href="#biApple0"/></g></svg>
     Import
   </button>
@@ -138,7 +143,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="profile-updatae-form"
-        onsubmit="event.preventDefault(); window.updateProfile(document.getElementById('handle').innerHTML, document.getElementById('profile-name').value, tagsArray(document.getElementById('profile-tags').value), document.getElementById('profile-text').value).then(function(){console.log('i am here'); window.refreshProfile()}); profile_edit_modal.close(); return false"
+        onsubmit="event.preventDefault(); updateProfile(document.getElementById('handle').innerHTML, document.getElementById('profile-name').value, tagsArray(document.getElementById('profile-tags').value), document.getElementById('profile-text').value).then(function(){console.log('i am here'); refreshProfile()}); profile_edit_modal.close(); return false"
         class="space-y-1 text-center">
         <label for="profile-name" class="label"><span class="label-text">Name</span></label>
         <input type="text" id="profile-name" class="border border-gray-300 px-2 py-1 rounded-lg" value="name">
