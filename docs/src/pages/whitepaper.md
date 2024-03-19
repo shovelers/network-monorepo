@@ -89,6 +89,8 @@ Each of these agents and hub runs an embedded Helia node to store data and make 
 
 A variety of social utility applications can be built using DCN:
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/o_lrbkEE3y8?si=IicNiWFL2tW7K27F" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 - A `local-first PRM (personal-relationship manager)` for a user to store and operate on connections from multiple apps/networks and contacts.
 - A `directory app` for communities to create and manage member-controlled profiles.
 - A [Forever Contact App](https://www.windley.com/liveweb/forever/forever.shtml) that auto-updates the contact details when a contact changes their profile, forever.
