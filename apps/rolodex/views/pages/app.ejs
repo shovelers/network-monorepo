@@ -38,8 +38,6 @@
       }
 
       window.refreshContacts = function(){
-        console.log(window)
-        console.log(window.getContacts)
         window.getContacts().then((result) => {
           document.querySelector("contact-table").contacts = result
         })
