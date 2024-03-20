@@ -13,7 +13,14 @@
   "tauri": {
     "allowlist": {
       "dialog": {
-        "message": true
+        "message": true,
+        "save": true
+      },
+      "shell": {
+        "open": true
+      },
+      "fs":{
+        "writeFile": true
       },
       "all": false
     },

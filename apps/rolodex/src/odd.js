@@ -5,6 +5,8 @@ import { ContactTable } from "./contact_table";
 import { programInit, Account, Person, PeopleRepository } from 'account-fs';
 import * as uint8arrays from 'uint8arrays';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
+import { save } from '@tauri-apps/api/dialog';
+import { writeTextFile } from '@tauri-apps/api/fs';
 
 const farcasterClient = createAppClient({
   relay: 'https://relay.farcaster.xyz',
@@ -112,28 +114,42 @@ async function signout() {
 }
 
 async function downloadContactsDataLocally() {
+  let filename = "contacts.json"
   const content = await getContacts()
   console.log("content: ", content)
-  const data = new Blob([JSON.stringify(content, null, 4)], { type: 'application/json' })
-  var fileURL = window.URL.createObjectURL(data);
-  var tempLink = document.createElement('a');
-  tempLink.href = fileURL;
-  tempLink.setAttribute('download', 'contacts.json');
-  tempLink.click();
-  window.URL.revokeObjectURL(fileURL);
+  
+  if (window.__TAURI__) {
+    const filePath = await save({ defaultPath: filename });
+    await writeTextFile(filePath, JSON.stringify(content));
+  } else {
+    const data = new Blob([JSON.stringify(content, null, 4)], { type: 'application/json' })
+    var fileURL = window.URL.createObjectURL(data);
+    var tempLink = document.createElement('a');
+    tempLink.href = fileURL;
+    tempLink.setAttribute('download', `${filename}`);
+    tempLink.click();
+    window.URL.revokeObjectURL(fileURL);
+  }
 }
 
 async function generateRecoveryKit(username){
   const content = await account.recoveryKitContent()
+  const filename = `rolodex-${username}-recovery-kit.yaml`
   
-  const data = new Blob([content], { type: 'text/plain' })
-  var fileURL = window.URL.createObjectURL(data);
-  var tempLink = document.createElement('a');
-  tempLink.href = fileURL;
-  tempLink.setAttribute('download', `rolodex-${username}-recovery-kit.yaml`);
-  tempLink.click();
-  window.URL.revokeObjectURL(fileURL);
-  alert('your file has been downloaded!'); 
+  if (window.__TAURI__) {
+    const filePath = await save({ defaultPath: filename });
+    await writeTextFile(filePath, content);
+    alert('your file has been downloaded!');
+  } else {
+    const data = new Blob([content], { type: 'text/plain' })
+    var fileURL = window.URL.createObjectURL(data);
+    var tempLink = document.createElement('a');
+    tempLink.href = fileURL;
+    tempLink.setAttribute('download', `${filename}`);
+    tempLink.click();
+    window.URL.revokeObjectURL(fileURL);
+    alert('your file has been downloaded!');
+  } 
 }
 
 async function recover(kit) {
