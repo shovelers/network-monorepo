@@ -7,7 +7,7 @@
   "scripts": {
     "test": "mocha --import=tsx --experimental-specifier-resolution=node --extension=ts,js"
   },
-    "author": "",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "@chainsafe/libp2p-gossipsub": "^11.2.0",
@@ -45,6 +45,7 @@
     "@types/node": "^20.11.30",
     "chai": "^5.1.0",
     "mocha": "^10.3.0",
+    "sinon": "^17.0.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.7.1",
     "typescript": "^5.4.3"
