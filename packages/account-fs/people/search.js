@@ -30,12 +30,17 @@ export const SearchCapability = {
 
     //for each contactWithDepth fetchSharedContacts and append to filteredContacts and return filteredContacts
     console.log("contactsWithDepth :", contactsWithDepth)
-
-    // Map each element to a promise representing the asynchronous execution of filterFromSharedContacts
     const promises = contactsWithDepth.map(async (element) => {
+      let result;
       try {
-        console.log("starting searching", element.UID)
-        const result = await this.filterFromSharedContacts(element, query);
+        result = await Promise.race([
+          this.filterFromSharedContacts(element, query),
+          new Promise((resolve, reject) => {
+            setTimeout(() => {
+              reject(new Error('Timeout'));
+            }, 5000); // Timeout after 5 seconds
+          })
+        ]);
         console.log("result after fetch and filter :", element.UID, result);
         filteredContacts = filteredContacts.concat(result);
       } catch (error) {
@@ -55,6 +60,8 @@ export const SearchCapability = {
     let details = person.XML.split(':')[1]
     let handle = details.split('.')[0]
     let accessKey = details.split('.')[1]
+    
+    console.log("starting searching", handle)
 
     //fetch cid using handle
     return await this.axios_client.get(`/forestCID/${handle}`).then(async (response) => {
