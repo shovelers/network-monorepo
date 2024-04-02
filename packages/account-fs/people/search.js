@@ -31,7 +31,13 @@ export const SearchCapability = {
     //for each contactWithDepth fetchSharedContacts and append to filteredContacts and return filteredContacts
     console.log("contactsWithDepth :", contactsWithDepth)
     for (const element of contactsWithDepth) {
-      let result = await this.filterFromSharedContacts(element, query)
+      let result
+      try {
+        result = await this.filterFromSharedContacts(element, query)
+      } catch {
+        console.log("contact filtering failed", element)
+        continue
+      }
       console.log("result after fetch and filter :", result)
       filteredContacts = filteredContacts.concat(result)
     }
