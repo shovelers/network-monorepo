@@ -68,12 +68,17 @@ export const SearchCapability = {
         return []
       }
 
-      fetchedContacts = JSON.parse(fetchedContacts)
-      //filter contats to get contacts matching criterion
-      var filteredContacts = this.fullTextMatch(fetchedContacts, query)
-      //create Person Object and add XML = via: person.UID so that the UI can show this info in the search results
-      filteredContacts = this.typecastToPerson(filteredContacts, handle)
-      return filteredContacts
+      try {
+        fetchedContacts = JSON.parse(fetchedContacts)
+        //filter contats to get contacts matching criterion
+        var filteredContacts = this.fullTextMatch(fetchedContacts, query)
+        //create Person Object and add XML = via: person.UID so that the UI can show this info in the search results
+        filteredContacts = this.typecastToPerson(filteredContacts, handle)
+        return filteredContacts
+      } catch (e) {
+        console.log("weird data bug", handle, e)
+        return []
+      }
     }).catch((e) => {
         console.log("Couldn't resolve CID", handle, e);
         return []
