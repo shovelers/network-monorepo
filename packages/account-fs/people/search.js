@@ -63,6 +63,7 @@ export const SearchCapability = {
       var fetchedContacts
       try {
         fetchedContacts = await this.readPrivateFileByPointer(accessKey, CID.parse(forestCID).bytes)
+        console.log("CID fetch complete", handle)
       } catch (e) {
         console.log("CID fetch failed", handle, forestCID, e);
         return []
@@ -74,6 +75,7 @@ export const SearchCapability = {
         var filteredContacts = this.fullTextMatch(fetchedContacts, query)
         //create Person Object and add XML = via: person.UID so that the UI can show this info in the search results
         filteredContacts = this.typecastToPerson(filteredContacts, handle)
+        console.log("filtering done", handle)
         return filteredContacts
       } catch (e) {
         console.log("weird data bug", handle, e)
