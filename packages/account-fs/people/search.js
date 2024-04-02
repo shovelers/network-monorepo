@@ -74,7 +74,7 @@ export const SearchCapability = {
       filteredContacts = this.typecastToPerson(filteredContacts, handle)
       return filteredContacts
     }).catch((e) => {
-        console.log(e);
+        console.log("Couldn't resolve CID", handle, e);
         return []
       })
   },
