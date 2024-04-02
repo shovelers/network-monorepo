@@ -58,7 +58,7 @@ export const SearchCapability = {
       return filteredContacts
     }).catch((e) => {
         console.log(e);
-        return e
+        return []
       })
   },
 
