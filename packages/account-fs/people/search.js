@@ -30,17 +30,21 @@ export const SearchCapability = {
 
     //for each contactWithDepth fetchSharedContacts and append to filteredContacts and return filteredContacts
     console.log("contactsWithDepth :", contactsWithDepth)
-    for (const element of contactsWithDepth) {
-      let result
+
+    // Map each element to a promise representing the asynchronous execution of filterFromSharedContacts
+    const promises = contactsWithDepth.map(async (element) => {
       try {
-        result = await this.filterFromSharedContacts(element, query)
-        console.log("result after fetch and filter :", result)
-        filteredContacts = filteredContacts.concat(result)
-      } catch {
-        console.log("contact filtering failed", element, result)
-        continue
+        const result = await this.filterFromSharedContacts(element, query);
+        console.log("result after fetch and filter :", result);
+        filteredContacts = filteredContacts.concat(result);
+      } catch (error) {
+        console.log("contact filtering failed", element, error);
       }
-    }
+    });
+
+    // Wait for all promises to resolve
+    await Promise.all(promises);
+    
     console.log("filtered after concat :", filteredContacts)
     return filteredContacts
   },
