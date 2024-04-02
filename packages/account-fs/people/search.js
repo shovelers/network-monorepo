@@ -49,7 +49,14 @@ export const SearchCapability = {
     return await this.axios_client.get(`/forestCID/${handle}`).then(async (response) => {
       let forestCID = response.data.cid
       //Use accesskey & forestCID to get content of contats.json
-      var fetchedContacts = await this.readPrivateFileByPointer(accessKey, CID.parse(forestCID).bytes)
+      var fetchedContacts
+      try {
+        fetchedContacts = await this.readPrivateFileByPointer(accessKey, CID.parse(forestCID).bytes)
+      } catch (e) {
+        console.log("CID fetch failed", handle, forestCID, e);
+        return []
+      }
+
       fetchedContacts = JSON.parse(fetchedContacts)
       //filter contats to get contacts matching criterion
       var filteredContacts = this.fullTextMatch(fetchedContacts, query)
