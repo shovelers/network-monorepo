@@ -34,11 +34,12 @@ export const SearchCapability = {
     // Map each element to a promise representing the asynchronous execution of filterFromSharedContacts
     const promises = contactsWithDepth.map(async (element) => {
       try {
+        console.log("starting searching", element.UID)
         const result = await this.filterFromSharedContacts(element, query);
-        console.log("result after fetch and filter :", result);
+        console.log("result after fetch and filter :", element.UID, result);
         filteredContacts = filteredContacts.concat(result);
       } catch (error) {
-        console.log("contact filtering failed", element, error);
+        console.log("contact filtering failed", element.UID, error);
       }
     });
 
