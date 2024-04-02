@@ -34,12 +34,12 @@ export const SearchCapability = {
       let result
       try {
         result = await this.filterFromSharedContacts(element, query)
+        console.log("result after fetch and filter :", result)
+        filteredContacts = filteredContacts.concat(result)
       } catch {
-        console.log("contact filtering failed", element)
+        console.log("contact filtering failed", element, result)
         continue
       }
-      console.log("result after fetch and filter :", result)
-      filteredContacts = filteredContacts.concat(result)
     }
     console.log("filtered after concat :", filteredContacts)
     return filteredContacts
