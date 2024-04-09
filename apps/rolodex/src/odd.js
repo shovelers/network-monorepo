@@ -88,8 +88,8 @@ async function updateProfile(handle, name, tags = [], text = '') {
   account.editProfile({handle: handle, name: name, tags: tags, text: text})
 }
 
-async function addContact(name, tags = [], text = "", links = []) {
-  let person = new Person({FN: name, CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()})
+async function addContact(name, email='', tags = [], text = "", links = []) {
+  let person = new Person({FN: name, EMAIL: email, CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()})
   return contactRepo.create(person)
 }
 
@@ -100,8 +100,9 @@ async function addConnection(person) {
 }
 
 // TODO - fix bug where contact edit clears PRODID etc.
-async function editContact(id, name, tags = [], text='', links = []) {
-  let person = new Person({FN: name, CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: id})
+async function editContact(id, name, email='', tags = [], text='', links = []) {
+
+  let person = new Person({FN: name,  EMAIL:email, CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: id})
   return contactRepo.edit(person)
 }
 
