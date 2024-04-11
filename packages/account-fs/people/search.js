@@ -80,6 +80,12 @@ export const SearchCapability = {
         filteredContacts.push(person)
         continue
       }
+
+      if (person.EMAIL && person.EMAIL.some(email => email.toLowerCase().includes(queryString))) {
+        filteredContacts.push(person)
+        continue
+      }
+
     }
     return filteredContacts
   },

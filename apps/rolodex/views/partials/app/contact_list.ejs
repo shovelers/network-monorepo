@@ -2,7 +2,7 @@
   window.setContactEditForm = function (uid){
     window.getContactByUID(uid).then((person) => { 
       document.getElementById("edit-contact-name").value = person.FN
-      document.getElementById("edit-contact-email").value = typeof person.EMAIL === 'string' ? person.EMAIL : '';
+      document.getElementById("edit-contact-email").value = person.EMAIL; 
       document.getElementById("edit-contact-id").value = person.UID
       document.getElementById("edit-contact-tags").value = person.CATEGORIES
       document.getElementById("edit-contact-text").value = person.NOTE
@@ -30,8 +30,8 @@
         <input type="text" id="edit-contact-id" hidden>
         <label for="edit-contact-name" class="label"><span class="label-text">Name</span> </label>
         <input type="text" name="edit-contact-name" id="edit-contact-name" class="input input-bordered input-sm rounded-lg w-full">
-        <label for="edit-contact-email" class="label"><span class="label-text">Email</span></label>
-        <input type="email" name="edit-contact-email" id="edit-contact-email" class="input input-bordered input-sm rounded-lg w-full"> 
+        <label for="edit-contact-email" class="label"><span class="label-text">Emails (comma separated)</span></label>
+        <input type="text" name="edit-contact-email" id="edit-contact-email" class="input input-bordered input-sm rounded-lg w-full"> 
         <label for="edit-contact-tags" class="label"><span class="label-text">Tags (comma separated)</span></label>
         <input type="text" name="edit-contact-tags" id="edit-contact-tags" class="input input-bordered input-sm rounded-lg w-full">
         <label for="edit-contact-links" class="label"><span class="label-text">Links (comma separated)</span></label>
