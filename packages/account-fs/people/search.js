@@ -30,11 +30,27 @@ export const SearchCapability = {
 
     //for each contactWithDepth fetchSharedContacts and append to filteredContacts and return filteredContacts
     console.log("contactsWithDepth :", contactsWithDepth)
-    for (const element of contactsWithDepth) {
-      let result = await this.filterFromSharedContacts(element, query)
-      console.log("result after fetch and filter :", result)
-      filteredContacts = filteredContacts.concat(result)
-    }
+    const promises = contactsWithDepth.map(async (element) => {
+      let result;
+      try {
+        result = await Promise.race([
+          this.filterFromSharedContacts(element, query),
+          new Promise((resolve, reject) => {
+            setTimeout(() => {
+              reject(new Error('Timeout'));
+            }, 5000); // Timeout after 5 seconds
+          })
+        ]);
+        console.log("result after fetch and filter :", element.UID, result);
+        filteredContacts = filteredContacts.concat(result);
+      } catch (error) {
+        console.log("contact filtering failed", element.UID, error);
+      }
+    });
+
+    // Wait for all promises to resolve
+    await Promise.all(promises);
+    
     console.log("filtered after concat :", filteredContacts)
     return filteredContacts
   },
@@ -44,21 +60,37 @@ export const SearchCapability = {
     let details = person.XML.split(':')[1]
     let handle = details.split('.')[0]
     let accessKey = details.split('.')[1]
+    
+    console.log("starting searching", handle)
 
     //fetch cid using handle
     return await this.axios_client.get(`/forestCID/${handle}`).then(async (response) => {
       let forestCID = response.data.cid
       //Use accesskey & forestCID to get content of contats.json
-      var fetchedContacts = await this.readPrivateFileByPointer(accessKey, CID.parse(forestCID).bytes)
-      fetchedContacts = JSON.parse(fetchedContacts)
-      //filter contats to get contacts matching criterion
-      var filteredContacts = this.fullTextMatch(fetchedContacts, query)
-      //create Person Object and add XML = via: person.UID so that the UI can show this info in the search results
-      filteredContacts = this.typecastToPerson(filteredContacts, handle)
-      return filteredContacts
+      var fetchedContacts
+      try {
+        fetchedContacts = await this.readPrivateFileByPointer(accessKey, CID.parse(forestCID).bytes)
+        console.log("CID fetch complete", handle)
+      } catch (e) {
+        console.log("CID fetch failed", handle, forestCID, e);
+        return []
+      }
+
+      try {
+        fetchedContacts = JSON.parse(fetchedContacts)
+        //filter contats to get contacts matching criterion
+        var filteredContacts = this.fullTextMatch(fetchedContacts, query)
+        //create Person Object and add XML = via: person.UID so that the UI can show this info in the search results
+        filteredContacts = this.typecastToPerson(filteredContacts, handle)
+        console.log("filtering done", handle)
+        return filteredContacts
+      } catch (e) {
+        console.log("weird data bug", handle, e)
+        return []
+      }
     }).catch((e) => {
-        console.log(e);
-        return e
+        console.log("Couldn't resolve CID", handle, e);
+        return []
       })
   },
 
