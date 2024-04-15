@@ -89,7 +89,7 @@ async function updateProfile(handle, name, tags = [], text = '') {
 }
 
 async function addContact(name, email='', tags = [], text = "", links = []) {
- 
+  
   let person = new Person({FN: name, EMAIL: convertEmailStringToEmailArray(email), CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()})
   return contactRepo.create(person)
 }
@@ -219,7 +219,7 @@ async function addAppleContactsToContactList(appleContacts){
     var EMAIL = parsedAppleContact.email ? parsedAppleContact.email[0].value : undefined
     if (!existingAppleContactIDs.includes(uid)) {
       // TODO set PROPID from vcard parsing
-      contactList.push(new Person({FN: name, PRODID: "APPLE", UID: uid, EMAIL: EMAIL, TEL: TEL}))
+      contactList.push(new Person({FN: name, PRODID: "APPLE", UID: uid, EMAIL: convertEmailStringToEmailArray(EMAIL), TEL: TEL}))
     }
   }
   await contactRepo.bulkCreate(contactList)
@@ -264,7 +264,7 @@ async function addGoogleContactsToContactList(googleContacts){
     var TEL = googleContact.phoneNumbers ? googleContact.phoneNumbers[0].canonicalForm : undefined
     var uid = googleContact.resourceName
     if (!existingGoogleContactIDs.includes(uid)) {
-      contactList.push(new Person({FN: name, PRODID: "GOOGLE", UID: uid, EMAIL: EMAIL, TEL: TEL}))
+      contactList.push(new Person({FN: name, PRODID: "GOOGLE", UID: uid, EMAIL: convertEmailStringToEmailArray(EMAIL), TEL: TEL}))
     }
   }
 
