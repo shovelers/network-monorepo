@@ -114,8 +114,16 @@ export const SearchCapability = {
       }
 
       if (person.EMAIL && person.EMAIL.some(email => email.toLowerCase().includes(queryString))) {
-        filteredContacts.push(person)
-        continue
+        let emailMatch = false;
+        if (Array.isArray(person.EMAIL)) {
+          emailMatch = person.EMAIL.some(email => email.toLowerCase().includes(queryString));
+        } else {   //done this way as some email's are strings while are some array of strings
+          emailMatch =  person.EMAIL.split(',').filter(email => email.trim().toLowerCase().includes(queryString)).length > 0
+        }
+        if (emailMatch) {
+          filteredContacts.push(person);
+          continue;
+        }
       }
 
     }
