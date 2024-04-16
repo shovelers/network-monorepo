@@ -66,7 +66,8 @@ export class ContactTable extends HTMLElement {
       const emailCell = row.insertCell(1); 
       emailCell.classList.add('col-span-3', 'font-medium')
       if (value.EMAIL !== undefined && value.EMAIL.length > 0) {
-        for (let email of value.EMAIL) {
+        let emails = Array.isArray(value.EMAIL) ? value.EMAIL : [value.EMAIL];  // Check if EMAIL is an array, if not, treat it as a single string in an array
+        for (let email of emails) {
           emailCell.innerHTML += `<span class="badge badge-neutral">${email}</span>`;
         }
       } else {
