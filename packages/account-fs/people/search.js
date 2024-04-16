@@ -113,7 +113,7 @@ export const SearchCapability = {
         continue
       }
 
-      if (person.EMAIL && person.EMAIL.some(email => email.toLowerCase().includes(queryString))) {
+      if (person.EMAIL ) {
         let emailMatch = false;
         if (Array.isArray(person.EMAIL)) {
           emailMatch = person.EMAIL.some(email => email.toLowerCase().includes(queryString));
