@@ -88,8 +88,9 @@ async function updateProfile(handle, name, tags = [], text = '') {
   account.editProfile({handle: handle, name: name, tags: tags, text: text})
 }
 
-async function addContact(name, tags = [], text = "", links = []) {
-  let person = new Person({FN: name, CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()})
+async function addContact(name, email='', tags = [], text = "", links = []) {
+  
+  let person = new Person({FN: name, EMAIL: convertEmailStringToEmailArray(email), CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()})
   return contactRepo.create(person)
 }
 
@@ -99,9 +100,16 @@ async function addConnection(person) {
   return contactRepo.create(connection) 
 }
 
+function convertEmailStringToEmailArray(emailString) {
+  if (typeof emailString === 'string' && emailString.trim() !== '') {
+    return emailString.split(',').map(email => email.trim());
+  }
+  return [];
+}
+
 // TODO - fix bug where contact edit clears PRODID etc.
-async function editContact(id, name, tags = [], text='', links = []) {
-  let person = new Person({FN: name, CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: id})
+async function editContact(id, name, email='', tags = [], text='', links = []) {
+  let person = new Person({FN: name,  EMAIL:convertEmailStringToEmailArray(email), CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: id})
   return contactRepo.edit(person)
 }
 
@@ -211,7 +219,7 @@ async function addAppleContactsToContactList(appleContacts){
     var EMAIL = parsedAppleContact.email ? parsedAppleContact.email[0].value : undefined
     if (!existingAppleContactIDs.includes(uid)) {
       // TODO set PROPID from vcard parsing
-      contactList.push(new Person({FN: name, PRODID: "APPLE", UID: uid, EMAIL: EMAIL, TEL: TEL}))
+      contactList.push(new Person({FN: name, PRODID: "APPLE", UID: uid, EMAIL: convertEmailStringToEmailArray(EMAIL), TEL: TEL}))
     }
   }
   await contactRepo.bulkCreate(contactList)
@@ -256,7 +264,7 @@ async function addGoogleContactsToContactList(googleContacts){
     var TEL = googleContact.phoneNumbers ? googleContact.phoneNumbers[0].canonicalForm : undefined
     var uid = googleContact.resourceName
     if (!existingGoogleContactIDs.includes(uid)) {
-      contactList.push(new Person({FN: name, PRODID: "GOOGLE", UID: uid, EMAIL: EMAIL, TEL: TEL}))
+      contactList.push(new Person({FN: name, PRODID: "GOOGLE", UID: uid, EMAIL: convertEmailStringToEmailArray(EMAIL), TEL: TEL}))
     }
   }
 

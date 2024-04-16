@@ -1,7 +1,8 @@
 export class ContactTable extends HTMLElement {
+  gridSize = 'grid-cols-9';
   constructor() {
     super();
-
+   
     // Create a table element
     const table = document.createElement('table');
     table.classList.add('table', 'table-lg', 'table-pin-rows');
@@ -9,10 +10,11 @@ export class ContactTable extends HTMLElement {
     // Create the table header row
     const thead = table.createTHead();
     const headerRow = document.createElement('tr');
-    const headers = ['Name (sort)']; // Customize as needed
+    headerRow.classList.add('grid', this.gridSize); 
+    const headers = ['Name (sort)', 'Email']; // Customize as needed
     headers.forEach((headerText) => {
       const th = document.createElement('th');
-      th.classList.add('cursor-pointer')
+      th.classList.add('cursor-pointer','col-span-2') //add value for 'col-span-X'  based on corresponding row element size
       th.textContent = headerText;
       th.value = "asc";
       th.onclick = () => {this.sortTable(th);};
@@ -56,11 +58,22 @@ export class ContactTable extends HTMLElement {
         continue;
       }
       const row = tbody.insertRow();
-      row.classList.add('grid','grid-cols-6', 'gap-2', 'place-content-center', 'hover');
+      row.classList.add('grid',this.gridSize, 'gap-2', 'place-content-center', 'hover');
       const nameCell = row.insertCell(0);
       nameCell.classList.add('justify-self-start', 'col-span-2', 'font-medium');
       nameCell.textContent = value.FN;
-      let tagscell = row.insertCell(1);
+
+      const emailCell = row.insertCell(1); 
+      emailCell.classList.add('col-span-3', 'font-medium')
+      if (value.EMAIL !== undefined && value.EMAIL.length > 0) {
+        let emails = Array.isArray(value.EMAIL) ? value.EMAIL : [value.EMAIL];  // Check if EMAIL is an array, if not, treat it as a single string in an array
+        for (let email of emails) {
+          emailCell.innerHTML += `<span class="badge badge-neutral">${email}</span>`;
+        }
+      } else {
+        emailCell.innerHTML = '';
+      }
+      let tagscell = row.insertCell(2);
       tagscell.classList.add('place-self-center', 'space-x-1', 'space-y-1', 'col-span-3');
       if (value.CATEGORIES !== undefined && value.CATEGORIES.length > 0) {
         let tags = value.CATEGORIES.split(',')
@@ -70,7 +83,7 @@ export class ContactTable extends HTMLElement {
       } else {
         tagscell.innerHTML = '';
       }
-      let editcell = row.insertCell(2);
+      let editcell = row.insertCell(3);
       editcell.classList.add('justify-self-end', 'col-span-1');
       if (value.XML && value.XML.split(':')[0] == 'via') {
         editcell.innerHTML = `<span class="badge badge-secondary">${value.XML}</span>`
