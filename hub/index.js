@@ -94,9 +94,16 @@ class Accounts {
     return await this.addAgent(fullname)
   }
 
-  async createWithDID(accountDID, agentDID) {
-    await this.redis.hSet(`account:${accountDID}`, 'id', accountDID)
-    return await this.redis.sAdd(`agents:${accountDID}`, agentDID)
+  async createOrAdd(accountDID, agentDID) {
+    var registeredDID = await this.redis.hGet(`account:${accountDID}`, "id")
+    if (registeredDID == accountDID) {
+      await this.redis.sAdd(`agents:${accountDID}`, agentDID)
+      return false
+    } else {
+      await this.redis.hSet(`account:${accountDID}`, 'id', accountDID)
+      await this.redis.sAdd(`agents:${accountDID}`, agentDID)
+      return true
+    }
   }
 
   async addAgent(fullname) {
@@ -154,13 +161,18 @@ server.post("/v1/accounts", async (req, res) => {
     if (value.success && siweMessage.requestId == req.body.message.signer) {
       const accountDID = req.body.message.accountDID
       const agentDID = req.body.message.signer
-      await accounts.createWithDID(accountDID, agentDID)
-      res.status(201).json({ created: true })
+      const response = await accounts.createOrAdd(accountDID, agentDID)
+      if (response) {
+        res.status(201).json({ created: response })
+      } else {
+        res.status(204).json({ created: response })
+      }
     } else {
-      res.status(400).json({ created: false })
+      res.status(400).json({ created: false, msg: "SiweSignatureCheckFailed" })
     }
-  } catch {
-    res.status(400).json({ created: false })
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ created: false, msg: "ExceptionOnSIWE" })
   }
 })
 
