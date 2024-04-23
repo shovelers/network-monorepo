@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 
 import sinon from 'sinon';
-import { PeopleRepository }  from '../people/people';
-import { Person } from '../people/person';
+import { PeopleRepository }  from '../repository/people/people';
+import { Person } from '../repository/people/person';
 
 describe('PeopleRepository', function() {
   let repo;
