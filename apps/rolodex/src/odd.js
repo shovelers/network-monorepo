@@ -50,6 +50,10 @@ async function signup(username, requester) {
   return success
 }
 
+async function farcasterSignup(accountDID, siweMessage, signature) {
+  return await program.agent.register(accountDID, siweMessage, signature)
+}
+
 async function getProfile() {
   return account.getProfile()
 }
@@ -283,6 +287,7 @@ async function portOldContacts(contacts){
 export { 
   account,
   farcasterClient,
+  farcasterSignup,
   signup, 
   signout, 
   generateRecoveryKit, 

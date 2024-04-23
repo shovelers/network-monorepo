@@ -47,6 +47,7 @@ export class Account {
     })
   }
 
+  // TODO - change signature - to take accountDID instead of handle
   async create(handle, initialFiles) {
     const success = await this.agent.registerUser(handle)
 
