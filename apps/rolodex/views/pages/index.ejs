@@ -60,8 +60,6 @@
            console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username, agentDID, status.data.message, status.data.signature)
            let accountDID = `did:pkh:eip155:${response.data.chainId}:${response.data.address}`
            farcasterSignup(accountDID, status.data.message, status.data.signature)
-           
-           signup(status.data.username, requester)
          }
         })
       })
