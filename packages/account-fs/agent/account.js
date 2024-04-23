@@ -92,6 +92,21 @@ export class Account {
   }
 }
 
+//represents account on the network in the context of an application running account-fs
+//  applicationDID to be used as the application context
+//  `create` calls Hub with applicationDID & `signed payload` from applicationDID 
+//   to creates root fs, and get accessKey for the subfolder back & UCAN for forestCID edit// need to be implemented on Hub's Account Service
+export class AccountV1 {
+  constructor(agent) {
+    this.agent = agent
+  } 
+
+  async create() {
+  }
+
+  // recovery - not needed for facaster login
+}
+
 class RecoveryKit {
   static toYML(data){
     return `

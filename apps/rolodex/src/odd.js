@@ -2,7 +2,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
-import { programInit, Account, Person, PeopleRepository } from 'account-fs';
+import { programInit, Account, Person, PeopleRepository, AccountV1 } from 'account-fs';
 import * as uint8arrays from 'uint8arrays';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { save } from '@tauri-apps/api/dialog';
@@ -21,6 +21,7 @@ window.shovel = program
 
 const contactRepo = new PeopleRepository(program.agent)
 const account = new Account(program.agent)
+const accountv1 = new AccountV1(program.agent)
 
 customElements.define('contact-table', ContactTable);
 
@@ -51,6 +52,11 @@ async function signup(username, requester) {
 }
 
 async function farcasterSignup(accountDID, siweMessage, signature) {
+  // await accountv1.create(accountDID, siweMessage, signature)
+  // What will be the profile/handle here? /applicationDID/profile.json - {} Initialised Rolodex ProfileSchema with Farcaster Profile data
+  // When do we register a DCN name? No DCN handle for farcaster login, only name for accountDID
+  // How to intialise repostiories? People repo
+
   return await program.agent.register(accountDID, siweMessage, signature)
 }
 
