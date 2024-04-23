@@ -16,6 +16,7 @@ import { PrivateFS, PrivateFile } from "./fs/private_fs.js"
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
+const SHOVEL_ACCOUNT_DID = "SHOVEL_ACCOUNT_DID"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
@@ -122,6 +123,23 @@ export const AccountCapability = {
     let success = false
     const envelope = await this.envelop({fullname: fullname})
     await this.axios_client.post('/accounts', envelope).then(async (response) => {
+      console.log("account creation status", response.status)
+      success = true
+    }).catch(async (e) => {
+      console.log(e);
+      await this.destroy()
+      return e
+    })
+
+    return success
+  },
+
+  async register(accountDID, siweMessage, siweSignature) {
+    await this.runtime.setItem(SHOVEL_ACCOUNT_DID, accountDID)
+
+    let success = false
+    const envelope = await this.envelop({accountDID: accountDID, siweMessage: siweMessage, siweSignature: siweSignature})
+    await this.axios_client.post('/v1/accounts', envelope).then(async (response) => {
       console.log("account creation status", response.status)
       success = true
     }).catch(async (e) => {

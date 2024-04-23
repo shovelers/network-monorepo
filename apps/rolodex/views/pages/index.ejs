@@ -10,7 +10,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { signup, recover, account, farcasterClient } from '/odd.js';
+      import { signup, recover, account, farcasterClient, farcasterSignup } from '/odd.js';
       window.signup = signup;
       window.recover = recover;
 
@@ -57,7 +57,10 @@
         }).then((response) => {
          console.log(response)
          if (response.success) {
-           console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username)
+           console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username, agentDID, status.data.message, status.data.signature)
+           let accountDID = `did:pkh:eip155:${response.data.chainId}:${response.data.address}`
+           farcasterSignup(accountDID, status.data.message, status.data.signature)
+           
            signup(status.data.username, requester)
          }
         })

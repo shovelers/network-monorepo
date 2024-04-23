@@ -12,6 +12,7 @@ import { createClient } from 'redis';
 import * as uint8arrays from 'uint8arrays';
 import * as verifiers from 'iso-signatures/verifiers/rsa.js'
 import { DIDKey } from 'iso-did/key'
+import { SiweMessage } from 'siwe';
 
 const redisURL = process.env.REDIS_URL || "redis://localhost:6379"
 const redisClient =  createClient({ url: redisURL });
@@ -82,6 +83,7 @@ server.post('/pin', async (req, res) => {
   res.status(201).json({})
 });
 
+// Todo - accountDID as primary key, move handles to separate naming layer
 class Accounts {
   constructor(redis) {
     this.redis =  redis
@@ -90,6 +92,11 @@ class Accounts {
   async create(fullname) {
     await this.redis.sAdd("handles", fullname.split('#')[0])
     return await this.addAgent(fullname)
+  }
+
+  async createWithDID(accountDID, agentDID) {
+    await this.redis.hSet(`account:${accountDID}`, 'id', accountDID)
+    return await this.redis.sAdd(`agents:${accountDID}`, agentDID)
   }
 
   async addAgent(fullname) {
@@ -106,6 +113,17 @@ class Accounts {
 }
 const accounts = new Accounts(redisClient)
 
+/*
+   Registration
+
+    body
+        ▪ accountDID: did:pkh
+        ▪ agentDID: did:key
+        ▪ signed SIWE message, signed by did:pkh
+
+    Response:
+      {201, created: true/false}
+*/
 server.post("/accounts", async (req, res) => {
   const verified = await verify(req.body.message, req.body.signature)
   if (!verified) {
@@ -123,6 +141,30 @@ server.post("/accounts", async (req, res) => {
   }
 });
 
+server.post("/v1/accounts", async (req, res) => {
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({})
+    return
+  }
+
+  try {
+    const siweMessage = new SiweMessage(req.body.message.siweMessage);
+    const value = await siweMessage.verify({ signature: req.body.message.siweSignature });
+    if (value.success && siweMessage.requestId == req.body.message.signer) {
+      const accountDID = req.body.message.accountDID
+      const agentDID = req.body.message.signer
+      await accounts.createWithDID(accountDID, agentDID)
+      res.status(201).json({ created: true })
+    } else {
+      res.status(400).json({ created: false })
+    }
+  } catch {
+    res.status(400).json({ created: false })
+  }
+})
+
+// Add Agent - change handle to accountDID
 server.put("/accounts/:handle/agents", async (req, res) => {
   const verified = await verify(req.body.message, req.body.signature)
   if (!verified) {
@@ -135,6 +177,7 @@ server.put("/accounts/:handle/agents", async (req, res) => {
   res.status(201).json({}) 
 })
 
+// Recovery
 server.put("/accounts", async (req, res) => {
   const verified = await verify(req.body.message, req.body.signature)
   if (!verified) {
@@ -164,6 +207,7 @@ server.put("/accounts", async (req, res) => {
 
   res.status(201).json({cid: cid.toString()})
 });
+
 
 server.get("/forestCID/:handle", async (req, res) => {
   try {
