@@ -1,4 +1,5 @@
 import * as uint8arrays from 'uint8arrays';
+import { ProfileRepository } from '../repository/profile/profile';
 
 class Profile {
   constructor(args) {
@@ -20,31 +21,6 @@ class Profile {
       text: this.text,
       appleCreds: this.appleCreds
     }
-  }
-}
-
-class ProfileRepository {
-  constructor(agent) {
-    this.agent = agent
-    this.filename = "profile.json" 
-  }
-
-  async initalise(){
-    // TODO return if files exist before
-    await this.agent.updatePrivateFile(this.filename, () => { return {} })
-  }
-
-  async get(){
-    return await this.agent.readPrivateFile(this.filename)
-  }
-
-  async set(params){
-    let profile = await this.get()
-
-    await this.agent.updatePrivateFile(this.filename, (content) => {
-      content = {...profile, ...params}
-      return content
-    })
   }
 }
 
@@ -109,30 +85,6 @@ export class Account {
     }
     return success
   }
-}
-
-//represents account on the network in the context of an application running account-fs
-//  applicationDID to be used as the application context
-//  `create` calls Hub with applicationDID & `signed payload` from applicationDID 
-//   to creates root fs, and get accessKey for the subfolder back & UCAN for forestCID edit// need to be implemented on Hub's Account Service
-export class AccountV1 {
-  constructor(agent) {
-    this.agent = agent
-    this.repositories = { profile: new ProfileRepository(agent) }
-  } 
-
-  async create(accountDID, siweMessage, siweSignature) {
-    // TODO review failure scenarios of register
-    const success = await this.agent.register(accountDID, siweMessage, siweSignature)
-
-    if (success) {
-      // Initialise Profile Repo and also additional Repos
-      await this.repositories.profile.initalise()
-    }
-    return success
-  }
-
-  // recovery - not needed for facaster login
 }
 
 class RecoveryKit {

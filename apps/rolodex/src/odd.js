@@ -21,7 +21,8 @@ window.shovel = program
 
 const contactRepo = new PeopleRepository(program.agent)
 const account = new Account(program.agent)
-const accountv1 = new AccountV1(program.agent)
+const accountv1 = new AccountV1(program.agent, ["PEOPLE"])
+shovel.accountv1 = accountv1
 
 customElements.define('contact-table', ContactTable);
 
