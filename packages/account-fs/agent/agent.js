@@ -228,6 +228,7 @@ export const AccountCapability = {
     await this.runtime.removeItem(SHOVEL_FS_FOREST_CID)
     await this.runtime.removeItem(SHOVEL_AGENT_WRITE_KEYPAIR)
     await this.runtime.removeItem(SHOVEL_ACCOUNT_HANDLE)
+    await this.runtime.removeItem(SHOVEL_ACCOUNT_DID)
   },
 
   async activeSession() {
@@ -369,7 +370,13 @@ export class Agent {
   }
 
   async accountDID() {
-    return await this.runtime.getItem(SHOVEL_ACCOUNT_DID)
+    const accountDID = await this.runtime.getItem(SHOVEL_ACCOUNT_DID)
+    if (accountDID == null) {
+      return await this.DID()
+    } else {
+      return accountDID 
+    }
+
   }
   
   async bootstrap(){
