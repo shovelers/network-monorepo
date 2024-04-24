@@ -274,10 +274,10 @@ export const StorageCapability = {
     await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
 
     let cid = CID.decode(forestCID).toString()
-    let handle = await this.handle()
+    let accountDID = await this.accountDID()
 
-    const envelope = await this.envelop({cid: cid, handle: handle})
-    await this.axios_client.post('/pin', envelope).then(async (response) => {
+    const envelope = await this.envelop({cid: cid})
+    await this.axios_client.post(`/v1/accounts/${accountDID}/head`, envelope).then(async (response) => {
       console.log(response.status)
     }).catch((e) => {
       console.log(e);
@@ -324,6 +324,10 @@ export class Agent {
 
   async handle() {
     return await this.runtime.getItem(SHOVEL_ACCOUNT_HANDLE)
+  }
+
+  async accountDID() {
+    return await this.runtime.getItem(SHOVEL_ACCOUNT_DID)
   }
 
   async bootstrap(){
