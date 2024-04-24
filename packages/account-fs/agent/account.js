@@ -30,21 +30,18 @@ class ProfileRepository {
   }
 
   async initalise(){
-    // await this.agent.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
+    await this.agent.updatePrivateFile(this.filename, () => { return {} })
   }
 
-  async getProfile(){
-    this.profile = await this.agent.readPrivateFile(this.filename)
-    return this.profile
+  async get(){
+    return await this.agent.readPrivateFile(this.filename)
   }
 
-  async editProfile(params){
-    if (!this.profile) {
-      await this.getProfile()
-    }
+  async set(params){
+    let profile = await this.get()
 
     await this.agent.updatePrivateFile(this.filename, (content) => {
-      content = {...this.profile, ...params}
+      content = {...profile, ...params}
       return content
     })
   }
@@ -60,11 +57,11 @@ export class Account {
   }
 
   async getProfile(){
-    return await this.profileRepo.getProfile()
+    return await this.profileRepo.get()
   }
 
   async editProfile(params){
-    return await this.profileRepo.editProfile(params)
+    return await this.profileRepo.set(params)
   }
 
   // TODO - change signature - to take accountDID instead of handle
@@ -120,11 +117,18 @@ export class Account {
 export class AccountV1 {
   constructor(agent) {
     this.agent = agent
+    this.repositories = { profile: new ProfileRepository(agent) }
   } 
 
   async create(accountDID, siweMessage, siweSignature) {
-    // Initialise Profile Repo and also additional Repos
-    return await program.agent.register(accountDID, siweMessage, siweSignature)
+    // TODO review failure scenarios of register
+    const success = await this.agent.register(accountDID, siweMessage, siweSignature)
+
+    if (success) {
+      // Initialise Profile Repo and also additional Repos
+      await this.repositories.profile.initalise()
+    }
+    return success
   }
 
   // recovery - not needed for facaster login

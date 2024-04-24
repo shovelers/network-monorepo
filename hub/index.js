@@ -83,6 +83,28 @@ server.post('/pin', async (req, res) => {
   res.status(201).json({})
 });
 
+// TODO - PUT /accounts/:accountDID/head
+// TODO - authz - ACL based agent list check - UCAN to switch to OCap
+server.post('/v1/accounts/:accountDID/head', async (req, res) => { 
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({error: "InvalidSignature"})
+    return
+  }
+
+  const canPin = await accounts.validAgentV1(req.params.accountDID, req.body.message.signer)
+  if (!canPin) {
+    res.status(401).json({error: "InvalidAgent"})
+    return
+  }
+
+  // Possible failure scenario where head gets updated but block is not pinned
+  await accounts.pin(req.params.accountDID, req.body.message.cid)
+  node.pins.add(CID.parse(req.body.message.cid)).then(() => { console.log("pin complete", req.params.accountDID, req.body.message.cid) })
+  
+  res.status(201).json({})
+});
+
 // Todo - accountDID as primary key, move handles to separate naming layer
 class Accounts {
   constructor(redis) {
@@ -94,6 +116,7 @@ class Accounts {
     return await this.addAgent(fullname)
   }
 
+// TODO - authz - ACL based agent list check - UCAN to switch to OCap - remove agents list
   async createOrAdd(accountDID, agentDID) {
     var registeredDID = await this.redis.hGet(`account:${accountDID}`, "id")
     if (registeredDID == accountDID) {
@@ -115,7 +138,16 @@ class Accounts {
   }
 
   async validAgent(fullname) {
+    // TODO check for accountDID and agentDID    
     return await this.redis.sIsMember("accounts", fullname)
+  }
+
+  async validAgentV1(accountDID, agentDID) {
+    return await this.redis.sIsMember(`agents:${accountDID}`, agentDID)
+  }
+
+  async pin(accountDID, cid){
+    return await this.redis.hSet(`account:${accountDID}`, 'head', cid)
   }
 }
 const accounts = new Accounts(redisClient)

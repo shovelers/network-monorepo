@@ -49,6 +49,7 @@
       farcasterClient.watchStatus({
         channelToken: channel.data.channelToken,
       }).then((status) => {
+        console.log(status)
         farcasterClient.verifySignInMessage({
          nonce: status.data.nonce,
          domain: 'localhost:4000',
@@ -59,7 +60,8 @@
          if (response.success) {
            console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username, agentDID, status.data.message, status.data.signature)
            let accountDID = `did:pkh:eip155:${response.data.chainId}:${response.data.address}`
-           farcasterSignup(accountDID, status.data.message, status.data.signature)
+           let profileData = { handle: status.data.username, name: status.data.displayName, text: status.data.bio, tags: [] }
+           farcasterSignup(accountDID, status.data.message, status.data.signature, profileData)
          }
         })
       })
