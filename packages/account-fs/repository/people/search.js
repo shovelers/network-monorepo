@@ -63,6 +63,7 @@ export const SearchCapability = {
     
     console.log("starting searching", handle)
 
+    // TODO replace with new v1 api
     //fetch cid using handle
     return await this.axios_client.get(`/forestCID/${handle}`).then(async (response) => {
       let forestCID = response.data.cid
