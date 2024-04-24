@@ -43,18 +43,6 @@ const peers = await node.libp2p.peerStore.all()
 console.log("node address:", multiaddrs);
 console.log("peers:", peers.length)
 
-server.get("/bootstrap", async (req, res) => {
-  res.status(200).json({
-    peerId: node.libp2p.peerId.toString(),
-    peers: peers.length
-  }) 
-});
-
-server.get("/metrics", async (req, res) => {
-  res.write(await client.register.metrics());
-  res.end();
-})
-
 async function verify(message, signature){
   const pubKey = DIDKey.fromString(message.signer).publicKey
   const binMessage = uint8arrays.fromString(JSON.stringify(message)) 
@@ -62,50 +50,7 @@ async function verify(message, signature){
   return await verifiers.verify({message: binMessage, signature: binSignature, publicKey: pubKey})
 }
 
-server.post('/pin', async (req, res) => { 
-  const verified = await verify(req.body.message, req.body.signature)
-  if (!verified) {
-    res.status(401).json({error: "InvalidSignature"})
-    return
-  }
-
-  const canPin = await accounts.validAgent(`${req.body.message.handle}#${req.body.message.signer}`)
-  if (!canPin) {
-    res.status(401).json({error: "InvalidAgent"})
-    return
-  }
-
-  var cid = CID.parse(req.body.message.cid)
-  var handle = req.body.message.handle
-  await node.datastore.put(new Key('/handle/' + handle), cid.bytes)
-  var pin = node.pins.add(cid)
-  console.log("pin", cid)
-  res.status(201).json({})
-});
-
-// TODO - PUT /accounts/:accountDID/head
-// TODO - authz - ACL based agent list check - UCAN to switch to OCap
-server.post('/v1/accounts/:accountDID/head', async (req, res) => { 
-  const verified = await verify(req.body.message, req.body.signature)
-  if (!verified) {
-    res.status(401).json({error: "InvalidSignature"})
-    return
-  }
-
-  const canPin = await accounts.validAgentV1(req.params.accountDID, req.body.message.signer)
-  if (!canPin) {
-    res.status(401).json({error: "InvalidAgent"})
-    return
-  }
-
-  // Possible failure scenario where head gets updated but block is not pinned
-  await accounts.pin(req.params.accountDID, req.body.message.cid)
-  node.pins.add(CID.parse(req.body.message.cid)).then(() => { console.log("pin complete", req.params.accountDID, req.body.message.cid) })
-  
-  res.status(201).json({})
-});
-
-// Todo - accountDID as primary key, move handles to separate naming layer
+// Todo - accountDID as primary key, move handles to separate naming layer - Redo modelling
 class Accounts {
   constructor(redis) {
     this.redis =  redis
@@ -146,13 +91,19 @@ class Accounts {
     return await this.redis.sIsMember(`agents:${accountDID}`, agentDID)
   }
 
-  async pin(accountDID, cid){
+  async setHead(accountDID, cid){
     return await this.redis.hSet(`account:${accountDID}`, 'head', cid)
+  }
+
+  async getHead(accountDID){
+    return await this.redis.hGet(`account:${accountDID}`, 'head')
   }
 }
 const accounts = new Accounts(redisClient)
 
 /*
+  Account APIs
+
    Registration
 
     body
@@ -253,6 +204,60 @@ server.put("/accounts", async (req, res) => {
 });
 
 
+/*
+  Storage APIs
+*/
+server.post('/pin', async (req, res) => { 
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({error: "InvalidSignature"})
+    return
+  }
+
+  const canPin = await accounts.validAgent(`${req.body.message.handle}#${req.body.message.signer}`)
+  if (!canPin) {
+    res.status(401).json({error: "InvalidAgent"})
+    return
+  }
+
+  var cid = CID.parse(req.body.message.cid)
+  var handle = req.body.message.handle
+  await node.datastore.put(new Key('/handle/' + handle), cid.bytes)
+  var pin = node.pins.add(cid)
+  console.log("pin", cid)
+  res.status(201).json({})
+});
+
+// TODO - authz - ACL based agent list check - UCAN to switch to OCap
+server.post('/v1/accounts/:accountDID/head', async (req, res) => { 
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({error: "InvalidSignature"})
+    return
+  }
+
+  const canPin = await accounts.validAgentV1(req.params.accountDID, req.body.message.signer)
+  if (!canPin) {
+    res.status(401).json({error: "InvalidAgent"})
+    return
+  }
+
+  // Possible failure scenario where head gets updated but block is not pinned
+  await accounts.setHead(req.params.accountDID, req.body.message.cid)
+  node.pins.add(CID.parse(req.body.message.cid)).then(() => { console.log("pin complete", req.params.accountDID, req.body.message.cid) })
+  
+  res.status(201).json({})
+});
+
+server.get("/v1/accounts/:accountDID/head", async (req, res) => {
+  const cid = await accounts.getHead(req.params.accountDID)
+  if (cid) {
+    res.status(200).json({cid: cid})
+  } else {
+    res.status(404).json({})
+  }
+});
+
 server.get("/forestCID/:handle", async (req, res) => {
   try {
     var cid = await node.datastore.get(new Key('/handle/' + req.params["handle"]))
@@ -262,6 +267,24 @@ server.get("/forestCID/:handle", async (req, res) => {
     res.status(404).json({})
   }
 });
+
+/* 
+  Network APIs
+*/
+server.get("/bootstrap", async (req, res) => {
+  res.status(200).json({
+    peerId: node.libp2p.peerId.toString(),
+    peers: peers.length
+  }) 
+});
+
+/*
+  Admin APIs
+*/
+server.get("/metrics", async (req, res) => {
+  res.write(await client.register.metrics());
+  res.end();
+})
 
 server.get("/", async (req, res) => {
   const numberOfDevices = await redisClient.sCard("accounts"); 
