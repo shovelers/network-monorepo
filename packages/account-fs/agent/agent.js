@@ -151,6 +151,22 @@ export const AccountCapability = {
     return success
   },
 
+  async appendName(id, provider) {
+    let accountDID = await this.accountDID()
+
+    let success = false
+    const envelope = await this.envelop({id: id, provider: provider})
+    await this.axios_client.put(`/v1/accounts/${accountDID}/names`, envelope).then(async (response) => {
+      console.log("name submitted", response.status)
+      success = true
+    }).catch(async (e) => {
+      console.log(e);
+      return e
+    })
+
+    return success
+  },
+
   async linkDevice(message) {
     let success = false
     let handle = await this.handle()

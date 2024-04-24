@@ -30,6 +30,7 @@ class ProfileRepository {
   }
 
   async initalise(){
+    // TODO return if files exist before
     await this.agent.updatePrivateFile(this.filename, () => { return {} })
   }
 
