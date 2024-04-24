@@ -9,7 +9,7 @@ export class PrivateFS {
     this.rng = new Rng()
   }
 
-  async initalise() {
+  async initialise() {
     const initialForest = new PrivateForest(this.rng)
     const privateDir = new PrivateDirectory(initialForest.emptyName(), new Date(), this.rng)
   
@@ -17,6 +17,9 @@ export class PrivateFS {
 
     this.rootDir = rootDir
     this.forest = forest
+    
+    var [ accessKey, forest ]  = await this.rootDir.store(this.forest, this.store, this.rng)
+    return accessKey.toBytes()
   }
 
   async loadForest(accessKey, forestCID) {
@@ -39,7 +42,7 @@ export class PrivateFS {
     let file = this.path.concat(filename)
 
     if (this.rootDir == null) {
-      await this.initalise()
+      await this.initialise()
     }
 
     var { rootDir, forest } = await this.rootDir.write(
@@ -69,7 +72,7 @@ export class PrivateFS {
     let file = this.path.concat(filename)
 
     if (this.rootDir == null) {
-      await this.initalise()
+      await this.initialise()
     }
 
     var content = await this.rootDir.read(file, true, this.forest, this.store)

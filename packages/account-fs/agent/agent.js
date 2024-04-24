@@ -167,6 +167,21 @@ export const AccountCapability = {
     return success
   },
 
+  async setCustodyKey(accessKey) {
+    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
+
+    const encodedAccessKey = uint8arrays.toString(accessKey, 'base64url');
+    let accountDID = await this.accountDID()
+
+    const envelope = await this.envelop({accessKey: encodedAccessKey})
+    await this.axios_client.put(`/v1/accounts/${accountDID}/custody`, envelope).then(async (response) => {
+      console.log(response.status)
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
+  },
+
   async linkDevice(message) {
     let success = false
     let handle = await this.handle()
@@ -356,7 +371,7 @@ export class Agent {
   async accountDID() {
     return await this.runtime.getItem(SHOVEL_ACCOUNT_DID)
   }
-
+  
   async bootstrap(){
     await this.axios_client.get('/bootstrap').then(async (response) => {
       this.syncServer = this.prefix + response.data.peerId

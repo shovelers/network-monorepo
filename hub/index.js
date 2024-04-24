@@ -99,9 +99,17 @@ class Accounts {
     return await this.redis.hGet(`account:${accountDID}`, 'head')
   }
 
+  async setAccessKey(accountDID, accessKey){
+    return await this.redis.hSet(`account:${accountDID}`, 'accessKey', accessKey)
+  }
+
+  async getAccessKey(accountDID){
+    return await this.redis.hGet(`account:${accountDID}`, 'accessKey')
+  }
+
   async appendName(accountDID, name){
     let names = await this.getNames(accountDID)
-    names = (names) ? name : names
+    names = (names == null) ? name : names
     names = (names.split(',').includes(name)) ? names : `${names},${name}` 
     return await this.redis.hSet(`account:${accountDID}`, 'names', names)
   }
@@ -231,6 +239,25 @@ server.put("/v1/accounts/:accountDID/names", async (req, res) => {
   // TODO enforce schema
   const name = `${req.body.message.id}@${req.body.message.provider}`
   await accounts.appendName(req.params.accountDID, name)
+  res.status(201).json({})
+})
+
+// Custody
+server.put("/v1/accounts/:accountDID/custody", async (req, res) => {
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({error: "InvalidSignature"})
+    return
+  }
+
+  const valid = await accounts.validAgentV1(req.params.accountDID, req.body.message.signer)
+  if (!valid) {
+    res.status(401).json({error: "InvalidAgent"})
+    return
+  }
+
+  const accessKey = req.body.message.accessKey
+  await accounts.setAccessKey(req.params.accountDID, accessKey) 
   res.status(201).json({})
 })
 
