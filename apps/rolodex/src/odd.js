@@ -52,12 +52,10 @@ async function signup(username, requester) {
 }
 
 async function farcasterSignup(accountDID, siweMessage, signature) {
-  // await accountv1.create(accountDID, siweMessage, signature)
   // What will be the profile/handle here? /applicationDID/profile.json - {} Initialised Rolodex ProfileSchema with Farcaster Profile data
   // When do we register a DCN name? No DCN handle for farcaster login, only name for accountDID
   // How to intialise repostiories? People repo
-
-  return await program.agent.register(accountDID, siweMessage, signature)
+  return await accountv1.create(accountDID, siweMessage, signature)
 }
 
 async function getProfile() {

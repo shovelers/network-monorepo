@@ -23,12 +23,14 @@ class Profile {
   }
 }
 
-//TODO move profile file/object to Roloedx, and reduce to DCN account management
-export class Account {
+class ProfileRepository {
   constructor(agent) {
     this.agent = agent
-    this.filename = "profile.json"
-    this.profile = null
+    this.filename = "profile.json" 
+  }
+
+  async initalise(){
+    // await this.agent.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
   }
 
   async getProfile(){
@@ -46,12 +48,31 @@ export class Account {
       return content
     })
   }
+}
+
+//TODO move profile file/object to Roloedx, and reduce to DCN account management
+export class Account {
+  constructor(agent) {
+    this.agent = agent
+    this.filename = "profile.json"
+    this.profile = null
+    this.profileRepo = new ProfileRepository(agent)
+  }
+
+  async getProfile(){
+    return await this.profileRepo.getProfile()
+  }
+
+  async editProfile(params){
+    return await this.profileRepo.editProfile(params)
+  }
 
   // TODO - change signature - to take accountDID instead of handle
   async create(handle, initialFiles) {
     const success = await this.agent.registerUser(handle)
 
     if (success) {
+      //TODO replace file initialisation with repo initialisation
       await this.agent.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
       await initialFiles.forEach(async element => {
         await this.agent.updatePrivateFile(element.name, () => { return element.initialData })
@@ -101,7 +122,9 @@ export class AccountV1 {
     this.agent = agent
   } 
 
-  async create() {
+  async create(accountDID, siweMessage, siweSignature) {
+    // Initialise Profile Repo and also additional Repos
+    return await program.agent.register(accountDID, siweMessage, siweSignature)
   }
 
   // recovery - not needed for facaster login
