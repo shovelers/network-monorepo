@@ -254,6 +254,17 @@ export const StorageCapability = {
     }
   },
 
+  async fileExists(filename) {
+    try {
+      let content = await this.fs.read(filename)
+      JSON.parse(content)
+      return true
+    } catch (error) {
+      console.log("missing file: ", filename, error)
+      return false
+    }
+  },
+
   async readPrivateFile(filename) {
     try {
       let content = await this.fs.read(filename)

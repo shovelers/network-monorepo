@@ -1,8 +1,5 @@
 import { Person } from "./person"
 
-
-
-
 interface Contact {
   PRODID: string;
   UID: string;
@@ -32,6 +29,13 @@ export class PeopleRepository {
   private filename: string = "contacts.json";
   constructor(agent: any) {
     this.agent = agent
+  }
+
+  async initialise(): Promise<void> {
+    const exists = await this.agent.fileExists(this.filename)
+    if (!exists) {
+      await this.agent.updatePrivateFile(this.filename, () => { return { contactList: {}} })
+    }
   }
 
   async list(): Promise<Person[]> {

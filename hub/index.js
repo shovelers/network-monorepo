@@ -101,7 +101,8 @@ class Accounts {
 
   async appendName(accountDID, name){
     let names = await this.getNames(accountDID)
-    names = (names) ? `${names},${name}` : name 
+    names = (names) ? name : names
+    names = (names.split(',').includes(name)) ? names : `${names},${name}` 
     return await this.redis.hSet(`account:${accountDID}`, 'names', names)
   }
 
@@ -229,11 +230,8 @@ server.put("/v1/accounts/:accountDID/names", async (req, res) => {
 
   // TODO enforce schema
   const name = `${req.body.message.id}@${req.body.message.provider}`
-  if (await accounts.appendName(req.params.accountDID, name)) {
-    res.status(201).json({})
-  } else {
-    res.status(500).json({error: "UnknownException"})
-  }
+  await accounts.appendName(req.params.accountDID, name)
+  res.status(201).json({})
 })
 
 /*
