@@ -98,6 +98,16 @@ class Accounts {
   async getHead(accountDID){
     return await this.redis.hGet(`account:${accountDID}`, 'head')
   }
+
+  async appendName(accountDID, name){
+    let names = await this.getNames(accountDID)
+    names = (names) ? `${names},${name}` : name 
+    return await this.redis.hSet(`account:${accountDID}`, 'names', names)
+  }
+
+  async getNames(accountDID) {
+    return await this.redis.hGet(`account:${accountDID}`, 'names')
+  }
 }
 const accounts = new Accounts(redisClient)
 
@@ -203,6 +213,28 @@ server.put("/accounts", async (req, res) => {
   res.status(201).json({cid: cid.toString()})
 });
 
+// Names
+server.put("/v1/accounts/:accountDID/names", async (req, res) => {
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({error: "InvalidSignature"})
+    return
+  }
+
+  const valid = await accounts.validAgentV1(req.params.accountDID, req.body.message.signer)
+  if (!valid) {
+    res.status(401).json({error: "InvalidAgent"})
+    return
+  }
+
+  // TODO enforce schema
+  const name = `${req.body.message.id}@${req.body.message.provider}`
+  if (await accounts.appendName(req.params.accountDID, name)) {
+    res.status(201).json({})
+  } else {
+    res.status(500).json({error: "UnknownException"})
+  }
+})
 
 /*
   Storage APIs
