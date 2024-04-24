@@ -1,5 +1,6 @@
 import { PeopleRepository } from "./repository/people/people.ts";
 import { ProfileRepository } from "./repository/profile/profile.js";
+import * as uint8arrays from 'uint8arrays';
 
 //represents account on the network in the context of an application running account-fs
 //  applicationDID to be used as the application context
@@ -17,6 +18,10 @@ export class AccountV1 {
   async create(accountDID, siweMessage, siweSignature) {
     // TODO review failure scenarios of register
     const success = await this.agent.register(accountDID, siweMessage, siweSignature)
+
+    // Initialise file system, get root key and submit for custody
+    const accessKey = await this.agent.fs.initialise()
+    await this.agent.setCustodyKey(accessKey)
 
     if (success) {
       for (const [key, value] of Object.entries(this.repositories)) {
