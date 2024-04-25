@@ -53,11 +53,6 @@ async function signup(username, requester) {
 }
 
 async function farcasterSignup(accountDID, siweMessage, siweSignature, profileData, fid) {
-  // What will be the profile/handle here? /applicationDID/profile.json - {} Initialised Rolodex ProfileSchema with Farcaster Profile data
-    // tags - empty, text - bio, name - displayName, handle - username, fid?
-  // When do we register a DCN name? No DCN handle for farcaster login, only name for accountDID
-  // How to intialise repostiories? People repo
-  // Submit access key for Custody 
   await accountv1.create(accountDID, siweMessage, siweSignature)
   await accountv1.repositories.profile.set(profileData)
   await accountv1.agent.appendName(fid, 'farcaster')

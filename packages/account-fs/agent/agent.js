@@ -137,11 +137,19 @@ export const AccountCapability = {
   async register(accountDID, siweMessage, siweSignature) {
     await this.runtime.setItem(SHOVEL_ACCOUNT_DID, accountDID)
 
-    let success = false
+    let success = {status: false, created: true}
     const envelope = await this.envelop({accountDID: accountDID, siweMessage: siweMessage, siweSignature: siweSignature})
     await this.axios_client.post('/v1/accounts', envelope).then(async (response) => {
       console.log("account creation status", response.status)
-      success = true
+      if (response.data.created == false) {
+        const accessKey = uint8arrays.fromString(response.data.accessKey, 'base64url');
+        await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
+
+        const forestCID = CID.parse(response.data.forestCID).bytes
+        await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
+        success.created = false
+      }
+      success.status = true
     }).catch(async (e) => {
       console.log(e);
       await this.destroy()
@@ -265,7 +273,7 @@ export const StorageCapability = {
         await this.fs.loadForest(accessKey, forestCID)
       }
     } catch (err) {
-      console.log("missing datastore keys, need an account")
+      console.log("load failed: ", err.name, err.message)
       return 
     }
   },
@@ -276,7 +284,7 @@ export const StorageCapability = {
       JSON.parse(content)
       return true
     } catch (error) {
-      console.log("missing file: ", filename, error)
+      console.log("missing file: ", filename, error.name)
       return false
     }
   },
@@ -376,7 +384,6 @@ export class Agent {
     } else {
       return accountDID 
     }
-
   }
   
   async bootstrap(){

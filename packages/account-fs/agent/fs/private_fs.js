@@ -16,9 +16,9 @@ export class PrivateFS {
     var { rootDir, forest } = await privateDir.mkdir(this.path, true, new Date(), initialForest, this.store, this.rng);
 
     this.rootDir = rootDir
-    this.forest = forest
     
-    var [ accessKey, forest ]  = await this.rootDir.store(this.forest, this.store, this.rng)
+    var [ accessKey, forest ]  = await this.rootDir.store(forest, this.store, this.rng)
+    this.forest = forest
     return accessKey.toBytes()
   }
 

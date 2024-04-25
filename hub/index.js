@@ -167,7 +167,9 @@ server.post("/v1/accounts", async (req, res) => {
       if (response) {
         res.status(201).json({ created: response })
       } else {
-        res.status(204).json({ created: response })
+        const accessKey = await accounts.getAccessKey(accountDID) 
+        const cid = await accounts.getHead(accountDID)
+        res.status(200).json({ created: response, accessKey: accessKey, forestCID: cid })
       }
     } else {
       res.status(400).json({ created: false, msg: "SiweSignatureCheckFailed" })
