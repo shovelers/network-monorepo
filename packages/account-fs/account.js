@@ -19,11 +19,14 @@ export class AccountV1 {
     // TODO review failure scenarios of register
     const success = await this.agent.register(accountDID, siweMessage, siweSignature)
 
-    // Initialise file system, get root key and submit for custody
-    const accessKey = await this.agent.fs.initialise()
-    await this.agent.setCustodyKey(accessKey)
+    if (success.status) {
+      if (success.created) {
+        const accessKey = await this.agent.fs.initialise()
+        await this.agent.setCustodyKey(accessKey)
+      } else {
+        await this.agent.load()
+      }
 
-    if (success) {
       for (const [key, value] of Object.entries(this.repositories)) {
         await value.initialise()
       }
