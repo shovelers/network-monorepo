@@ -309,9 +309,9 @@ server.post('/v1/accounts/:accountDID/head', async (req, res) => {
 });
 
 server.get("/v1/accounts/:accountDID/head", async (req, res) => {
-  const cid = await accounts.getHead(req.params.accountDID)
-  if (cid) {
-    res.status(200).json({cid: cid})
+  const head = await accounts.getHead(req.params.accountDID)
+  if (head) {
+    res.status(200).json({head: head})
   } else {
     res.status(404).json({})
   }

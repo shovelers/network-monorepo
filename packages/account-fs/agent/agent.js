@@ -276,6 +276,26 @@ export const StorageCapability = {
       console.log("load failed: ", err.name, err.message)
       return 
     }
+
+    let accountDID = await this.accountDID()
+    if (accountDID) {
+      await this.axios_client.get(`/v1/accounts/${accountDID}/head`).then(async (response) => {
+        const headCID = CID.parse(response.data.head).bytes
+        console.log("checking head")
+        
+        const diff = await this.fs.compareWithRemote(headCID)
+        const merge = await this.fs.mergeWithRemote(headCID)
+        // check the cid after merge
+        console.log("setting mergedcid as forestcid :", merge.mergedForestCID)
+        this.runtime.setItem(SHOVEL_FS_FOREST_CID, merge.mergedForestCID)
+        window.diff = diff
+        window.merge = merge
+        console.log("diff :", diff, "merge :", merge)
+      }).catch((e) => {
+        console.log(e)
+        return e
+      })
+    }
   },
 
   async fileExists(filename) {
@@ -321,7 +341,7 @@ export const StorageCapability = {
   },
 
   async pin(accessKey, forestCID) {
-    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
+    //Todo: Pull remoteCID, Merge locally, see the final file, then push 
     await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
 
     let cid = CID.decode(forestCID).toString()
@@ -378,12 +398,7 @@ export class Agent {
   }
 
   async accountDID() {
-    const accountDID = await this.runtime.getItem(SHOVEL_ACCOUNT_DID)
-    if (accountDID == null) {
-      return await this.DID()
-    } else {
-      return accountDID 
-    }
+    return await this.runtime.getItem(SHOVEL_ACCOUNT_DID)
   }
   
   async bootstrap(){
