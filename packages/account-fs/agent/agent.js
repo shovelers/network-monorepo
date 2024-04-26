@@ -278,23 +278,8 @@ export const StorageCapability = {
     }
 
     let accountDID = await this.accountDID()
-    if (accountDID) {
-      await this.axios_client.get(`/v1/accounts/${accountDID}/head`).then(async (response) => {
-        const headCID = CID.parse(response.data.head).bytes
-        console.log("checking head")
-        
-        const diff = await this.fs.compareWithRemote(headCID)
-        const merge = await this.fs.mergeWithRemote(headCID)
-        // check the cid after merge
-        console.log("setting mergedcid as forestcid :", merge.mergedForestCID)
-        this.runtime.setItem(SHOVEL_FS_FOREST_CID, merge.mergedForestCID)
-        window.diff = diff
-        window.merge = merge
-        console.log("diff :", diff, "merge :", merge)
-      }).catch((e) => {
-        console.log(e)
-        return e
-      })
+    if (accountDID) { 
+      await this.syncWithHub(accountDID)
     }
   },
 
@@ -334,20 +319,19 @@ export const StorageCapability = {
   async updatePrivateFile(filename, mutationFunction) {
     let content = await this.readPrivateFile(filename)
     let newContent = mutationFunction(content)
-    var [access_key, forest_cid] = await this.fs.write(filename, JSON.stringify(newContent))
+    var [accessKey, forestCID] = await this.fs.write(filename, JSON.stringify(newContent))
 
-    await this.pin(access_key,forest_cid)
+    await this.pin()
     return newContent
   },
 
-  async pin(accessKey, forestCID) {
-    //Todo: Pull remoteCID, Merge locally, see the final file, then push 
-    await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
-
-    let cid = CID.decode(forestCID).toString()
+  async pin() {
     let accountDID = await this.accountDID()
-
-    const envelope = await this.envelop({cid: cid})
+    
+    //Pulls remoteCID, Merge locally, see the final file, then push
+    const mergedCID = await this.syncWithHub(accountDID)
+    const envelope = await this.envelop({cid: CID.decode(mergedCID).toString()})
+    
     await this.axios_client.post(`/v1/accounts/${accountDID}/head`, envelope).then(async (response) => {
       console.log(response.status)
     }).catch((e) => {
@@ -362,7 +346,28 @@ export const StorageCapability = {
 
   async forestCID() {
     return await this.runtime.getItem(SHOVEL_FS_FOREST_CID)
-  }
+  },
+
+  async syncWithHub(accountDID) {
+    let merge
+    
+    await this.axios_client.get(`/v1/accounts/${accountDID}/head`).then(async (response) => {
+      const headCID = CID.parse(response.data.head).bytes
+      console.log("checking head")
+      
+      const diff = await this.fs.compareWithRemote(headCID)
+      merge = await this.fs.mergeWithRemote(headCID)
+      // check the cid after merge
+      console.log("setting mergedcid as forestcid :", merge.mergedForestCID)
+      this.runtime.setItem(SHOVEL_FS_FOREST_CID, merge.mergedForestCID)
+      console.log("diff :", diff, "merge :", merge)
+    }).catch((e) => {
+      console.log(e)
+      return e
+    })
+    
+    return merge.mergedForestCID
+  }, 
 }
 
 export class Agent {
