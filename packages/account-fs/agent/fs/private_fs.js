@@ -31,11 +31,28 @@ export class PrivateFS {
     var node = await PrivateNode.load(key, forest, this.store)
     console.log("loaded node:", node)
 
+    //find the latest revision of the node
+    node = await node.searchLatest(forest, this.store)
+    console.log("latest node:", node)
+
     //load the node as_dir to get the rootDir 
     var rootDir = await node.asDir(forest, this.store)
  
     this.forest = forest
     this.rootDir = rootDir
+  }
+
+  async compareWithRemote(remoteCID){
+    let remoteForest = await PrivateForest.load(remoteCID, this.store)
+    return await this.forest.diff(remoteForest, this.store)
+  }
+
+  async mergeWithRemote(remoteCID) {
+    let remoteForest = await PrivateForest.load(remoteCID, this.store)
+    let mergedForest = await this.forest.merge(remoteForest, this.store)
+    this.forest = mergedForest
+    console.log("remoteCID :", remoteCID, "mergedCID :", await mergedForest.store(this.store))
+    return {mergedForest: mergedForest, mergedForestCID: await mergedForest.store(this.store)}
   }
 
   async write(filename, content) {
@@ -61,11 +78,10 @@ export class PrivateFS {
 
     var [ accessKey, forest ]  = await this.rootDir.store(this.forest, this.store, this.rng)
 
-    this.accessKey = accessKey
     this.forest = forest
 
     var forestCID = await forest.store(this.store)
-    return [this.accessKey.toBytes(), forestCID]
+    return [accessKey.toBytes(), forestCID]
   }
 
   async read(filename) {
