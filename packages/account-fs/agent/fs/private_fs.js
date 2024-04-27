@@ -51,8 +51,7 @@ export class PrivateFS {
     let remoteForest = await PrivateForest.load(remoteCID, this.store)
     let mergedForest = await this.forest.merge(remoteForest, this.store)
     this.forest = mergedForest
-    console.log("remoteCID :", remoteCID, "mergedCID :", await mergedForest.store(this.store))
-    return {mergedForest: mergedForest, mergedForestCID: await mergedForest.store(this.store)}
+    return await mergedForest.store(this.store)
   }
 
   async write(filename, content) {

@@ -279,7 +279,7 @@ export const StorageCapability = {
 
     let accountDID = await this.accountDID()
     if (accountDID) { 
-      await this.syncWithHub(accountDID)
+      await this.syncWithHub(accountDID, await this.forestCID())
     }
   },
 
@@ -321,15 +321,16 @@ export const StorageCapability = {
     let newContent = mutationFunction(content)
     var [accessKey, forestCID] = await this.fs.write(filename, JSON.stringify(newContent))
 
-    await this.pin()
+    await this.pin(forestCID)
     return newContent
   },
 
-  async pin() {
+  async pin(cid) {
     let accountDID = await this.accountDID()
     
     //Pulls remoteCID, Merge locally, see the final file, then push
-    const mergedCID = await this.syncWithHub(accountDID)
+    const mergedCID = await this.syncWithHub(accountDID, cid)
+    console.log("merged CID on first try :", mergedCID, cid)
     const envelope = await this.envelop({cid: CID.decode(mergedCID).toString()})
     
     await this.axios_client.post(`/v1/accounts/${accountDID}/head`, envelope).then(async (response) => {
@@ -348,25 +349,27 @@ export const StorageCapability = {
     return await this.runtime.getItem(SHOVEL_FS_FOREST_CID)
   },
 
-  async syncWithHub(accountDID) {
-    let merge
+  async syncWithHub(accountDID, cid) {
+    let mergedCID
     
     await this.axios_client.get(`/v1/accounts/${accountDID}/head`).then(async (response) => {
       const headCID = CID.parse(response.data.head).bytes
-      console.log("checking head")
       
       const diff = await this.fs.compareWithRemote(headCID)
-      merge = await this.fs.mergeWithRemote(headCID)
-      // check the cid after merge
-      console.log("setting mergedcid as forestcid :", merge.mergedForestCID)
-      this.runtime.setItem(SHOVEL_FS_FOREST_CID, merge.mergedForestCID)
-      console.log("diff :", diff, "merge :", merge)
+      mergedCID = await this.fs.mergeWithRemote(headCID)
+      
+      this.runtime.setItem(SHOVEL_FS_FOREST_CID, mergedCID)
+      console.log("diff :", diff, "merge :", mergedCID)
     }).catch((e) => {
-      console.log(e)
+      if (e.response.status == '404') {
+        this.runtime.setItem(SHOVEL_FS_FOREST_CID, cid)
+        mergedCID = cid
+      }
+
       return e
     })
     
-    return merge.mergedForestCID
+    return mergedCID
   }, 
 }
 
