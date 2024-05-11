@@ -103,6 +103,33 @@ async function addContact(name, email='', tags = [], text = "", links = []) {
   return contactRepo.create(person)
 }
 
+/*
+  TODOs based on S04 -
+  create a new connection file - needs requester's (accountDID, profileFile, connectionFile) and sharedContacts (Assuming all)
+
+  Filename - connections/accountDID.json - assuming not limit to length of file name.
+  {
+    connection:  {
+      DID: accountDID //accountDID of the receiver
+      Profile: `${accessKeyToFile}` //accessKey to the received profile object
+      recievedConnectionFile: `${accessKeyToFile}` //accessKey to the received connection file 
+    }
+    sharedContacts: [Person] //only with Public attributes
+    state: "PRESENT/REMOVED"
+  }
+
+  connect handshake steps -
+    requester creates connections/approverDID.json and send handshake data
+      File content - { connection: { DID: approverDID, profile: "", receivedConnectionFile: "" }, sharedContacts: "ALLContacts", state: "REQUESTED" }
+      Handshake Data - { DID: requesterDID, profile:, `${accessKeyToFile}`, receivedConnectionFile: `${accessKeyToFile}` }
+    apporover confirms the handshake, creates connection/requesterDID.json and send something back
+      File content - { connection: { DID: requesterDID, profile:, `${accessKeyToFile}`, receivedConnectionFile: `${accessKeyToFile}` }, sharedContacts: "ALLContacts", state: "CONFIRMED" }
+      Handshake Data - { DID: approverDID, profile:, `${accessKeyToFile}`, receivedConnectionFile: `${accessKeyToFile}` } 
+    requester reads something and update connections/approverDID.json with new data
+      File content - { connection: { DID: approverDID, profile:, `${accessKeyToFile}`, receivedConnectionFile: `${accessKeyToFile}` }, sharedContacts: "ALLContacts", state: "CONFIRMED" }
+
+*/
+
 // TODO - handle duplicate connections
 async function addConnection(person) {
   let connection = new Person({FN: person.FN, PRODID: person.PRODID, UID: person.UID, XML: person.XML})
