@@ -57,14 +57,14 @@ async function farcasterSignup(accountDID, siweMessage, siweSignature, profileDa
   await accountv1.create(accountDID, siweMessage, siweSignature)
   await accountv1.repositories.profile.set(profileData)
   await accountv1.agent.appendName(fid, 'farcaster')
-  //window.location.href = "/app";
+  window.location.href = "/app";
 }
 
 async function ethereumSignup(accountDID,siweMessage, siweSignature, profileData,fid) {
   await accountv1.create(accountDID, siweMessage, siweSignature)
   await accountv1.repositories.profile.set(profileData)
   await accountv1.agent.appendName(fid, 'ethereum')
-  //window.location.href = "/app";
+  window.location.href = "/app";
 }
 
 async function getNonce() {
@@ -77,8 +77,9 @@ async function getNonce() {
   }
 }
 
-async function createSiweMessage(address, nonce ) {
+async function createSiweMessage(address, nonce, requestId) {
   const message = new SiweMessage({
+      requestId,
       domain: 'localhost:4000',
       address: address,
       statement : 'Sign in via ethereum',
@@ -94,7 +95,6 @@ async function verifySiweMessage(message,signature,nonce) {
   let SiweObject = new SiweMessage(message)
   try {
     SiweObject.verify(signature,nonce);
-    console.log("Verified message")
     return true;
   }
   catch(e) {
