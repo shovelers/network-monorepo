@@ -12,7 +12,7 @@
   <body class="antialiased bg-base-100">
     <script type="module">
       
-      import { signup, recover, account, farcasterClient, farcasterSignup, createSiweMessage } from '/odd.js';
+      import { signup, recover, account, farcasterClient, farcasterSignup, createSiweMessage, getNonce, verifySiweMessage, ethereumSignup } from '/odd.js';
       window.signup = signup;
       window.recover = recover;
       const { ethers } = window;
@@ -47,14 +47,23 @@
      window.ethereumSignUp = async function() {
       connectWallet(); 
       const agentDID = await account.agent.DID()
+      const nonce = await getNonce();
       console.log("agent did",agentDID);
       const signer = await provider.getSigner();
       const address = await signer.getAddress();
       console.log('signer', signer);
       console.log('address', address);  
-      const message =  await createSiweMessage(address);
+      const message =  await createSiweMessage(address,nonce);
       const signature = await signer.signMessage(message)
-      console.log(signature);       
+      console.log('signature', signature);       
+      console.log("message", message)
+      const verified = verifySiweMessage(message,signature,nonce);
+      let accountDID = `did:pkh:eip155:1:${address}`
+      let profileData = { handle: address, name: "", text:"", tags: [] }
+      if(verified) {
+        ethereumSignup(accountDID, message, signature, profileData, "metamask")
+      }
+      
      }
 
      window.startFarcasterSignup = async function(){
@@ -86,6 +95,7 @@
            console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username, agentDID, status.data.message, status.data.signature)
            let accountDID = `did:pkh:eip155:${response.data.chainId}:${response.data.address}`
            let profileData = { handle: status.data.username, name: status.data.displayName, text: status.data.bio, tags: [] }
+           console.log("farcaster message", status.data.message);
            farcasterSignup(accountDID, status.data.message, status.data.signature, profileData, status.data.fid)
          }
         })
