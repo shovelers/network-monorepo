@@ -1,24 +1,51 @@
 ---
-import Layout from '../layouts/layout.astro';
-import { Icon } from "astro-icon";
+import { SEO } from "astro-seo";
+import Navbar from "../components/navbar.astro"
+import Footer from "../components/footer.astro"
 ---
 
-<Layout title="Decentralised Contact Network">
-  <main class="w-full antialiased flex justify-center items-center">
-    <div class="flex flex-col text-center items-center graphpaper p-12">
-      <p class="text-5xl font-bold tracking-tighter">Decentralised Contact Network</p>
-      <p class="mt-8 w-4/5 md:w-1/2 text-2xl">Protocol for creation, storage, and retrieval of contextual relationships & social graphs.</p>
-      <p class="mt-6 w-4/5 md:w-1/2">Decentralised. User-Controlled. Permissionless</p>
-      <div class="flex flex-row items-center space-x-8 mt-8">
-        <div>To stay up to date</div>
-        <a href="https://discord.gg/PmzsJeembE" target="_blank" class="flex flex-row items-center px-2.5 py-2 rounded-lg bg-black text-white">
-          <Icon class="text-white w-8 h-8 mr-2" name="ic:baseline-discord"/>
-          Join
-        </a>
-      <div>
-    </div>
-  </main>
-</Layout>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+    <meta http-equiv="refresh" content="0; URL=https://shovel.company/" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H9K0YV6H99"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-H9K0YV6H99');
+    </script>
+    <SEO
+      title="Creole Network"
+      description="Creole Network"
+      canonical={"https://creole.network"}
+      openGraph={{
+        basic: {
+        url: "https://creole.network",
+          type: "website",
+          title: `Creole Network`,
+          image: "https://creole.network/layers.png",
+        },
+        image: {
+          alt: "Creole Network Layers",
+        },
+      }}
+    />
+	</head>
+  <body class="antialiased flex flex-col justify-between min-h-screen font-mono">
+    <!-- <Navbar /> -->
+    <main class="w-full antialiased flex justify-center items-center">
+      <div class="flex flex-col text-center items-center graphpaper p-12">
+        <p> Redirecting you to shovel.company</p>       
+      </div>
+    </main>
+    <Footer />
+	</body>
+</html>
 
 <style>
 .graphpaper {
