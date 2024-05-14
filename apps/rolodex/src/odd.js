@@ -7,6 +7,7 @@ import * as uint8arrays from 'uint8arrays';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { save } from '@tauri-apps/api/dialog';
 import { writeTextFile } from '@tauri-apps/api/fs';
+import { SiweMessage } from 'siwe';
 
 const farcasterClient = createAppClient({
   relay: 'https://relay.farcaster.xyz',
@@ -57,6 +58,36 @@ async function farcasterSignup(accountDID, siweMessage, siweSignature, profileDa
   await accountv1.repositories.profile.set(profileData)
   await accountv1.agent.appendName(fid, 'farcaster')
   window.location.href = "/app";
+}
+
+async function ethereumSignup(accountDID,siweMessage, siweSignature, profileData,fid) {
+  await accountv1.create(accountDID, siweMessage, siweSignature)
+  await accountv1.repositories.profile.set(profileData)
+  await accountv1.agent.appendName(fid, 'ethereum')
+  window.location.href = "/app";
+}
+
+async function getNonce() {
+  try {
+    const response = await axios_client.get('/nonce');
+    return response.data;  
+  } catch (error) {
+    console.error('Error fetching nonce:', error);
+    throw error;  
+  }
+}
+
+async function createSiweMessage(address ) {
+  const message = new SiweMessage({
+      domain: 'localhost:4000',
+      address: address,
+      statement : 'Sign in via ethereum',
+      uri: 'http://localhost:4000/home',
+      version: '1',
+      chainId: '1',
+      nonce: await getNonce()
+  });
+  return message.prepareMessage();
 }
 
 async function getProfile() {
@@ -338,5 +369,6 @@ export {
   appleCredsPresent,
   getContactForRelate,
   downloadContactsDataLocally,
-  portOldContacts
+  portOldContacts,
+  createSiweMessage
 };
