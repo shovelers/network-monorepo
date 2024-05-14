@@ -57,14 +57,14 @@ async function farcasterSignup(accountDID, siweMessage, siweSignature, profileDa
   await accountv1.create(accountDID, siweMessage, siweSignature)
   await accountv1.repositories.profile.set(profileData)
   await accountv1.agent.appendName(fid, 'farcaster')
-  window.location.href = "/app";
+  //window.location.href = "/app";
 }
 
 async function ethereumSignup(accountDID,siweMessage, siweSignature, profileData,fid) {
   await accountv1.create(accountDID, siweMessage, siweSignature)
   await accountv1.repositories.profile.set(profileData)
   await accountv1.agent.appendName(fid, 'ethereum')
-  window.location.href = "/app";
+  //window.location.href = "/app";
 }
 
 async function getNonce() {
@@ -77,7 +77,7 @@ async function getNonce() {
   }
 }
 
-async function createSiweMessage(address ) {
+async function createSiweMessage(address, nonce ) {
   const message = new SiweMessage({
       domain: 'localhost:4000',
       address: address,
@@ -85,9 +85,21 @@ async function createSiweMessage(address ) {
       uri: 'http://localhost:4000/home',
       version: '1',
       chainId: '1',
-      nonce: await getNonce()
+      nonce
   });
   return message.prepareMessage();
+}
+
+async function verifySiweMessage(message,signature,nonce) {
+  let SiweObject = new SiweMessage(message)
+  try {
+    SiweObject.verify(signature,nonce);
+    console.log("Verified message")
+    return true;
+  }
+  catch(e) {
+    console.error("SIWE Message verfication failed", e);
+  }
 }
 
 async function getProfile() {
@@ -343,5 +355,8 @@ export {
   getContactForRelate,
   downloadContactsDataLocally,
   portOldContacts,
-  createSiweMessage
+  createSiweMessage,
+  getNonce,
+  verifySiweMessage,
+  ethereumSignup
 };
