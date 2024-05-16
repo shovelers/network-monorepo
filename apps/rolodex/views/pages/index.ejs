@@ -49,14 +49,15 @@
       const agentDID = await account.agent.DID()
       const nonce = await getNonce();
       const signer = await provider.getSigner();
-      const address = await signer.getAddress(); 
-      const message =  await createSiweMessage(address,nonce,agentDID);
+      const address = await signer.getAddress();
+      const chainId =  await window.ethereum.request({method:"eth_chainId"});
+      const message =  await createSiweMessage(address,nonce,agentDID,chainId);
       const signature = await signer.signMessage(message)
       const verified = verifySiweMessage(message,signature,nonce);
       let accountDID = `did:pkh:eip155:1:${address}`
       let profileData = { handle: address, name: "", text:"", tags: [] }
       if(verified) {
-        ethereumSignup(accountDID, message, signature, profileData, "metamask")
+        ethereumSignup(accountDID, message, signature, profileData, address)
       }
       
      }
