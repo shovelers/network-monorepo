@@ -9,6 +9,9 @@ import { save } from '@tauri-apps/api/dialog';
 import { writeTextFile } from '@tauri-apps/api/fs';
 import { SiweMessage } from 'siwe';
 
+import { ethers } from 'ethers';
+
+
 const farcasterClient = createAppClient({
   relay: 'https://relay.farcaster.xyz',
   ethereum: viemConnector(),
@@ -170,7 +173,19 @@ async function deleteContact(id) {
 }
 
 async function signout() {
+  if(window.ethereum) {
+    await window.ethereum.request({
+          method: "wallet_revokePermissions",
+          params: [
+            {
+              eth_accounts: {},
+            },
+          ],
+        });
+
+  }
   await account.signout()
+
 }
 
 async function downloadContactsDataLocally() {
