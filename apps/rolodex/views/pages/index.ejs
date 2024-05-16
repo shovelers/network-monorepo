@@ -51,10 +51,11 @@
       const signer = await provider.getSigner();
       const address = await signer.getAddress();
       const chainId =  await window.ethereum.request({method:"eth_chainId"});
-      const message =  await createSiweMessage(address,nonce,agentDID,chainId);
+      const integerChainId = parseInt(chainId,16)
+      const message =  await createSiweMessage(address,nonce,agentDID,integerChainId);
       const signature = await signer.signMessage(message)
       const verified = verifySiweMessage(message,signature,nonce);
-      let accountDID = `did:pkh:eip155:1:${address}`
+      let accountDID = `did:pkh:eip155:${integerChainId}:${address}`
       let profileData = { handle: address, name: "", text:"", tags: [] }
       if(verified) {
         ethereumSignup(accountDID, message, signature, profileData, address)
