@@ -40,12 +40,12 @@
       
 
       window.connectWallet = async function(){
-        provider.send('eth_requestAccounts', [])
+        await provider.send('eth_requestAccounts', [])
                 .catch(() => console.log('User rejected request'));
       }
 
      window.ethereumSignUp = async function() {
-      connectWallet(); 
+      const connected = await connectWallet();
       const agentDID = await account.agent.DID()
       const nonce = await getNonce();
       const signer = await provider.getSigner();
