@@ -7,6 +7,10 @@ import * as uint8arrays from 'uint8arrays';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { save } from '@tauri-apps/api/dialog';
 import { writeTextFile } from '@tauri-apps/api/fs';
+import { SiweMessage } from 'siwe';
+
+import { ethers } from 'ethers';
+
 
 const farcasterClient = createAppClient({
   relay: 'https://relay.farcaster.xyz',
@@ -57,6 +61,48 @@ async function farcasterSignup(accountDID, siweMessage, siweSignature, profileDa
   await accountv1.repositories.profile.set(profileData)
   await accountv1.agent.appendName(fid, 'farcaster')
   window.location.href = "/app";
+}
+
+async function ethereumSignup(accountDID,siweMessage, siweSignature, profileData,fid) {
+  await accountv1.create(accountDID, siweMessage, siweSignature)
+  await accountv1.repositories.profile.set(profileData)
+  await accountv1.agent.appendName(fid, 'ethereum')
+  window.location.href = "/app";
+}
+
+async function getNonce() {
+  try {
+    const response = await axios_client.get('/nonce');
+    return response.data;  
+  } catch (error) {
+    console.error('Error fetching nonce:', error);
+    throw error;  
+  }
+}
+
+async function createSiweMessage(address, nonce, requestId, chainId) {
+  const message = new SiweMessage({
+      requestId,
+      domain: 'localhost:4000',
+      address: address,
+      statement : 'Sign in via ethereum',
+      uri: 'http://localhost:4000/home',
+      version: '1',
+      chainId: chainId,
+      nonce
+  });
+  return message.prepareMessage();
+}
+
+async function verifySiweMessage(message,signature,nonce) {
+  let SiweObject = new SiweMessage(message)
+  try {
+    SiweObject.verify(signature,nonce);
+    return true;
+  }
+  catch(e) {
+    console.error("SIWE Message verfication failed", e);
+  }
 }
 
 async function getProfile() {
@@ -154,7 +200,19 @@ async function deleteContact(id) {
 }
 
 async function signout() {
+  if(window.ethereum) {
+    await window.ethereum.request({
+          method: "wallet_revokePermissions",
+          params: [
+            {
+              eth_accounts: {},
+            },
+          ],
+        });
+
+  }
   await account.signout()
+
 }
 
 async function downloadContactsDataLocally() {
@@ -338,5 +396,9 @@ export {
   appleCredsPresent,
   getContactForRelate,
   downloadContactsDataLocally,
-  portOldContacts
+  portOldContacts,
+  createSiweMessage,
+  getNonce,
+  verifySiweMessage,
+  ethereumSignup
 };
