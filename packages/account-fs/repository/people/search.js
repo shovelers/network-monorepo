@@ -63,6 +63,7 @@ export const SearchCapability = {
     
     console.log("starting searching", handle)
 
+    // TODO replace with new v1 api
     //fetch cid using handle
     return await this.axios_client.get(`/forestCID/${handle}`).then(async (response) => {
       let forestCID = response.data.cid
@@ -112,6 +113,20 @@ export const SearchCapability = {
         filteredContacts.push(person)
         continue
       }
+
+      if (person.EMAIL ) {
+        let emailMatch = false;
+        if (Array.isArray(person.EMAIL)) {
+          emailMatch = person.EMAIL.some(email => email.toLowerCase().includes(queryString));
+        } else {   //done this way as some email's are strings while are some array of strings
+          emailMatch =  person.EMAIL.split(',').filter(email => email.trim().toLowerCase().includes(queryString)).length > 0
+        }
+        if (emailMatch) {
+          filteredContacts.push(person);
+          continue;
+        }
+      }
+
     }
     return filteredContacts
   },

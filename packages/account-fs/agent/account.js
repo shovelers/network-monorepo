@@ -1,4 +1,5 @@
 import * as uint8arrays from 'uint8arrays';
+import { ProfileRepository } from '../repository/profile/profile';
 
 class Profile {
   constructor(args) {
@@ -29,28 +30,23 @@ export class Account {
     this.agent = agent
     this.filename = "profile.json"
     this.profile = null
+    this.profileRepo = new ProfileRepository(agent)
   }
 
   async getProfile(){
-    this.profile = await this.agent.readPrivateFile(this.filename)
-    return this.profile
+    return await this.profileRepo.get()
   }
 
   async editProfile(params){
-    if (!this.profile) {
-      await this.getProfile()
-    }
-
-    await this.agent.updatePrivateFile(this.filename, (content) => {
-      content = {...this.profile, ...params}
-      return content
-    })
+    return await this.profileRepo.set(params)
   }
 
+  // TODO - change signature - to take accountDID instead of handle
   async create(handle, initialFiles) {
     const success = await this.agent.registerUser(handle)
 
     if (success) {
+      //TODO replace file initialisation with repo initialisation
       await this.agent.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
       await initialFiles.forEach(async element => {
         await this.agent.updatePrivateFile(element.name, () => { return element.initialData })

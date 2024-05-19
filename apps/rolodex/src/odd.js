@@ -2,11 +2,15 @@ import axios from 'axios';
 import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
-import { programInit, Account, Person, PeopleRepository } from 'account-fs';
+import { programInit, Account, Person, PeopleRepository, AccountV1 } from 'account-fs';
 import * as uint8arrays from 'uint8arrays';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { save } from '@tauri-apps/api/dialog';
 import { writeTextFile } from '@tauri-apps/api/fs';
+import { SiweMessage } from 'siwe';
+
+import { ethers } from 'ethers';
+
 
 const farcasterClient = createAppClient({
   relay: 'https://relay.farcaster.xyz',
@@ -21,6 +25,8 @@ window.shovel = program
 
 const contactRepo = new PeopleRepository(program.agent)
 const account = new Account(program.agent)
+const accountv1 = new AccountV1(program.agent, ["PEOPLE"])
+shovel.accountv1 = accountv1
 
 customElements.define('contact-table', ContactTable);
 
@@ -48,6 +54,55 @@ async function signup(username, requester) {
   }
 
   return success
+}
+
+async function farcasterSignup(accountDID, siweMessage, siweSignature, profileData, fid) {
+  await accountv1.create(accountDID, siweMessage, siweSignature)
+  await accountv1.repositories.profile.set(profileData)
+  await accountv1.agent.appendName(fid, 'farcaster')
+  window.location.href = "/app";
+}
+
+async function ethereumSignup(accountDID,siweMessage, siweSignature, profileData,fid) {
+  await accountv1.create(accountDID, siweMessage, siweSignature)
+  await accountv1.repositories.profile.set(profileData)
+  await accountv1.agent.appendName(fid, 'ethereum')
+  window.location.href = "/app";
+}
+
+async function getNonce() {
+  try {
+    const response = await axios_client.get('/nonce');
+    return response.data;  
+  } catch (error) {
+    console.error('Error fetching nonce:', error);
+    throw error;  
+  }
+}
+
+async function createSiweMessage(address, nonce, requestId, chainId) {
+  const message = new SiweMessage({
+      requestId,
+      domain: 'localhost:4000',
+      address: address,
+      statement : 'Sign in via ethereum',
+      uri: 'http://localhost:4000/home',
+      version: '1',
+      chainId: chainId,
+      nonce
+  });
+  return message.prepareMessage();
+}
+
+async function verifySiweMessage(message,signature,nonce) {
+  let SiweObject = new SiweMessage(message)
+  try {
+    SiweObject.verify(signature,nonce);
+    return true;
+  }
+  catch(e) {
+    console.error("SIWE Message verfication failed", e);
+  }
 }
 
 async function getProfile() {
@@ -88,10 +143,38 @@ async function updateProfile(handle, name, tags = [], text = '') {
   account.editProfile({handle: handle, name: name, tags: tags, text: text})
 }
 
-async function addContact(name, tags = [], text = "", links = []) {
-  let person = new Person({FN: name, CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()})
+async function addContact(name, email='', tags = [], text = "", links = []) {
+  
+  let person = new Person({FN: name, EMAIL: convertEmailStringToEmailArray(email), CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()})
   return contactRepo.create(person)
 }
+
+/*
+  TODOs based on S04 -
+  create a new connection file - needs requester's (accountDID, profileFile, connectionFile) and sharedContacts (Assuming all)
+
+  Filename - connections/accountDID.json - assuming not limit to length of file name.
+  {
+    connection:  {
+      DID: accountDID //accountDID of the receiver
+      Profile: `${accessKeyToFile}` //accessKey to the received profile object
+      recievedConnectionFile: `${accessKeyToFile}` //accessKey to the received connection file 
+    }
+    sharedContacts: [Person] //only with Public attributes
+    state: "PRESENT/REMOVED"
+  }
+
+  connect handshake steps -
+    requester creates connections/approverDID.json and send handshake data
+      File content - { connection: { DID: approverDID, profile: "", receivedConnectionFile: "" }, sharedContacts: "ALLContacts", state: "REQUESTED" }
+      Handshake Data - { DID: requesterDID, profile:, `${accessKeyToFile}`, receivedConnectionFile: `${accessKeyToFile}` }
+    apporover confirms the handshake, creates connection/requesterDID.json and send something back
+      File content - { connection: { DID: requesterDID, profile:, `${accessKeyToFile}`, receivedConnectionFile: `${accessKeyToFile}` }, sharedContacts: "ALLContacts", state: "CONFIRMED" }
+      Handshake Data - { DID: approverDID, profile:, `${accessKeyToFile}`, receivedConnectionFile: `${accessKeyToFile}` } 
+    requester reads something and update connections/approverDID.json with new data
+      File content - { connection: { DID: approverDID, profile:, `${accessKeyToFile}`, receivedConnectionFile: `${accessKeyToFile}` }, sharedContacts: "ALLContacts", state: "CONFIRMED" }
+
+*/
 
 // TODO - handle duplicate connections
 async function addConnection(person) {
@@ -99,9 +182,16 @@ async function addConnection(person) {
   return contactRepo.create(connection) 
 }
 
+function convertEmailStringToEmailArray(emailString) {
+  if (typeof emailString === 'string' && emailString.trim() !== '') {
+    return emailString.split(',').map(email => email.trim());
+  }
+  return [];
+}
+
 // TODO - fix bug where contact edit clears PRODID etc.
-async function editContact(id, name, tags = [], text='', links = []) {
-  let person = new Person({FN: name, CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: id})
+async function editContact(id, name, email='', tags = [], text='', links = []) {
+  let person = new Person({FN: name,  EMAIL:convertEmailStringToEmailArray(email), CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: id})
   return contactRepo.edit(person)
 }
 
@@ -110,7 +200,19 @@ async function deleteContact(id) {
 }
 
 async function signout() {
+  if(window.ethereum) {
+    await window.ethereum.request({
+          method: "wallet_revokePermissions",
+          params: [
+            {
+              eth_accounts: {},
+            },
+          ],
+        });
+
+  }
   await account.signout()
+
 }
 
 async function downloadContactsDataLocally() {
@@ -211,7 +313,7 @@ async function addAppleContactsToContactList(appleContacts){
     var EMAIL = parsedAppleContact.email ? parsedAppleContact.email[0].value : undefined
     if (!existingAppleContactIDs.includes(uid)) {
       // TODO set PROPID from vcard parsing
-      contactList.push(new Person({FN: name, PRODID: "APPLE", UID: uid, EMAIL: EMAIL, TEL: TEL}))
+      contactList.push(new Person({FN: name, PRODID: "APPLE", UID: uid, EMAIL: convertEmailStringToEmailArray(EMAIL), TEL: TEL}))
     }
   }
   await contactRepo.bulkCreate(contactList)
@@ -256,7 +358,7 @@ async function addGoogleContactsToContactList(googleContacts){
     var TEL = googleContact.phoneNumbers ? googleContact.phoneNumbers[0].canonicalForm : undefined
     var uid = googleContact.resourceName
     if (!existingGoogleContactIDs.includes(uid)) {
-      contactList.push(new Person({FN: name, PRODID: "GOOGLE", UID: uid, EMAIL: EMAIL, TEL: TEL}))
+      contactList.push(new Person({FN: name, PRODID: "GOOGLE", UID: uid, EMAIL: convertEmailStringToEmailArray(EMAIL), TEL: TEL}))
     }
   }
 
@@ -275,6 +377,7 @@ async function portOldContacts(contacts){
 export { 
   account,
   farcasterClient,
+  farcasterSignup,
   signup, 
   signout, 
   generateRecoveryKit, 
@@ -293,5 +396,9 @@ export {
   appleCredsPresent,
   getContactForRelate,
   downloadContactsDataLocally,
-  portOldContacts
+  portOldContacts,
+  createSiweMessage,
+  getNonce,
+  verifySiweMessage,
+  ethereumSignup
 };

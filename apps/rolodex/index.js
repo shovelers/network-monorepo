@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDAVClient } from 'tsdav';
 import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability } from 'account-fs/app.js';
+import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 
 const port = process.argv[2] || 3000;
@@ -55,6 +56,11 @@ server.get("/app", (req, res) => {
 
 server.get("/link", (req, res) => {
   res.render('pages/link', { username: req.query.username })
+});
+
+server.get('/nonce',  (req, res) => {
+  const nonce = generateNonce();
+  res.status(200).json(nonce);
 });
 
 server.get("/apple_contacts", async (req, res) => {

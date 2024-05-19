@@ -16,6 +16,7 @@ import { PrivateFS, PrivateFile } from "./fs/private_fs.js"
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
+const SHOVEL_ACCOUNT_DID = "SHOVEL_ACCOUNT_DID"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
@@ -133,6 +134,62 @@ export const AccountCapability = {
     return success
   },
 
+  async register(accountDID, siweMessage, siweSignature) {
+    await this.runtime.setItem(SHOVEL_ACCOUNT_DID, accountDID)
+
+    let success = {status: false, created: true}
+    const envelope = await this.envelop({accountDID: accountDID, siweMessage: siweMessage, siweSignature: siweSignature})
+    await this.axios_client.post('/v1/accounts', envelope).then(async (response) => {
+      console.log("account creation status", response.status)
+      if (response.data.created == false) {
+        const accessKey = uint8arrays.fromString(response.data.accessKey, 'base64url');
+        await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
+
+        const forestCID = CID.parse(response.data.forestCID).bytes
+        await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
+        success.created = false
+      }
+      success.status = true
+    }).catch(async (e) => {
+      console.log(e);
+      await this.destroy()
+      return e
+    })
+
+    return success
+  },
+
+  async appendName(id, provider) {
+    let accountDID = await this.accountDID()
+
+    let success = false
+    const envelope = await this.envelop({id: id, provider: provider})
+    await this.axios_client.put(`/v1/accounts/${accountDID}/names`, envelope).then(async (response) => {
+      console.log("name submitted", response.status)
+      success = true
+    }).catch(async (e) => {
+      console.log(e);
+      return e
+    })
+
+    return success
+  },
+
+  async setCustodyKey(accessKey) {
+    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
+
+    const encodedAccessKey = uint8arrays.toString(accessKey, 'base64url');
+    let accountDID = await this.accountDID()
+
+    const envelope = await this.envelop({accessKey: encodedAccessKey})
+    await this.axios_client.put(`/v1/accounts/${accountDID}/custody`, envelope).then(async (response) => {
+      console.log(response.status)
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
+  },
+
   async linkDevice(message) {
     let success = false
     let handle = await this.handle()
@@ -179,6 +236,7 @@ export const AccountCapability = {
     await this.runtime.removeItem(SHOVEL_FS_FOREST_CID)
     await this.runtime.removeItem(SHOVEL_AGENT_WRITE_KEYPAIR)
     await this.runtime.removeItem(SHOVEL_ACCOUNT_HANDLE)
+    await this.runtime.removeItem(SHOVEL_ACCOUNT_DID)
   },
 
   async activeSession() {
@@ -215,8 +273,24 @@ export const StorageCapability = {
         await this.fs.loadForest(accessKey, forestCID)
       }
     } catch (err) {
-      console.log("missing datastore keys, need an account")
+      console.log("load failed: ", err.name, err.message)
       return 
+    }
+
+    let accountDID = await this.accountDID()
+    if (accountDID) { 
+      await this.syncWithHub(accountDID, await this.forestCID())
+    }
+  },
+
+  async fileExists(filename) {
+    try {
+      let content = await this.fs.read(filename)
+      JSON.parse(content)
+      return true
+    } catch (error) {
+      console.log("missing file: ", filename, error.name)
+      return false
     }
   },
 
@@ -245,21 +319,21 @@ export const StorageCapability = {
   async updatePrivateFile(filename, mutationFunction) {
     let content = await this.readPrivateFile(filename)
     let newContent = mutationFunction(content)
-    var [access_key, forest_cid] = await this.fs.write(filename, JSON.stringify(newContent))
+    var [accessKey, forestCID] = await this.fs.write(filename, JSON.stringify(newContent))
 
-    await this.pin(access_key,forest_cid)
+    await this.pin(forestCID)
     return newContent
   },
 
-  async pin(accessKey, forestCID) {
-    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
-    await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
-
-    let cid = CID.decode(forestCID).toString()
-    let handle = await this.handle()
-
-    const envelope = await this.envelop({cid: cid, handle: handle})
-    await this.axios_client.post('/pin', envelope).then(async (response) => {
+  async pin(cid) {
+    let accountDID = await this.accountDID()
+    
+    //Pulls remoteCID, Merge locally, see the final file, then push
+    const mergedCID = await this.syncWithHub(accountDID, cid)
+    console.log("merged CID on first try :", mergedCID, cid)
+    const envelope = await this.envelop({cid: CID.decode(mergedCID).toString()})
+    
+    await this.axios_client.post(`/v1/accounts/${accountDID}/head`, envelope).then(async (response) => {
       console.log(response.status)
     }).catch((e) => {
       console.log(e);
@@ -273,7 +347,30 @@ export const StorageCapability = {
 
   async forestCID() {
     return await this.runtime.getItem(SHOVEL_FS_FOREST_CID)
-  }
+  },
+
+  async syncWithHub(accountDID, cid) {
+    let mergedCID
+    
+    await this.axios_client.get(`/v1/accounts/${accountDID}/head`).then(async (response) => {
+      const headCID = CID.parse(response.data.head).bytes
+      
+      const diff = await this.fs.compareWithRemote(headCID)
+      mergedCID = await this.fs.mergeWithRemote(headCID)
+      
+      this.runtime.setItem(SHOVEL_FS_FOREST_CID, mergedCID)
+      console.log("diff :", diff, "merge :", mergedCID)
+    }).catch((e) => {
+      if (e.response.status == '404') {
+        this.runtime.setItem(SHOVEL_FS_FOREST_CID, cid)
+        mergedCID = cid
+      }
+
+      return e
+    })
+    
+    return mergedCID
+  }, 
 }
 
 export class Agent {
@@ -308,6 +405,10 @@ export class Agent {
     return await this.runtime.getItem(SHOVEL_ACCOUNT_HANDLE)
   }
 
+  async accountDID() {
+    return await this.runtime.getItem(SHOVEL_ACCOUNT_DID)
+  }
+  
   async bootstrap(){
     await this.axios_client.get('/bootstrap').then(async (response) => {
       this.syncServer = this.prefix + response.data.peerId

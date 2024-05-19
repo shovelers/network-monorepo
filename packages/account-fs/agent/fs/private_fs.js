@@ -9,14 +9,17 @@ export class PrivateFS {
     this.rng = new Rng()
   }
 
-  async initalise() {
+  async initialise() {
     const initialForest = new PrivateForest(this.rng)
     const privateDir = new PrivateDirectory(initialForest.emptyName(), new Date(), this.rng)
   
     var { rootDir, forest } = await privateDir.mkdir(this.path, true, new Date(), initialForest, this.store, this.rng);
 
     this.rootDir = rootDir
+    
+    var [ accessKey, forest ]  = await this.rootDir.store(forest, this.store, this.rng)
     this.forest = forest
+    return accessKey.toBytes()
   }
 
   async loadForest(accessKey, forestCID) {
@@ -28,6 +31,10 @@ export class PrivateFS {
     var node = await PrivateNode.load(key, forest, this.store)
     console.log("loaded node:", node)
 
+    //find the latest revision of the node
+    node = await node.searchLatest(forest, this.store)
+    console.log("latest node:", node)
+
     //load the node as_dir to get the rootDir 
     var rootDir = await node.asDir(forest, this.store)
  
@@ -35,11 +42,23 @@ export class PrivateFS {
     this.rootDir = rootDir
   }
 
+  async compareWithRemote(remoteCID){
+    let remoteForest = await PrivateForest.load(remoteCID, this.store)
+    return await this.forest.diff(remoteForest, this.store)
+  }
+
+  async mergeWithRemote(remoteCID) {
+    let remoteForest = await PrivateForest.load(remoteCID, this.store)
+    let mergedForest = await this.forest.merge(remoteForest, this.store)
+    this.forest = mergedForest
+    return await mergedForest.store(this.store)
+  }
+
   async write(filename, content) {
     let file = this.path.concat(filename)
 
     if (this.rootDir == null) {
-      await this.initalise()
+      await this.initialise()
     }
 
     var { rootDir, forest } = await this.rootDir.write(
@@ -58,18 +77,17 @@ export class PrivateFS {
 
     var [ accessKey, forest ]  = await this.rootDir.store(this.forest, this.store, this.rng)
 
-    this.accessKey = accessKey
     this.forest = forest
 
     var forestCID = await forest.store(this.store)
-    return [this.accessKey.toBytes(), forestCID]
+    return [accessKey.toBytes(), forestCID]
   }
 
   async read(filename) {
     let file = this.path.concat(filename)
 
     if (this.rootDir == null) {
-      await this.initalise()
+      await this.initialise()
     }
 
     var content = await this.rootDir.read(file, true, this.forest, this.store)
