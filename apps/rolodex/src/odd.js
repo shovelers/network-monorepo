@@ -83,10 +83,10 @@ async function getNonce() {
 async function createSiweMessage(address, nonce, requestId, chainId) {
   const message = new SiweMessage({
       requestId,
-      domain: 'localhost:4000',
+      domain: window.origin,
       address: address,
       statement : 'Sign in via ethereum',
-      uri: 'http://localhost:4000/home',
+      uri: window.origin+'/home',
       version: '1',
       chainId: chainId,
       nonce
