@@ -6,6 +6,8 @@
   <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
   <link rel="icon" href="/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 </head>
 
 <%- include('../partials/google_analytics.ejs') %>
@@ -80,23 +82,51 @@
       })
     </script>
 
-    <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
-      <div class="w-full h-5/6 p-4 text-center flex flex-row justify-evenly">
-        <div class="relative bg-base-200 w-1/4 py-4 space-y-2 rounded-lg">
-          <%- include('../partials/app/sidebar.ejs') %>
+    <div class="container mx-auto h-screen flex flex-col justify-evenly items-center">
+      <div class="w-full h-5/6 text-center md:flex md:flex-row md:justify-evenly overflow-x-hidden">
+
+        <div class="md:relative md:w-1/4 md:space-y-2 md:rounded-lg">
+          <div class="max-md:drawer ">
+            <input id="my-drawer" type="checkbox" class="drawer-toggle" />      
+            <div class="max-md:drawer-content">
+                <div class="max-md:px-2 flex justify-between"> 
+                    <label for="my-drawer" class="md:hidden btn btn-ghost drawer-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="33" height="33" viewBox="0 0 50 50">
+                            <path d="M 3 8 A 2.0002 2.0002 0 1 0 3 12 L 47 12 A 2.0002 2.0002 0 1 0 47 8 L 3 8 z M 3 23 A 2.0002 2.0002 0 1 0 3 27 L 47 27 A 2.0002 2.0002 0 1 0 47 23 L 3 23 z M 3 38 A 2.0002 2.0002 0 1 0 3 42 L 47 42 A 2.0002 2.0002 0 1 0 47 38 L 3 38 z"></path>
+                        </svg>
+                    </label>
+                    
+                </div>
+            </div>
+            <div class="max-md:drawer-side z-10">
+              <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+              <ul class="max-md:menu max-md:p-4 max-md:w-80 max-md:min-h-full max-md:bg-base-200 max-md:text-base-content block">
+                <%- include('../partials/app/sidebar.ejs') %>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div class="w-3/4 py-4 space-y-2 overflow-hidden">
-          <div class="flex justify-evenly">
+        
+        
+
+        <div class=" md:w-3/4 space-y-2 overflow-hidden pt-2">  
+          <div class="flex justify-evenly ">          
             <%- include('../partials/app/search_bar.ejs') %>
             <%- include('../partials/app/contact_add.ejs') %>
+
           </div>
-          <div class="flex flex-col justify-center max-h-full py-4 overflow-y-auto">
+          
+          <div class="flex flex-col justify-center max-h-full py-4 relative">
             <%- include('../partials/app/contact_list.ejs') %>
           </div>
         </div>
+
       </div>
       <%- include('../partials/shovel.ejs') %>
     </div>
+
+      <!-- <%- include('./app2.ejs') %> -->
+      
   </body>
 
 </html>
