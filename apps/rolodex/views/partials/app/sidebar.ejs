@@ -65,7 +65,7 @@
 
   window.addConnectionButton = async function(){
     // TODO check if valid handle to connect
-    var connectHandle = document.getElementById('connection-handle').value
+    var connectHandle = document.querySelector('.connection-handle').value
     let person = await window.getContactForRelate()
     console.log("person with XML :", person)
     // TODO Transfer profile.json in such a way, that it mimics forever contact app semantics
@@ -134,7 +134,7 @@
     <p class="text-xs">Press ESC key or click the button below to close</p>
     <div class="modal-action flex justify-center items-center">
       <form id="connection-add-form"    
-        onsubmit="event.preventDefault(); window.addConnectionButton(document.querySelectorAll('.connection-handle').value.value); network_modal.close(); document.querySelectorAll('.connection-handle').value.value = ''; return false"
+        onsubmit="event.preventDefault(); window.addConnectionButton(document.querySelector('.connection-handle').value); network_modal.close(); document.querySelector('.connection-handle').value = ''; return false"
         class="space-y-1 text-center">
         <label for="connection-handle" class="label"><span class="label-text">Handle</span></label>
         <input type="text" id="" class="connection-handle border border-gray-300 px-2 py-1 rounded-lg">
