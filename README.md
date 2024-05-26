@@ -56,5 +56,5 @@ Currently, 'rolodex' requires the 'hub' to be up as well for it to work.
 
 ## Start Building
 
-* Read our [Whitepaper](https://network.shovel.company/whitepaper)
+* Read our [Whitepaper](https://creole.network/whitepaper)
 * Come join us on our [Discord](https://discord.gg/PmzsJeembE)
