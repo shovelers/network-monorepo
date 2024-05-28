@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <link rel="stylesheet" href="/styles/style.css" />
+    <link rel="icon" href="/favicon.ico">
+    <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
+  </head>
+
+  <%- include('../partials/google_analytics.ejs') %>
+
+  <body class="antialiased bg-base-100">
+    <script type="module">
+      
+      import { signup, recover, account, farcasterClient, farcasterSignup, createSiweMessage, getNonce, verifySiweMessage, ethereumSignup } from '/odd.js';
+      window.signup = signup;
+      window.recover = recover;
+
+      window.showLoading = function(){
+        document.querySelector(".loading").classList.remove("hidden");
+        document.querySelector("#input-forms").classList.add("hidden");
+      }
+    </script>
+
+    <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
+      <div class="p-4 text-center">
+        <div class="text-7xl font-bold tracking-tight leading-normal underline decoration-red-500 decoration-8">Join Form</div>
+      </div>
+      
+      <div class="text-xl font-medium tracking-tight leading-normal">You have been invited to join <span class="uppercase font-semibold text-2xl text-blue-500"><%= communityName %></span>'s directory</div>
+      
+      <div class="loading loading-infinity loading-lg hidden"></div>
+      
+      <%- include('../partials/shovel.ejs') %>
+    </div>
+  </body>
+</html>

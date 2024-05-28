@@ -60,7 +60,6 @@ async function farcasterSignup(accountDID, siweMessage, siweSignature, profileDa
   await accountv1.create(accountDID, siweMessage, siweSignature)
   await accountv1.repositories.profile.set(profileData)
   await accountv1.agent.appendName(fid, 'farcaster')
-  window.location.href = "/app";
 }
 
 async function ethereumSignup(accountDID,siweMessage, siweSignature, profileData,fid) {

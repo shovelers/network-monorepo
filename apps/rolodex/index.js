@@ -58,6 +58,16 @@ server.get("/link", (req, res) => {
   res.render('pages/link', { username: req.query.username })
 });
 
+// Community Join link: community/{accountDID}/join?name=decentralised.co
+server.get("/community/:accountDID/join", (req, res) => {
+  res.render('pages/join', { address: address, appHandle: appHandle, communityName: req.query.name })
+});
+
+// Community join form: community/{accountDID}/form?name=decentralised.co
+server.get("/community/:accountDID/form", (req, res) => {
+  res.render('pages/join_form', { address: address, appHandle: appHandle, communityName: req.query.name })
+});
+
 server.get('/nonce',  (req, res) => {
   const nonce = generateNonce();
   res.status(200).json(nonce);
