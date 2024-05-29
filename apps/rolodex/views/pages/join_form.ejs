@@ -36,7 +36,7 @@
           let isClicked = badge.getAttribute('data-is-clicked')
           let question = badge.getAttribute('question')
           if (isClicked === "false") {
-            badge.classList.remove('badge-ghost');
+            badge.classList.remove('badge-outline');
             badge.classList.add('badge-neutral');
             badge.setAttribute('data-is-clicked', true)
             switch (question){
@@ -55,7 +55,7 @@
             console.log("On Add : ", "looking for :", lookingFor, "interestedIn :", interestedIn, "expertise :", expertise)
           } else {
             badge.classList.remove('badge-neutral');
-            badge.classList.add('badge-ghost');
+            badge.classList.add('badge-outline');
             badge.setAttribute('data-is-clicked', false)
             let index
             switch (question){
@@ -106,19 +106,19 @@
           <div>
             <div>Looking For</div>
             <% for(var i=0; i<options.lookingFor.length; i++) {%>
-              <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="lookingFor"> <%= options.lookingFor[i] %></div>
+              <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="lookingFor"> <%= options.lookingFor[i] %></div>
             <% } %>
           </div>
           <div>
            <div>Interested In</div>
             <% for(var i=0; i<options.interestedIn.length; i++) {%>
-              <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="interestedIn"> <%= options.interestedIn[i] %></div>
+              <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="interestedIn"> <%= options.interestedIn[i] %></div>
             <% } %>
           </div>
           <div>
             <div>Expertise</div>
             <% for(var i=0; i<options.expertise.length; i++) {%>
-              <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="expertise"> <%= options.expertise[i] %></div>
+              <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="expertise"> <%= options.expertise[i] %></div>
             <% } %>
           </div>
           
