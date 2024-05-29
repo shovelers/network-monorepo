@@ -139,7 +139,12 @@ async function filterContacts(filter) {
 }
 
 async function updateProfile(handle, name, tags = [], text = '') {
-  account.editProfile({handle: handle, name: name, tags: tags, text: text})
+  await account.editProfile({handle: handle, name: name, tags: tags, text: text})
+}
+
+//updates given params with new values while keeping rest of the keys in Profile Object the same
+async function v1UpdateProfile(params) {
+  return await account.editProfile(params)
 }
 
 async function addContact(name, email='', tags = [], text = "", links = []) {
@@ -399,5 +404,6 @@ export {
   createSiweMessage,
   getNonce,
   verifySiweMessage,
-  ethereumSignup
+  ethereumSignup,
+  v1UpdateProfile
 };

@@ -10,7 +10,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">      
-      import { getProfile } from '/odd.js';
+      import { getProfile, v1UpdateProfile } from '/odd.js';
 
       // show values from farcaster
       getProfile().then((result) => {
@@ -26,9 +26,9 @@
       }
 
       //Flips the colour of option pills and stores the resposes of respective question
-      const lookingFor = []
-      const interestedIn = []
-      const expertise = []
+      var lookingFor = []
+      var interestedIn = []
+      var expertise = []
       const badges = [...document.querySelectorAll('#color-changing-badge')];
 
       badges.forEach((badge) =>
@@ -61,15 +61,15 @@
             switch (question){
               case 'lookingFor':
                 index = lookingFor.indexOf(badge.innerHTML)
-                lookingFor.splice(index, 1)
+                lookingFor = lookingFor.splice(index, 1)
                 break;
               case 'interestedIn':
                 index = interestedIn.indexOf(badge.innerHTML)
-                interestedIn.splice(index, 1)
+                interestedIn = interestedIn.splice(index, 1)
                 break;
               case 'expertise':
                 index = expertise.indexOf(badge.innerHTML)
-                expertise.splice(index, 1)
+                expertise = expertise.splice(index, 1)
                 break;
               default:
                 console.log("Store for Question not defined")
@@ -78,7 +78,13 @@
           }
         })
       )
-      
+      // add selected tags to profile on save
+      window.addSelectedTagsToProfile = async function(){
+        await v1UpdateProfile({lookingFor: lookingFor, interestedIn: interestedIn, expertise: expertise})
+        
+        let profile = await getProfile()
+        console.log("Profile after save :", profile)
+      }
     </script>
 
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
@@ -118,7 +124,7 @@
           
           <%/* submit button */%>
           <div class="flex justify-center">
-            <button class="btn"> Submit </button>
+            <button class="btn" onclick="addSelectedTagsToProfile()"> Submit </button>
           </div>
         </div>  
       </div>
