@@ -9,10 +9,10 @@
   <%- include('../partials/google_analytics.ejs') %>
 
   <body class="antialiased bg-base-100">
-    <script type="module">
-      
+    <script type="module">      
       import { getProfile } from '/odd.js';
 
+      // show values from farcaster
       getProfile().then((result) => {
         console.log(result)
         document.querySelector("#farcaster-name").innerHTML = result.name
@@ -25,7 +25,7 @@
         document.querySelector("#input-forms").classList.add("hidden");
       }
 
-      //Flips the colour of clicked button and stores the resposes of respective question
+      //Flips the colour of option pills and stores the resposes of respective question
       const lookingFor = []
       const interestedIn = []
       const expertise = []
@@ -43,7 +43,7 @@
               case 'lookingFor':
                 lookingFor.push(badge.innerHTML)
                 break;
-              case 'interestdIn':
+              case 'interestedIn':
                 interestedIn.push(badge.innerHTML)
                 break;
               case 'expertise':
@@ -52,7 +52,7 @@
               default:
                 console.log("Store for Question not defined")
             }
-            console.log("looking for :", lookingFor, "interstedIn :", interestedIn, "expertise :", expertise)
+            console.log("looking for :", lookingFor, "interestedIn :", interestedIn, "expertise :", expertise)
           } else {
             badge.classList.remove('badge-neutral');
             badge.classList.add('badge-ghost');
@@ -63,7 +63,7 @@
                 index = lookingFor.indexOf(badge.innerHTML)
                 lookingFor.splice(index, 1)
                 break;
-              case 'interestdIn':
+              case 'interestedIn':
                 index = interestedIn.indexOf(badge.innerHTML)
                 interestedIn.splice(index, 1)
                 break;
@@ -74,7 +74,7 @@
               default:
                 console.log("Store for Question not defined")
             }
-            console.log("looking for :", lookingFor, "interstedIn :", interestedIn, "expertise :", expertise)
+            console.log("looking for :", lookingFor, "interestedIn :", interestedIn, "expertise :", expertise)
           }
         })
       )
@@ -99,21 +99,21 @@
         <div class="flex flex-col justify-evenly place-content-center w-1/2 p-8">
           <div>
             <div>Looking For</div>
-            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="lookingFor">Looking For 1</div>
-            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="lookingFor">Looking For 2</div>
-            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="lookingFor">Looking For 3</div>
+            <% for(var i=0; i<options.lookingFor.length; i++) {%>
+              <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="lookingFor"> <%= options.lookingFor[i] %></div>
+            <% } %>
           </div>
           <div>
            <div>Interested In</div>
-            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="interestdIn">Interested In 1</div>
-            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="interestdIn">Interested In 2</div>
-            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="interestdIn">Interested In 2</div>
+            <% for(var i=0; i<options.interestedIn.length; i++) {%>
+              <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="interestedIn"> <%= options.interestedIn[i] %></div>
+            <% } %>
           </div>
           <div>
             <div>Expertise</div>
-            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="expertise">Expertise 1</div>
-            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="expertise">Expertise 2</div>
-            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="expertise">Expertise 3</div>
+            <% for(var i=0; i<options.expertise.length; i++) {%>
+              <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="expertise"> <%= options.expertise[i] %></div>
+            <% } %>
           </div>
           
           <%/* submit button */%>

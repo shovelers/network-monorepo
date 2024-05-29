@@ -65,7 +65,12 @@ server.get("/community/:accountDID/join", (req, res) => {
 
 // Community join form: community/{accountDID}/form?name=decentralised.co
 server.get("/community/:accountDID/form", (req, res) => {
-  res.render('pages/join_form', { address: address, appHandle: appHandle, communityName: req.query.name })
+  const options = {
+    lookingFor: ["lf1", "lf2", "lf3"],
+    interestedIn: ["iI1", "iI2", "iI3"],
+    expertise: ["e1", "e2", "e3"]
+  }
+  res.render('pages/join_form', { address: address, appHandle: appHandle, communityName: req.query.name, options: options })
 });
 
 server.get('/nonce',  (req, res) => {
