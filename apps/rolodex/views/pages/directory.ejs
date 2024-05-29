@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="./styles/style.css" />
+  <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client"></script>
+  <link rel="icon" href="/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<%- include('../partials/google_analytics.ejs') %>
+
+  <body class="antialiased bg-base-100">
+    <script type="module">
+      import { account, addContact, getContacts, getContactByUID, editContact, deleteContact, filterContacts,
+        getProfile, updateProfile, signout} from '/odd.js';
+      window.addContact = addContact;
+      window.getContacts = getContacts;
+      window.editContact = editContact;
+      window.deleteContact = deleteContact;
+      window.filterContacts = filterContacts;
+      window.updateProfile = updateProfile;
+      window.signout = signout;
+      window.getProfile = getProfile;
+      window.getContactByUID = getContactByUID;
+
+      var session = await account.activeSession();
+      if (session == false) {
+        window.location.href = '/home';
+      }
+
+      window.refreshContacts = function(){
+        window.getContacts().then((result) => {
+          document.querySelector("contact-table").contacts = result
+        })
+      }
+      refreshContacts();
+     
+      //setup values for the Profile being shown
+      window.refreshProfile = function(){
+        window.getProfile().then((result) => {
+        console.log("result: ", result)
+        document.getElementById("handle").innerHTML = result.handle
+        document.getElementById("name").innerHTML = "Name: " + result.name
+        document.getElementById("lookingFor").innerHTML = '';
+        for (let lf of result.lookingFor) {
+          if (lf == '') continue;
+          document.getElementById("lookingFor").innerHTML += `<span class="badge badge-neutral">${lf}</span>`;
+        }
+        document.getElementById("interestedIn").innerHTML = '';
+        for (let ii of result.interestedIn) {
+          if (ii == '') continue;
+          document.getElementById("interestedIn").innerHTML += `<span class="badge badge-neutral">${ii}</span>`;
+        }
+        document.getElementById("expertise").innerHTML = '';
+        for (let e of result.expertise) {
+          if (e == '') continue;
+          document.getElementById("expertise").innerHTML += `<span class="badge badge-neutral">${e}</span>`;
+        }
+
+        document.getElementById("profile-name").value = result.name
+        document.getElementById("profile-tags").value = result.tags || []
+        document.getElementById("profile-text").value = result.text || ''
+        document.querySelector(".avatar > div > span").innerHTML = result.handle.charAt(0).toUpperCase()
+      })}
+      refreshProfile();
+
+      var agentHandle = await shovel.agent.handle()
+    </script>
+
+    <div class="container mx-auto h-screen flex flex-col justify-evenly items-center">
+      <div class="w-full h-5/6 text-center md:flex md:flex-row md:justify-evenly overflow-x-hidden">
+
+        <div class="md:relative md:w-1/4 md:space-y-2 md:rounded-lg bg-base-200 p-4">
+          <div class="max-md:drawer ">
+            <input id="my-drawer" type="checkbox" class="drawer-toggle" />      
+            <div class="max-md:drawer-content">
+                <div class="max-md:px-2 flex justify-between"> 
+                    <label for="my-drawer" class="md:hidden btn btn-ghost drawer-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="33" height="33" viewBox="0 0 50 50">
+                            <path d="M 3 8 A 2.0002 2.0002 0 1 0 3 12 L 47 12 A 2.0002 2.0002 0 1 0 47 8 L 3 8 z M 3 23 A 2.0002 2.0002 0 1 0 3 27 L 47 27 A 2.0002 2.0002 0 1 0 47 23 L 3 23 z M 3 38 A 2.0002 2.0002 0 1 0 3 42 L 47 42 A 2.0002 2.0002 0 1 0 47 38 L 3 38 z"></path>
+                        </svg>
+                    </label>
+                    
+                </div>
+            </div>
+            <div class="max-md:drawer-side z-10">
+              <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+              <ul class="max-md:menu max-md:p-4 max-md:w-80 max-md:min-h-full max-md:bg-base-200 max-md:text-base-content block">
+                <%- include('../partials/directory/sidebar.ejs') %>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class=" md:w-3/4 space-y-2 overflow-hidden pt-2">  
+          <div class="flex justify-evenly ">          
+            <%- include('../partials/app/search_bar.ejs') %>
+            <%- include('../partials/app/contact_add.ejs') %>
+          </div>
+          
+          <div class="flex flex-col justify-center max-h-full py-4 relative">
+            <%- include('../partials/app/contact_list.ejs') %>
+          </div>
+        </div>
+
+      </div>
+      <%- include('../partials/shovel.ejs') %>
+    </div>
+  </body>
+</html>

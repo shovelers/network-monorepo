@@ -73,6 +73,10 @@ server.get("/community/:accountDID/form", (req, res) => {
   res.render('pages/join_form', { address: address, appHandle: appHandle, communityName: req.query.name, options: options })
 });
 
+server.get("/directory", (req, res) => {
+  res.render('pages/directory')
+})
+
 server.get('/nonce',  (req, res) => {
   const nonce = generateNonce();
   res.status(200).json(nonce);

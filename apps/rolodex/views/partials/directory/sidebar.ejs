@@ -1,0 +1,105 @@
+<script type="module">
+  if (window.__TAURI__) {
+    document.getElementById("google-import").style.display = "none"
+  }
+
+  var confirm
+  var reject
+  console.log("checking js loading")
+  window.challengeProcessor = function (input){
+    if(input === window.pin.join("")) {
+      confirm.call() 
+    } else {
+      reject.call()
+    }
+  }
+
+  window.showLoading = function(){
+    document.querySelector(".loading").classList.remove("hidden");
+    document.getElementById("apple_username").style.display = "none"
+    document.getElementById("apple_password").style.display = "none"
+  }
+
+  window.hideLoading = function(){
+    document.querySelector(".loading").classList.add("hidden");
+    document.getElementById("apple_username").style.display = ""
+    document.getElementById("apple_password").style.display = ""
+  }
+</script>
+
+<div class="max-md:flex max-md:justify-center max-md:items-center avatar online placeholder max-md:mx-20">    
+  <div class="bg-neutral-focus text-neutral-content rounded-full w-32">
+    <span class="text-3xl profile_username_first_letter"></span>
+  </div>
+</div>
+
+<div class="flex justify-center items-center py-1">
+  <div class="flex items-center space-x-2">
+    <span id="handle" class="text-xl font-semibold ml-2" style="display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis;"></span>
+  </div>
+</div>
+
+<div id="name" class="py-1 text-left"></div>
+<div class="space-x-1 space-y-1 py-1 text-left">Looking For : <span id="lookingFor"></span></div>
+<div class="space-x-1 space-y-1 py-1 text-left">Inerested In : <span id="interestedIn"></span></div>
+<div class="space-x-1 space-y-1 py-1 text-left">Expertise : <span id="expertise"></span></div>
+
+<div class="max-md:pt-2 md:absolute md:inset-x-0 md:bottom-0 md:pb-4 md:flex md:flex-col md:space-y-2 md:items-center">
+  <button id="profile-edit-btn" class="btn max-md:my-1 btn-outline max-md:w-5/6 md:btn-sm md:w-2/3" onclick="profile_edit_modal.showModal()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"> <path fill="currentColor" d="m13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057l3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z" /></svg>
+    Edit Profile
+  </button>
+  <button class="btn max-md:my-1 btn-outline max-md:w-5/6 md:btn-sm md:w-2/3" onclick="logout_modal.showModal()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2zM3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H3z" /></svg>
+    Logout
+  </button>
+</div>
+
+<dialog id="profile_edit_modal" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Edit Profile</h3>
+    <p class="text-xs">Press ESC key or click the button below to close</p>
+    <div class="modal-action flex justify-center items-center">
+      <form id="profile-updatae-form"
+        onsubmit="event.preventDefault(); updateProfile(document.getElementById('handle').innerHTML, document.getElementById('profile-name').value, tagsArray(document.getElementById('profile-tags').value), document.getElementById('profile-text').value).then(function(){console.log('i am here'); refreshProfile()}); profile_edit_modal.close(); return false"
+        class="space-y-1 text-center">
+        <label for="profile-name" class="label"><span class="label-text">Name</span></label>
+        <input type="text" id="profile-name" class="border border-gray-300 px-2 py-1 rounded-lg" value="name">
+        <label for="profile-tags" class="label"><span class="label-text">Tags (comma separated)</span></label>
+        <input type="text" name="profile-tags" id="profile-tags" class="input input-sm input-bordered rounded-lg">
+        <label for="profile-text" class="label"><span class="label-text">Text</span></label>
+        <textarea type="text" name="profile-text" id="profile-text" class="textarea textarea-bordered rounded-lg"></textarea>
+        <div class="flex flex-row space-x-2 pt-4 justify-center">
+          <button type="submit" class="btn btn-outline btn-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M12 2h-2v3h2V2Z"/><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5V2.914a1.5 1.5 0 0 0-.44-1.06L14.147.439A1.5 1.5 0 0 0 13.086 0H1.5ZM4 6a1 1 0 0 1-1-1V1h10v4a1 1 0 0 1-1 1H4ZM3 9h10a1 1 0 0 1 1 1v5H2v-5a1 1 0 0 1 1-1Z"/></g></svg>
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="event.preventDefault(); profile_edit_modal.close();">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8L4.646 5.354a.5.5 0 0 1 0-.708z"/></g></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</dialog>
+<dialog id="logout_modal" class="modal">
+  <div class="modal-box">
+    <p class="text-lg font-bold">Beware!!</p>
+    <p class="text-sm">Your account is bound to this device </p>
+    <p class="text-sm mt-2">Do Not Logout if you have not downloaded </br> the Recovery Key or Linked Another Device to this account yet</p>
+    <div class="modal-action flex flex-col justify-center items-center space-y-2">
+      <form class="flex flex-col space-y-2 items-center" onsubmit="event.preventDefault(); signout().then(function(){window.location.href='/home'}) ;return false">
+        <div class="flex flex-row space-x-2">
+          <button class="btn btn-outline btn-sm w-2/3" onclick="event.preventDefault(); generateRecoveryKit(document.getElementById('handle').innerHTML)">
+            Get Recovery Key
+          </button>
+          <button type="submit" class="btn btn-outline btn-sm">
+            Logout
+          </button>
+          <button class="btn btn-outline btn-sm" formmethod="dialog" onclick="event.preventDefault(); logout_modal.close()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8L4.646 5.354a.5.5 0 0 1 0-.708z"/></g></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</dialog>
