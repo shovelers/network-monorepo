@@ -10,10 +10,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      
-      import { signup, recover, account, farcasterClient, farcasterSignup, createSiweMessage, getNonce, verifySiweMessage, ethereumSignup } from '/odd.js';
-      window.signup = signup;
-      window.recover = recover;
+      import { account, farcasterClient, farcasterSignup } from '/odd.js';
 
       var session = await account.activeSession();
       if (session) {

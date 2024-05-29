@@ -11,22 +11,117 @@
   <body class="antialiased bg-base-100">
     <script type="module">
       
-      import { signup, recover, account, farcasterClient, farcasterSignup, createSiweMessage, getNonce, verifySiweMessage, ethereumSignup } from '/odd.js';
-      window.signup = signup;
-      window.recover = recover;
+      import { getProfile } from '/odd.js';
+
+      getProfile().then((result) => {
+        console.log(result)
+        document.querySelector("#farcaster-name").innerHTML = result.name
+        document.querySelector("#farcaster-handle").innerHTML = result.handle
+        document.querySelector("#farcaster-bio").innerHTML = result.text
+      })
 
       window.showLoading = function(){
         document.querySelector(".loading").classList.remove("hidden");
         document.querySelector("#input-forms").classList.add("hidden");
       }
+
+      //Flips the colour of clicked button and stores the resposes of respective question
+      const lookingFor = []
+      const interestedIn = []
+      const expertise = []
+      const badges = [...document.querySelectorAll('#color-changing-badge')];
+
+      badges.forEach((badge) =>
+        badge.addEventListener('click', () => {
+          let isClicked = badge.getAttribute('data-is-clicked')
+          let question = badge.getAttribute('question')
+          if (isClicked === "false") {
+            badge.classList.remove('badge-ghost');
+            badge.classList.add('badge-neutral');
+            badge.setAttribute('data-is-clicked', true)
+            switch (question){
+              case 'lookingFor':
+                lookingFor.push(badge.innerHTML)
+                break;
+              case 'interestdIn':
+                interestedIn.push(badge.innerHTML)
+                break;
+              case 'expertise':
+                expertise.push(badge.innerHTML)
+                break;
+              default:
+                console.log("Store for Question not defined")
+            }
+            console.log("looking for :", lookingFor, "interstedIn :", interestedIn, "expertise :", expertise)
+          } else {
+            badge.classList.remove('badge-neutral');
+            badge.classList.add('badge-ghost');
+            badge.setAttribute('data-is-clicked', false)
+            let index
+            switch (question){
+              case 'lookingFor':
+                index = lookingFor.indexOf(badge.innerHTML)
+                lookingFor.splice(index, 1)
+                break;
+              case 'interestdIn':
+                index = interestedIn.indexOf(badge.innerHTML)
+                interestedIn.splice(index, 1)
+                break;
+              case 'expertise':
+                index = expertise.indexOf(badge.innerHTML)
+                expertise.splice(index, 1)
+                break;
+              default:
+                console.log("Store for Question not defined")
+            }
+            console.log("looking for :", lookingFor, "interstedIn :", interestedIn, "expertise :", expertise)
+          }
+        })
+      )
+      
     </script>
 
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
-      <div class="p-4 text-center">
-        <div class="text-7xl font-bold tracking-tight leading-normal underline decoration-red-500 decoration-8">Join Form</div>
+      <div class="flex flex-row h-3/4 w-full">
+        <%/* farcaster info */%>
+        <div class="flex flex-col gap-4 p-8 text-center justify-center place-content-center items-center">
+          <div>Info from Farcaster</div>
+          <div class="bg-base-200 p-4 w-2/3 text-left">
+            <div class="font-semibold">Name : <span id="farcaster-name" class="font-normal"></span></div>
+            <div class="font-semibold">Handle : <span id="farcaster-handle" class="font-normal"></span></div>
+            <div class="font-semibold">Bio : <span id="farcaster-bio" class="font-normal"></span></div>
+          </div>
+          <div>To Introduce you to the right members <span class="uppercase text-semibold font-lg text-blue-500"><%= communityName %></span> wants to know you a bit better</div>
+        </div>
+        <%/* divider */%>
+        <div class="divider divider-horizontal"></div>
+        <%/* form half */%>
+        <div class="flex flex-col justify-evenly place-content-center w-1/2 p-8">
+          <div>
+            <div>Looking For</div>
+            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="lookingFor">Looking For 1</div>
+            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="lookingFor">Looking For 2</div>
+            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="lookingFor">Looking For 3</div>
+          </div>
+          <div>
+           <div>Interested In</div>
+            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="interestdIn">Interested In 1</div>
+            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="interestdIn">Interested In 2</div>
+            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="interestdIn">Interested In 2</div>
+          </div>
+          <div>
+            <div>Expertise</div>
+            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="expertise">Expertise 1</div>
+            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="expertise">Expertise 2</div>
+            <div id="color-changing-badge" class="badge badge-md badge-ghost cursor-pointer" data-is-clicked="false" question="expertise">Expertise 3</div>
+          </div>
+          
+          <%/* submit button */%>
+          <div class="flex justify-center">
+            <button class="btn"> Submit </button>
+          </div>
+        </div>  
       </div>
-      
-      <div class="text-xl font-medium tracking-tight leading-normal">You have been invited to join <span class="uppercase font-semibold text-2xl text-blue-500"><%= communityName %></span>'s directory</div>
       
       <div class="loading loading-infinity loading-lg hidden"></div>
       
