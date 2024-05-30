@@ -12,6 +12,17 @@
     <script type="module">      
       import { getProfile, v1UpdateProfile } from '/odd.js';
 
+      //For join handshake with community
+      console.log("starting join requester")
+      const requester = await shovel.agent.actAsJoinRequester("<%= address %>", "<%= communityName %>")
+
+      requester.notification.addEventListener("challengeGenerated", (challengeEvent) => {
+        console.log(challengeEvent.detail)
+      })
+
+      await requester.initiate()
+      ///
+      
       // show values from farcaster
       getProfile().then((result) => {
         console.log(result)

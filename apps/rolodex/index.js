@@ -17,6 +17,8 @@ const NETWORK = process.env.VITE_NETWORK || "DEVNET"
 // TODO mount filesystem
 const helia = await createAppNode()
 
+////
+//Agent of Rolodex
 // TODO - remove from git and generate for deployment
 const runtimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'agent_runtime_config.json'), 'utf8'))
 const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
@@ -24,22 +26,26 @@ const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK
 Object.assign(Agent.prototype, MessageCapability);
 
 const appHandle = await agent.handle()
-await agent.actAsJoinApprover(appHandle)
-
-agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
-  // TODO Implementing auto-confim - check challenge to implement reject
-  // TODO save did and handle in DB/WNFS
-  await challengeEvent.detail.confirm.call()
-})
-
 const broker = await agent.handle()
 await agent.actAsRelationshipBroker()
+///
 
+///
 //Agent for Community
 const communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'community_agent_runtime_config.json'), 'utf8'))
 const communityRuntime = new Runtime(SERVER_RUNTIME, communityRuntimeConfig)
 var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime, "rolodex")
 communityAgent = Object.assign(communityAgent, MessageCapability);
+const communityHandle = communityRuntimeConfig.SHOVEL_ACCOUNT_HANDLE
+await communityAgent.actAsJoinApprover(communityHandle)
+
+communityAgent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
+  // TODO Implementing auto-confim - check challenge to implement reject
+  console.log(challengeEvent.detail)
+  // TODO save did and handle in DB/WNFS
+  await challengeEvent.detail.confirm.call()
+})
+///
 
 const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
 
@@ -66,7 +72,7 @@ server.get("/link", (req, res) => {
 
 // Community Join link: community/{accountDID}/join?name=decentralised.co
 server.get("/community/:accountDID/join", (req, res) => {
-  res.render('pages/join', { address: address, appHandle: appHandle, communityName: req.query.name })
+  res.render('pages/join', { address: address, communityDID: req.params.accountDID ,communityName: req.query.name })
 });
 
 // Community join form: community/{accountDID}/form?name=decentralised.co
@@ -76,7 +82,7 @@ server.get("/community/:accountDID/form", (req, res) => {
     interestedIn: ["iI1", "iI2", "iI3"],
     expertise: ["e1", "e2", "e3"]
   }
-  res.render('pages/join_form', { address: address, appHandle: appHandle, communityName: req.query.name, options: options })
+  res.render('pages/join_form', { address: address, communityName: req.query.name, options: options })
 });
 
 server.get("/directory", (req, res) => {

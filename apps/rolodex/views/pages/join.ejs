@@ -11,14 +11,14 @@
   <body class="antialiased bg-base-100">
     <script type="module">
       import { account, farcasterClient, farcasterSignup } from '/odd.js';
+      var communityDID = '<%- communityDID %>'
+      var communityName = '<%- communityName %>'
 
       var session = await account.activeSession();
       if (session) {
         //Todo: fix the redirect on active session
-        window.location.href = '/community/1/form';
+        window.location.href = `/community/${communityDID}/form?name=${communityName}`;
       }
-
-      const requester = await shovel.agent.actAsJoinRequester("<%= address %>", "<%= appHandle %>")
 
       window.showLoading = function(){
         document.querySelector(".loading").classList.remove("hidden");
@@ -57,7 +57,7 @@
            console.log("farcaster message", status.data.message);
            await farcasterSignup(accountDID, status.data.message, status.data.signature, profileData, status.data.fid)
            //todo: make the redirect dynamic
-           window.location.href = "/community/1/form?name=decentralised.co"
+           window.location.href = `/community/${communityDID}/form?name=${communityName}`
          }
         })
       })

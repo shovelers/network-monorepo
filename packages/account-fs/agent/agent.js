@@ -59,6 +59,7 @@ export const MessageCapability = {
     })
 
     await channel.subscribe(this.approver)
+    console.log("Subscribing to :", channelName)
   },
 
   async actAsJoinRequester(address, approverHandle) {
@@ -71,6 +72,7 @@ export const MessageCapability = {
 
     await dial(this.helia, address)
     await channel.subscribe(this.requester)
+    console.log("Subscribing to :", channelName)
     return this.requester
   },
 
