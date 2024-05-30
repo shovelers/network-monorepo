@@ -66,7 +66,6 @@ async function ethereumSignup(accountDID,siweMessage, siweSignature, profileData
   await accountv1.create(accountDID, siweMessage, siweSignature)
   await accountv1.repositories.profile.set(profileData)
   await accountv1.agent.appendName(fid, 'ethereum')
-  window.location.href = "/app";
 }
 
 async function getNonce() {
@@ -144,7 +143,7 @@ async function updateProfile(handle, name, tags = [], text = '') {
 
 //updates given params with new values while keeping rest of the keys in Profile Object the same
 async function v1UpdateProfile(params) {
-  return await account.editProfile(params)
+  return await accountv1.repositories.profile.set(params)
 }
 
 async function addContact(name, email='', tags = [], text = "", links = []) {

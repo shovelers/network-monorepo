@@ -24,8 +24,6 @@
         window.location.href = '/app';
       }
 
-      const requester = await shovel.agent.actAsJoinRequester("<%= address %>", "<%= appHandle %>")
-
       window.showLoading = function(){
         document.querySelector(".loading").classList.remove("hidden");
         document.querySelector("#input-forms").classList.add("hidden");
@@ -36,8 +34,6 @@
         if (success) {window.showLoading()}
         else { alert("Username Already Taken")}
       }
-
-      
 
       window.connectWallet = async function(){
         await provider.send('eth_requestAccounts', [])
@@ -54,11 +50,15 @@
       const integerChainId = parseInt(chainId,16)
       const message =  await createSiweMessage(address,nonce,agentDID,integerChainId);
       const signature = await signer.signMessage(message)
-      const verified = verifySiweMessage(message,signature,nonce);
+      const verified = await verifySiweMessage(message,signature,nonce);
+      console.log("verified :", verified)
       let accountDID = `did:pkh:eip155:${integerChainId}:${address}`
       let profileData = { handle: address, name: "", text:"", tags: [] }
       if(verified) {
-        ethereumSignup(accountDID, message, signature, profileData, address)
+        await ethereumSignup(accountDID, message, signature, profileData, address)
+        window.location.href = "/app";
+      } else {
+        alert('Singup failed! Error :', verified)
       }
       
      }
