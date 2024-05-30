@@ -35,6 +35,12 @@ agent.approver.notification.addEventListener("challengeRecieved", async (challen
 const broker = await agent.handle()
 await agent.actAsRelationshipBroker()
 
+//Agent for Community
+const communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'community_agent_runtime_config.json'), 'utf8'))
+const communityRuntime = new Runtime(SERVER_RUNTIME, communityRuntimeConfig)
+var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime, "rolodex")
+communityAgent = Object.assign(communityAgent, MessageCapability);
+
 const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
 
 server.use(express.urlencoded({ extended: true }))
