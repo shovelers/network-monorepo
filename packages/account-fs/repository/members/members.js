@@ -1,0 +1,105 @@
+const PRODIDs = {
+  "APPLE": "APPLE",
+  "GOOGLE": "GOOGLE",
+  "DCN": "DCN"
+}
+
+/*
+  "PRODID": "GOOGLE",
+  "UID": contact.resourceName,
+
+  "PRODID": "DCN",
+  "UID": `DCN:${contact.handle}`, || `DCN:${contact.fullname}` 
+
+  "PRODID": "FARCASTER",
+  "UID": `FARCASTER:${contact.fid}`, || `DCN:${contact.handle}` 
+
+  "PRODID": "APPLE",
+  "UID": contact.UID,
+*/
+
+export class Person {
+  PRODID;
+  UID;
+  FN;
+  CATEGORIES;
+  URL;
+  NOTE;
+  TEL;
+  EMAIL;
+  // TODO: Define how to use XML for profile
+  XML;
+
+  constructor(fields) {
+    this.PRODID = fields.PRODID  //required
+    this.UID = fields.UID        //required
+    this.FN = fields.FN          //required
+    this.CATEGORIES = fields.CATEGORIES || ""
+    this.URL = fields.URL || ""
+    this.NOTE = fields.NOTE || ""
+    this.TEL = fields.TEL
+    this.EMAIL = fields.EMAIL
+    this.XML = fields.XML
+    this.VERSION = "4.0"
+  }
+
+  asJSON() {
+    return {
+      PRODID: this.PRODID,
+      UID: this.UID,
+      TEL: this.TEL,
+      EMAIL: this.EMAIL,
+      FN: this.FN,
+      CATEGORIES: this.CATEGORIES,
+      URL: this.URL,
+      NOTE: this.NOTE,
+      XML: this.XML
+    }
+  }
+}
+
+export class MembersRepository {
+  constructor(agent) {
+    this.agent = agent
+    this.filename = "members.json" 
+  }
+
+  async initialise(){
+    const exists = await this.agent.fileExists(this.filename)
+    if (!exists) {
+      console.log("I am here")
+      await this.agent.updatePrivateFile(this.filename, () => { return { memberList: {}} })
+    }
+  }
+
+  async list() {
+    const content = await this.agent.readPrivateFile(this.filename);
+    const members = [];
+
+    for (const [_, member] of Object.entries(content.memberList)) {
+      people.push(
+        new Person({
+          PRODID: member.PRODID,
+          UID: member.UID,
+          TEL: member.TEL,
+          EMAIL: member.EMAIL,
+          FN: member.FN,
+          //TODO: remove below fields from search results, when searched from other apps
+          CATEGORIES: member.CATEGORIES,
+          URL: member.URL,
+          NOTE: member.NOTE,
+          XML: member.XML,
+        })
+      );
+    }
+
+    return members;
+  }
+
+  async add(member){
+    await this.agent.updatePrivateFile(this.filename, (content) => {
+      content.memberList[member.UID] = member.asJSON();
+      return content;
+    });
+  }
+}

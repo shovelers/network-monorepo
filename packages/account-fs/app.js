@@ -1,4 +1,5 @@
 import { Agent, Runtime, SERVER_RUNTIME, MessageCapability, StorageCapability} from './agent/agent.js'
+import { MembersRepository } from './repository/members/members.js';
 import { createNode, APP } from './agent/helia_node.js';
 import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
@@ -19,4 +20,4 @@ const connection = {
   "TESTNET": {network: "TESTNET", sync_host: "https://testnet.shovel.company:8001", dial_prefix: "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/"}
 }
 
-export { Agent, Runtime, connection, createAppNode, SERVER_RUNTIME, MessageCapability, StorageCapability }
+export { Agent, Runtime, connection, createAppNode, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository }

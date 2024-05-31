@@ -324,6 +324,7 @@ export const StorageCapability = {
     var [accessKey, forestCID] = await this.fs.write(filename, JSON.stringify(newContent))
 
     await this.pin(forestCID)
+    console.log("pinning content")
     return newContent
   },
 
