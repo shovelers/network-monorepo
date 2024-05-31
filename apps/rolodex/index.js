@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDAVClient } from 'tsdav';
-import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability } from 'account-fs/app.js';
+import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability } from 'account-fs/app.js';
 import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 
@@ -36,6 +36,10 @@ const communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname,
 const communityRuntime = new Runtime(SERVER_RUNTIME, communityRuntimeConfig)
 var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime, "rolodex")
 communityAgent = Object.assign(communityAgent, MessageCapability);
+communityAgent = Object.assign(communityAgent, StorageCapability);
+//load fs
+await communityAgent.bootstrap()
+await communityAgent.load();
 const communityHandle = communityRuntimeConfig.SHOVEL_ACCOUNT_HANDLE
 await communityAgent.actAsJoinApprover(communityHandle)
 

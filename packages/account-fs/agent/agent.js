@@ -359,15 +359,14 @@ export const StorageCapability = {
       
       const diff = await this.fs.compareWithRemote(headCID)
       mergedCID = await this.fs.mergeWithRemote(headCID)
-      
-      this.runtime.setItem(SHOVEL_FS_FOREST_CID, mergedCID)
+     
+      await this.runtime.setItem(SHOVEL_FS_FOREST_CID, mergedCID)
       console.log("diff :", diff, "merge :", mergedCID)
     }).catch((e) => {
       if (e.response.status == '404') {
         this.runtime.setItem(SHOVEL_FS_FOREST_CID, cid)
         mergedCID = cid
       }
-
       return e
     })
     
@@ -485,7 +484,7 @@ export class Runtime {
 
         return await RSASigner.importJwk(jwk, did)
       default:
-        throw "InvalidRuntime"
+        throw "InvalidRuntime from signer"
     }
   }
 
@@ -494,9 +493,18 @@ export class Runtime {
       case BROWSER_RUNTIME:
         return await localforage.getItem(key)
       case SERVER_RUNTIME:
-        return this.config[key]
+        if (key == "SHOVEL_FS_ACCESS_KEY") {
+          // convert string to Uint8array
+          return uint8arrays.fromString(this.config[key], 'base64url')
+        } else if (key == "SHOVEL_FS_FOREST_CID") {
+          //convert string to Uinst8array
+          return CID.parse(this.config[key]).bytes
+        }
+        else {
+          return this.config[key]
+        }
       default:
-        throw "InvalidRuntime"
+        throw "InvalidRuntime from getItem"
     }
   }
  
@@ -505,9 +513,20 @@ export class Runtime {
       case BROWSER_RUNTIME:
         return await localforage.setItem(key, value)
       case SERVER_RUNTIME:
-        throw "NotImplementedInRuntime"
+        //convert uint8arrays to string before save to file
+        //TODO: Make the config persist on the config file 
+        if (key == "SHOVEL_FS_ACCESS_KEY") {
+          var valueString = uint8arrays.toString(value, 'base64url')
+          return this.config[key] = valueString
+        } else if (key == "SHOVEL_FS_FOREST_CID") {
+          var valueString = CID.decode(value).toString()
+          return this.config[key] = valueString
+        }
+        else {
+          return this.config[key] = value
+        }
       default:
-        throw "InvalidRuntime"
+        throw "InvalidRuntime from setItem"
     }
   }
 
@@ -518,7 +537,7 @@ export class Runtime {
       case SERVER_RUNTIME:
         throw "NotImplementedInRuntime"
       default:
-        throw "InvalidRuntime"
+        throw "InvalidRuntime for removeItem"
     }
   }
 }
