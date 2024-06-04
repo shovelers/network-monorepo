@@ -5,6 +5,8 @@ import { createDAVClient } from 'tsdav';
 import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository } from 'account-fs/app.js';
 import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
+import {access, constants } from 'node:fs/promises';
+import axios from 'axios';
 
 const port = process.argv[2] || 3000;
 const server = express();
@@ -13,6 +15,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const NETWORK = process.env.VITE_NETWORK || "DEVNET"
+const COMMUNITY_AGENT_ACCESS_KEY = process.env.VITE_COMMUNITY_AGENT_ACCESS_KEY || ""
+const RUN_COMMUNITY_AGENT = process.env.VITE_RUN_COMMUNITY_AGENT || true
 
 // TODO mount filesystem
 const helia = await createAppNode()
@@ -32,31 +36,53 @@ await agent.actAsRelationshipBroker()
 
 ///
 //Agent for Community
-const communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'community_agent_runtime_config.json'), 'utf8'))
-const communityRuntime = new Runtime(SERVER_RUNTIME, communityRuntimeConfig)
-var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime, "rolodex")
-communityAgent = Object.assign(communityAgent, MessageCapability);
-communityAgent = Object.assign(communityAgent, StorageCapability);
-
-//load fs
-await communityAgent.bootstrap()
-await communityAgent.load();
-console.log("communityAgent DID :", await communityAgent.DID())
-
-//initialise members repo
-var members = new MembersRepository(communityAgent)
-await members.initialise()
-
-//Run Join Approver fro community agent
-const communityHandle = communityRuntimeConfig.SHOVEL_ACCOUNT_HANDLE
-await communityAgent.actAsJoinApprover(communityHandle)
-
-communityAgent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
-  // TODO Implementing auto-confim - check challenge to implement reject
-  console.log("receieved from reequester :", challengeEvent.detail)
-  // TODO save did and handle in DB/WNFS
-  await challengeEvent.detail.confirm.call()
-})
+// set VITE_RUN_COMMUNITY_AGENT as false if you don't want this flow locally
+if (RUN_COMMUNITY_AGENT == true) {
+  try {
+    //check if config file exists
+    await access(path.join(__dirname, "community_agent_runtime_config.json"), constants.R_OK | constants.W_OK);
+    
+    const communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, "community_agent_runtime_config.json"), 'utf8'))
+    //add accessKey from envVar to runtime config
+    communityRuntimeConfig.SHOVEL_FS_ACCESS_KEY = COMMUNITY_AGENT_ACCESS_KEY
+    //add forestCID from hub to runtime config
+    const axios_client  = axios.create({
+      baseURL: connection[NETWORK].sync_host,
+    })  
+    await axios_client.get(`/v1/accounts/${communityRuntimeConfig.SHOVEL_ACCOUNT_DID}/head`).then(async (response) => {
+      communityRuntimeConfig.SHOVEL_FS_FOREST_CID = response.data.head
+    })
+    // create runtime
+    const communityRuntime = new Runtime(SERVER_RUNTIME, communityRuntimeConfig)
+    var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime, "rolodex")
+    communityAgent = Object.assign(communityAgent, MessageCapability);
+    communityAgent = Object.assign(communityAgent, StorageCapability);
+    
+    //load fs
+    console.log("bootsrapping ....")
+    await communityAgent.bootstrap()
+    console.log("loading CID....", await communityAgent.forestCID())
+    await communityAgent.load();
+    console.log("communityAgent DID :", await communityAgent.DID())
+    
+    //initialise members repo
+    var members = new MembersRepository(communityAgent)
+    await members.initialise()
+    
+    //Run Join Approver fro community agent
+    const communityHandle = communityRuntimeConfig.SHOVEL_ACCOUNT_HANDLE
+    await communityAgent.actAsJoinApprover(communityHandle)
+    
+    communityAgent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
+      // TODO Implementing auto-confim - check challenge to implement reject
+      console.log("receieved from reequester :", challengeEvent.detail)
+      // TODO save did and handle in DB/WNFS
+      await challengeEvent.detail.confirm.call()
+    })
+  } catch {
+    console.error("Not running Community Agent : No config file found")
+  }
+}
 ///
 
 const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
