@@ -4,7 +4,6 @@
     <link rel="stylesheet" href="./styles/style.css" />
     <link rel="icon" href="/favicon.ico">
     <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
   </head>
 
   <%- include('../partials/google_analytics.ejs') %>
@@ -13,10 +12,10 @@
     <script type="module">
       
       import { signup, recover, account, farcasterClient, farcasterSignup, createSiweMessage, getNonce, verifySiweMessage, ethereumSignup } from '/odd.js';
+      import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.12.1/ethers.min.js";
       window.signup = signup;
       window.recover = recover;
-      const { ethers } = window;
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
 
 
       var session = await account.activeSession();
@@ -50,10 +49,11 @@
       const integerChainId = parseInt(chainId,16)
       const message =  await createSiweMessage(address,nonce,agentDID,integerChainId);
       const signature = await signer.signMessage(message)
-      const verified = await verifySiweMessage(message,signature,nonce);
-      console.log("verified :", verified)
+      
       let accountDID = `did:pkh:eip155:${integerChainId}:${address}`
       let profileData = { handle: address, name: "", text:"", tags: [] }
+      
+      const verified = await verifySiweMessage(message,signature,nonce);
       if(verified) {
         await ethereumSignup(accountDID, message, signature, profileData, address)
         window.location.href = "/app";

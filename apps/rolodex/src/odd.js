@@ -9,9 +9,6 @@ import { save } from '@tauri-apps/api/dialog';
 import { writeTextFile } from '@tauri-apps/api/fs';
 import { SiweMessage } from 'siwe';
 
-import { ethers } from 'ethers';
-
-
 const farcasterClient = createAppClient({
   relay: 'https://relay.farcaster.xyz',
   ethereum: viemConnector(),
@@ -80,14 +77,14 @@ async function getNonce() {
 
 async function createSiweMessage(address, nonce, requestId, chainId) {
   const message = new SiweMessage({
-      requestId,
-      domain: window.origin,
+      domain: window.location.host,
       address: address,
       statement : 'Sign in via ethereum',
-      uri: window.origin+'/home',
+      uri: window.location.origin,
       version: '1',
       chainId: chainId,
-      nonce
+      nonce: nonce,
+      requestId: requestId
   });
   return message.prepareMessage();
 }
@@ -95,8 +92,8 @@ async function createSiweMessage(address, nonce, requestId, chainId) {
 async function verifySiweMessage(message,signature,nonce) {
   let SiweObject = new SiweMessage(message)
   try {
-    SiweObject.verify(signature,nonce);
-    return true;
+    var publicKey, result = await SiweObject.verify({signature: signature, nonce: nonce});
+    return result.success;
   }
   catch(e) {
     console.error("SIWE Message verfication failed", e);

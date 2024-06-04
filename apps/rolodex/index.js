@@ -5,7 +5,7 @@ import { createDAVClient } from 'tsdav';
 import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository } from 'account-fs/app.js';
 import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
-import {access, constants } from 'node:fs/promises';
+import { access, constants } from 'node:fs/promises';
 import axios from 'axios';
 
 const port = process.argv[2] || 3000;
