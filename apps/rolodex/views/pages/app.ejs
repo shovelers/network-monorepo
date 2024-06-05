@@ -15,7 +15,7 @@
   <body class="antialiased bg-base-100">
     <script type="module">
       import { account, getContactForRelate, addConnection, portOldContacts, addContact, getContacts, getContactByUID, editContact, deleteContact, filterContacts,
-        getProfile, updateProfile, signout, generateRecoveryKit, importContacts, appleCredsPresent, importGoogleContacts, downloadContactsDataLocally} from '/odd.js';
+        getProfile, updateProfile, signout, generateRecoveryKit, importContacts, appleCredsPresent, importGoogleContacts, downloadContactsDataLocally, getMembers} from '/odd.js';
       window.addContact = addContact;
       window.getContacts = getContacts;
       window.editContact = editContact;
@@ -33,14 +33,21 @@
       window.getContactForRelate = getContactForRelate;
       window.addConnection = addConnection;
       window.appleCredsPresent = appleCredsPresent;
+      window.getMembers = getMembers;
 
       var session = await account.activeSession();
       if (session == false) {
         window.location.href = '/home';
       }
 
+      let members = await window.getMembers()
+      console.log("memberList...", members)
+
       window.refreshContacts = function(){
         window.getContacts().then((result) => {
+          if (members.memberList) {
+            result.contactList = (members.memberList).concat(result.contactList)
+          }
           document.querySelector("contact-table").contacts = result
         })
       }

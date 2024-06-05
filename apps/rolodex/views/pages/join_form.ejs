@@ -10,7 +10,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">      
-      import { getProfile, account ,v1UpdateProfile, addCommunity, contactToJoinCommunity } from '/odd.js';
+      import { getProfile, account ,v1UpdateProfile, addCommunityToContacts, contactToJoinCommunity } from '/odd.js';
       
       var session = await account.activeSession();
       if (session) {
@@ -92,7 +92,7 @@
       requester.challenge = function () { return { person: person } }
 
       requester.notification.addEventListener("CONFIRMED", async (event) => {
-        let result = await addCommunity(event.detail.data.community)
+        let result = await addCommunityToContacts(event.detail.data.community)
         console.log("community added to contacts :", result)
       })
 

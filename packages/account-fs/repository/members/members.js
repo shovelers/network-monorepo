@@ -73,27 +73,31 @@ export class MembersRepository {
   }
 
   async list() {
-    const content = await this.agent.readPrivateFile(this.filename);
-    const members = [];
+    try {
+      const content = await this.agent.readPrivateFile(this.filename);
+      const members = [];
 
-    for (const [_, member] of Object.entries(content.memberList)) {
-      people.push(
-        new Person({
-          PRODID: member.PRODID,
-          UID: member.UID,
-          TEL: member.TEL,
-          EMAIL: member.EMAIL,
-          FN: member.FN,
-          //TODO: remove below fields from search results, when searched from other apps
-          CATEGORIES: member.CATEGORIES,
-          URL: member.URL,
-          NOTE: member.NOTE,
-          XML: member.XML,
-        })
-      );
+      for (const [_, member] of Object.entries(content.memberList)) {
+        members.push(
+          new Person({
+            PRODID: member.PRODID,
+            UID: member.UID,
+            TEL: member.TEL,
+            EMAIL: member.EMAIL,
+            FN: member.FN,
+            //TODO: remove below fields from search results, when searched from other apps
+            CATEGORIES: member.CATEGORIES,
+            URL: member.URL,
+            NOTE: member.NOTE,
+            XML: member.XML,
+          })
+        );
+      }
+
+      return members;
+    } catch (error) {
+      console.log(error)  
     }
-
-    return members;
   }
 
   async add(member){

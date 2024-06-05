@@ -2,7 +2,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
-import { programInit, Account, Person, PeopleRepository, AccountV1 } from 'account-fs';
+import { programInit, Account, Person, PeopleRepository, AccountV1, MembersRepository } from 'account-fs';
 import * as uint8arrays from 'uint8arrays';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { save } from '@tauri-apps/api/dialog';
@@ -21,6 +21,7 @@ const program = await programInit(NETWORK, "rolodex")
 window.shovel = program
 
 const contactRepo = new PeopleRepository(program.agent)
+const membersRepo = new MembersRepository(program.agent)
 const account = new Account(program.agent)
 const accountv1 = new AccountV1(program.agent, ["PEOPLE"])
 shovel.accountv1 = accountv1
@@ -100,9 +101,15 @@ async function verifySiweMessage(message,signature,nonce) {
   }
 }
 
-async function addCommunity(community){
+async function addCommunityToContacts(community){
   let communityEntry = new Person({FN: community.FN, PRODID: community.PRODID, UID: community.UID, XML: community.XML, CATEGORIES: 'community'})
   return await contactRepo.create(communityEntry)
+}
+
+async function getMembers() {
+  var list = await membersRepo.list()
+  console.log("all", list)
+  return {memberList: list}
 }
 
 async function contactToJoinCommunity() {
@@ -421,6 +428,7 @@ export {
   verifySiweMessage,
   ethereumSignup,
   v1UpdateProfile,
-  addCommunity,
-  contactToJoinCommunity
+  addCommunityToContacts,
+  contactToJoinCommunity,
+  getMembers
 };
