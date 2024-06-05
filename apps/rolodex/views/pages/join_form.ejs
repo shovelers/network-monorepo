@@ -10,19 +10,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">      
-      import { getProfile, v1UpdateProfile } from '/odd.js';
-
-      //For join handshake with community
-      console.log("starting join requester")
-      const requester = await shovel.agent.actAsJoinRequester("<%= address %>", "<%= communityName %>")
-
-      requester.notification.addEventListener("challengeGenerated", (challengeEvent) => {
-        console.log(challengeEvent.detail)
-      })
-
-      await requester.initiate()
-      ///
-      
+      import { getProfile, v1UpdateProfile, addCommunity, contactToJoinCommunity } from '/odd.js';
       // show values from farcaster
       getProfile().then((result) => {
         console.log(result)
@@ -89,6 +77,21 @@
           }
         })
       )
+
+      //For join handshake with community
+      let person = await contactToJoinCommunity()
+      console.log("person with XML :", person)
+
+      let requester = await shovel.agent.actAsJoinRequester("<%= address %>", "<%= communityName %>")
+      requester.challenge = function () { return { person: person } }
+
+      requester.notification.addEventListener("CONFIRMED", async (event) => {
+        let result = await addCommunity(event.detail.data.community)
+        console.log("community added to contacts :", result)
+      })
+
+      await requester.initiate()
+
       // add selected tags to profile on save
       window.addSelectedTagsToProfile = async function(){
         await v1UpdateProfile({lookingFor: lookingFor, interestedIn: interestedIn, expertise: expertise})

@@ -59,9 +59,8 @@ if (RUN_COMMUNITY_AGENT == true) {
     communityAgent = Object.assign(communityAgent, StorageCapability);
     
     //load fs
-    console.log("bootsrapping ....")
+    console.log("...bootstrapping...")
     await communityAgent.bootstrap()
-    console.log("loading CID....", await communityAgent.forestCID())
     await communityAgent.load();
     console.log("communityAgent DID :", await communityAgent.DID())
     
@@ -75,7 +74,9 @@ if (RUN_COMMUNITY_AGENT == true) {
     
     communityAgent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
       // TODO Implementing auto-confim - check challenge to implement reject
-      console.log("receieved from reequester :", challengeEvent.detail)
+      console.log("receieved from requester :", challengeEvent.detail)
+      await members.add(challengeEvent.detail.message.challenge.person)
+
       // TODO save did and handle in DB/WNFS
       await challengeEvent.detail.confirm.call()
     })

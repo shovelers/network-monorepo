@@ -100,6 +100,25 @@ async function verifySiweMessage(message,signature,nonce) {
   }
 }
 
+async function addCommunity(community){
+  let communityEntry = new Person({FN: community.FN, PRODID: community.PRODID, UID: crypto.randomUUID(), XML: community.XML, CATEGORIES: 'community'})
+  return await contactRepo.create(communityEntry)
+}
+
+async function contactToJoinCommunity() {
+  let accountDID = await accountv1.agent.accountDID()
+  let profile = await getProfile()
+  let profileAccessKey = await program.agent.getAccessKeyForPrivateFile('profile.json')
+  let encodedProfileAccessKey = uint8arrays.toString(profileAccessKey.toBytes(), 'base64');
+
+  return {
+    FN: profile.name,
+    UID: `DCN:${accountDID}`,
+    PRODID: "DCN:rolodex",
+    XML: `profile.json:${profile.handle}.${encodedProfileAccessKey}`
+  }
+}
+
 async function getProfile() {
   return account.getProfile()
 }
@@ -401,5 +420,7 @@ export {
   getNonce,
   verifySiweMessage,
   ethereumSignup,
-  v1UpdateProfile
+  v1UpdateProfile,
+  addCommunity,
+  contactToJoinCommunity
 };

@@ -98,7 +98,7 @@ export class MembersRepository {
 
   async add(member){
     await this.agent.updatePrivateFile(this.filename, (content) => {
-      content.memberList[member.UID] = member.asJSON();
+      content.memberList[member.UID] = member;
       return content;
     });
   }
