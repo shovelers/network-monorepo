@@ -16,8 +16,7 @@
 
       var session = await account.activeSession();
       if (session) {
-        //Todo: fix the redirect on active session
-        window.location.href = `/community/${communityDID}/form?name=${communityName}`;
+        window.location.href = `/directory`;
       }
 
       window.showLoading = function(){

@@ -10,7 +10,13 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">      
-      import { getProfile, v1UpdateProfile, addCommunity, contactToJoinCommunity } from '/odd.js';
+      import { getProfile, account ,v1UpdateProfile, addCommunity, contactToJoinCommunity } from '/odd.js';
+      
+      var session = await account.activeSession();
+      if (session) {
+        window.location.href = '/directory';
+      }
+
       // show values from farcaster
       getProfile().then((result) => {
         console.log(result)

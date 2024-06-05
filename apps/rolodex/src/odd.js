@@ -101,7 +101,7 @@ async function verifySiweMessage(message,signature,nonce) {
 }
 
 async function addCommunity(community){
-  let communityEntry = new Person({FN: community.FN, PRODID: community.PRODID, UID: crypto.randomUUID(), XML: community.XML, CATEGORIES: 'community'})
+  let communityEntry = new Person({FN: community.FN, PRODID: community.PRODID, UID: community.UID, XML: community.XML, CATEGORIES: 'community'})
   return await contactRepo.create(communityEntry)
 }
 
