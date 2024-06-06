@@ -77,8 +77,14 @@ export class ContactTable extends HTMLElement {
       tagscell.classList.add('place-self-center', 'space-x-1', 'space-y-1', 'col-span-3');
       if (value.CATEGORIES !== undefined && value.CATEGORIES.length > 0) {
         let tags = value.CATEGORIES.split(',')
-        for (let tag of tags) {
-          tagscell.innerHTML += `<span class="badge badge-neutral">${tag}</span>`;
+        if (tags.includes('community')){
+          for (let tag of tags) {
+            tagscell.innerHTML += `<button class="badge badge-neutral" onclick="window.location.href = '/directory/${value.UID}?name=${value.FN}'">${tag}</button>`;
+          }
+        } else {
+          for (let tag of tags) {
+            tagscell.innerHTML += `<span class="badge badge-neutral">${tag}</span>`;
+          }
         }
       } else {
         tagscell.innerHTML = '';
