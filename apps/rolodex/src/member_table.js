@@ -64,7 +64,7 @@ export class MemberTable extends HTMLElement {
       nameCell.textContent = value.name;
 
       const lookingForCell = row.insertCell(1); 
-      lookingForCell.classList.add('col-span-2', 'font-medium')
+      lookingForCell.classList.add('col-span-2', 'font-medium', 'space-x-1')
       if (value.lookingFor !== undefined && value.lookingFor.length > 0) {
         let tags = Array.isArray(value.lookingFor) ? value.lookingFor : [value.lookingFor];  // Check if EMAIL is an array, if not, treat it as a single string in an array
         for (let tag of tags) {
@@ -74,7 +74,7 @@ export class MemberTable extends HTMLElement {
         lookingForCell.innerHTML = '';
       }
       const interestedInCell = row.insertCell(2); 
-      interestedInCell.classList.add('col-span-2', 'font-medium')
+      interestedInCell.classList.add('col-span-2', 'font-medium', 'space-x-1')
       if (value.interestedIn !== undefined && value.interestedIn.length > 0) {
         let tags = Array.isArray(value.interestedIn) ? value.interestedIn : [value.interestedIn];  // Check if EMAIL is an array, if not, treat it as a single string in an array
         for (let tag of tags) {
@@ -84,7 +84,7 @@ export class MemberTable extends HTMLElement {
         interestedInCell.innerHTML = '';
       }
       const expertiseCell = row.insertCell(3); 
-      expertise.classList.add('col-span-2', 'font-medium')
+      expertiseCell.classList.add('col-span-2', 'font-medium', 'space-x-1')
       if (value.expertise !== undefined && value.expertise.length > 0) {
         let tags = Array.isArray(value.expertise) ? value.expertise : [value.expertise];  // Check if EMAIL is an array, if not, treat it as a single string in an array
         for (let tag of tags) {

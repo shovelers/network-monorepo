@@ -118,6 +118,10 @@ async function getCommunityMembers(community) {
   return await program.agent.fetchMemberProfilesForCommunity(community)
 }
 
+async function filterMembers(filter, profiles) {
+  return await program.agent.searchMembers(filter, profiles)
+}
+
 async function contactToJoinCommunity() {
   let accountDID = await accountv1.agent.accountDID()
   let profile = await getProfile()
@@ -165,6 +169,7 @@ async function getContactByUID(uid) {
 async function filterContacts(filter) {
   return { contactList: await program.agent.search(filter) }
 }
+
 
 async function updateProfile(handle, name, tags = [], text = '') {
   await account.editProfile({handle: handle, name: name, tags: tags, text: text})
@@ -437,5 +442,6 @@ export {
   addCommunityToContacts,
   contactToJoinCommunity,
   getMembers,
-  getCommunityMembers
+  getCommunityMembers,
+  filterMembers
 };

@@ -144,6 +144,23 @@ export const SearchCapability = {
     })
   },
 
+  async searchMembers(query, profiles){
+    //fetch all profiles for the community
+      //select & return the matching profiles
+    var filteredProfiles = []
+    for (let [key, value] of Object.entries(profiles)) {
+      let allTags = value.lookingFor.concat(value.interestedIn, value.expertise)
+      if (value.name.toLowerCase().includes(query) || value.handle.toLowerCase().includes(query) || value.text.toLowerCase().includes(query)){
+        filteredProfiles.push(value)
+      } else if ( (allTags.filter(tag => tag.toLowerCase().includes(query))).length > 0 ) {
+        filteredProfiles.push(value)
+      }
+    } 
+
+    console.log("from inside serch", query, filteredProfiles)
+    return filteredProfiles
+  },
+
   //matches the query with text in contact fileds
   fullTextMatch (contacts, queryString) {
     var filteredContacts = []
