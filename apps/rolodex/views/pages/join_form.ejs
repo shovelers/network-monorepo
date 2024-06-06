@@ -11,12 +11,8 @@
   <body class="antialiased bg-base-100">
     <script type="module">      
       import { getProfile, account ,v1UpdateProfile, addCommunityToContacts, contactToJoinCommunity } from '/odd.js';
+      var communityDID = '<%- communityDID %>'
       
-      var session = await account.activeSession();
-      if (session) {
-        window.location.href = '/directory';
-      }
-
       // show values from farcaster
       getProfile().then((result) => {
         console.log(result)
@@ -105,7 +101,7 @@
         let profile = await getProfile()
         console.log("Profile after save :", profile)
 
-        window.location.href = '/directory';
+        window.location.href = `/directory/${communityDID}`;
       }
     </script>
 

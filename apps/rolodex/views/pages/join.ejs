@@ -16,7 +16,7 @@
 
       var session = await account.activeSession();
       if (session) {
-        window.location.href = `/directory`;
+        window.location.href = `/directory/${communityDID}`;
       }
 
       window.showLoading = function(){

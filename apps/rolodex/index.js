@@ -121,11 +121,11 @@ server.get("/community/:accountDID/form", (req, res) => {
     interestedIn: ["iI1", "iI2", "iI3"],
     expertise: ["e1", "e2", "e3"]
   }
-  res.render('pages/join_form', { address: address, communityName: req.query.name, options: options })
+  res.render('pages/join_form', { address: address, communityDID: req.params.accountDID, communityName: req.query.name, options: options })
 });
 
-server.get("/directory", (req, res) => {
-  res.render('pages/directory')
+server.get("/directory/:accountDID", (req, res) => {
+  res.render('pages/directory', {communityDID: req.params.accountDID})
 })
 
 server.get('/nonce',  (req, res) => {
