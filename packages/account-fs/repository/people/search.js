@@ -95,6 +95,55 @@ export const SearchCapability = {
       })
   },
 
+  async fetchMemberProfilesForCommunity(community){
+    //example community.XML format {members.json details}|{contacts.json details}
+    //"members.json:DecentralisedCo.oXN3bmZzL3NoYXJlL3RlbXBvcmFso2VsYWJlbFggAxDOaGW3iLTPdw9K71ow6_-3ZzBReTN4N6hLMrhMGFJqY29udGVudENpZNgqWCUAAVUSIMG7uPOznVH86HYDUQWVq1YB1SPeIFsw6PKReWzb38zTa3RlbXBvcmFsS2V5WCD8fo-LhlD-NQZ_rop3lNx6aRRTq14OhH1wXGbxqYl1hg|contacts.json:DecentralisedCo.oXN3bmZzL3NoYXJlL3RlbXBvcmFso2VsYWJlbFggpX6-bGdo36XxL4280055vrM7qxaTj4hd_KHRYvbzVG1qY29udGVudENpZNgqWCUAAVUSIFiQy3vwUResYBaRClZfLLwqYsX0IbaeqFNjR-qadaeja3RlbXBvcmFsS2V5WCAJttK3Ut2VFLeZwGS4w9RmWk2UwK4IpDHuQnRnfOopRA"
+    
+    //fetch forestCID from hub
+      //read members.json of community
+        //for each member read profile.json
+        //return a list of profile objects
+    let details = community.XML.split('|')
+    let memberDetails = details[0].split(':')[1]
+    let memberAccessKey = memberDetails.split('.')[1]
+    let communityDID = community.UID.split(':').splice(1).join(':')
+    return await this.axios_client.get(`/v1/accounts/${communityDID}/head`).then(async (response) => {
+      let forestCID = response.data.head
+      var fetchedProfiles = []
+      var fetchedMembers
+      try {
+        let filecontent = await this.readPrivateFileByPointer(memberAccessKey, CID.parse(forestCID).bytes, 'base64url')
+        fetchedMembers = JSON.parse(filecontent).memberList 
+        console.log("fetched members", fetchedMembers )
+      } catch (e) {
+        console.log("CID fetch failed", e);
+        return []
+      }
+
+      for (let [key, value] of Object.entries(fetchedMembers)) {
+        //for each value, read UID, fetch head, readFilebyPointer  
+        let personDetails = value.XML.split(':')[1]
+        let profileAccessKey = personDetails.split('.')[1]
+        let personDID = value.UID.split(':').splice(1).join(':')
+        console.log("profile ak :", profileAccessKey)
+
+        await this.axios_client.get(`/v1/accounts/${personDID}/head`).then(async (response) => {
+          let personForestCID = response.data.head
+          try {
+            let filecontent = await this.readPrivateFileByPointer(profileAccessKey, CID.parse(personForestCID).bytes)
+            let profile = JSON.parse(filecontent) 
+            fetchedProfiles.push(profile)
+          } catch (e) {
+            console.log("CID fetch failed", e);
+            return []
+          }
+        })
+      }
+      console.log("fetched Profiles :", fetchedProfiles)
+      return fetchedProfiles
+    })
+  },
+
   //matches the query with text in contact fileds
   fullTextMatch (contacts, queryString) {
     var filteredContacts = []

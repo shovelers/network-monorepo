@@ -305,11 +305,11 @@ export const StorageCapability = {
     }
   },
 
-  async readPrivateFileByPointer(accessKey, forestCID){
+  async readPrivateFileByPointer(accessKey, forestCID, akEncoding='base64'){
     //fetches the CID from the network if not available locally
       //Primarily used for fetching data shared by other users to the client
     let privateFile = new PrivateFile(this.helia)
-    let content = await privateFile.read(uint8arrays.fromString(accessKey, 'base64'), forestCID)
+    let content = await privateFile.read(uint8arrays.fromString(accessKey, akEncoding), forestCID)
     console.log("content fetched", forestCID)
     return content
   },
@@ -372,7 +372,7 @@ export const StorageCapability = {
     })
     
     return mergedCID
-  }, 
+  },
 }
 
 export class Agent {

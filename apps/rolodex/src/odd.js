@@ -2,6 +2,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
+import { MemberTable } from "./member_table";
 import { programInit, Account, Person, PeopleRepository, AccountV1, MembersRepository } from 'account-fs';
 import * as uint8arrays from 'uint8arrays';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
@@ -27,6 +28,7 @@ const accountv1 = new AccountV1(program.agent, ["PEOPLE"])
 shovel.accountv1 = accountv1
 
 customElements.define('contact-table', ContactTable);
+customElements.define('member-table', MemberTable);
 
 const axios_client  = axios.create({
   baseURL: `${window.location.origin}`,
@@ -110,6 +112,10 @@ async function getMembers() {
   var list = await membersRepo.list()
   console.log("all", list)
   return {memberList: list}
+}
+
+async function getCommunityMembers(community) {
+  return await program.agent.fetchMemberProfilesForCommunity(community)
 }
 
 async function contactToJoinCommunity() {
@@ -430,5 +436,6 @@ export {
   v1UpdateProfile,
   addCommunityToContacts,
   contactToJoinCommunity,
-  getMembers
+  getMembers,
+  getCommunityMembers
 };

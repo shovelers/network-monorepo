@@ -12,6 +12,7 @@
     <script type="module">      
       import { getProfile, account ,v1UpdateProfile, addCommunityToContacts, contactToJoinCommunity } from '/odd.js';
       var communityDID = '<%- communityDID %>'
+      var communityName = '<%- communityName %>'
       
       // show values from farcaster
       getProfile().then((result) => {
@@ -101,7 +102,7 @@
         let profile = await getProfile()
         console.log("Profile after save :", profile)
 
-        window.location.href = `/directory/${communityDID}`;
+        window.location.href = `/directory/${communityDID}?name=${communityName}`;
       }
     </script>
 

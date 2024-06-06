@@ -2,9 +2,8 @@
 <html lang="en">
 
 <head>
-  <link rel="stylesheet" href="./styles/style.css" />
+  <link rel="stylesheet" href="../styles/style.css" />
   <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
-  <script src="https://accounts.google.com/gsi/client"></script>
   <link rel="icon" href="/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -14,8 +13,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { account, addContact, getContacts, getContactByUID, editContact, deleteContact, filterContacts,
-        getProfile, updateProfile, signout} from '/odd.js';
+      import { account, addContact, getContacts, getContactByUID, editContact, deleteContact, filterContacts, getProfile, updateProfile, signout, getMembers, getCommunityMembers} from '/odd.js';
       window.addContact = addContact;
       window.getContacts = getContacts;
       window.editContact = editContact;
@@ -24,20 +22,21 @@
       window.updateProfile = updateProfile;
       window.signout = signout;
       window.getProfile = getProfile;
-      window.getContactByUID = getContactByUID;
+      window.getMembers = getMembers;
 
       var session = await account.activeSession();
       if (session == false) {
         window.location.href = '/home';
       }
-
-      window.refreshContacts = function(){
-        window.getContacts().then((result) => {
-          document.querySelector("contact-table").contacts = result
+      
+      let community = await getContactByUID('DCN:'+'<%- communityDID %>')
+      window.refreshmembers = function(){
+        getCommunityMembers(community).then((result) => {
+          document.querySelector("member-table").members = result
         })
       }
-      refreshContacts();
-     
+      refreshmembers();
+    
       //setup values for the Profile being shown
       window.refreshProfile = function(){
         window.getProfile().then((result) => {
@@ -96,13 +95,14 @@
         </div>
         
         <div class=" md:w-3/4 space-y-2 overflow-hidden pt-2">  
-          <div class="flex justify-evenly ">          
+          <div class="flex justify-evenly ">
+            <div>Member List for <%= communityName %> </div>          
             <%- include('../partials/app/search_bar.ejs') %>
             <%- include('../partials/app/contact_add.ejs') %>
           </div>
           
           <div class="flex flex-col justify-center max-h-full py-4 relative">
-            <%- include('../partials/app/contact_list.ejs') %>
+            <%- include('../partials/directory/member_list.ejs') %>
           </div>
         </div>
 
