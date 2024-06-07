@@ -46,6 +46,7 @@ if (RUN_COMMUNITY_AGENT == true) {
     console.log("community runtime config filecontent :", communityRuntimeConfig)
     console.log("process env :", process.env)
     console.log("envs :", process.env.VITE_NETWORK, process.env.VITE_COMMUNITY_AGENT_ACCESS_KEY, process.env.VITE_RUN_COMMUNITY_AGENT)
+    console.log("import meta env:", import.meta.env)
     console.log("network config and connection object", NETWORK, connection, connection[NETWORK] )
     //add accessKey from envVar to runtime config
     communityRuntimeConfig.SHOVEL_FS_ACCESS_KEY = COMMUNITY_AGENT_ACCESS_KEY
