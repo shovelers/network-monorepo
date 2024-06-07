@@ -44,6 +44,7 @@ if (RUN_COMMUNITY_AGENT == true) {
     
     const communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, "community_agent_runtime_config.json"), 'utf8'))
     console.log("community runtime config filecontent :", communityRuntimeConfig)
+    console.log("network config and connection object", NETWORK, connection, connection[NETWORK] )
     //add accessKey from envVar to runtime config
     communityRuntimeConfig.SHOVEL_FS_ACCESS_KEY = COMMUNITY_AGENT_ACCESS_KEY
     //add forestCID from hub to runtime config
