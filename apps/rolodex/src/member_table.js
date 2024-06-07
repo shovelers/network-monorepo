@@ -11,7 +11,7 @@ export class MemberTable extends HTMLElement {
     const thead = table.createTHead();
     const headerRow = document.createElement('tr');
     headerRow.classList.add('grid', this.gridSize); 
-    const headers = ['Name (sort)', 'LookingFor', 'InterestedIn', 'Expertise']; // Customize as needed
+    const headers = ['Name (sort)', 'LookingFor', 'CanHelpWith', 'Expertise']; // Customize as needed
     headers.forEach((headerText) => {
       const th = document.createElement('th');
       th.classList.add('cursor-pointer','col-span-2') //add value for 'col-span-X'  based on corresponding row element size
@@ -73,15 +73,15 @@ export class MemberTable extends HTMLElement {
       } else {
         lookingForCell.innerHTML = '';
       }
-      const interestedInCell = row.insertCell(2); 
-      interestedInCell.classList.add('col-span-2', 'font-medium', 'space-x-1')
-      if (value.interestedIn !== undefined && value.interestedIn.length > 0) {
-        let tags = Array.isArray(value.interestedIn) ? value.interestedIn : [value.interestedIn];  // Check if EMAIL is an array, if not, treat it as a single string in an array
+      const canHelpWithCell = row.insertCell(2); 
+      canHelpWithCell.classList.add('col-span-2', 'font-medium', 'space-x-1')
+      if (value.canHelpWith !== undefined && value.canHelpWith.length > 0) {
+        let tags = Array.isArray(value.canHelpWith) ? value.canHelpWith : [value.canHelpWith];  // Check if EMAIL is an array, if not, treat it as a single string in an array
         for (let tag of tags) {
-          interestedInCell.innerHTML += `<span class="badge badge-md badge-neutral">${tag}</span>`;
+          canHelpWithCell.innerHTML += `<span class="badge badge-md badge-neutral">${tag}</span>`;
         }
       } else {
-        interestedInCell.innerHTML = '';
+        canHelpWithCell.innerHTML = '';
       }
       const expertiseCell = row.insertCell(3); 
       expertiseCell.classList.add('col-span-2', 'font-medium', 'space-x-1')

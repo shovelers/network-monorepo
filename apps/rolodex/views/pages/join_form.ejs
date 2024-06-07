@@ -29,7 +29,7 @@
 
       //Flips the colour of option pills and stores the resposes of respective question
       var lookingFor = []
-      var interestedIn = []
+      var canHelpWith = []
       var expertise = []
       const badges = [...document.querySelectorAll('#color-changing-badge')];
 
@@ -45,8 +45,8 @@
               case 'lookingFor':
                 lookingFor.push(badge.innerHTML)
                 break;
-              case 'interestedIn':
-                interestedIn.push(badge.innerHTML)
+              case 'canHelpWith':
+                canHelpWith.push(badge.innerHTML)
                 break;
               case 'expertise':
                 expertise.push(badge.innerHTML)
@@ -54,7 +54,7 @@
               default:
                 console.log("Store for Question not defined")
             }
-            console.log("On Add : ", "looking for :", lookingFor, "interestedIn :", interestedIn, "expertise :", expertise)
+            console.log("On Add : ", "looking for :", lookingFor, "canHelpWith :", canHelpWith, "expertise :", expertise)
           } else {
             badge.classList.remove('badge-neutral');
             badge.classList.add('badge-outline');
@@ -65,9 +65,9 @@
                 index = lookingFor.indexOf(badge.innerHTML)
                 lookingFor.splice(index++, 1)
                 break;
-              case 'interestedIn':
-                index = interestedIn.indexOf(badge.innerHTML)
-                interestedIn.splice(index++, 1)
+              case 'canHelpWith':
+                index = canHelpWith.indexOf(badge.innerHTML)
+                canHelpWith.splice(index++, 1)
                 break;
               case 'expertise':
                 index = expertise.indexOf(badge.innerHTML)
@@ -76,7 +76,7 @@
               default:
                 console.log("Store for Question not defined")
             }
-            console.log("On remove :", "looking for :", lookingFor, "interestedIn :", interestedIn, "expertise :", expertise)
+            console.log("On remove :", "looking for :", lookingFor, "canHelpWith :", canHelpWith, "expertise :", expertise)
           }
         })
       )
@@ -97,7 +97,7 @@
 
       // add selected tags to profile on save
       window.addSelectedTagsToProfile = async function(){
-        await v1UpdateProfile({lookingFor: lookingFor, interestedIn: interestedIn, expertise: expertise})
+        await v1UpdateProfile({lookingFor: lookingFor, canHelpWith: canHelpWith, expertise: expertise})
         
         let profile = await getProfile()
         console.log("Profile after save :", profile)
@@ -110,7 +110,7 @@
       <div class="flex flex-row h-3/4 w-full">
         <%/* farcaster info */%>
         <div class="flex flex-col gap-4 p-8 text-center justify-center place-content-center items-center">
-          <div>Info from Farcaster</div>
+          <div class="font-semibold text-md">Info from Farcaster</div>
           <div class="bg-base-200 p-4 w-2/3 text-left">
             <div class="font-semibold">Name : <span id="farcaster-name" class="font-normal"></span></div>
             <div class="font-semibold">Handle : <span id="farcaster-handle" class="font-normal"></span></div>
@@ -122,20 +122,20 @@
         <div class="divider divider-horizontal"></div>
         <%/* form half */%>
         <div class="flex flex-col justify-evenly place-content-center w-1/2 p-8">
-          <div>
-            <div>Looking For</div>
+          <div class="space-y-2">
+            <div class="font-semibold text-md">Looking For</div>
             <% for(var i=0; i<options.lookingFor.length; i++) {%>
               <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="lookingFor"> <%= options.lookingFor[i] %></div>
             <% } %>
           </div>
-          <div>
-           <div>Interested In</div>
-            <% for(var i=0; i<options.interestedIn.length; i++) {%>
-              <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="interestedIn"> <%= options.interestedIn[i] %></div>
+          <div class="space-y-2">
+           <div class="font-semibold text-md">Interested In</div>
+            <% for(var i=0; i<options.canHelpWith.length; i++) {%>
+              <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="canHelpWith"> <%= options.canHelpWith[i] %></div>
             <% } %>
           </div>
-          <div>
-            <div>Expertise</div>
+          <div class="space-y-2">
+            <div class="font-semibold text-md">Expertise</div>
             <% for(var i=0; i<options.expertise.length; i++) {%>
               <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="expertise"> <%= options.expertise[i] %></div>
             <% } %>
