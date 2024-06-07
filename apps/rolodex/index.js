@@ -80,7 +80,8 @@ if (RUN_COMMUNITY_AGENT == true) {
       // TODO save did and handle in DB/WNFS
       await challengeEvent.detail.confirm.call()
     })
-  } catch {
+  } catch (e){
+    console.log(e)
     console.error("Not running Community Agent : No config file found")
   }
 }
