@@ -88,9 +88,9 @@ if (RUN_COMMUNITY_AGENT == true) {
 
 const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
 const joinFormOptions = { 
-  lookingFor: ["Gig", "Job", "Partnership", "Talent", "Warm Intro"],
+  lookingFor: ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
   canHelpWith: ["Development", "Tokenomics", "Design", "Ideation", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
-  expertise: ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Design", "Community", "Consumet Tech", "Social"]
+  expertise: ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumet Tech", "Social"]
 }
 
 server.use(express.urlencoded({ extended: true }))
