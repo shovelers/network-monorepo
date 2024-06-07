@@ -2,29 +2,85 @@
   if (window.__TAURI__) {
     document.getElementById("google-import").style.display = "none"
   }
+  import { getProfile, v1UpdateProfile } from '/odd.js';
+  window.v1UpdateProfile = v1UpdateProfile
 
-  var confirm
-  var reject
-  console.log("checking js loading")
-  window.challengeProcessor = function (input){
-    if(input === window.pin.join("")) {
-      confirm.call() 
-    } else {
-      reject.call()
-    }
-  }
+  var lFor = []
+  var iIn = []
+  var exp = []
+  
+  getProfile().then((result) => {
+    console.log("I am inside getprofile :", result)
+    document.getElementById("profile-name").innerHTML = result.name
+    document.getElementById("profile-handle").innerHTML = result.handle
+    document.getElementById("profile-bio").innerHTML = result.text
+    
+    window.lFor = result.lookingFor
+    window.iIn = result.interestedIn
+    window.exp = result.expertise
 
-  window.showLoading = function(){
-    document.querySelector(".loading").classList.remove("hidden");
-    document.getElementById("apple_username").style.display = "none"
-    document.getElementById("apple_password").style.display = "none"
-  }
+    console.log(window.lFor, window.iIn, window.exp)
+    
+    const badges = [...document.querySelectorAll('#color-changing-badge')];
+    //Set deault color & Flips the colour of option pills and stores the resposes of respective question
+    badges.forEach((badge) => {
+      if ((result.interestedIn).includes(badge.innerHTML) || (result.lookingFor).includes(badge.innerHTML) || (result.expertise).includes(badge.innerHTML)) {
+        badge.classList.remove('badge-outline');
+        badge.classList.add('badge-neutral');
+        badge.setAttribute('data-is-clicked', true)
+      }
+    })
 
-  window.hideLoading = function(){
-    document.querySelector(".loading").classList.add("hidden");
-    document.getElementById("apple_username").style.display = ""
-    document.getElementById("apple_password").style.display = ""
-  }
+    badges.forEach((badge) => {
+      badge.addEventListener('click', () => {
+        let isClicked = badge.getAttribute('data-is-clicked')
+        let question = badge.getAttribute('question')
+        if (isClicked === "false") {
+          badge.classList.remove('badge-outline');
+          badge.classList.add('badge-neutral');
+          badge.setAttribute('data-is-clicked', true)
+          switch (question){
+            case 'lookingFor':
+              console.log("adding", badge.innerHTML)
+              window.lFor.push(badge.innerHTML)
+              break;
+            case 'interestedIn':
+              window.iIn.push(badge.innerHTML)
+              break;
+            case 'expertise':
+              window.exp.push(badge.innerHTML)
+              break;
+            default:
+              console.log("Store for Question not defined")
+          }
+          console.log("On Add : ", "looking for :", window.lFor, "interestedIn :", window.iIn, "expertise :", window.exp)
+        } else {
+          badge.classList.remove('badge-neutral');
+          badge.classList.add('badge-outline');
+          badge.setAttribute('data-is-clicked', false)
+          let index
+          switch (question){
+            case 'lookingFor':
+              index = lFor.indexOf(badge.innerHTML)
+              window.lFor.splice(index++, 1)
+              break;
+            case 'interestedIn':
+              index = iIn.indexOf(badge.innerHTML)
+              window.iIn.splice(index++, 1)
+              break;
+            case 'expertise':
+              index = exp.indexOf(badge.innerHTML)
+              window.exp.splice(index++, 1)
+              break;
+            default:
+              console.log("Store for Question not defined")
+          }
+          console.log("On remove :", "looking for :", window.lFor, "interestedIn :", window.iIn, "expertise :", widnow.exp)
+        }
+      })
+    })
+  })
+  
 </script>
 
 <div class="max-md:flex max-md:justify-center max-md:items-center avatar online placeholder max-md:mx-20">    
@@ -57,18 +113,37 @@
 
 <dialog id="profile_edit_modal" class="modal">
   <div class="modal-box">
-    <h3 class="font-bold text-lg">Edit Profile</h3>
-    <p class="text-xs">Press ESC key or click the button below to close</p>
+    <h3 class="font-semibold text-lg">Edit Profile</h3>
+    <p class="text-xs font-light">⚡ Changes will propogate automatically to all community directories</p>
     <div class="modal-action flex justify-center items-center">
       <form id="profile-updatae-form"
-        onsubmit="event.preventDefault(); updateProfile(document.getElementById('handle').innerHTML, document.getElementById('profile-name').value, tagsArray(document.getElementById('profile-tags').value), document.getElementById('profile-text').value).then(function(){console.log('i am here'); refreshProfile()}); profile_edit_modal.close(); return false"
+        onsubmit="event.preventDefault(); window.v1UpdateProfile({lookingFor: window.lFor, interestedIn: window.iIn, expertise: window.exp}).then(function(){refreshProfile()}); profile_edit_modal.close(); return false"
         class="space-y-1 text-center">
-        <label for="profile-name" class="label"><span class="label-text">Name</span></label>
-        <input type="text" id="profile-name" class="border border-gray-300 px-2 py-1 rounded-lg" value="name">
-        <label for="profile-tags" class="label"><span class="label-text">Tags (comma separated)</span></label>
-        <input type="text" name="profile-tags" id="profile-tags" class="input input-sm input-bordered rounded-lg">
-        <label for="profile-text" class="label"><span class="label-text">Text</span></label>
-        <textarea type="text" name="profile-text" id="profile-text" class="textarea textarea-bordered rounded-lg"></textarea>
+        <div class="font-semibold text-left">Name : <span id="profile-name" class="font-normal"></span></div>
+        <div class="font-semibold text-left">Handle : <span id="profile-handle" class="font-normal"></span></div>
+        <div class="font-semibold text-left">Bio : <span id="profile-bio" class="font-normal"></span></div>
+        
+        <div class="divider py-2"></div>
+        
+        <div>
+          <div>Looking For</div>
+          <% for(var i=0; i<options.lookingFor.length; i++) {%>
+            <div id="color-changing-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="lookingFor"> <%= options.lookingFor[i] %></div>
+          <% } %>
+        </div>
+        <div>
+         <div>Interested In</div>
+          <% for(var i=0; i<options.interestedIn.length; i++) {%>
+            <div id="color-changing-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="interestedIn"> <%= options.interestedIn[i] %></div>
+          <% } %>
+        </div>
+        <div>
+          <div>Expertise</div>
+          <% for(var i=0; i<options.expertise.length; i++) {%>
+            <div id="color-changing-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="expertise"> <%= options.expertise[i] %></div>
+          <% } %>
+        </div>
+        
         <div class="flex flex-row space-x-2 pt-4 justify-center">
           <button type="submit" class="btn btn-outline btn-sm">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M12 2h-2v3h2V2Z"/><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5V2.914a1.5 1.5 0 0 0-.44-1.06L14.147.439A1.5 1.5 0 0 0 13.086 0H1.5ZM4 6a1 1 0 0 1-1-1V1h10v4a1 1 0 0 1-1 1H4ZM3 9h10a1 1 0 0 1 1 1v5H2v-5a1 1 0 0 1 1-1Z"/></g></svg>

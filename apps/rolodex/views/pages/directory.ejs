@@ -50,22 +50,19 @@
         document.getElementById("lookingFor").innerHTML = '';
         for (let lf of result.lookingFor) {
           if (lf == '') continue;
-          document.getElementById("lookingFor").innerHTML += `<span class="badge badge-neutral">${lf}</span>`;
+          document.getElementById("lookingFor").innerHTML += `<span class="badge badge-md badge-neutral">${lf}</span>`;
         }
         document.getElementById("interestedIn").innerHTML = '';
         for (let ii of result.interestedIn) {
           if (ii == '') continue;
-          document.getElementById("interestedIn").innerHTML += `<span class="badge badge-neutral">${ii}</span>`;
+          document.getElementById("interestedIn").innerHTML += `<span class="badge badeg-md badge-neutral">${ii}</span>`;
         }
         document.getElementById("expertise").innerHTML = '';
         for (let e of result.expertise) {
           if (e == '') continue;
-          document.getElementById("expertise").innerHTML += `<span class="badge badge-neutral">${e}</span>`;
+          document.getElementById("expertise").innerHTML += `<span class="badge badge-md badge-neutral">${e}</span>`;
         }
 
-        document.getElementById("profile-name").value = result.name
-        document.getElementById("profile-tags").value = result.tags || []
-        document.getElementById("profile-text").value = result.text || ''
         document.querySelector(".avatar > div > span").innerHTML = result.handle.charAt(0).toUpperCase()
       })}
       refreshProfile();
