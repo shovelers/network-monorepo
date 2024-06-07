@@ -42,8 +42,10 @@ if (RUN_COMMUNITY_AGENT == true) {
     //check if config file exists
     await access(path.join(__dirname, "community_agent_runtime_config.json"), constants.R_OK | constants.W_OK);
     
-    const communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, "community_agent_runtime_config.json"), 'utf8'))
+    var communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, "community_agent_runtime_config.json"), 'utf8'))
     console.log("community runtime config filecontent :", communityRuntimeConfig)
+    console.log("process env :", process.env)
+    console.log("envs :", process.env.VITE_NETWORK, process.env.VITE_COMMUNITY_AGENT_ACCESS_KEY, process.env.VITE_RUN_COMMUNITY_AGENT)
     console.log("network config and connection object", NETWORK, connection, connection[NETWORK] )
     //add accessKey from envVar to runtime config
     communityRuntimeConfig.SHOVEL_FS_ACCESS_KEY = COMMUNITY_AGENT_ACCESS_KEY
