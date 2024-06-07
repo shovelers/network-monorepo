@@ -15,7 +15,7 @@
   <body class="antialiased bg-base-100">
     <script type="module">
       import { account, getContactForRelate, addConnection, portOldContacts, addContact, getContacts, getContactByUID, editContact, deleteContact, filterContacts,
-        getProfile, updateProfile, signout, generateRecoveryKit, importContacts, appleCredsPresent, importGoogleContacts, downloadContactsDataLocally, getMembers} from '/odd.js';
+        getProfile, updateProfile, signout, generateRecoveryKit, importContacts, appleCredsPresent, importGoogleContacts, downloadContactsDataLocally, getMembers, uint8arrays} from '/odd.js';
       window.addContact = addContact;
       window.getContacts = getContacts;
       window.editContact = editContact;
@@ -34,6 +34,7 @@
       window.addConnection = addConnection;
       window.appleCredsPresent = appleCredsPresent;
       window.getMembers = getMembers;
+      window.uint8arrays = uint8arrays;
 
       var session = await account.activeSession();
       if (session == false) {

@@ -79,7 +79,7 @@ export class ContactTable extends HTMLElement {
         let tags = value.CATEGORIES.split(',')
         if (tags.includes('community')){
           for (let tag of tags) {
-            tagscell.innerHTML += `<button class="badge badge-neutral" onclick="window.location.href = '/directory/${value.UID}?name=${value.FN}'">${tag}</button>`;
+            tagscell.innerHTML += `<button class="badge badge-neutral" onclick="window.location.href = '/directory/${value.UID.split(':').splice(1).join(':')}?name=${value.FN}'">${tag}</button>`;
           }
         } else {
           for (let tag of tags) {

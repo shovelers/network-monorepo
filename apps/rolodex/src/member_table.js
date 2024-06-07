@@ -61,7 +61,7 @@ export class MemberTable extends HTMLElement {
       row.classList.add('grid',this.gridSize, 'gap-2', 'place-content-center', 'hover');
       const nameCell = row.insertCell(0);
       nameCell.classList.add('justify-self-start', 'col-span-2', 'font-medium');
-      nameCell.textContent = value.name;
+      nameCell.textContent = `${value.name} (${value.handle})`;
 
       const lookingForCell = row.insertCell(1); 
       lookingForCell.classList.add('col-span-2', 'font-medium', 'space-x-1')

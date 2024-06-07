@@ -131,8 +131,15 @@ export const SearchCapability = {
           let personForestCID = response.data.head
           try {
             let filecontent = await this.readPrivateFileByPointer(profileAccessKey, CID.parse(personForestCID).bytes)
-            let profile = JSON.parse(filecontent) 
-            fetchedProfiles.push(profile)
+            //parse seed data file for profiles
+            if (value.FN == "Seed Data"){
+              for (let [k, v] of Object.entries(JSON.parse(filecontent))){
+                fetchedProfiles.push(v)
+              }
+            } else {
+              let profile = JSON.parse(filecontent) 
+              fetchedProfiles.push(profile)
+            }
           } catch (e) {
             console.log("CID fetch failed", e);
             return []

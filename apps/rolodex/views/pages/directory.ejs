@@ -13,7 +13,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { account, addContact, getContacts, getContactByUID, editContact, deleteContact, filterContacts, getProfile, updateProfile, signout, getMembers, getCommunityMembers, filterMembers} from '/odd.js';
+      import { account, addContact, getContacts, getContactByUID, editContact, deleteContact, filterContacts, getProfile, updateProfile, signout, getMembers, getCommunityMembers, filterMembers, uint8arrays} from '/odd.js';
       window.addContact = addContact;
       window.getContacts = getContacts;
       window.editContact = editContact;
@@ -24,6 +24,7 @@
       window.getProfile = getProfile;
       window.getMembers = getMembers;
       window.filterMembers = filterMembers;
+      window.uint8arrays = uint8arrays;
 
       var session = await account.activeSession();
       if (session == false) {
@@ -31,6 +32,7 @@
       }
       
       let community = await getContactByUID('DCN:'+'<%- communityDID %>')
+      console.log("community entry in contactList :", community)
       window.refreshMembers = function(){
         getCommunityMembers(community).then((result) => {
           window.memberListCache = result

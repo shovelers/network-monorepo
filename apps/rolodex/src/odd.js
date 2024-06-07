@@ -443,5 +443,6 @@ export {
   contactToJoinCommunity,
   getMembers,
   getCommunityMembers,
-  filterMembers
+  filterMembers,
+  uint8arrays
 };
