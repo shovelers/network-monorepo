@@ -346,13 +346,18 @@ server.get("/metrics", async (req, res) => {
 })
 
 server.get("/", async (req, res) => {
-  const numberOfDevices = await redisClient.sCard("accounts"); 
-  //TODO : Change "accounts" to something more appropriate like active sessions in redis
-  const numberOfAccounts = await redisClient.sCard("handles"); 
+  let accountKeys = await redisClient.sendCommand(["keys","account:did*"])
+  let numberOfAccounts = accountKeys.length
+
+  let agentKeys = await redisClient.sendCommand(["keys","agents:did*"])
+  let numberOfAgents = 0
+  for (const key of agentKeys) {
+    let count = await redisClient.sCard(key)
+    numberOfAgents = numberOfAgents + count
+  }
 
   res.render('pages/index', {
-   
-    agents : numberOfDevices,
+    agents : numberOfAgents,
     accounts: numberOfAccounts
   })
 });
