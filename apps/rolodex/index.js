@@ -96,7 +96,7 @@ const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DN
 const joinFormOptions = { 
   lookingFor: ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
   canHelpWith: ["Development", "Tokenomics", "Design", "Ideation", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
-  expertise: ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumet Tech", "Social"]
+  expertise: ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
 }
 
 server.use(express.urlencoded({ extended: true }))

@@ -11,7 +11,7 @@ export class MemberTable extends HTMLElement {
     const thead = table.createTHead();
     const headerRow = document.createElement('tr');
     headerRow.classList.add('grid', this.gridSize); 
-    const headers = ['Name (sort)', 'LookingFor', 'CanHelpWith', 'Expertise']; // Customize as needed
+    const headers = ['Name (sort)', 'Looking For', 'Can Help With', 'Expertise']; // Customize as needed
     headers.forEach((headerText) => {
       const th = document.createElement('th');
       th.classList.add('cursor-pointer','col-span-2') //add value for 'col-span-X'  based on corresponding row element size

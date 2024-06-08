@@ -96,9 +96,9 @@
 </div>
 
 <div id="name" class="py-1 text-left"></div>
-<div class="text-left">Looking For : <span class="space-x-1 space-y-1 py-1" id="lookingFor"></span></div>
-<div class="text-left">Inerested In : <span class="space-x-1 space-y-1 py-1" id="canHelpWith"></span></div>
-<div class="text-left">Expertise : <span class="space-x-1 space-y-1 py-1" id="expertise"></span></div>
+<div class="text-left">Looking For :</br><span class="space-x-1 space-y-1 py-1" id="lookingFor"></span></div>
+<div class="text-left">Can Help With :</br><span class="space-x-1 space-y-1 py-1" id="canHelpWith"></span></div>
+<div class="text-left">Expertise :</br><span class="space-x-1 space-y-1 py-1" id="expertise"></span></div>
 
 <div class="max-md:pt-2 md:absolute md:inset-x-0 md:bottom-0 md:pb-4 md:flex md:flex-col md:space-y-2 md:items-center">
   <button id="profile-edit-btn" class="btn max-md:my-1 btn-outline max-md:w-5/6 md:btn-sm md:w-2/3" onclick="profile_edit_modal.showModal()">
@@ -132,7 +132,7 @@
           <% } %>
         </div>
         <div>
-         <div>Interested In</div>
+         <div>Can Help With</div>
           <% for(var i=0; i<options.canHelpWith.length; i++) {%>
             <div id="color-changing-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="canHelpWith"> <%= options.canHelpWith[i] %></div>
           <% } %>
@@ -158,15 +158,11 @@
 </dialog>
 <dialog id="logout_modal" class="modal">
   <div class="modal-box">
-    <p class="text-lg font-bold">Beware!!</p>
-    <p class="text-sm">Your account is bound to this device </p>
-    <p class="text-sm mt-2">Do Not Logout if you have not downloaded </br> the Recovery Key or Linked Another Device to this account yet</p>
+    <p class="text-lg font-bold">Note</p>
+    <p class="text-sm">Sign-in with the same FC account/wallet the next time</p>
     <div class="modal-action flex flex-col justify-center items-center space-y-2">
       <form class="flex flex-col space-y-2 items-center" onsubmit="event.preventDefault(); signout().then(function(){window.location.href='/home'}) ;return false">
         <div class="flex flex-row space-x-2">
-          <button class="btn btn-outline btn-sm w-2/3" onclick="event.preventDefault(); generateRecoveryKit(document.getElementById('handle').innerHTML)">
-            Get Recovery Key
-          </button>
           <button type="submit" class="btn btn-outline btn-sm">
             Logout
           </button>

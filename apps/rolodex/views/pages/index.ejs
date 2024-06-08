@@ -107,10 +107,10 @@
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
       <div class="p-4 text-center">
         <div class="text-7xl font-bold tracking-tight leading-normal underline decoration-red-500 decoration-8">Rolodex</div>
-        <div class="text-3xl font-semibold tracking-tight leading-normal">Build Better Relationships</div>
+        <div class="text-3xl font-semibold tracking-tight leading-normal">Your Internet Native Contact Book</div>
       </div>
       <div class="loading loading-infinity loading-lg hidden"></div>
-      <div id="input-forms" class="space-y-8 bg-base-200 p-12 rounded-lg">
+      <div id="input-forms" class=" flex flex-col space-y-4 bg-base-200 p-8 rounded-lg">
         <form id="signup-form" onsubmit="event.preventDefault(); signupForm(document.getElementById('handle').value);" class="hidden space-y-1 text-center">
           <label for="user_name" class="font-bold">Username</label>
           <input type="text" id="handle" name="handle" class="border border-gray-300 px-2 py-1 rounded-lg">
@@ -119,7 +119,7 @@
             Signup
           </button>
         </form>
-        <form id="recovery-form" onsubmit="event.preventDefault(); recover(document.querySelector('#recovery-form > input').files[0]); showLoading();" class="space-y-1 text-center">
+        <form id="recovery-form" onsubmit="event.preventDefault(); recover(document.querySelector('#recovery-form > input').files[0]); showLoading();" class="hidden space-y-1 text-center">
           <p class="text-lg font-semibold">Already Have an account?</p>
           <p class="italic text-sm">Use Recovery Kit</p>
           <input type="file" name="recovery_kit" class="file-input file-input-sm file-input-bordered">
