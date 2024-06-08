@@ -123,7 +123,7 @@ export const SearchCapability = {
       for (let [key, value] of Object.entries(fetchedMembers)) {
         //for each value, read UID, fetch head, readFilebyPointer  
         let personDetails = value.XML.split(':')[1]
-        let profileAccessKey = personDetails.split('.')[1]
+        let profileAccessKey = personDetails.split('.').pop()
         let personDID = value.UID.split(':').splice(1).join(':')
         console.log("profile ak :", profileAccessKey)
 
