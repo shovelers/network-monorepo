@@ -10,7 +10,6 @@
   var exp = []
   
   getProfile().then((result) => {
-    console.log("I am inside getprofile :", result)
     document.getElementById("profile-name").innerHTML = result.name
     document.getElementById("profile-handle").innerHTML = result.handle
     document.getElementById("profile-bio").innerHTML = result.text

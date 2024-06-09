@@ -43,11 +43,6 @@ if (RUN_COMMUNITY_AGENT == true) {
     await access(path.join(__dirname, "community_agent_runtime_config.json"), constants.R_OK | constants.W_OK);
     
     var communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, "community_agent_runtime_config.json"), 'utf8'))
-    console.log("community runtime config filecontent :", communityRuntimeConfig)
-    console.log("process env :", process.env)
-    console.log("envs :", process.env.VITE_NETWORK, process.env.VITE_COMMUNITY_AGENT_ACCESS_KEY, process.env.VITE_RUN_COMMUNITY_AGENT)
-    console.log("import meta env:", import.meta.env)
-    console.log("network config and connection object", NETWORK, connection, connection[NETWORK] )
     //add accessKey from envVar to runtime config
     communityRuntimeConfig.SHOVEL_FS_ACCESS_KEY = COMMUNITY_AGENT_ACCESS_KEY
     //add forestCID from hub to runtime config
