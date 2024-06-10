@@ -91,7 +91,7 @@
          if (response.success) {
            console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username, agentDID, status.data.message, status.data.signature)
            let accountDID = `did:pkh:eip155:${response.data.chainId}:${response.data.address}`
-           let profileData = { handle: status.data.username, name: status.data.displayName, text: status.data.bio, tags: [] }
+           let profileData = { handle: status.data.username, name: status.data.displayName, text: status.data.bio, tags: [], pfpUrl: status.data.pfpUrl}
            console.log("farcaster message", status.data.message);
            await farcasterSignup(accountDID, status.data.message, status.data.signature, profileData, status.data.fid)
            window.location.href = "/app"
@@ -110,7 +110,7 @@
         <div class="text-3xl font-semibold tracking-tight leading-normal">Your Internet Native Contact Book</div>
       </div>
       <div class="loading loading-infinity loading-lg hidden"></div>
-      <div id="input-forms" class=" flex flex-col space-y-4 bg-base-200 p-8 rounded-lg">
+      <div id="input-forms" class=" flex flex-col space-y-4 p-8 rounded-lg">
         <form id="signup-form" onsubmit="event.preventDefault(); signupForm(document.getElementById('handle').value);" class="hidden space-y-1 text-center">
           <label for="user_name" class="font-bold">Username</label>
           <input type="text" id="handle" name="handle" class="border border-gray-300 px-2 py-1 rounded-lg">

@@ -115,7 +115,6 @@ export const SearchCapability = {
             let personDetails = value.XML.split(':')[1];
             let profileAccessKey = personDetails.split('.').pop();
             let personDID = value.UID.split(':').splice(1).join(':');
-            console.log("profile ak :", profileAccessKey);
 
             try {
                 let personResponse = await this.axios_client.get(`/v1/accounts/${personDID}/head`);

@@ -310,7 +310,6 @@ export const StorageCapability = {
       //Primarily used for fetching data shared by other users to the client
     let privateFile = new PrivateFile(this.helia)
     let content = await privateFile.read(uint8arrays.fromString(accessKey, akEncoding), forestCID)
-    console.log("content fetched", forestCID)
     return content
   },
 
