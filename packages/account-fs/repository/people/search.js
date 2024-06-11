@@ -102,6 +102,12 @@ export const SearchCapability = {
     let memberDetails = details[0].split(':')[1];
     let memberAccessKey = memberDetails.split('.')[1];
     let communityDID = community.UID.split(':').splice(1).join(':');
+
+    const timeout = (ms) => {
+      return new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('timeout')), ms);
+      });
+    };
     
     try {
         let response = await this.axios_client.get(`/v1/accounts/${communityDID}/head`);
@@ -119,7 +125,10 @@ export const SearchCapability = {
             try {
                 let personResponse = await this.axios_client.get(`/v1/accounts/${personDID}/head`);
                 let personForestCID = personResponse.data.head;
-                let filecontent = await this.readPrivateFileByPointer(profileAccessKey, CID.parse(personForestCID).bytes);
+                let filecontent = await Promise.race([
+                  this.readPrivateFileByPointer(profileAccessKey, CID.parse(personForestCID).bytes),
+                  timeout(5000)
+                ]);
 
                 if (value.FN == "Seed Data") {
                     return Object.values(JSON.parse(filecontent));
