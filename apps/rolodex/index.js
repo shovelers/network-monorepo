@@ -61,6 +61,8 @@ if (RUN_COMMUNITY_AGENT == true) {
     //load fs
     console.log("...bootstrapping...")
     await communityAgent.bootstrap()
+    console.log("...loading filesytem... ", communityAgent, communityAgent.runtime)
+    console.log("...loading Credentials... ", await communityAgent.accountDID(), await communityAgent.forestCID(), await communityAgent.accessKey())
     await communityAgent.load();
     console.log("communityAgent DID :", await communityAgent.DID())
     
