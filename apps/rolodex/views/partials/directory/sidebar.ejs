@@ -6,7 +6,7 @@
   window.v1UpdateProfile = v1UpdateProfile
 
   var lFor = []
-  var iIn = []
+  var cHW = []
   var exp = []
   
   getProfile().then((result) => {
@@ -15,10 +15,10 @@
     document.getElementById("profile-bio").innerHTML = result.text
     
     window.lFor = result.lookingFor
-    window.iIn = result.canHelpWith
+    window.cHW = result.canHelpWith
     window.exp = result.expertise
 
-    console.log(window.lFor, window.iIn, window.exp)
+    console.log(window.lFor, window.cHW, window.exp)
     
     const badges = [...document.querySelectorAll('#color-changing-badge')];
     //Set deault color & Flips the colour of option pills and stores the resposes of respective question
@@ -44,7 +44,7 @@
               window.lFor.push(badge.innerHTML)
               break;
             case 'canHelpWith':
-              window.iIn.push(badge.innerHTML)
+              window.cHW.push(badge.innerHTML)
               break;
             case 'expertise':
               window.exp.push(badge.innerHTML)
@@ -52,29 +52,28 @@
             default:
               console.log("Store for Question not defined")
           }
-          console.log("On Add : ", "looking for :", window.lFor, "canHelpWith :", window.iIn, "expertise :", window.exp)
+          console.log("On Add : ", "looking for :", window.lFor, "canHelpWith :", window.cHW, "expertise :", window.exp)
         } else {
           badge.classList.remove('badge-neutral');
           badge.classList.add('badge-outline');
           badge.setAttribute('data-is-clicked', false)
-          let index
           switch (question){
             case 'lookingFor':
-              index = lFor.indexOf(badge.innerHTML)
-              window.lFor.splice(index++, 1)
+              let lForIndex = lFor.indexOf(badge.innerHTML)
+              window.lFor.splice(lForIndex, 1)
               break;
             case 'canHelpWith':
-              index = iIn.indexOf(badge.innerHTML)
-              window.iIn.splice(index++, 1)
+              let cHWIndex = cHW.indexOf(badge.innerHTML)
+              window.cHW.splice(cHWIndex, 1)
               break;
             case 'expertise':
-              index = exp.indexOf(badge.innerHTML)
-              window.exp.splice(index++, 1)
+              let expIndex = exp.indexOf(badge.innerHTML)
+              window.exp.splice(expIndex, 1)
               break;
             default:
               console.log("Store for Question not defined")
           }
-          console.log("On remove :", "looking for :", window.lFor, "canHelpWith :", window.iIn, "expertise :", window.exp)
+          console.log("On remove :", "looking for :", window.lFor, "canHelpWith :", window.cHW, "expertise :", window.exp)
         }
       })
     })
