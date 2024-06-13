@@ -66,8 +66,8 @@
      window.startFarcasterSignup = async function(){
       const agentDID = await account.agent.DID()
       const channel = await farcasterClient.createChannel({
-        siweUri: 'http://localhost:4000/home',
-        domain: 'localhost:4000',
+        siweUri: window.location.origin,
+        domain: window.location.host,
         requestId: agentDID
       });
 
@@ -83,7 +83,7 @@
         console.log(status)
         farcasterClient.verifySignInMessage({
          nonce: status.data.nonce,
-         domain: 'localhost:4000',
+         domain: window.location.host,
          message: status.data.message,
          signature: status.data.signature
         }).then(async (response) => {
