@@ -8,19 +8,15 @@
   var lFor = []
   var cHW = []
   var exp = []
-  
   getProfile().then((result) => {
     document.getElementById("profile-name").innerHTML = result.name
     document.getElementById("profile-handle").innerHTML = result.handle
     document.getElementById("profile-bio").innerHTML = result.text
+    lFor = result.lookingFor
+    cHW = result.canHelpWith
+    exp = result.expertise
     
-    window.lFor = result.lookingFor
-    window.cHW = result.canHelpWith
-    window.exp = result.expertise
-
-    console.log(window.lFor, window.cHW, window.exp)
-    
-    const badges = [...document.querySelectorAll('#color-changing-badge')];
+    const badges = [...document.querySelectorAll('#edit-badge')];
     //Set deault color & Flips the colour of option pills and stores the resposes of respective question
     badges.forEach((badge) => {
       if ((result.canHelpWith).includes(badge.innerHTML) || (result.lookingFor).includes(badge.innerHTML) || (result.expertise).includes(badge.innerHTML)) {
@@ -33,7 +29,9 @@
     badges.forEach((badge) => {
       badge.addEventListener('click', () => {
         let isClicked = badge.getAttribute('data-is-clicked')
+        console.log("isClicked", isClicked)
         let question = badge.getAttribute('question')
+        console.log("question", question)
         if (isClicked === "false") {
           badge.classList.remove('badge-outline');
           badge.classList.add('badge-neutral');
@@ -41,43 +39,50 @@
           switch (question){
             case 'lookingFor':
               console.log("adding", badge.innerHTML)
-              window.lFor.push(badge.innerHTML)
+              lFor.push(badge.innerHTML)
               break;
             case 'canHelpWith':
-              window.cHW.push(badge.innerHTML)
+              console.log("adding", badge.innerHTML)
+              cHW.push(badge.innerHTML)
               break;
             case 'expertise':
-              window.exp.push(badge.innerHTML)
+              console.log("adding", badge.innerHTML)
+              exp.push(badge.innerHTML)
               break;
             default:
               console.log("Store for Question not defined")
           }
-          console.log("On Add : ", "looking for :", window.lFor, "canHelpWith :", window.cHW, "expertise :", window.exp)
+          console.log("On Add : ", "looking for :", lFor, "canHelpWith :", cHW, "expertise :", exp)
         } else {
           badge.classList.remove('badge-neutral');
           badge.classList.add('badge-outline');
           badge.setAttribute('data-is-clicked', false)
           switch (question){
             case 'lookingFor':
-              let lForIndex = lFor.indexOf(badge.innerHTML)
-              window.lFor.splice(lForIndex, 1)
+              console.log("removing", badge.innerHTML)
+              lFor = lFor.filter(item => item !== badge.innerHTML)
               break;
             case 'canHelpWith':
-              let cHWIndex = cHW.indexOf(badge.innerHTML)
-              window.cHW.splice(cHWIndex, 1)
+              console.log("removing", badge.innerHTML)
+              cHW = cHW.filter(item => item !== badge.innerHTML)
               break;
             case 'expertise':
-              let expIndex = exp.indexOf(badge.innerHTML)
-              window.exp.splice(expIndex, 1)
+              console.log("removing", badge.innerHTML)
+              exp = exp.filter(item => item !== badge.innerHTML)
               break;
             default:
               console.log("Store for Question not defined")
           }
-          console.log("On remove :", "looking for :", window.lFor, "canHelpWith :", window.cHW, "expertise :", window.exp)
+          console.log("On remove :", "looking for :", lFor, "canHelpWith :", cHW, "expertise :", exp)
         }
       })
     })
   })
+
+  window.updateSelectedTagsToProfile = async function(){
+    await v1UpdateProfile({lookingFor: lFor, canHelpWith: cHW, expertise: exp})
+    console.log("Profile after update :", await getProfile())
+  }
   
 </script>
 
@@ -115,7 +120,7 @@
     <p class="text-xs font-light">⚡ Changes will propogate automatically to all community directories</p>
     <div class="modal-action flex justify-center items-center">
       <form id="profile-updatae-form"
-        onsubmit="event.preventDefault(); window.v1UpdateProfile({lookingFor: window.lFor, canHelpWith: window.cHW, expertise: window.exp}).then(function(){refreshProfile()}); profile_edit_modal.close(); return false"
+        onsubmit="event.preventDefault(); updateSelectedTagsToProfile().then(function(){refreshProfile()}); profile_edit_modal.close(); return false"
         class="space-y-1 text-center">
         <div class="font-semibold text-left">Name : <span id="profile-name" class="font-normal"></span></div>
         <div class="font-semibold text-left">Handle : <span id="profile-handle" class="font-normal"></span></div>
@@ -126,19 +131,19 @@
         <div>
           <div>Looking For</div>
           <% for(var i=0; i<options.lookingFor.length; i++) {%>
-            <div id="color-changing-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="lookingFor"> <%= options.lookingFor[i] %></div>
+            <div id="edit-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="lookingFor"><%= options.lookingFor[i] %></div>
           <% } %>
         </div>
         <div>
          <div>Can Help With</div>
           <% for(var i=0; i<options.canHelpWith.length; i++) {%>
-            <div id="color-changing-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="canHelpWith"> <%= options.canHelpWith[i] %></div>
+            <div id="edit-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="canHelpWith"><%= options.canHelpWith[i] %></div>
           <% } %>
         </div>
         <div>
           <div>Expertise</div>
           <% for(var i=0; i<options.expertise.length; i++) {%>
-            <div id="color-changing-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="expertise"> <%= options.expertise[i] %></div>
+            <div id="edit-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="expertise"><%= options.expertise[i] %></div>
           <% } %>
         </div>
         
