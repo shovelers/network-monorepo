@@ -70,7 +70,12 @@ export const MessageCapability = {
       console.log(message.detail)
     })
 
-    await dial(this.helia, address)
+    try {
+      await dial(this.helia, address)
+    } catch (e) {
+      alert('Connection with Hub Failed. Please Relaod the Page.')
+    }
+
     await channel.subscribe(this.requester)
     console.log("Subscribing to :", channelName)
     return this.requester

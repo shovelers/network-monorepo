@@ -11,7 +11,7 @@ export const SearchCapability = {
     // Search and return a list of contacts for the query
     const queryString = query.toLowerCase()
     //TODO: move filter to repository
-    var filteredContacts = this.fullTextMatch(contacts, query)
+    var filteredContacts = this.fullTextMatch(contacts, queryString)
     // Find contats who have shared their contactbook with us for second degree search
     var contactsWithDepth = []
     for (var id in contacts.contactList) {
@@ -155,12 +155,13 @@ export const SearchCapability = {
   async searchMembers(query, profiles){
     //fetch all profiles for the community
       //select & return the matching profiles
+    let queryNormalized = query.toLowerCase()
     var filteredProfiles = []
     for (let [key, value] of Object.entries(profiles)) {
       let allTags = value.lookingFor.concat(value.canHelpWith, value.expertise)
-      if (value.name.toLowerCase().includes(query) || value.handle.toLowerCase().includes(query) || value.text.toLowerCase().includes(query)){
+      if (value.name.toLowerCase().includes(queryNormalized) || value.handle.toLowerCase().includes(queryNormalized) || value.text.toLowerCase().includes(queryNormalized)){
         filteredProfiles.push(value)
-      } else if ( (allTags.filter(tag => tag.toLowerCase().includes(query))).length > 0 ) {
+      } else if ( (allTags.filter(tag => tag.toLowerCase().includes(queryNormalized))).length > 0 ) {
         filteredProfiles.push(value)
       }
     } 
