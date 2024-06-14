@@ -37,6 +37,7 @@
         getCommunityMembers(community).then((result) => {
           window.memberListCache = result
           document.querySelector("member-table").members = result
+          document.querySelector("member-table > .loader").classList.add("hidden")
         })
       }
       refreshMembers();

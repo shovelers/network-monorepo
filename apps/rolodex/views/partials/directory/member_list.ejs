@@ -16,7 +16,12 @@
   <span id="member-count">counting...</span>
 </div>
 <div id="member-list-table" class="overflow-x-auto w-full px-4">
-  <member-table></member-table>
+  <member-table>
+    <div class="loader pt-4">
+      <span class="loading loading-infinity"></span>
+      <div>Fetching data privately from all members...</div>
+    </div>
+  </member-table>
 </div>
 <dialog id="contact_edit_modal" class="modal">
   <div class="modal-box">
