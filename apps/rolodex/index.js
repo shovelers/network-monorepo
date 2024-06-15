@@ -21,7 +21,7 @@ const RUN_COMMUNITY_AGENT = process.env.VITE_RUN_COMMUNITY_AGENT || true
 // TODO mount filesystem
 const helia = await createAppNode()
 
-////
+///
 //Agent of Rolodex
 // TODO - remove from git and generate for deployment
 const runtimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'agent_runtime_config.json'), 'utf8'))
