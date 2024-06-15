@@ -24,7 +24,6 @@ export class PrivateFS {
 
   async loadForest(accessKey, forestCID) {
     const key = AccessKey.fromBytes(accessKey)
-    console.log("Inside fs.loadforest :", key, accessKey, forestCID)
     const forest = await PrivateForest.load(forestCID, this.store)
     console.log("loaded forest:", forest)
 

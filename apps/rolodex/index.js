@@ -15,7 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const NETWORK = process.env.VITE_NETWORK || "DEVNET"
-const COMMUNITY_AGENT_ACCESS_KEY = process.env.VITE_COMMUNITY_AGENT_ACCESS_KEY || ""
+const COMMUNITY_AGENT_ACCESS_KEY = JSON.parse(process.env.VITE_COMMUNITY_AGENT_ACCESS_KEY) || ""
 const RUN_COMMUNITY_AGENT = process.env.VITE_RUN_COMMUNITY_AGENT || true
 
 // TODO mount filesystem
@@ -43,45 +43,52 @@ if (RUN_COMMUNITY_AGENT == true) {
     await access(path.join(__dirname, "community_agent_runtime_config.json"), constants.R_OK | constants.W_OK);
     
     var communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, "community_agent_runtime_config.json"), 'utf8'))
-    //add accessKey from envVar to runtime config
-    communityRuntimeConfig.SHOVEL_FS_ACCESS_KEY = COMMUNITY_AGENT_ACCESS_KEY
-    //add forestCID from hub to runtime config
-    const axios_client  = axios.create({
-      baseURL: connection[NETWORK].sync_host,
-    })  
-    await axios_client.get(`/v1/accounts/${communityRuntimeConfig.SHOVEL_ACCOUNT_DID}/head`).then(async (response) => {
-      communityRuntimeConfig.SHOVEL_FS_FOREST_CID = response.data.head
-    })
-    // create runtime
-    const communityRuntime = new Runtime(SERVER_RUNTIME, communityRuntimeConfig)
-    var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime, "rolodex")
-    communityAgent = Object.assign(communityAgent, MessageCapability);
-    communityAgent = Object.assign(communityAgent, StorageCapability);
-    
-    //load fs
-    console.log("...bootstrapping...")
-    await communityAgent.bootstrap()
-    console.log("...loading filesytem... ", communityAgent, communityAgent.runtime)
-    console.log("...loading Credentials... ", await communityAgent.accountDID(), await communityAgent.forestCID(), await communityAgent.accessKey())
-    await communityAgent.load();
-    console.log("communityAgent DID :", await communityAgent.DID())
-    
-    //initialise members repo
-    var members = new MembersRepository(communityAgent)
-    await members.initialise()
-    
-    //Run Join Approver fro community agent
-    const communityHandle = communityRuntimeConfig.SHOVEL_ACCOUNT_HANDLE
-    await communityAgent.actAsJoinApprover(communityHandle)
-    
-    communityAgent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
-      // TODO Implementing auto-confim - check challenge to implement reject
-      console.log("receieved from requester :", challengeEvent.detail)
-      await members.add(challengeEvent.detail.message.challenge.person)
+    //instantiate agent for each community in config file
+    for (const [key, config] of Object.entries(communityRuntimeConfig)) {
+      //add accessKey from envVar to runtime config
+      let communityName = config.SHOVEL_ACCOUNT_HANDLE
+      let communityAccountDID = config.SHOVEL_ACCOUNT_DID
 
-      // TODO save did and handle in DB/WNFS
-      await challengeEvent.detail.confirm.call()
-    })
+      config.SHOVEL_FS_ACCESS_KEY = COMMUNITY_AGENT_ACCESS_KEY[communityAccountDID]
+      console.log("accesskey picked up from env var :", communityName)
+      
+      //add forestCID from hub to runtime config
+      const axios_client  = axios.create({
+        baseURL: connection[NETWORK].sync_host,
+      })  
+      await axios_client.get(`/v1/accounts/${config.SHOVEL_ACCOUNT_DID}/head`).then(async (response) => {
+        config.SHOVEL_FS_FOREST_CID = response.data.head
+      })
+      // create runtime
+      const communityRuntime = new Runtime(SERVER_RUNTIME, config)
+      var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime, "rolodex")
+      communityAgent = Object.assign(communityAgent, MessageCapability);
+      communityAgent = Object.assign(communityAgent, StorageCapability);
+      
+      //load fs
+      console.log("...bootstrapping agent for :", communityName)
+      await communityAgent.bootstrap()
+      console.log(`...loading filesystem for ${communityName}`)
+      await communityAgent.load();
+      console.log(`community Agent DID for ${communityName}:`, await communityAgent.DID())
+      
+      //initialise members repo
+      var members = new MembersRepository(communityAgent)
+      await members.initialise()
+      
+      //Run Join Approver fro community agent
+      const communityHandle = config.SHOVEL_ACCOUNT_HANDLE
+      await communityAgent.actAsJoinApprover(communityHandle)
+      
+      communityAgent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
+        // TODO Implementing auto-confim - check challenge to implement reject
+        console.log("receieved from requester :", challengeEvent.detail)
+        await members.add(challengeEvent.detail.message.challenge.person)
+
+        // TODO save did and handle in DB/WNFS
+        await challengeEvent.detail.confirm.call()
+      })
+    }
   } catch (e){
     console.log(e)
     console.error("Not running Community Agent : No config file found")
@@ -90,10 +97,12 @@ if (RUN_COMMUNITY_AGENT == true) {
 ///
 
 const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
-const joinFormOptions = { 
-  lookingFor: ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
-  canHelpWith: ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
-  expertise: ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
+const joinFormOptions = {
+  "did:pkh:eip155:8453:0x9209C02c5DaC471CB4aaE58dc4B8008662E27039": { 
+    lookingFor: ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
+    canHelpWith: ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
+    expertise: ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
+  }
 }
 
 server.use(express.urlencoded({ extended: true }))
@@ -124,11 +133,11 @@ server.get("/community/:accountDID/join", (req, res) => {
 
 // Community join form: community/{accountDID}/form?name=decentralised.co
 server.get("/community/:accountDID/form", (req, res) => { 
-  res.render('pages/join_form', { address: address, communityDID: req.params.accountDID, communityName: req.query.name, options: joinFormOptions })
+  res.render('pages/join_form', { address: address, communityDID: req.params.accountDID, communityName: req.query.name, options: joinFormOptions[req.params.accountDID] })
 });
 
 server.get("/directory/:accountDID", (req, res) => {
-  res.render('pages/directory', {communityDID: req.params.accountDID, communityName: req.query.name, options: joinFormOptions})
+  res.render('pages/directory', {communityDID: req.params.accountDID, communityName: req.query.name, options: joinFormOptions[req.params.accountDID]})
 })
 
 server.get('/nonce',  (req, res) => {
