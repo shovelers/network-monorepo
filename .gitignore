@@ -135,3 +135,5 @@ dist
 .pnp.*
 apps/*/public/odd.js
 apps/*/public/assets/
+
+*.DS_Store

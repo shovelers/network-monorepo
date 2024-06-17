@@ -39,7 +39,7 @@
           let question = badge.getAttribute('question')
           if (isClicked === "false") {
             badge.classList.remove('badge-outline');
-            badge.classList.add('badge-neutral');
+            badge.classList.add('badge-secondary');
             badge.setAttribute('data-is-clicked', true)
             switch (question){
               case 'lookingFor':
@@ -56,7 +56,7 @@
             }
             console.log("On Add : ", "looking for :", lookingFor, "canHelpWith :", canHelpWith, "expertise :", expertise)
           } else {
-            badge.classList.remove('badge-neutral');
+            badge.classList.remove('badge-secondary');
             badge.classList.add('badge-outline');
             badge.setAttribute('data-is-clicked', false)
             let index

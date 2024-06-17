@@ -21,7 +21,7 @@
     badges.forEach((badge) => {
       if ((result.canHelpWith).includes(badge.innerHTML) || (result.lookingFor).includes(badge.innerHTML) || (result.expertise).includes(badge.innerHTML)) {
         badge.classList.remove('badge-outline');
-        badge.classList.add('badge-neutral');
+        badge.classList.add('badge-secondary');
         badge.setAttribute('data-is-clicked', true)
       }
     })
@@ -34,7 +34,7 @@
         console.log("question", question)
         if (isClicked === "false") {
           badge.classList.remove('badge-outline');
-          badge.classList.add('badge-neutral');
+          badge.classList.add('badge-secondary');
           badge.setAttribute('data-is-clicked', true)
           switch (question){
             case 'lookingFor':
@@ -54,7 +54,7 @@
           }
           console.log("On Add : ", "looking for :", lFor, "canHelpWith :", cHW, "expertise :", exp)
         } else {
-          badge.classList.remove('badge-neutral');
+          badge.classList.remove('badge-secondary');
           badge.classList.add('badge-outline');
           badge.setAttribute('data-is-clicked', false)
           switch (question){
@@ -83,7 +83,6 @@
     await v1UpdateProfile({lookingFor: lFor, canHelpWith: cHW, expertise: exp})
     console.log("Profile after update :", await getProfile())
   }
-  
 </script>
 
 <div class="max-md:flex max-md:justify-center max-md:items-center avatar online placeholder max-md:mx-20">    
@@ -130,20 +129,20 @@
         
         <div>
           <div>Looking For</div>
-          <% for(var i=0; i<options.lookingFor.length; i++) {%>
-            <div id="edit-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="lookingFor"><%= options.lookingFor[i] %></div>
+          <% for(var i=0; i<JSON.parse(options).lookingFor.length; i++) {%>
+            <div id="edit-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="lookingFor"><%= JSON.parse(options).lookingFor[i] %></div>
           <% } %>
         </div>
         <div>
          <div>Can Help With</div>
-          <% for(var i=0; i<options.canHelpWith.length; i++) {%>
-            <div id="edit-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="canHelpWith"><%= options.canHelpWith[i] %></div>
+          <% for(var i=0; i<JSON.parse(options).canHelpWith.length; i++) {%>
+            <div id="edit-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="canHelpWith"><%= JSON.parse(options).canHelpWith[i] %></div>
           <% } %>
         </div>
         <div>
           <div>Expertise</div>
-          <% for(var i=0; i<options.expertise.length; i++) {%>
-            <div id="edit-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="expertise"><%= options.expertise[i] %></div>
+          <% for(var i=0; i<JSON.parse(options).expertise.length; i++) {%>
+            <div id="edit-badge" class="badge badge-md badge-outline cursor-pointer" data-is-clicked="false" question="expertise"><%= JSON.parse(options).expertise[i] %></div>
           <% } %>
         </div>
         

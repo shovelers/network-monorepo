@@ -132,12 +132,12 @@ server.get("/community/:accountDID/join", (req, res) => {
 });
 
 // Community join form: community/{accountDID}/form?name=decentralised.co
-server.get("/community/:accountDID/form", (req, res) => { 
-  res.render('pages/join_form', { address: address, communityDID: req.params.accountDID, communityName: req.query.name, options: joinFormOptions[req.params.accountDID] })
+server.get("/community/:accountDID/form", (req, res) => {
+  res.render('pages/join_form', { address: address, communityDID: req.params.accountDID, communityName: req.query.name, options: JSON.stringify(joinFormOptions[req.params.accountDID]) })
 });
 
 server.get("/directory/:accountDID", (req, res) => {
-  res.render('pages/directory', {communityDID: req.params.accountDID, communityName: req.query.name, options: joinFormOptions[req.params.accountDID]})
+  res.render('pages/directory', {communityDID: req.params.accountDID, communityName: req.query.name, options: JSON.stringify(joinFormOptions[req.params.accountDID])})
 })
 
 server.get('/nonce',  (req, res) => {
