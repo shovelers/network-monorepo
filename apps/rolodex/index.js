@@ -98,10 +98,15 @@ if (RUN_COMMUNITY_AGENT == true) {
 
 const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
 const joinFormOptions = {
-  "did:pkh:eip155:8453:0x9209C02c5DaC471CB4aaE58dc4B8008662E27039": { 
-    lookingFor: ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
-    canHelpWith: ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
-    expertise: ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
+  "did:pkh:eip155:8453:0x9209C02c5DaC471CB4aaE58dc4B8008662E27039": {
+    "lookingFor": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
+    "canHelpWith": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
+    "expertise": ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
+  },
+  "did:pkh:eip155:8453:0xa56C43263123D36804806A9249A062500c50058F": {
+    "lookingFor": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
+    "canHelpWith": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
+    "expertise": ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
   }
 }
 
