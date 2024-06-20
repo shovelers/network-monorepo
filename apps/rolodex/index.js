@@ -37,6 +37,7 @@ await agent.actAsRelationshipBroker()
 ///
 //Agent for Community
 // set VITE_RUN_COMMUNITY_AGENT as false if you don't want this flow locally
+var communityAgents = []
 if (RUN_COMMUNITY_AGENT == true) {
   try {
     //check if config file exists
@@ -79,19 +80,28 @@ if (RUN_COMMUNITY_AGENT == true) {
       //Run Join Approver fro community agent
       const communityHandle = config.SHOVEL_ACCOUNT_HANDLE
       await communityAgent.actAsJoinApprover(communityHandle)
-      
-      communityAgent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
-        // TODO Implementing auto-confim - check challenge to implement reject
-        console.log("receieved from requester :", challengeEvent.detail)
-        await members.add(challengeEvent.detail.message.challenge.person)
-
-        // TODO save did and handle in DB/WNFS
-        await challengeEvent.detail.confirm.call()
-      })
+      communityAgents.push(communityAgent)
     }
+
+    //start listeners for each agent
+    communityAgents.forEach(async (agent) => {
+      agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
+        console.log("receieved from requester :", challengeEvent.detail)
+        console.log("channel from event :", challengeEvent.detail.channelName)
+        console.log("channel from agent :", agent.approver.channel.name)
+        if (challengeEvent.detail.channelName == agent.approver.channel.name){
+          console.log("I am inside")
+          var memberRepo = new MembersRepository(agent)
+          await memberRepo.add(challengeEvent.detail.message.challenge.person)
+          // TODO Implementing auto-confim - check challenge to implement reject
+          await challengeEvent.detail.confirm.call()
+        } else {
+          throw `Member Add on Join Handshake failed for ${agent.accountDID()}`
+        }
+      })
+    })
   } catch (e){
     console.log(e)
-    console.error("Not running Community Agent : No config file found")
   }
 }
 ///

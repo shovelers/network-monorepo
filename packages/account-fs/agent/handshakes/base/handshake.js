@@ -42,7 +42,8 @@ export class Handshake {
     this.notification.emitEvent("challengeRecieved", {
       confirm: async (confirmData) => { return await approver.confirm(message, challengeMessage, confirmData) },
       reject: async () => { return await approver.reject(message) },
-      message: challengeMessage
+      message: challengeMessage,
+      channelName: this.channel.name
     })
     this.state = "NEGOTIATED"
   }
