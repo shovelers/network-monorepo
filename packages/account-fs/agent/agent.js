@@ -319,7 +319,7 @@ export const StorageCapability = {
     let privateFile = new PrivateFile(this.helia)
     let content = await privateFile.read(uint8arrays.fromString(accessKey, akEncoding), forestCID)      
     var endTime = performance.now()  
-    console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
+    console.log(`Call to readPrivateFileByPointer took ${endTime - startTime} milliseconds`)
     return content
     
 
