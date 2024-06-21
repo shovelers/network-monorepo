@@ -320,7 +320,6 @@ export const StorageCapability = {
     let content = await privateFile.read(uint8arrays.fromString(accessKey, akEncoding), forestCID)      
     var endTime = performance.now()  
     console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
-    console.log(`found file content by pointer: ${content && content.length()}`)
     return content
     
 
