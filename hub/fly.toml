@@ -23,8 +23,9 @@ primary_region = "sin"
   processes = ["app"]
   
   [services.concurrency]
-    hard_limit = 25
-    soft_limit = 20
+    hard_limit = 500
+    soft_limit = 200
+    type = requests
   
   [[services.ports]]
     handlers = ["http"]
@@ -43,8 +44,9 @@ primary_region = "sin"
   protocol = "tcp"
 
   [services.concurrency]
-    hard_limit = 25
-    soft_limit = 20
+    hard_limit = 500
+    soft_limit = 200
+    type = connections
   
   [[services.ports]]
     handlers = ["http"]
