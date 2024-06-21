@@ -21,7 +21,7 @@ primary_region = "sin"
   [services.concurrency]
     hard_limit = 500
     soft_limit = 200
-    type = connections
+    type = "connections"
 
   [[services.ports]]
     handlers = ["tls", "http"]
@@ -42,7 +42,7 @@ primary_region = "sin"
   [services.concurrency]
     hard_limit = 500
     soft_limit = 200
-    type = requests
+    type = "requests"
   
   [[services.ports]]
     handlers = ["http"]
