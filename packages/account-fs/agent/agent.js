@@ -321,9 +321,6 @@ export const StorageCapability = {
     var endTime = performance.now()  
     console.log(`Call to readPrivateFileByPointer took ${endTime - startTime} milliseconds`)
     return content
-    
-
-
   },
 
   async getAccessKeyForPrivateFile(filename) {
