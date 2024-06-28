@@ -3,9 +3,18 @@ export class MemberTable extends HTMLElement {
   constructor() {
     super();
    
+    const container = document.createElement('div');
+    container.classList.add('relative');
+   
+    // Create a sticky header container
+    const stickyHeader = document.createElement('div');
+    stickyHeader.classList.add('sticky', 'top-0', 'bg-gray-200', 'z-10','table', 'table-lg', 'table-pin-rows' );
+   
     // Create a table element
     const table = document.createElement('table');
     table.classList.add('table', 'table-lg', 'table-pin-rows');
+
+    
 
     // Create the table header row
     const thead = table.createTHead();
@@ -21,14 +30,24 @@ export class MemberTable extends HTMLElement {
       headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
-    table.appendChild(thead);
+    stickyHeader.appendChild(thead);
 
-    var tbody = table.createTBody();
-    // Create table rows for contacts (initially empty)
-    this._contacts = [];
+    const tbody = table.createTBody();
+
     
     // Append the table to the Shadow DOM
-    this.appendChild(table);
+   // Append the sticky header and table to the container
++   container.appendChild(stickyHeader);
++   container.appendChild(table);
++
++   // Append the container to the Shadow DOM
++   this.appendChild(container);
+
+    const scrollableArea = document.createElement('div');
++   scrollableArea.classList.add('max-h-[calc(100vh-200px)]', 'overflow-y-auto');
++   scrollableArea.appendChild(tbody);
++   table.appendChild(scrollableArea);
+    this._members = [];
   }
 
   // Define a property setter for the "contacts" property
@@ -44,12 +63,10 @@ export class MemberTable extends HTMLElement {
 
   // Method to update the table based on the contacts data
   updateTable(memberList) {
-    const table = this.querySelector('table');
+    
     const tbody = this.querySelector('tbody');
     // Clear existing rows
-    while (table.rows.length > 1) {
-      table.deleteRow(1);
-    }
+   tbody.innerHTML=''
     var rowCount = 0;
 
     // Create table rows for contacts
