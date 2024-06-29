@@ -1,3 +1,8 @@
+<style>
+  .input::placeholder {
+    color: grey; 
+  }
+</style>
 <div class="flex flex-row space-x-2 w-2/3">
   <form class="search-form flex flex-row space-x-2 w-full"
   onsubmit="event.preventDefault(); window.filterContacts(document.querySelector('.search-form > input').value).then((result) => {document.querySelector('contact-table').contacts = result}); return false">
