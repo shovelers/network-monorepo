@@ -13,9 +13,6 @@ export class MemberTable extends HTMLElement {
     // Create a table element
     const table = document.createElement('table');
     table.classList.add('table', 'table-lg', 'table-pin-rows');
-
-    
-
     // Create the table header row
     const thead = table.createTHead();
     const headerRow = document.createElement('tr');
@@ -26,7 +23,11 @@ export class MemberTable extends HTMLElement {
       th.classList.add('cursor-pointer','col-span-2') //add value for 'col-span-X'  based on corresponding row element size
       th.textContent = headerText;
       th.value = "asc";
-      th.onclick = () => {this.sortTable(th);};
+      th.onclick = () => {
+        if (headerText === 'Name (sort)') {
+          this.sortTableBasedOnName(th);
+        }
+      };
       headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -129,16 +130,20 @@ export class MemberTable extends HTMLElement {
     document.getElementById('member-count').innerHTML = rowCount;
   }
 
-  sortTable(element) {
+  sortTableBasedOnName(element) {
     switch (element.value) {
       case "asc":
-        var sortedMemberList = Object.fromEntries(Object.entries(this._members).sort((a, b) => { return a[1].name.localeCompare(b[1].name) }))
+        var sortedMemberList =  this._members.sort((a, b) => {
+          return (a.name).localeCompare(b.name);
+        });
         this.updateTable(sortedMemberList);
         element.textContent = "Name  ▼";
         element.value = "desc";
         break;
       case "desc":
-        var sortedMemberList = Object.fromEntries(Object.entries(this._members).sort((a, b) => { return a[1].name.localeCompare(b[1].name) }).reverse())
+        var sortedMemberList =  this._members.sort((a, b) => {
+          return (b.name).localeCompare(a.name);
+        });
         this.updateTable(sortedMemberList);
         element.textContent = "Name  ▲";
         element.value = "asc";
