@@ -3,10 +3,16 @@ export class MemberTable extends HTMLElement {
   constructor() {
     super();
    
+    const container = document.createElement('div');
+    container.classList.add('relative');
+   
+    // Create a sticky header container
+    const stickyHeader = document.createElement('div');
+    stickyHeader.classList.add('sticky', 'top-0', 'bg-gray-200', 'z-10','table', 'table-lg', 'table-pin-rows' );
+   
     // Create a table element
     const table = document.createElement('table');
     table.classList.add('table', 'table-lg', 'table-pin-rows');
-
     // Create the table header row
     const thead = table.createTHead();
     const headerRow = document.createElement('tr');
@@ -17,18 +23,32 @@ export class MemberTable extends HTMLElement {
       th.classList.add('cursor-pointer','col-span-2') //add value for 'col-span-X'  based on corresponding row element size
       th.textContent = headerText;
       th.value = "asc";
-      th.onclick = () => {this.sortTable(th);};
+      th.onclick = () => {
+        if (headerText === 'Name (sort)') {
+          this.sortTableBasedOnName(th);
+        }
+      };
       headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
-    table.appendChild(thead);
+    stickyHeader.appendChild(thead);
 
-    var tbody = table.createTBody();
-    // Create table rows for contacts (initially empty)
-    this._contacts = [];
+    const tbody = table.createTBody();
+
     
     // Append the table to the Shadow DOM
-    this.appendChild(table);
+   // Append the sticky header and table to the container
++   container.appendChild(stickyHeader);
++   container.appendChild(table);
++
++   // Append the container to the Shadow DOM
++   this.appendChild(container);
+
+    const scrollableArea = document.createElement('div');
++   scrollableArea.classList.add('max-h-[calc(100vh-200px)]', 'overflow-y-auto');
++   scrollableArea.appendChild(tbody);
++   table.appendChild(scrollableArea);
+    this._members = [];
   }
 
   // Define a property setter for the "contacts" property
@@ -44,12 +64,10 @@ export class MemberTable extends HTMLElement {
 
   // Method to update the table based on the contacts data
   updateTable(memberList) {
-    const table = this.querySelector('table');
+    
     const tbody = this.querySelector('tbody');
     // Clear existing rows
-    while (table.rows.length > 1) {
-      table.deleteRow(1);
-    }
+   tbody.innerHTML=''
     var rowCount = 0;
 
     // Create table rows for contacts
@@ -112,16 +130,20 @@ export class MemberTable extends HTMLElement {
     document.getElementById('member-count').innerHTML = rowCount;
   }
 
-  sortTable(element) {
+  sortTableBasedOnName(element) {
     switch (element.value) {
       case "asc":
-        var sortedMemberList = Object.fromEntries(Object.entries(this._members).sort((a, b) => { return a[1].name.localeCompare(b[1].name) }))
+        var sortedMemberList =  this._members.sort((a, b) => {
+          return (a.name).localeCompare(b.name);
+        });
         this.updateTable(sortedMemberList);
         element.textContent = "Name  ▼";
         element.value = "desc";
         break;
       case "desc":
-        var sortedMemberList = Object.fromEntries(Object.entries(this._members).sort((a, b) => { return a[1].name.localeCompare(b[1].name) }).reverse())
+        var sortedMemberList =  this._members.sort((a, b) => {
+          return (b.name).localeCompare(a.name);
+        });
         this.updateTable(sortedMemberList);
         element.textContent = "Name  ▲";
         element.value = "asc";

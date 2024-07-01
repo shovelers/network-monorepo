@@ -117,6 +117,11 @@ const joinFormOptions = {
     "lookingFor": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
     "canHelpWith": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
     "expertise": ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
+  },
+  "did:pkh:eip155:8453:0x4b59De6dc42e2F7f7978D6489dCfF922535c162F": {
+    "lookingFor": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
+    "canHelpWith": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
+    "expertise": ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
   }
 }
 

@@ -127,7 +127,7 @@ export const SearchCapability = {
                 let personForestCID = personResponse.data.head;
                 let filecontent = await Promise.race([
                   this.readPrivateFileByPointer(profileAccessKey, CID.parse(personForestCID).bytes),
-                  timeout(5000)
+                  timeout(10000)
                 ]);
 
                 if (value.FN == "Seed Data") {
