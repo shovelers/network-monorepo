@@ -282,8 +282,12 @@ server.post('/v1/accounts/:accountDID/head', async (req, res) => {
   }
 
   // Possible failure scenario where head gets updated but block is not pinned
-  await accounts.setHead(req.params.accountDID, req.body.message.cid)
-  node.pins.add(CID.parse(req.body.message.cid)).then(() => { console.log("pin complete", req.params.accountDID, req.body.message.cid) })
+  node.pins.add(CID.parse(req.body.message.cid)).then(() => {
+    console.log("pin complete", req.params.accountDID, req.body.message.cid)
+    accounts.setHead(req.params.accountDID, req.body.message.cid).then(() => {
+      console.log("head updated")
+    })
+  })
   
   res.status(201).json({})
 });
