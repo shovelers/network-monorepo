@@ -266,26 +266,6 @@ server.put("/v1/accounts/:accountDID/custody", async (req, res) => {
 /*
   Storage APIs
 */
-server.post('/pin', async (req, res) => { 
-  const verified = await verify(req.body.message, req.body.signature)
-  if (!verified) {
-    res.status(401).json({error: "InvalidSignature"})
-    return
-  }
-
-  const canPin = await accounts.validAgent(`${req.body.message.handle}#${req.body.message.signer}`)
-  if (!canPin) {
-    res.status(401).json({error: "InvalidAgent"})
-    return
-  }
-
-  var cid = CID.parse(req.body.message.cid)
-  var handle = req.body.message.handle
-  await node.datastore.put(new Key('/handle/' + handle), cid.bytes)
-  var pin = node.pins.add(cid)
-  console.log("pin", cid)
-  res.status(201).json({})
-});
 
 // TODO - authz - ACL based agent list check - UCAN to switch to OCap
 server.post('/v1/accounts/:accountDID/head', async (req, res) => { 
@@ -302,8 +282,12 @@ server.post('/v1/accounts/:accountDID/head', async (req, res) => {
   }
 
   // Possible failure scenario where head gets updated but block is not pinned
-  await accounts.setHead(req.params.accountDID, req.body.message.cid)
-  node.pins.add(CID.parse(req.body.message.cid)).then(() => { console.log("pin complete", req.params.accountDID, req.body.message.cid) })
+  node.pins.add(CID.parse(req.body.message.cid)).then(() => {
+    console.log("pin complete", req.params.accountDID, req.body.message.cid)
+    accounts.setHead(req.params.accountDID, req.body.message.cid).then(() => {
+      console.log("head updated")
+    })
+  })
   
   res.status(201).json({})
 });
@@ -313,16 +297,6 @@ server.get("/v1/accounts/:accountDID/head", async (req, res) => {
   if (head) {
     res.status(200).json({head: head})
   } else {
-    res.status(404).json({})
-  }
-});
-
-server.get("/forestCID/:handle", async (req, res) => {
-  try {
-    var cid = await node.datastore.get(new Key('/handle/' + req.params["handle"]))
-    cid = CID.decode(cid)
-    res.status(200).json({cid: cid.toString()})
-  } catch (error) {
     res.status(404).json({})
   }
 });

@@ -81,6 +81,8 @@
         channelToken: channel.data.channelToken,
       }).then((status) => {
         console.log(status)
+        signup_by_farcaster.close()
+        window.showLoading()
         farcasterClient.verifySignInMessage({
          nonce: status.data.nonce,
          domain: window.location.host,
