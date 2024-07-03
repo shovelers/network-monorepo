@@ -76,6 +76,20 @@
     })
   }
 
+  window.refreshSyncStatus = function() {
+    window.shovel.agent.syncStatus().then((s) => {
+      if (s == false) {
+        document.getElementById("avatar").classList.remove('online');
+        document.getElementById("avatar").classList.add('offline');
+      } else if (s == true) {
+        document.getElementById("avatar").classList.add('online');
+        document.getElementById("avatar").classList.remove('offline');
+      }
+    })
+    setTimeout(refreshSyncStatus, 10000);
+  }
+  setTimeout(refreshSyncStatus, 3000);
+
   window.syncButton = async function() {
     window.shovel.agent.syncStatus().then((s) => {
       console.log("sync status", s)
@@ -86,7 +100,7 @@
   }
 </script>
 
-<div class="max-md:flex max-md:justify-center max-md:items-center avatar online placeholder max-md:mx-20">    
+<div id="avatar" class="max-md:flex max-md:justify-center max-md:items-center avatar online placeholder max-md:mx-20">    
   <div class="bg-neutral-focus text-neutral-content rounded-full w-32">
     <span class="text-3xl profile_username_first_letter"></span>
   </div>
