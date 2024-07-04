@@ -111,9 +111,8 @@
        window.channel = channel
      }
 
-      const ethButton = document.getElementById('ethereum-signup-button');
       if (window.ethereum) {
-        ethButton.classList.remove('hidden');
+        document.getElementById('ethereum-signup-button').classList.remove('hidden');
       }
     </script>
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
