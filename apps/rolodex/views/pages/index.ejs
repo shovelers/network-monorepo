@@ -15,8 +15,6 @@
       import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.12.1/ethers.min.js";
       window.signup = signup;
       window.recover = recover;
-      const provider = new ethers.BrowserProvider(window.ethereum);
-
 
       var session = await account.activeSession();
       if (session) {
@@ -34,13 +32,21 @@
         else { alert("Username Already Taken")}
       }
 
-      window.connectWallet = async function(){
-        await provider.send('eth_requestAccounts', [])
-                .catch(() => console.log('User rejected request'));
-      }
 
      window.ethereumSignUp = async function() {
-      const connected = await connectWallet();
+      let provider;
+      if(window.ethereum) {
+          try {
+            provider = new ethers.BrowserProvider(window.ethereum); 
+          }
+          catch (error) {
+            console.log("Issue with initialising ethereum provider");
+          }
+      }
+      else {
+        console.error("Ethereum provider not found");
+      }
+      const connected = await provider.send('eth_requestAccounts', []).catch(() => console.log('User rejected request'));
       const agentDID = await account.agent.DID()
       const nonce = await getNonce();
       const signer = await provider.getSigner();
@@ -105,6 +111,9 @@
        window.channel = channel
      }
 
+      if (window.ethereum) {
+        document.getElementById('ethereum-signup-button').classList.remove('hidden');
+      }
     </script>
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
       <div class="p-4 text-center">
@@ -134,7 +143,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M18.24.24H5.76A5.76 5.76 0 0 0 0 6v12a5.76 5.76 0 0 0 5.76 5.76h12.48A5.76 5.76 0 0 0 24 18V6A5.76 5.76 0 0 0 18.24.24m.816 17.166v.504a.49.49 0 0 1 .543.48v.568h-5.143v-.569A.49.49 0 0 1 15 17.91v-.504c0-.22.153-.402.358-.458l-.01-4.364c-.158-1.737-1.64-3.098-3.443-3.098c-1.804 0-3.285 1.361-3.443 3.098l-.01 4.358c.228.042.532.208.54.464v.504a.49.49 0 0 1 .543.48v.568H4.392v-.569a.49.49 0 0 1 .543-.479v-.504c0-.253.201-.454.454-.472V9.039h-.49l-.61-2.031H6.93V5.042h9.95v1.966h2.822l-.61 2.03h-.49v7.896c.252.017.453.22.453.472"/></svg>
           Sign-in with Warpcast
         </button>
-        <button type="submit" class="btn btn-outline btn-sm" onclick="ethereumSignUp()">
+        <button id="ethereum-signup-button" type="submit" class="hidden btn btn-outline btn-sm" onclick="ethereumSignUp()">
           <svg xmlns="http://www.w3.org/2000/svg" width="0.62em" height="1em" viewBox="0 0 256 417"><path fill="#343434" d="m127.961 0l-2.795 9.5v275.668l2.795 2.79l127.962-75.638z"/><path fill="#8c8c8c" d="M127.962 0L0 212.32l127.962 75.639V154.158z"/><path fill="#3c3c3b" d="m127.961 312.187l-1.575 1.92v98.199l1.575 4.601l128.038-180.32z"/><path fill="#8c8c8c" d="M127.962 416.905v-104.72L0 236.585z"/><path fill="#141414" d="m127.961 287.958l127.96-75.637l-127.96-58.162z"/><path fill="#393939" d="m.001 212.321l127.96 75.637V154.159z"/></svg>
            Sign in with ethereum
         </button>
