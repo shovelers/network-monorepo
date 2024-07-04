@@ -15,8 +15,16 @@
       import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.12.1/ethers.min.js";
       window.signup = signup;
       window.recover = recover;
-      const provider = new ethers.BrowserProvider(window.ethereum);
-
+      if (window.ethereum) {
+        try {
+        const provider = new ethers.BrowserProvider(window.ethereum); 
+        }
+        catch (error) {
+          console.log("Issue with initialising ethereum provider");
+        }
+      }  else {
+        console.error("Ethereum provider not found");
+      }
 
       var session = await account.activeSession();
       if (session) {
