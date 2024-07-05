@@ -41,20 +41,6 @@ export class Account {
     return await this.profileRepo.set(params)
   }
 
-  // TODO - change signature - to take accountDID instead of handle
-  async create(handle, initialFiles) {
-    const success = await this.agent.registerUser(handle)
-
-    if (success) {
-      //TODO replace file initialisation with repo initialisation
-      await this.agent.updatePrivateFile("profile.json", () => { return new Profile({handle: handle}).asJSON() })
-      await initialFiles.forEach(async element => {
-        await this.agent.updatePrivateFile(element.name, () => { return element.initialData })
-      });
-    }
-    return success
-  }
-
   async getLink() {
     let forestCID = await this.agent.forestCID()
     const accessKey = await this.agent.getAccessKeyForPrivateFile(this.filename)

@@ -121,26 +121,6 @@ export const MessageCapability = {
 }
 
 export const AccountCapability = {
-  async registerUser(handle) {
-    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, handle)
-
-    const did = await this.DID()
-    const fullname = `${handle}#${did}`
-
-    let success = false
-    const envelope = await this.envelop({fullname: fullname})
-    await this.axios_client.post('/accounts', envelope).then(async (response) => {
-      console.log("account creation status", response.status)
-      success = true
-    }).catch(async (e) => {
-      console.log(e);
-      await this.destroy()
-      return e
-    })
-
-    return success
-  },
-
   async register(accountDID, siweMessage, siweSignature) {
     await this.runtime.setItem(SHOVEL_ACCOUNT_DID, accountDID)
 

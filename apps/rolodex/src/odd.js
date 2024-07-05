@@ -34,28 +34,6 @@ const axios_client  = axios.create({
   baseURL: `${window.location.origin}`,
 })
 
-async function signup(username, requester) {
-  requester.notification.addEventListener("challengeGenerated", (challengeEvent) => {
-    console.log(challengeEvent.detail)
-  })
-  
-  const success = await account.create(
-    username,
-    [{name: "contacts.json", initialData: { contactList: {} }}]
-  );
-
-  if (success == true) {
-    await requester.initiate()
-
-    const timeout = setTimeout(() => {
-      clearTimeout(timeout)
-      window.location.href = "/app";
-    }, 5000)
-  }
-
-  return success
-}
-
 async function farcasterSignup(accountDID, siweMessage, siweSignature, profileData, fid) {
   await accountv1.create(accountDID, siweMessage, siweSignature)
   await accountv1.repositories.profile.set(profileData)
@@ -386,7 +364,6 @@ export {
   account,
   farcasterClient,
   farcasterSignup,
-  signup, 
   signout, 
   getProfile, 
   updateProfile, 

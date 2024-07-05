@@ -55,11 +55,6 @@ class Accounts {
     this.redis =  redis
   }
 
-  async create(fullname) {
-    await this.redis.sAdd("handles", fullname.split('#')[0])
-    return await this.addAgent(fullname)
-  }
-
 // TODO - authz - ACL based agent list check - UCAN to switch to OCap - remove agents list
   async createOrAdd(accountDID, agentDID) {
     var registeredDID = await this.redis.hGet(`account:${accountDID}`, "id")
@@ -75,15 +70,6 @@ class Accounts {
 
   async addAgent(fullname) {
     return await this.redis.sAdd("accounts", fullname)
-  }
-
-  async taken(handle) {
-    return await this.redis.sIsMember("handles", handle)
-  }
-
-  async validAgent(fullname) {
-    // TODO check for accountDID and agentDID    
-    return await this.redis.sIsMember("accounts", fullname)
   }
 
   async validAgentV1(accountDID, agentDID) {
@@ -132,23 +118,6 @@ const accounts = new Accounts(redisClient)
     Response:
       {201, created: true/false}
 */
-server.post("/accounts", async (req, res) => {
-  const verified = await verify(req.body.message, req.body.signature)
-  if (!verified) {
-    res.status(401).json({})
-    return
-  }
-
-  var fullname = req.body.message.fullname
-  const taken = await accounts.taken(fullname.split('#')[0])
-  if (taken) {
-    res.status(400).json({error: "User name taken"})
-  } else {
-    await accounts.create(fullname)
-    res.status(201).json({})
-  }
-});
-
 server.post("/v1/accounts", async (req, res) => {
   const verified = await verify(req.body.message, req.body.signature)
   if (!verified) {
