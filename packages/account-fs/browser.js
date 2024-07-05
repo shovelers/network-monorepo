@@ -1,5 +1,4 @@
 import { createNode, BROWSER } from './agent/helia_node.js';
-import { Account } from './agent/account.js'
 import { AccountV1 } from './account.js'
 import { Agent, BROWSER_RUNTIME, AccountCapability, StorageCapability, MessageCapability, Runtime } from './agent/agent.js'
 import { SearchCapability } from './repository/people/search.js'
@@ -45,4 +44,4 @@ async function programInit(network, appHandle) {
   }
 }
 
-export { Account, programInit, Person, PeopleRepository, AccountV1, MembersRepository }
+export { programInit, Person, PeopleRepository, AccountV1, MembersRepository }

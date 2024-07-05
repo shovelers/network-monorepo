@@ -3,7 +3,7 @@ import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
 import { MemberTable } from "./member_table";
-import { programInit, Account, Person, PeopleRepository, AccountV1, MembersRepository } from 'account-fs';
+import { programInit, Person, PeopleRepository, AccountV1, MembersRepository } from 'account-fs';
 import * as uint8arrays from 'uint8arrays';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { save } from '@tauri-apps/api/dialog';
@@ -23,9 +23,9 @@ window.shovel = program
 
 const contactRepo = new PeopleRepository(program.agent)
 const membersRepo = new MembersRepository(program.agent)
-const account = new Account(program.agent)
-const accountv1 = new AccountV1(program.agent, ["PEOPLE"])
-shovel.accountv1 = accountv1
+const account = new AccountV1(program.agent, ["PEOPLE"])
+const accountv1 = account
+shovel.account = account
 
 customElements.define('contact-table', ContactTable);
 customElements.define('member-table', MemberTable);

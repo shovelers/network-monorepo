@@ -35,4 +35,20 @@ export class AccountV1 {
   }
 
   // recovery - not needed for facaster login
+
+  async getProfile(){
+    return await this.repositories.profile.get()
+  }
+
+  async editProfile(params){
+    return await this.repositories.profile.set(params)
+  }
+
+  async signout(){
+    await this.agent.destroy()
+  }
+
+  async activeSession() {
+    return this.agent.activeSession()
+  }
 }
