@@ -135,10 +135,6 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301c1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"/></svg>
     Import
   </button>
-  <button class="hidden max-md:my-1 btn-outline max-md:w-5/6 md:btn-sm md:w-2/3" onclick="generateRecoveryKit(document.getElementById('handle').innerHTML)">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647l.646-.647a.5.5 0 0 1 .708 0l.646.647l.646-.647a.5.5 0 0 1 .708 0l.646.647l.793-.793l-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z" /><path d="M4 8a1 1 0 1 1-2 0a1 1 0 0 1 2 0z" /></g></svg>
-    Recovery Key
-  </button>
   <button class="hidden btn max-md:my-1 btn-outline max-md:w-5/6 md:btn-sm md:w-2/3" onclick="startDeviceLink()">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M8.465 11.293c1.133-1.133 3.109-1.133 4.242 0l.707.707l1.414-1.414l-.707-.707c-.943-.944-2.199-1.465-3.535-1.465s-2.592.521-3.535 1.465L4.929 12a5.008 5.008 0 0 0 0 7.071a4.983 4.983 0 0 0 3.535 1.462A4.982 4.982 0 0 0 12 19.071l.707-.707l-1.414-1.414l-.707.707a3.007 3.007 0 0 1-4.243 0a3.005 3.005 0 0 1 0-4.243z"/><path fill="currentColor" d="m12 4.929l-.707.707l1.414 1.414l.707-.707a3.007 3.007 0 0 1 4.243 0a3.005 3.005 0 0 1 0 4.243l-2.122 2.121c-1.133 1.133-3.109 1.133-4.242 0L10.586 12l-1.414 1.414l.707.707c.943.944 2.199 1.465 3.535 1.465s2.592-.521 3.535-1.465L19.071 12a5.008 5.008 0 0 0 0-7.071a5.006 5.006 0 0 0-7.071 0"/></svg>
     Link Device
@@ -249,17 +245,14 @@
       </form>
     </div>
   </div>
+</dialog>
 <dialog id="logout_modal" class="modal">
   <div class="modal-box">
-    <p class="text-lg font-bold">Beware!!</p>
-    <p class="text-sm">Your account is bound to this device </p>
-    <p class="text-sm mt-2">Do Not Logout if you have not downloaded </br> the Recovery Key or Linked Another Device to this account yet</p>
+    <p class="text-lg font-bold">Note</p>
+    <p class="text-sm">Sign-in with the same FC account/wallet the next time</p>
     <div class="modal-action flex flex-col justify-center items-center space-y-2">
       <form class="flex flex-col space-y-2 items-center" onsubmit="event.preventDefault(); signout().then(function(){window.location.href='/home'}) ;return false">
         <div class="flex flex-row space-x-2">
-          <button class="btn btn-outline btn-sm w-2/3" onclick="event.preventDefault(); generateRecoveryKit(document.getElementById('handle').innerHTML)">
-            Get Recovery Key
-          </button>
           <button type="submit" class="btn btn-outline btn-sm">
             Logout
           </button>

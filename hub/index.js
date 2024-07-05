@@ -7,7 +7,6 @@ import { fileURLToPath } from 'url';
 import { createStandaloneNode } from 'account-fs/hub.js';
 import morgan from 'morgan';
 import client from 'prom-client'
-import { Key } from 'interface-datastore';
 import { createClient } from 'redis';
 import * as uint8arrays from 'uint8arrays';
 import * as verifiers from 'iso-signatures/verifiers/rsa.js'
@@ -192,37 +191,6 @@ server.put("/accounts/:handle/agents", async (req, res) => {
   await accounts.addAgent(fullname)
   res.status(201).json({}) 
 })
-
-// Recovery
-server.put("/accounts", async (req, res) => {
-  const verified = await verify(req.body.message, req.body.signature)
-  if (!verified) {
-    res.status(401).json({})
-    return
-  }
-
-  const kit = req.body.message.recoveryKit
-  const verifyGeneratingAgent = await accounts.validAgent(kit.generatingAgent)
-  if (!verifyGeneratingAgent) {
-    res.status(401).json({})
-    return
-  }
-
-  let message = {fullname: kit.generatingAgent, signer: kit.generatingAgent.split('#')[1]}
-  const verifyKitSignature = await verify(message, kit.signature)
-  if (!verifyKitSignature) {
-    res.status(401).json({})
-    return
-  }
-
-  var fullname = req.body.message.fullname
-  await accounts.addAgent(fullname)
-
-  var cid = await node.datastore.get(new Key('/handle/' + fullname.split('#')[0]))
-  cid = CID.decode(cid)
-
-  res.status(201).json({cid: cid.toString()})
-});
 
 // Names
 server.put("/v1/accounts/:accountDID/names", async (req, res) => {

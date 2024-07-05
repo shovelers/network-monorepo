@@ -70,44 +70,4 @@ export class Account {
   async activeSession() {
     return this.agent.activeSession()
   }
-
-  async recoveryKitContent() {
-    const data = await this.agent.recoveryKitData()
-    return RecoveryKit.toYML(data)
-  }
-
-  async recover(content){
-    var data = RecoveryKit.parseYML(content)
-
-    const success = await this.agent.recover(data)
-    if (success) {
-      await this.agent.load()
-    }
-    return success
-  }
-}
-
-class RecoveryKit {
-  static toYML(data){
-    return `
-  # This is your recovery kit. (It's a yaml text file)
-  # Store this somewhere safe.
-  # Anyone with this file will have read access to your private files.
-  # Losing it means you won't be able to recover your account
-  # in case you lose access to all your linked devices.
-  
-  fullname: ${data.fullname}
-  accountkey: ${data.accountKey}
-  signature: ${data.signature}
-  `;
-  }
-
-  static parseYML(content) {
-    var data = {}
-    data.fullname = content.toString().split("fullname: ")[1].split("\n")[0]
-    data.accountKey = content.toString().split("accountkey: ")[1].split("\n")[0]
-    data.signature = content.toString().split("signature: ")[1].split("\n")[0]
-
-    return data
-  }
 }

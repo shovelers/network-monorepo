@@ -271,35 +271,6 @@ async function downloadContactsDataLocally() {
   }
 }
 
-async function generateRecoveryKit(username){
-  const content = await account.recoveryKitContent()
-  const filename = `rolodex-${username}-recovery-kit.yaml`
-  
-  if (window.__TAURI__) {
-    const filePath = await save({ defaultPath: filename });
-    await writeTextFile(filePath, content);
-    alert('your file has been downloaded!');
-  } else {
-    const data = new Blob([content], { type: 'text/plain' })
-    var fileURL = window.URL.createObjectURL(data);
-    var tempLink = document.createElement('a');
-    tempLink.href = fileURL;
-    tempLink.setAttribute('download', `${filename}`);
-    tempLink.click();
-    window.URL.revokeObjectURL(fileURL);
-    alert('your file has been downloaded!');
-  } 
-}
-
-async function recover(kit) {
-  var kitText = await kit.text()
-  await account.recover(kitText)
-  const timeout = setTimeout(() => {
-    clearTimeout(timeout)
-    window.location.href = "/app";
-  }, 5000)
-}
-
 async function importContacts(username, password){
   //fetch creds from store if already present
   console.log("import triggered")
@@ -417,8 +388,6 @@ export {
   farcasterSignup,
   signup, 
   signout, 
-  generateRecoveryKit, 
-  recover,
   getProfile, 
   updateProfile, 
   getContacts, 
