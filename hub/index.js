@@ -49,7 +49,6 @@ async function verify(message, signature){
   return await verifiers.verify({message: binMessage, signature: binSignature, publicKey: pubKey})
 }
 
-// Todo - accountDID as primary key, move handles to separate naming layer - Redo modelling
 class Accounts {
   constructor(redis) {
     this.redis =  redis
@@ -66,10 +65,6 @@ class Accounts {
       await this.redis.sAdd(`agents:${accountDID}`, agentDID)
       return true
     }
-  }
-
-  async addAgent(fullname) {
-    return await this.redis.sAdd("accounts", fullname)
   }
 
   async validAgentV1(accountDID, agentDID) {
@@ -146,19 +141,6 @@ server.post("/v1/accounts", async (req, res) => {
     console.log(error)
     res.status(400).json({ created: false, msg: "ExceptionOnSIWE" })
   }
-})
-
-// Add Agent - change handle to accountDID
-server.put("/accounts/:handle/agents", async (req, res) => {
-  const verified = await verify(req.body.message, req.body.signature)
-  if (!verified) {
-    res.status(401).json({})
-    return
-  }
-  var agentDID = req.body.message.agentDID
-  var fullname = `${req.params["handle"]}#${agentDID}`
-  await accounts.addAgent(fullname)
-  res.status(201).json({}) 
 })
 
 // Names

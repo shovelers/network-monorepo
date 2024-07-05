@@ -1,6 +1,5 @@
 import { Notification } from './common.js';
 import { JoinHandshake } from '../join.js';
-import { LinkingHandshake } from '../link.js';
 import { RelateHandshake } from '../relate.js';
 
 export class Approver {
@@ -24,8 +23,6 @@ export class Approver {
 
   newHandshake(request) {
     switch (request.type) {
-    case "LINK":
-      return new LinkingHandshake(this.agent, this.channel, request.id, this.notification)
     case "JOIN":
       return new JoinHandshake(this.agent, this.channel, request.id, this.notification)
     case "RELATE":

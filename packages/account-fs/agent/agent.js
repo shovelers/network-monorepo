@@ -2,7 +2,6 @@ import * as uint8arrays from 'uint8arrays';
 import axios from 'axios'
 import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
-import { LinkingRequester } from './handshakes/link.js';
 import { JoinRequester } from './handshakes/join.js';
 import { RelateRequester } from './handshakes/relate.js';
 import { Broker } from './handshakes/base/broker.js';
@@ -21,35 +20,6 @@ const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
 export const MessageCapability = {
-  async actAsApprover(approverHandle) {
-    let agent = this
-    let channelName = approverHandle 
-    const channel = new Channel(this.helia, channelName)
-    this.approver = new Approver(this, channel, async (message) => {  })
-    this.approver.notification.addEventListener("CONFIRMED", async (message) => {
-      return await agent.linkDevice(message.detail)
-    })
-
-    await channel.subscribe(this.approver)
-  },
-
-  async actAsRequester(address, approverHandle) {
-    let agent = this
-    let channelName = approverHandle
-    const channel = new Channel(this.helia, channelName)
-    this.requester = new LinkingRequester(this, channel)
-    this.requester.notification.addEventListener("CONFIRMED", async (message) => {
-      return await agent.createSessionOnDeviceLink(message.detail.data)
-    })
-
-    await dial(this.helia, address)
-    await channel.subscribe(this.requester)
-    const timeout = setTimeout(() => {
-      clearTimeout(timeout)
-      this.requester.initiate()
-    }, 500)
-  },
-
   async actAsJoinApprover(approverHandle) {
     const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)
@@ -177,22 +147,6 @@ export const AccountCapability = {
     })
   },
 
-  async linkDevice(message) {
-    let success = false
-    let handle = await this.handle()
-    console.log("message with pin and did", message)
-    let agentDID = await message.did
-    const envelope = await this.envelop({agentDID: agentDID})
-    await this.axios_client.put(`accounts/${handle}/agents` , envelope).then(async (response) => {
-      success = true
-    }).catch(async (e) => {
-      console.log(e);
-      return e
-    })
-
-    return success 
-  },
-
   async destroy() {
     await this.runtime.removeItem(SHOVEL_FS_ACCESS_KEY)
     await this.runtime.removeItem(SHOVEL_FS_FOREST_CID)
@@ -205,12 +159,6 @@ export const AccountCapability = {
     // TODO when agent has storage capability check for access key
     let keypair = await this.runtime.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
     return (keypair != null)
-  },
-
-  async createSessionOnDeviceLink(message) {
-    await this.runtime.setItem(SHOVEL_ACCOUNT_HANDLE, message.handle)
-    await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, uint8arrays.fromString(message.accessKey, 'base64pad'))
-    await this.runtime.setItem(SHOVEL_FS_FOREST_CID, uint8arrays.fromString(message.forestCID, 'base64pad'))
   }
 }
 

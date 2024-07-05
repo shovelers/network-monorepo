@@ -142,10 +142,6 @@ server.get("/app", (req, res) => {
   res.render('pages/app', { broker: broker, address: address })
 });
 
-server.get("/link", (req, res) => {
-  res.render('pages/link', { username: req.query.username })
-});
-
 // Community Join link: community/{accountDID}/join?name=decentralised.co
 server.get("/community/:accountDID/join", (req, res) => {
   res.render('pages/join', { address: address, communityDID: req.params.accountDID ,communityName: req.query.name })
