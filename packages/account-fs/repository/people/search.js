@@ -1,6 +1,59 @@
 import { Person } from "./person"
 import { CID } from 'multiformats/cid'
 
+export class PeopleSearch {
+  // build a list of people
+    // get local contacts
+    // get shared contacts via users and community
+  // design caching and update of list of people
+  // provide fast query layer
+  // Alow providing context of community to query
+
+  constructor(agent, peopleRepo) {
+    this.agent = agent
+    this.peopleRepo = peopleRepo
+  }
+
+  // get all contacts for a community
+  // find contact matching 
+  // { match: "", context: community }
+  async search(query){
+    const queryString = query.toLowerCase()
+    var contacts = this.fullTextMatch(queryString)
+    return contacts
+  }
+
+  //private
+  async fullTextMatch(queryString) {
+    return await this.peopleRepo.match((person) => {
+      if (person.FN.toLowerCase().includes(queryString) || person.CATEGORIES.split(',').filter(tag => tag.toLowerCase().includes(queryString)).length > 0) {
+        return true
+      }
+
+      if (person.NOTE && person.NOTE.toLowerCase().includes(queryString)) {
+        return true
+      }
+
+      if (person.URL && (person.URL.split(',').filter(link => link.toLowerCase().includes(queryString)).length > 0)) {
+        return true
+      }
+
+      if (person.EMAIL ) {
+        let emailMatch = false;
+        if (Array.isArray(person.EMAIL)) {
+          emailMatch = person.EMAIL.some(email => email.toLowerCase().includes(queryString));
+        } else {   //done this way as some email's are strings while are some array of strings
+          emailMatch =  person.EMAIL.split(',').filter(email => email.trim().toLowerCase().includes(queryString)).length > 0
+        }
+        if (emailMatch) {
+          return true
+        }
+      }
+
+      return false
+    })
+  }
+}
 
 export const SearchCapability = {
   async search(query) {

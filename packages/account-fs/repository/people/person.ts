@@ -17,7 +17,6 @@ const PRODIDs = {
   "UID": contact.UID,
 */
 
-  
 export class Person {
   PRODID: string;
   UID: string;
@@ -29,6 +28,7 @@ export class Person {
   EMAIL: string[];
   XML: string;
   VERSION: string;
+  private cache: any;
 
   constructor(fields: PersonData) {
     this.PRODID = fields.PRODID; //required
@@ -42,6 +42,7 @@ export class Person {
     this.XML = fields.XML || "";
      // TODO: Define how to use XML for profile
     this.VERSION = "4.0";
+    this.cache = {}
   }
 
   asJSON() {
@@ -56,6 +57,51 @@ export class Person {
       NOTE: this.NOTE,
       XML: this.XML,
     };
+  }
+
+  accountDID(){
+    return this.UID.split(':').splice(1).join(':')
+  }
+
+  sharedFiles(){
+    return Object.fromEntries(this.XML.split('|').map(pair => {
+      const [key, value] = pair.split(':');
+      return [key, value.split('.')[1] || ''];
+    }))
+  }
+
+  isCommunity(): boolean{
+    return this.sharedFiles().hasOwnProperty('members.json')
+  }
+
+  async getMembers(agent){
+    if (this.isCommunity() != true ) { return [] }
+    const data = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['members.json'])
+    console.log("members.json", data)
+
+    let profilePromises = Object.entries(data.memberList).map(async ([key, value]) => {
+      const v = value as PersonData
+      const p = new Person({PRODID: v.PRODID, UID: v.UID, FN: v.FN, XML: v.XML})
+      return await Promise.race([
+        p.getProfile(agent),
+        new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('timeout')), 10000);
+        })
+      ])
+    });
+
+    let profileResults = await Promise.all(profilePromises);
+    let fetchedProfiles = profileResults.flat();
+    return fetchedProfiles
+  }
+
+  async getProfile(agent) {
+    if (this.sharedFiles().hasOwnProperty('profile.json') != true ) { return {} } 
+    if (this.cache.profile) { return this.cache.profile }
+
+    this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['profile.json'])
+    console.log("profile.json", this.cache.profile)
+    return this.cache.profile
   }
 }
 

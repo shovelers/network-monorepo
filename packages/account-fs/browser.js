@@ -1,7 +1,7 @@
 import { createNode, BROWSER } from './agent/helia_node.js';
 import { AccountV1 } from './account.js'
-import { Agent, BROWSER_RUNTIME, AccountCapability, StorageCapability, MessageCapability, Runtime } from './agent/agent.js'
-import { SearchCapability } from './repository/people/search.js'
+import { Agent, BROWSER_RUNTIME, AccountCapability, StorageCapability, MessageCapability, Runtime  } from './agent/agent.js'
+import { SearchCapability, PeopleSearch } from './repository/people/search.js'
 import { PeopleRepository } from "./repository/people/people.ts";
 import { Person } from "./repository/people/person.ts";
 import { MembersRepository } from './repository/members/members.js';
@@ -44,4 +44,4 @@ async function programInit(network, appHandle) {
   }
 }
 
-export { programInit, Person, PeopleRepository, AccountV1, MembersRepository }
+export { programInit, Person, PeopleRepository, AccountV1, MembersRepository, PeopleSearch }

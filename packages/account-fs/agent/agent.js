@@ -202,6 +202,20 @@ export const StorageCapability = {
     }
   },
 
+  async readSharedFile(accountDID, accessKey) {
+    let content = {}
+
+    await this.axios_client.get(`/v1/accounts/${accountDID}/head`).then(async (response) => {
+      const forestCID = CID.parse(response.data.head).bytes
+      content = await this.readPrivateFileByPointer(accessKey, forestCID, 'base64url')
+      content = JSON.parse(content);
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
+    return content
+  },
+
   async readPrivateFileByPointer(accessKey, forestCID, akEncoding='base64'){
     //fetches the CID from the network if not available locally
       //Primarily used for fetching data shared by other users to the client

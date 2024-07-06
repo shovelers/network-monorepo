@@ -39,6 +39,10 @@ export class PeopleRepository {
   }
 
   async list(): Promise<Person[]> {
+    return await this.match((c: Contact) => { return true })
+  }
+
+  async match(matcher: (contact: Contact) => boolean): Promise<Person[]> {
     const contacts: ContactsFile = await this.agent.readPrivateFile(this.filename);
     const people: Person[] = [];
 
@@ -46,6 +50,8 @@ export class PeopleRepository {
       if (contact.archived) {
         continue;
       }
+
+      if (matcher(contact) != true) { continue }
 
       people.push(
         new Person({
@@ -83,8 +89,6 @@ export class PeopleRepository {
       XML: contact.XML,
     });
   }
-
-  async filter(){}
 
   async create(person: Person): Promise<void> {
     await this.agent.updatePrivateFile(this.filename, (content: ContactsFile) => {
