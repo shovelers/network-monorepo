@@ -75,7 +75,7 @@ export class PeopleSearch {
     return false
   }
 
-  async memberMatch(person, queryString){
+  memberMatch(person, queryString){
     let allTags = person.lookingFor.concat(person.canHelpWith, person.expertise)
     if (person.name.toLowerCase().includes(queryString) || person.handle.toLowerCase().includes(queryString) || person.text.toLowerCase().includes(queryString)){
       return true
