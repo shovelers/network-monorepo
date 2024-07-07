@@ -110,7 +110,7 @@ export class Person {
     if (this.cache.profile) { return this.cache.profile }
 
     this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['profile.json'], 'base64')
-    if (this.cache.profile.keys.length == 0) {
+    if (this.cache.profile.keys().length == 0) {
       console.log("some bug", this.accountDID(), this.sharedFiles(), this)
     }
 
