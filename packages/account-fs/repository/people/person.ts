@@ -89,19 +89,33 @@ export class Person {
       })
     }
 
-    let profilePromises = this.cache.people.map(async (p: Person) => {
-      return await Promise.race([
-        p.getProfile(agent),
-        new Promise((resolve, reject) => {
-          setTimeout(() => { resolve(undefined) }, 10000);
-        })
-      ])
-    })
-
-    let results = await Promise.all(profilePromises);
+    let results = await this.fetchProfilesWithPool(this.cache.people, agent);
     results = results.flat().filter(i => i)
     console.log(`fetching ${this.cache.people.length} members, got ${results.length}`, this)
     return results
+  }
+
+  async fetchProfilesWithPool(people: Person[], agent: any, poolSize: number = 10): Promise<any[]> {
+    const results: any[] = [];
+    let index = 0;
+
+    async function fetchProfile(person: Person): Promise<any> {
+      if (index >= people.length) return null;
+
+      const p = people[index++];
+      const result = await Promise.race([
+        p.getProfile(agent),
+        new Promise((resolve) => { setTimeout(() => { resolve(undefined) }, 10000); })
+      ]);
+
+      results.push(result);
+      return fetchProfile(person);
+    }
+
+    const pool = new Array(poolSize).fill(null).map(() => fetchProfile(people[index]));
+    await Promise.all(pool);
+
+    return results;
   }
 
   async getProfile(agent) {
