@@ -67,7 +67,7 @@ export class Person {
     if (this.XML) {
       return Object.fromEntries(this.XML.split('|').map(pair => {
         const [key, value] = pair.split(':');
-        return [key, value.split('.')[1] || ''];
+        return [key, value.split('.').pop() || ''];
       }))
     } else { return {} }
   }
