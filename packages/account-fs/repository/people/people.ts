@@ -27,8 +27,11 @@ interface ContactsFile {
 export class PeopleRepository {
   private agent: any;
   private filename: string = "contacts.json";
+  private cache: any;
+
   constructor(agent: any) {
     this.agent = agent
+    this.cache = {}
   }
 
   async initialise(): Promise<void> {
@@ -39,7 +42,11 @@ export class PeopleRepository {
   }
 
   async list(): Promise<Person[]> {
-    return await this.match((c: Contact) => { return true })
+    if (!(this.cache.people)) {
+      this.cache.people = await this.match((c: Contact) => { return true })
+    }
+
+    return this.cache.people
   }
 
   async match(matcher: (contact: Contact) => boolean): Promise<Person[]> {
@@ -95,8 +102,8 @@ export class PeopleRepository {
       content.contactList[person.UID] = person.asJSON();
       return content;
     });
+    this.cache.people = undefined
   }
-  
 
   async bulkCreate(contacts: Person[]): Promise<void> {
     await this.agent.updatePrivateFile(this.filename, (content: ContactsFile) => {
@@ -105,6 +112,7 @@ export class PeopleRepository {
       });
       return content;
     });
+    this.cache.people = undefined
   }
 
   async edit(personData: Person): Promise<void> {
@@ -112,6 +120,7 @@ export class PeopleRepository {
       content.contactList[personData.UID] = personData.asJSON();
       return content;
     });
+    this.cache.people = undefined
   }
 
   async delete(UID: string): Promise<void> {
@@ -120,5 +129,6 @@ export class PeopleRepository {
       console.log("archived contact", content.contactList[UID]);
       return content;
     });
+    this.cache.people = undefined
   }
 }
