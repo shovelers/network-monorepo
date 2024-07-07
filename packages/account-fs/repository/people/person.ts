@@ -111,10 +111,10 @@ export class Person {
 
     this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['profile.json'], 'base64')
     if (Object.keys(this.cache.profile).length == 0) {
-      console.log("some bug", this.accountDID(), this.sharedFiles(), this)
+      console.log("unable to getProfile", this)
+      this.cache.profile = undefined
     }
 
-    console.log("profile.json", this.cache.profile)
     return this.cache.profile
   }
 }
