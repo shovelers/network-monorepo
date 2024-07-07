@@ -14,44 +14,76 @@ export class PeopleSearch {
     this.peopleRepo = peopleRepo
   }
 
-  // get all contacts for a community
-  // find contact matching 
-  // { match: "", context: community }
   async search(query){
     const queryString = query.toLowerCase()
-    var contacts = this.fullTextMatch(queryString)
-    return contacts
+    let dis = this
+
+    return await this.peopleRepo.match((p) => {
+      return dis.fullTextMatch(p, queryString)
+    })
+  }
+
+  async globalSearch(query){
+    const queryString = query.toLowerCase()
+    let matches = []
+
+    const people = await this.peopleRepo.list()
+    for (let step = 0; step < people.length; step++) {
+      if (this.fullTextMatch(people[step], queryString)) {
+        matches.push(people[step])
+      }
+
+      if (people[step].isCommunity()) {
+        const members = await people[step].getMembers(this.agent)
+        for (let i = 0; i < members.length; i++) {
+          console.log("comparing", members[i])
+          if (this.memberMatch(members[i], queryString) || (this.fullTextMatch(members[i], queryString))) {
+            matches.push(members[i])
+          }
+        }
+      }
+    }
+
+    return matches
   }
 
   //private
-  async fullTextMatch(queryString) {
-    return await this.peopleRepo.match((person) => {
-      if (person.FN.toLowerCase().includes(queryString) || person.CATEGORIES.split(',').filter(tag => tag.toLowerCase().includes(queryString)).length > 0) {
+  fullTextMatch(person, queryString) {
+    if ((person.FN && person.FN.toLowerCase().includes(queryString)) ||(person.CATEGORIES && person.CATEGORIES.split(',').filter(tag => tag.toLowerCase().includes(queryString)).length > 0)) {
+      return true
+    }
+
+    if (person.NOTE && person.NOTE.toLowerCase().includes(queryString)) {
+      return true
+    }
+
+    if (person.URL && (person.URL.split(',').filter(link => link.toLowerCase().includes(queryString)).length > 0)) {
+      return true
+    }
+
+    if (person.EMAIL) {
+      let emailMatch = false;
+      if (Array.isArray(person.EMAIL)) {
+        emailMatch = person.EMAIL.some(email => email.toLowerCase().includes(queryString));
+      } else {   //done this way as some email's are strings while are some array of strings
+        emailMatch =  person.EMAIL.split(',').filter(email => email.trim().toLowerCase().includes(queryString)).length > 0
+      }
+      if (emailMatch) {
         return true
       }
+    }
 
-      if (person.NOTE && person.NOTE.toLowerCase().includes(queryString)) {
-        return true
-      }
+    return false
+  }
 
-      if (person.URL && (person.URL.split(',').filter(link => link.toLowerCase().includes(queryString)).length > 0)) {
-        return true
-      }
-
-      if (person.EMAIL ) {
-        let emailMatch = false;
-        if (Array.isArray(person.EMAIL)) {
-          emailMatch = person.EMAIL.some(email => email.toLowerCase().includes(queryString));
-        } else {   //done this way as some email's are strings while are some array of strings
-          emailMatch =  person.EMAIL.split(',').filter(email => email.trim().toLowerCase().includes(queryString)).length > 0
-        }
-        if (emailMatch) {
-          return true
-        }
-      }
-
-      return false
-    })
+  async memberMatch(person, queryString){
+    let allTags = person.lookingFor.concat(person.canHelpWith, person.expertise)
+    if (person.name.toLowerCase().includes(queryString) || person.handle.toLowerCase().includes(queryString) || person.text.toLowerCase().includes(queryString)){
+      return true
+    } else if ((allTags.filter(tag => tag.toLowerCase().includes(queryString))).length > 0 ) {
+      return true
+    }
+    return false
   }
 }
 

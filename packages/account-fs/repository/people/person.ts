@@ -64,10 +64,12 @@ export class Person {
   }
 
   sharedFiles(){
-    return Object.fromEntries(this.XML.split('|').map(pair => {
-      const [key, value] = pair.split(':');
-      return [key, value.split('.')[1] || ''];
-    }))
+    if (this.XML) {
+      return Object.fromEntries(this.XML.split('|').map(pair => {
+        const [key, value] = pair.split(':');
+        return [key, value.split('.')[1] || ''];
+      }))
+    } else { return {} }
   }
 
   isCommunity(): boolean{
