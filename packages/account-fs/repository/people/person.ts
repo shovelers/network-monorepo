@@ -88,7 +88,6 @@ export class Person {
         return new Person({PRODID: v.PRODID, UID: v.UID, FN: v.FN, XML: v.XML})
       })
     }
-    console.log("people", this.cache.people)
 
     let profilePromises = this.cache.people.map(async (p: Person) => {
       return await Promise.race([
@@ -101,7 +100,7 @@ export class Person {
 
     let results = await Promise.all(profilePromises);
     results = results.flat().filter(i => i)
-    console.log(`fetching ${this.cache.people.length} members, got ${results.length}`)
+    console.log(`fetching ${this.cache.people.length} members, got ${results.length}`, this)
     return results
   }
 

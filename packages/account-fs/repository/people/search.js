@@ -36,7 +36,6 @@ export class PeopleSearch {
       if (people[step].isCommunity()) {
         const members = await people[step].getMembers(this.agent)
         for (let i = 0; i < members.length; i++) {
-          console.log("comparing", members[i])
           if (this.memberMatch(members[i], queryString) || (this.fullTextMatch(members[i], queryString))) {
             matches.push(members[i])
           }
