@@ -202,12 +202,12 @@ export const StorageCapability = {
     }
   },
 
-  async readSharedFile(accountDID, accessKey) {
+  async readSharedFile(accountDID, accessKey, akEncoding='base64url') {
     let content = {}
 
     await this.axios_client.get(`/v1/accounts/${accountDID}/head`).then(async (response) => {
       const forestCID = CID.parse(response.data.head).bytes
-      content = await this.readPrivateFileByPointer(accessKey, forestCID, 'base64url')
+      content = await this.readPrivateFileByPointer(accessKey, forestCID, akEncoding)
       content = JSON.parse(content);
     }).catch((e) => {
       console.log(e);

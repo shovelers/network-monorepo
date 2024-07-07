@@ -80,7 +80,7 @@ export class Person {
     if (this.isCommunity() != true ) { return [] }
 
     if (!(this.cache.people)) {
-      const data = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['members.json'])
+      const data = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['members.json'], 'base64url')
       console.log("members.json", data)
 
       this.cache.people = Object.entries(data.memberList).map(([key, value]) => {
@@ -107,7 +107,7 @@ export class Person {
     if (this.sharedFiles().hasOwnProperty('profile.json') != true ) { return {} } 
     if (this.cache.profile) { return this.cache.profile }
 
-    this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['profile.json'])
+    this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['profile.json'], 'base64')
     console.log("profile.json", this.cache.profile)
     return this.cache.profile
   }
