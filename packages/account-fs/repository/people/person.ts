@@ -76,23 +76,29 @@ export class Person {
 
   async getMembers(agent){
     if (this.isCommunity() != true ) { return [] }
-    const data = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['members.json'])
-    console.log("members.json", data)
 
-    let profilePromises = Object.entries(data.memberList).map(async ([key, value]) => {
-      const v = value as PersonData
-      const p = new Person({PRODID: v.PRODID, UID: v.UID, FN: v.FN, XML: v.XML})
+    if (!(this.cache.people)) {
+      const data = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['members.json'])
+      console.log("members.json", data)
+
+      this.cache.people = Object.entries(data.memberList).map(([key, value]) => {
+        const v = value as PersonData
+        return new Person({PRODID: v.PRODID, UID: v.UID, FN: v.FN, XML: v.XML})
+      })
+    }
+    console.log("people", this.cache.people)
+
+    let profilePromises = this.cache.people.map(async (p: Person) => {
       return await Promise.race([
         p.getProfile(agent),
         new Promise((_, reject) => {
           setTimeout(() => reject(new Error('timeout')), 10000);
         })
       ])
-    });
+    })
 
-    let profileResults = await Promise.all(profilePromises);
-    let fetchedProfiles = profileResults.flat();
-    return fetchedProfiles
+    let results = await Promise.all(profilePromises);
+    return results.flat()
   }
 
   async getProfile(agent) {
