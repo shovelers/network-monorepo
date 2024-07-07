@@ -93,14 +93,16 @@ export class Person {
     let profilePromises = this.cache.people.map(async (p: Person) => {
       return await Promise.race([
         p.getProfile(agent),
-        new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('timeout')), 10000);
+        new Promise((resolve, reject) => {
+          setTimeout(() => { resolve(undefined) }, 10000);
         })
       ])
     })
 
     let results = await Promise.all(profilePromises);
-    return results.flat()
+    results = results.flat().filter(i => i)
+    console.log(`fetching ${this.cache.people.length} members, got ${results.length}`)
+    return results
   }
 
   async getProfile(agent) {
