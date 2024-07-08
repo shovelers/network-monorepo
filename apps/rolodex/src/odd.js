@@ -22,11 +22,12 @@ const program = await programInit(NETWORK, "rolodex")
 window.shovel = program
 
 const contactRepo = new PeopleRepository(program.agent)
-window.ps = new PeopleSearch(program.agent, contactRepo)
+const peopleSearch = new PeopleSearch(program.agent, contactRepo)
 const membersRepo = new MembersRepository(program.agent)
 const account = new AccountV1(program.agent, ["PEOPLE"])
 const accountv1 = account
 shovel.account = account
+shovel.peopleSearch = peopleSearch
 
 customElements.define('contact-table', ContactTable);
 customElements.define('member-table', MemberTable);
@@ -94,11 +95,11 @@ async function getMembers() {
 }
 
 async function getCommunityMembers(community) {
-  return await program.agent.fetchMemberProfilesForCommunity(community)
+  return await peopleSearch.search({root: community.UID})
 }
 
-async function filterMembers(filter, profiles) {
-  return await program.agent.searchMembers(filter, profiles)
+async function filterMembers(filter, profiles, communityUID) {
+  return await peopleSearch.search({query: filter, root: communityUID})
 }
 
 async function contactToJoinCommunity() {
@@ -146,7 +147,7 @@ async function getContactByUID(uid) {
 }
 
 async function filterContacts(filter) {
-  return { contactList: await program.agent.search(filter) }
+  return { contactList: await peopleSearch.search({query: filter, depth: 1}) }
 }
 
 
