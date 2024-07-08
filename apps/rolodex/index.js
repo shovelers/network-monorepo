@@ -7,9 +7,11 @@ import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
 import axios from 'axios';
+import morgan from 'morgan';
 
 const port = process.argv[2] || 3000;
 const server = express();
+server.use(morgan('tiny'))
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
