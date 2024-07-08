@@ -119,9 +119,12 @@ export class Person {
   }
 
   async getProfile(agent) {
-    if (this.sharedFiles().hasOwnProperty('profile.json') != true ) { return {} } 
-    if (this.cache.profile) { return this.cache.profile }
+    if (this.sharedFiles().hasOwnProperty('profile.json') != true ) {
+      console.log("skip getProfile - no profile.json", this)
+      return {}
+    }
 
+    if (this.cache.profile) { return this.cache.profile }
     this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['profile.json'], 'base64')
     if (Object.keys(this.cache.profile).length == 0) {
       console.log("unable to getProfile", this)
