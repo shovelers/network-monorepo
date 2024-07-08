@@ -79,22 +79,10 @@ export class PeopleRepository {
     return people;
   }
 
-  async find(uid: string): Promise<Person> {
-    const contacts: ContactsFile = await this.agent.readPrivateFile(this.filename);
-    const contact: Contact = contacts.contactList[uid];
-
-    return new Person({
-      PRODID: contact.PRODID,
-      UID: contact.UID,
-      TEL: contact.TEL,
-      EMAIL: contact.EMAIL,
-      FN: contact.FN,
-      //TODO: remove below fields from search results, when searched from other apps
-      CATEGORIES: contact.CATEGORIES,
-      URL: contact.URL,
-      NOTE: contact.NOTE,
-      XML: contact.XML,
-    });
+  async find(uid: string): Promise<Person | undefined> {
+    const people = await this.list()
+    const person = people.find((p) => { return p.UID == uid })
+    return person
   }
 
   async create(person: Person): Promise<void> {

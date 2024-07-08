@@ -105,7 +105,7 @@ export class Person {
       const p = people[index++];
       const result = await Promise.race([
         p.getProfile(agent),
-        new Promise((resolve) => { setTimeout(() => { resolve(undefined) }, 10000); })
+        new Promise((resolve) => setTimeout(() => resolve(undefined), 10000))
       ]);
 
       results.push(result);

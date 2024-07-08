@@ -14,58 +14,61 @@ export class PeopleSearch {
     this.peopleRepo = peopleRepo
   }
 
-  async search(query){
-    const queryString = query.toLowerCase()
-    let dis = this
-
-    return await this.peopleRepo.match((p) => {
-      return dis.fullTextMatch(p, queryString)
-    })
-  }
-
-  async globalSearch(query){
+  // params -> query, depth and root
+  // query - string to match with, empty string to match all
+  // depth - direct connections (1 degree) or shared connections via directs (2nd degree)
+  // root - default root node or UID of direct connection
+  async search({ query = "", depth = 1, root = null } = {}){
     const queryString = query.toLowerCase()
     let matches = []
+    let dis = this
 
-    const people = await this.peopleRepo.list()
-    for (let step = 0; step < people.length; step++) {
-      if (this.fullTextMatch(people[step], queryString)) {
-        matches.push(people[step])
-      }
+    if (depth > 2) { throw "Max supported depth is 2 due to community profile not being person type" }
+    if (root && (depth != 1)) { throw "Max supported depth is 1 for a given root due to community profile not being person type" }
 
-      if (people[step].isCommunity()) {
-        const members = await people[step].getMembers(this.agent)
-        for (let i = 0; i < members.length; i++) {
-          if (this.memberMatch(members[i], queryString) || (this.fullTextMatch(members[i], queryString))) {
-            matches.push(members[i])
-          }
-        }
+    async function peopleList(root) {
+      if (root) {
+        const rootPerson = await dis.peopleRepo.find(root)
+        return await rootPerson.getMembers(dis.agent)
       }
+      return await dis.peopleRepo.list();
+    }
+
+    async function searchRecursively(node, currentDepth) {
+      if (dis.fullTextMatch(node, queryString) || dis.memberMatch(node, queryString)) {
+        matches.push(node);
+      }
+  
+      if (currentDepth >= depth) return;
+      let connections = await node.getMembers(dis.agent)
+      for (let connection of connections) {
+        await searchRecursively(connection, currentDepth + 1);
+      }
+    }
+
+    let people = await peopleList(root)
+    for (let person of people) {
+      await searchRecursively(person, 1);
     }
 
     return matches
   }
 
   //private
-  fullTextMatch(person, queryString) {
-    if ((person.FN && person.FN.toLowerCase().includes(queryString)) ||(person.CATEGORIES && person.CATEGORIES.split(',').filter(tag => tag.toLowerCase().includes(queryString)).length > 0)) {
-      return true
-    }
-
-    if (person.NOTE && person.NOTE.toLowerCase().includes(queryString)) {
-      return true
-    }
-
-    if (person.URL && (person.URL.split(',').filter(link => link.toLowerCase().includes(queryString)).length > 0)) {
+  fullTextMatch(person, query) {
+    if ((person.FN && person.FN.toLowerCase().includes(query)) ||
+        (person.NOTE && person.NOTE.toLowerCase().includes(query)) ||
+        (person.URL && (person.URL.split(',').filter(link => link.toLowerCase().includes(query)).length > 0)) ||
+        (person.CATEGORIES && person.CATEGORIES.split(',').filter(tag => tag.toLowerCase().includes(query)).length > 0)) {
       return true
     }
 
     if (person.EMAIL) {
       let emailMatch = false;
       if (Array.isArray(person.EMAIL)) {
-        emailMatch = person.EMAIL.some(email => email.toLowerCase().includes(queryString));
+        emailMatch = person.EMAIL.some(email => email.toLowerCase().includes(query));
       } else {   //done this way as some email's are strings while are some array of strings
-        emailMatch =  person.EMAIL.split(',').filter(email => email.trim().toLowerCase().includes(queryString)).length > 0
+        emailMatch =  person.EMAIL.split(',').filter(email => email.trim().toLowerCase().includes(query)).length > 0
       }
       if (emailMatch) {
         return true
@@ -75,13 +78,18 @@ export class PeopleSearch {
     return false
   }
 
-  memberMatch(person, queryString){
-    let allTags = person.lookingFor.concat(person.canHelpWith, person.expertise)
-    if (person.name.toLowerCase().includes(queryString) || person.handle.toLowerCase().includes(queryString) || person.text.toLowerCase().includes(queryString)){
-      return true
-    } else if ((allTags.filter(tag => tag.toLowerCase().includes(queryString))).length > 0 ) {
+  memberMatch(person, query){
+    if ((person.name && person.name.toLowerCase().includes(query)) ||
+        (person.handle && person.handle.toLowerCase().includes(query)) ||
+        (person.text && person.text.toLowerCase().includes(query))) {
       return true
     }
+
+    let allTags = [].concat(person.lookingFor, person.canHelpWith, person.expertise).filter(t => t)
+    if ((allTags.filter(tag => tag.toLowerCase().includes(query))).length > 0 ) {
+      return true
+    }
+    
     return false
   }
 }
