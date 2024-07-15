@@ -10,7 +10,7 @@ export class MemberTable extends HTMLElement {
     };
     this.filterOptions = {
       lookingFor: ['Gigs', 'Warm Intros', 'Job', 'Partnerships', 'Talent'],
-      canHelpWith: ['Testing', 'Design', 'Tokenomics', 'Job/Gig Opportunities', 'GTM', 'Fundraise', 'Introductions', 'Ideation', 'Mentorship'],
+      canHelpWith: ['Testing', 'Design', 'Tokenomics', 'Job/Gig Opportunities', 'GTM', 'Fundraise', 'Introductions', 'Ideation', 'Mentorship','Development'],
       expertise: ['Full Stack', 'Backend', 'Frontend', 'Design', 'Consumer Tech', 'Smart Contracts', 'Frames', 'Data Analysis', 'Community', 'Social']
     };
    
@@ -297,18 +297,26 @@ export class MemberTable extends HTMLElement {
         break;
     }
   }
+  
+  resetSearch() {
+    const searchInput = document.querySelector('.search-form > input');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+    this.members = window.memberListCache;
+  }
 
   resetFilters() {
     // Reset all filters
     Object.keys(this.filters).forEach(key => {
       this.filters[key] = [];
     });
-
+  
     // Uncheck all checkboxes
-    this.querySelectorAll('.filter-dropdown input[type="checkbox"]').forEach(checkbox => {
+    document.querySelectorAll('.filter-dropdown input[type="checkbox"]').forEach(checkbox => {
       checkbox.checked = false;
     });
-
+  
     // Apply the reset filters
     this.applyFilters();
   }
