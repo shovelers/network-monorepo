@@ -95,11 +95,11 @@ async function getMembers() {
 }
 
 async function getCommunityMembers(community) {
-  return await peopleSearch.search({root: community.UID})
+  return await peopleSearch.search({personUID: community.UID})
 }
 
 async function filterMembers(filter, profiles, communityUID) {
-  return await peopleSearch.search({query: filter, root: communityUID})
+  return await peopleSearch.search({query: filter, personUID: communityUID})
 }
 
 async function contactToJoinCommunity() {
