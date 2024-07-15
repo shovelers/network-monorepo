@@ -60,20 +60,16 @@ export class MemberTable extends HTMLElement {
       // Create filter dropdown for columns other than 'Name'
       if (index > 0) {
         const filterDropdown = document.createElement('div');
-        filterDropdown.classList.add('filter-dropdown','max-w-full','hidden', 'absolute', 'top-full', 'left-0','border', 'border-gray-300', 'shadow-lg', 'z-20', 'p-2', 'w-48');        // Add filter options based on column
-        // filterDropdown.style.maxHeight = '200px';  //had tried making scrollable, last option
-        // filterDropdown.style.overflowY = 'auto';
-        filterDropdown.style.backgroundColor = '#0f1729';
-
+        filterDropdown.classList.add('filter-dropdown', 'hidden', 'fixed', 'border', 'border-gray-300', 'shadow-lg', 'z-50', 'p-2','max-h-[80vh]', 'overflow-y-auto', 'bg-[#0f1729]');
         this.createFilterOptions(filterDropdown, headerText.replace(/\s/g, ''));
         
-        th.appendChild(filterDropdown);
+        document.body.appendChild(filterDropdown);  // Append to body
         
         // Add click event for filter button
         const filterButton = th.querySelector('.filter-button');
         filterButton.addEventListener('click', (e) => {
           e.stopPropagation();
-          this.toggleFilterDropdown(filterDropdown);
+          this.toggleFilterDropdown(filterDropdown, th);
         });
       }
       
@@ -107,10 +103,14 @@ export class MemberTable extends HTMLElement {
         this.closeAllDropdowns();
       }
     });
+  
+    window.addEventListener('resize', () => this.handleWindowResize());
+  
   }
 
   // New method to create filter options
   createFilterOptions(dropdown, column) {
+    dropdown.setAttribute('data-header', column);
     // Convert column to lowercase for case-insensitive matching
     const lowercaseColumn = column.toLowerCase();
     
@@ -141,13 +141,19 @@ export class MemberTable extends HTMLElement {
       dropdown.appendChild(label);
     });
   }
-
-  toggleFilterDropdown(dropdown) {
+  toggleFilterDropdown(dropdown, th) {
     dropdown.classList.toggle('hidden');
+    
+    if (!dropdown.classList.contains('hidden')) {
+      const rect = th.getBoundingClientRect();
+      dropdown.style.top = `${rect.bottom}px`;
+      dropdown.style.left = `${rect.left}px`;
+      dropdown.style.width = `${rect.width}px`;
+    }
   }
 
   closeAllDropdowns() {
-    this.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+    document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
       dropdown.classList.add('hidden');
     });
   }
@@ -159,6 +165,14 @@ export class MemberTable extends HTMLElement {
       this.filters[column] = this.filters[column].filter(v => v !== value);
     }
     this.applyFilters();
+  }
+  handleWindowResize() {
+    document.querySelectorAll('.filter-dropdown:not(.hidden)').forEach(dropdown => {
+      const th = this.findAssociatedTh(dropdown);
+      if (th) {
+        this.toggleFilterDropdown(dropdown, th);
+      }
+    });
   }
 
   applyFilters() {
@@ -180,6 +194,11 @@ export class MemberTable extends HTMLElement {
     this.updateTable(filteredMembers);
   }
 
+  findAssociatedTh(dropdown) {
+    const headerText = dropdown.getAttribute('data-header');
+    return this.querySelector(`th:nth-child(${['Name (sort)', 'Looking For', 'Can Help With', 'Expertise'].indexOf(headerText) + 1})`);
+  }
+  
   set members(value) {
     this._members = value;
     this.applyFilters();
