@@ -10,13 +10,18 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      import { account, farcasterClient, farcasterSignup } from '/odd.js';
+      import { account, farcasterClient, farcasterSignup, getContactByUID } from '/odd.js';
       var communityDID = '<%- communityDID %>'
       var communityName = '<%- communityName %>'
 
       var session = await account.activeSession();
       if (session) {
-        window.location.href = `/directory/${communityDID}?name=${communityName}`;
+        let community = await getContactByUID('DCN:'+ communityDID)
+        if (community) {
+          window.location.href = `/directory/${communityDID}?name=${communityName}`
+        } else {
+          window.location.href = `/community/${communityDID}/form?name=${communityName}`;
+        }
       }
 
       window.showLoading = function(){
