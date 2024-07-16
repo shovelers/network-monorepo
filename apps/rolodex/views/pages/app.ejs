@@ -40,6 +40,9 @@
       if (session == false) {
         window.location.href = '/home';
       }
+      if (mixpanel){ 
+        mixpanel.identify(await shovel.agent.accountDID())
+      }
 
       let members = await window.getMembers()
       console.log("memberList...", members)

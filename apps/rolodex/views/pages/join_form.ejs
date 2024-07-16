@@ -28,6 +28,10 @@
         document.querySelector("#input-forms").classList.add("hidden");
       }
 
+      if (mixpanel) {
+        mixpanel.identify(await shovel.agent.accountDID())
+      }
+
       //Flips the colour of option pills and stores the resposes of respective question
       var lookingFor = []
       var canHelpWith = []

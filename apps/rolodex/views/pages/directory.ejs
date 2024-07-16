@@ -31,6 +31,9 @@
       if (session == false) {
         window.location.href = '/home';
       }
+      if (mixpanel){ 
+        mixpanel.identify(await shovel.agent.accountDID())
+      }
       
       let community = await getContactByUID('DCN:'+'<%- communityDID %>')
       console.log("community entry in contactList :", community)

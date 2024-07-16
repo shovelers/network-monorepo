@@ -17,6 +17,10 @@
 
       var session = await account.activeSession();
       if (session) {
+        if (mixpanel){ 
+          mixpanel.identify(await shovel.agent.accountDID())
+        }
+        
         let community = await getContactByUID('DCN:'+ communityDID)
         if (community) {
           window.location.href = `/directory/${communityDID}?name=${communityName}`

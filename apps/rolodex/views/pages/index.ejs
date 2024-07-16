@@ -18,6 +18,9 @@
       var session = await account.activeSession();
       if (session) {
         window.location.href = '/app';
+        if (mixpanel){ 
+          mixpanel.identify(await shovel.agent.accountDID())
+        }
       }
 
       window.showLoading = function(){
