@@ -2,6 +2,17 @@ export class MemberTable extends HTMLElement {
   gridSize = 'grid-cols-8';
   constructor() {
     super();
+
+    this.filters = {
+      lookingFor: [],
+      canHelpWith: [],
+      expertise: []
+    };
+    this.filterOptions = {
+      lookingFor: ['Gigs', 'Warm Intros', 'Job', 'Partnerships', 'Talent'],
+      canHelpWith: ['Testing', 'Design', 'Tokenomics', 'Job/Gig Opportunities', 'GTM', 'Fundraise', 'Introductions', 'Ideation', 'Mentorship','Development'],
+      expertise: ['Full Stack', 'Backend', 'Frontend', 'Design', 'Consumer Tech', 'Smart Contracts', 'Frames', 'Data Analysis', 'Community', 'Social']
+    };
    
     const container = document.createElement('div');
     container.classList.add('relative');
@@ -18,16 +29,50 @@ export class MemberTable extends HTMLElement {
     const headerRow = document.createElement('tr');
     headerRow.classList.add('grid', this.gridSize); 
     const headers = ['Name (sort)', 'Looking For', 'Can Help With', 'Expertise']; // Customize as needed
-    headers.forEach((headerText) => {
+    headers.forEach((headerText, index) => {
       const th = document.createElement('th');
-      th.classList.add('cursor-pointer','col-span-2') //add value for 'col-span-X'  based on corresponding row element size
-      th.textContent = headerText;
+      th.classList.add('cursor-pointer','col-span-2', 'relative') //add value for 'col-span-X'  based on corresponding row element size
+      
+      // Create header content
+      const headerContent = document.createElement('div');
+      headerContent.classList.add('flex', 'items-center', 'justify-between');
+      headerContent.innerHTML = `
+        <span>${headerText}</span>
+        ${index > 0 ? `
+          <button class="filter-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+          </button>
+        ` : ''}
+      `;
+      th.appendChild(headerContent);
+
       th.value = "asc";
-      th.onclick = () => {
+      th.onclick = (e) => {
         if (headerText === 'Name (sort)') {
           this.sortTableBasedOnName(th);
         }
+        // Prevent filter dropdown from opening when clicking on the header for sorting
+        e.stopPropagation();
       };
+      
+      // Create filter dropdown for columns other than 'Name'
+      if (index > 0) {
+        const filterDropdown = document.createElement('div');
+        filterDropdown.classList.add('filter-dropdown', 'hidden', 'fixed', 'border', 'border-gray-300', 'shadow-lg', 'z-50', 'p-2','max-h-[80vh]', 'overflow-y-auto', 'bg-[#0f1729]');
+        this.createFilterOptions(filterDropdown, headerText.replace(/\s/g, ''));
+        
+        document.body.appendChild(filterDropdown);  // Append to body
+        
+        // Add click event for filter button
+        const filterButton = th.querySelector('.filter-button');
+        filterButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.toggleFilterDropdown(filterDropdown, th);
+        });
+      }
+      
       headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -37,24 +82,126 @@ export class MemberTable extends HTMLElement {
 
     
     // Append the table to the Shadow DOM
-   // Append the sticky header and table to the container
-+   container.appendChild(stickyHeader);
-+   container.appendChild(table);
-+
-+   // Append the container to the Shadow DOM
-+   this.appendChild(container);
+    // Append the sticky header and table to the container
+    container.appendChild(stickyHeader);
+    container.appendChild(table);
+
+    // Append the container to the Shadow DOM
+    this.appendChild(container);
 
     const scrollableArea = document.createElement('div');
-+   scrollableArea.classList.add('max-h-[calc(100vh-200px)]', 'overflow-y-auto');
-+   scrollableArea.appendChild(tbody);
-+   table.appendChild(scrollableArea);
+    scrollableArea.classList.add('max-h-[calc(100vh-200px)]', 'overflow-y-auto');
+    scrollableArea.appendChild(tbody);
+    table.appendChild(scrollableArea);
     this._members = [];
+
+    // Initialize filters
+   
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.filter-dropdown') && !e.target.closest('.filter-button')) {
+        this.closeAllDropdowns();
+      }
+    });
+  
+    window.addEventListener('resize', () => this.handleWindowResize());
+  
   }
 
-  // Define a property setter for the "contacts" property
+  // New method to create filter options
+  createFilterOptions(dropdown, column) {
+    dropdown.setAttribute('data-header', column);
+    // Convert column to lowercase for case-insensitive matching
+    const lowercaseColumn = column.toLowerCase();
+    
+    console.log('filter options', this.filterOptions);
+    if (!this.filterOptions) {
+      console.error('Filter options are undefined in createFilterOptions');
+      return;
+    }
+    // Find the matching key in filterOptions
+    const matchingKey = Object.keys(this.filterOptions).find(key => key.toLowerCase() === lowercaseColumn);
+    
+    if (!matchingKey) {
+      console.error(`No filter options found for column: ${column}`);
+      return;
+    }
+    
+    const options = this.filterOptions[matchingKey];
+    options.forEach(option => {
+      const label = document.createElement('label');
+      label.classList.add('block', 'mb-1', 'flex', 'items-center','text-ellipsis','overflow-hidden'); // Added flex and items-center
+      label.innerHTML = `
+        <input type="checkbox" value="${option.toLowerCase()}" class="mr-2 form-checkbox ">
+        <span>${option}</span>
+      `;
+      label.querySelector('input').addEventListener('change', (e) => {
+        this.updateFilter(matchingKey, e.target.value, e.target.checked);
+      });
+      dropdown.appendChild(label);
+    });
+  }
+  toggleFilterDropdown(dropdown, th) {
+    dropdown.classList.toggle('hidden');
+    
+    if (!dropdown.classList.contains('hidden')) {
+      const rect = th.getBoundingClientRect();
+      dropdown.style.top = `${rect.bottom}px`;
+      dropdown.style.left = `${rect.left}px`;
+      dropdown.style.width = `${rect.width}px`;
+    }
+  }
+
+  closeAllDropdowns() {
+    document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+      dropdown.classList.add('hidden');
+    });
+  }
+
+  updateFilter(column, value, checked) {
+    if (checked) {
+      this.filters[column].push(value);
+    } else {
+      this.filters[column] = this.filters[column].filter(v => v !== value);
+    }
+    this.applyFilters();
+  }
+  handleWindowResize() {
+    document.querySelectorAll('.filter-dropdown:not(.hidden)').forEach(dropdown => {
+      const th = this.findAssociatedTh(dropdown);
+      if (th) {
+        this.toggleFilterDropdown(dropdown, th);
+      }
+    });
+  }
+
+  applyFilters() {
+    console.log('this member and this filter', this._members, this.filter);
+    if (!this.filters) {
+      console.error('Filters are undefined in applyFilter');
+      return;
+    }
+    const filteredMembers = this._members.filter(member => {
+      return Object.entries(this.filters).every(([column, filters]) => {
+        if (filters.length === 0) return true;
+        const memberValues = Array.isArray(member[column]) ? member[column] : [member[column]];
+        return filters.some(filter =>
+          memberValues.some(value => value.toLowerCase().includes(filter.toLowerCase()))
+        );
+      });
+    });
+
+    this.updateTable(filteredMembers);
+  }
+
+  findAssociatedTh(dropdown) {
+    const headerText = dropdown.getAttribute('data-header');
+    return this.querySelector(`th:nth-child(${['Name (sort)', 'Looking For', 'Can Help With', 'Expertise'].indexOf(headerText) + 1})`);
+  }
+  
   set members(value) {
     this._members = value;
-    this.updateTable(this._members);
+    this.applyFilters();
   }
 
   // Define a property getter for the "contacts" property
@@ -67,7 +214,7 @@ export class MemberTable extends HTMLElement {
     
     const tbody = this.querySelector('tbody');
     // Clear existing rows
-   tbody.innerHTML=''
+    tbody.innerHTML=''
     var rowCount = 0;
 
     // Create table rows for contacts
@@ -149,5 +296,28 @@ export class MemberTable extends HTMLElement {
         element.value = "asc";
         break;
     }
+  }
+  
+  resetSearch() {
+    const searchInput = document.querySelector('.search-form > input');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+    this.members = window.memberListCache;
+  }
+
+  resetFilters() {
+    // Reset all filters
+    Object.keys(this.filters).forEach(key => {
+      this.filters[key] = [];
+    });
+  
+    // Uncheck all checkboxes
+    document.querySelectorAll('.filter-dropdown input[type="checkbox"]').forEach(checkbox => {
+      checkbox.checked = false;
+    });
+  
+    // Apply the reset filters
+    this.applyFilters();
   }
 }
