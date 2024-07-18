@@ -20,6 +20,18 @@ const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
 export const MessageCapability = {
+  async setInbox(address){
+    let accountDID = await this.accountDID()
+
+    const envelope = await this.envelop({inbox: address})
+    await this.axios_client.post(`/v1/accounts/${accountDID}/inbox`, envelope).then(async (response) => {
+      console.log("setting inbox:", accountDID, address, response.status)
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
+  },
+
   async getInbox(accountDID){
     let inbox = ""
 

@@ -79,6 +79,10 @@ class Accounts {
     return await this.redis.hGet(`account:${accountDID}`, 'head')
   }
 
+  async setInbox(accountDID, inbox){
+    return await this.redis.hSet(`account:${accountDID}`, 'inbox', inbox)
+  }
+
   async getInbox(accountDID){
     return await this.redis.hGet(`account:${accountDID}`, 'inbox')
   }
@@ -187,6 +191,24 @@ server.put("/v1/accounts/:accountDID/custody", async (req, res) => {
 })
 
 // Inbox
+server.post('/v1/accounts/:accountDID/inbox', async (req, res) => { 
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({error: "InvalidSignature"})
+    return
+  }
+
+  const can = await accounts.validAgentV1(req.params.accountDID, req.body.message.signer)
+  if (!can) {
+    res.status(401).json({error: "InvalidAgent"})
+    return
+  }
+
+  await accounts.setInbox(req.params.accountDID, req.body.message.inbox)
+  
+  res.status(201).json({})
+});
+
 server.get("/v1/accounts/:accountDID/inbox", async (req, res) => {
   const inbox = await accounts.getInbox(req.params.accountDID)
   if (inbox) {

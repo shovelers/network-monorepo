@@ -34,6 +34,9 @@ Object.assign(Agent.prototype, MessageCapability);
 const appHandle = await agent.handle()
 const broker = await agent.handle()
 await agent.actAsRelationshipBroker()
+
+const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
+console.log(address)
 ///
 
 ///
@@ -74,6 +77,8 @@ if (RUN_COMMUNITY_AGENT == true) {
       console.log(`...loading filesystem for ${communityName}`)
       await communityAgent.load();
       console.log(`community Agent DID for ${communityName}:`, await communityAgent.DID())
+
+      await communityAgent.setInbox(address)
       
       //initialise members repo
       var members = new MembersRepository(communityAgent)
@@ -109,8 +114,6 @@ if (RUN_COMMUNITY_AGENT == true) {
 }
 ///
 
-const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
-console.log(address)
 const joinFormOptions = {
   "did:pkh:eip155:8453:0x9209C02c5DaC471CB4aaE58dc4B8008662E27039": {
     "lookingFor": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
