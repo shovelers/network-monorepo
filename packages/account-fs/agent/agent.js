@@ -20,6 +20,19 @@ const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
 
 export const MessageCapability = {
+  async getInbox(accountDID){
+    let inbox = ""
+
+    await this.axios_client.get(`/v1/accounts/${accountDID}/inbox`).then(async (response) => {
+      inbox = response.data.inbox
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
+
+    return inbox
+  },
+
   async actAsJoinApprover(approverHandle) {
     const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)

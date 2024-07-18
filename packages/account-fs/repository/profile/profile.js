@@ -1,3 +1,5 @@
+import * as uint8arrays from 'uint8arrays';
+
 export class ProfileRepository {
   constructor(agent) {
     this.agent = agent
@@ -22,5 +24,19 @@ export class ProfileRepository {
       content = {...profile, ...params}
       return content
     })
+  }
+
+  async contactForHandshake() {
+    let accountDID = await this.agent.accountDID()
+    let profile = await this.get()
+    let profileAccessKey = await this.agent.getAccessKeyForPrivateFile(this.filename)
+    let encodedProfileAccessKey = uint8arrays.toString(profileAccessKey.toBytes(), 'base64');
+  
+    return {
+      FN: profile.name,
+      UID: `DCN:${accountDID}`,
+      PRODID: "DCN:rolodex",
+      XML: `profile.json:${profile.handle}.${encodedProfileAccessKey}`
+    }
   }
 }

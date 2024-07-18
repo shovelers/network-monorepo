@@ -54,26 +54,10 @@ export class PeopleRepository {
     const people: Person[] = [];
 
     for (const [_, contact] of Object.entries(contacts.contactList)) {
-      if (contact.archived) {
-        continue;
-      }
-
+      if (contact.archived) { continue }
       if (matcher(contact) != true) { continue }
 
-      people.push(
-        new Person({
-          PRODID: contact.PRODID,
-          UID: contact.UID,
-          TEL: contact.TEL,
-          EMAIL: contact.EMAIL,
-          FN: contact.FN,
-          //TODO: remove below fields from search results, when searched from other apps
-          CATEGORIES: contact.CATEGORIES,
-          URL: contact.URL,
-          NOTE: contact.NOTE,
-          XML: contact.XML,
-        })
-      );
+      people.push(new Person(contact));
     }
 
     return people;

@@ -79,6 +79,10 @@ class Accounts {
     return await this.redis.hGet(`account:${accountDID}`, 'head')
   }
 
+  async getInbox(accountDID){
+    return await this.redis.hGet(`account:${accountDID}`, 'inbox')
+  }
+
   async setAccessKey(accountDID, accessKey){
     return await this.redis.hSet(`account:${accountDID}`, 'accessKey', accessKey)
   }
@@ -181,6 +185,16 @@ server.put("/v1/accounts/:accountDID/custody", async (req, res) => {
   await accounts.setAccessKey(req.params.accountDID, accessKey) 
   res.status(201).json({})
 })
+
+// Inbox
+server.get("/v1/accounts/:accountDID/inbox", async (req, res) => {
+  const inbox = await accounts.getInbox(req.params.accountDID)
+  if (inbox) {
+    res.status(200).json({inbox: inbox})
+  } else {
+    res.status(404).json({})
+  }
+});
 
 /*
   Storage APIs

@@ -82,6 +82,7 @@ if (RUN_COMMUNITY_AGENT == true) {
       //Run Join Approver fro community agent
       const communityHandle = config.SHOVEL_ACCOUNT_HANDLE
       await communityAgent.actAsJoinApprover(communityHandle)
+      await communityAgent.actAsJoinApprover(communityAccountDID)
       communityAgents.push(communityAgent)
     }
 
@@ -109,6 +110,7 @@ if (RUN_COMMUNITY_AGENT == true) {
 ///
 
 const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
+console.log(address)
 const joinFormOptions = {
   "did:pkh:eip155:8453:0x9209C02c5DaC471CB4aaE58dc4B8008662E27039": {
     "lookingFor": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
@@ -151,11 +153,11 @@ server.get("/community/:accountDID/join", (req, res) => {
 
 // Community join form: community/{accountDID}/form?name=decentralised.co
 server.get("/community/:accountDID/form", (req, res) => {
-  res.render('pages/join_form', { address: address, communityDID: req.params.accountDID, communityName: req.query.name, options: JSON.stringify(joinFormOptions[req.params.accountDID]) })
+  res.render('pages/join_form', { address: address, communityDID: req.params.accountDID, communityName: req.query.name, options: JSON.stringify(joinFormOptions[req.params.accountDID] || {}) })
 });
 
 server.get("/directory/:accountDID", (req, res) => {
-  res.render('pages/directory', {communityDID: req.params.accountDID, communityName: req.query.name, options: JSON.stringify(joinFormOptions[req.params.accountDID])})
+  res.render('pages/directory', {communityDID: req.params.accountDID, communityName: req.query.name, options: JSON.stringify(joinFormOptions[req.params.accountDID] || {})})
 })
 
 server.get('/nonce',  (req, res) => {
