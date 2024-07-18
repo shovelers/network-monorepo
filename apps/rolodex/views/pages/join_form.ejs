@@ -86,20 +86,6 @@
         })
       )
 
-      //For join handshake with community
-      let person = await contactToJoinCommunity()
-      console.log("person with XML :", person)
-
-      let requester = await shovel.agent.actAsJoinRequester("<%= address %>", "<%= communityName %>")
-      requester.challenge = function () { return { person: person } }
-
-      requester.notification.addEventListener("CONFIRMED", async (event) => {
-        let result = await addCommunityToContacts(event.detail.data.community)
-        console.log("community added to contacts :", result)
-      })
-
-      await requester.initiate()
-
       // add selected tags to profile on save
       window.addSelectedTagsToProfile = async function(){
         await v1UpdateProfile({lookingFor: lookingFor, canHelpWith: canHelpWith, expertise: expertise})
@@ -110,7 +96,7 @@
         window.location.href = `/directory/${communityDID}?name=${communityName}`;
       }
 
-      // await account.requestHandshake(communityDID)
+      await account.requestHandshake(communityDID)
     </script>
 
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
