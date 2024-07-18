@@ -83,11 +83,6 @@ async function verifySiweMessage(message,signature,nonce) {
   }
 }
 
-async function addCommunityToContacts(community){
-  let communityEntry = new Person({FN: community.FN, PRODID: community.PRODID, UID: community.UID, XML: community.XML, CATEGORIES: 'community'})
-  return await contactRepo.create(communityEntry)
-}
-
 async function getMembers() {
   var list = await membersRepo.list()
   console.log("all", list)
@@ -100,20 +95,6 @@ async function getCommunityMembers(community) {
 
 async function filterMembers(filter, profiles, communityUID) {
   return await peopleSearch.search({query: filter, personUID: communityUID})
-}
-
-async function contactToJoinCommunity() {
-  let accountDID = await accountv1.agent.accountDID()
-  let profile = await getProfile()
-  let profileAccessKey = await program.agent.getAccessKeyForPrivateFile('profile.json')
-  let encodedProfileAccessKey = uint8arrays.toString(profileAccessKey.toBytes(), 'base64');
-
-  return {
-    FN: profile.name,
-    UID: `DCN:${accountDID}`,
-    PRODID: "DCN:rolodex",
-    XML: `profile.json:${profile.handle}.${encodedProfileAccessKey}`
-  }
 }
 
 async function getProfile() {
@@ -387,8 +368,6 @@ export {
   verifySiweMessage,
   ethereumSignup,
   v1UpdateProfile,
-  addCommunityToContacts,
-  contactToJoinCommunity,
   getMembers,
   getCommunityMembers,
   filterMembers,

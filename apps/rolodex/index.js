@@ -151,12 +151,12 @@ server.get("/app", (req, res) => {
 
 // Community Join link: community/{accountDID}/join?name=decentralised.co
 server.get("/community/:accountDID/join", (req, res) => {
-  res.render('pages/join', { address: address, communityDID: req.params.accountDID ,communityName: req.query.name })
+  res.render('pages/join', { communityDID: req.params.accountDID ,communityName: req.query.name })
 });
 
 // Community join form: community/{accountDID}/form?name=decentralised.co
 server.get("/community/:accountDID/form", (req, res) => {
-  res.render('pages/join_form', { address: address, communityDID: req.params.accountDID, communityName: req.query.name, options: JSON.stringify(joinFormOptions[req.params.accountDID] || {}) })
+  res.render('pages/join_form', { communityDID: req.params.accountDID, communityName: req.query.name, options: JSON.stringify(joinFormOptions[req.params.accountDID] || {}) })
 });
 
 server.get("/directory/:accountDID", (req, res) => {
