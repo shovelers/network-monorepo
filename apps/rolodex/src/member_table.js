@@ -40,7 +40,7 @@ export class MemberTable extends HTMLElement {
         <span>${headerText}</span>
         ${index > 0 ? `
           <button class="filter-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="filter-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
             </svg>
           </button>
@@ -103,9 +103,7 @@ export class MemberTable extends HTMLElement {
         this.closeAllDropdowns();
       }
     });
-  
-    window.addEventListener('resize', () => this.handleWindowResize());
-  
+   window.addEventListener('resize', () => this.handleWindowResize());
   }
 
   // New method to create filter options
@@ -158,12 +156,34 @@ export class MemberTable extends HTMLElement {
     });
   }
 
+  updateFilterButtonAppearance(column) {
+    const spans = document.querySelectorAll('.flex.items-center.justify-between span');
+    spans.forEach((span) => {
+      const spanText = span.textContent.replace(/\s/g, '').toLowerCase();
+      console.log(spanText)
+        if (spanText === column.toLowerCase()) {
+        const flexParent = span.closest('.flex');
+        const filterIcon = flexParent.querySelector('.filter-icon');
+        if (this.filters[column].length > 0) {
+          filterIcon.setAttribute('stroke-width', '3.5');
+        }
+        else {
+          filterIcon.setAttribute('stroke-width', '2');
+        }
+      }
+      });  
+    }
+
+    isTagHighlighted(column, tag) {
+      return this.filters[column].includes(tag.toLowerCase());
+    }      
   updateFilter(column, value, checked) {
     if (checked) {
       this.filters[column].push(value);
     } else {
       this.filters[column] = this.filters[column].filter(v => v !== value);
     }
+    this.updateFilterButtonAppearance(column);
     this.applyFilters();
   }
   handleWindowResize() {
@@ -233,7 +253,8 @@ export class MemberTable extends HTMLElement {
       if (value.lookingFor !== undefined && value.lookingFor.length > 0) {
         let tags = Array.isArray(value.lookingFor) ? value.lookingFor : [value.lookingFor];  // Check if EMAIL is an array, if not, treat it as a single string in an array
         for (let tag of tags) {
-          lookingForCell.innerHTML += `<span class="badge badge-md badge-secondary">${tag}</span>`;
+          const badgeClass = this.isTagHighlighted('lookingFor', tag) ? 'badge-primary' : 'badge-secondary';
+          lookingForCell.innerHTML += `<span class="badge badge-md ${badgeClass}">${tag}</span>`;
         }
       } else {
         lookingForCell.innerHTML = '';
@@ -243,7 +264,8 @@ export class MemberTable extends HTMLElement {
       if (value.canHelpWith !== undefined && value.canHelpWith.length > 0) {
         let tags = Array.isArray(value.canHelpWith) ? value.canHelpWith : [value.canHelpWith];  // Check if EMAIL is an array, if not, treat it as a single string in an array
         for (let tag of tags) {
-          canHelpWithCell.innerHTML += `<span class="badge badge-md badge-secondary">${tag}</span>`;
+          const badgeClass = this.isTagHighlighted('canHelpWith', tag) ? 'badge-primary' : 'badge-secondary';
+          canHelpWithCell.innerHTML += `<span class="badge badge-md ${badgeClass}">${tag}</span>`;
         }
       } else {
         canHelpWithCell.innerHTML = '';
@@ -253,7 +275,8 @@ export class MemberTable extends HTMLElement {
       if (value.expertise !== undefined && value.expertise.length > 0) {
         let tags = Array.isArray(value.expertise) ? value.expertise : [value.expertise];  // Check if EMAIL is an array, if not, treat it as a single string in an array
         for (let tag of tags) {
-          expertiseCell.innerHTML += `<span class="badge badge-md badge-secondary">${tag}</span>`;
+          const badgeClass = this.isTagHighlighted('expertise', tag) ? 'badge-primary' : 'badge-secondary';
+          expertiseCell.innerHTML += `<span class="badge badge-md ${badgeClass}">${tag}</span>`;
         }
       } else {
         expertiseCell.innerHTML = '';
@@ -315,6 +338,9 @@ export class MemberTable extends HTMLElement {
     // Uncheck all checkboxes
     document.querySelectorAll('.filter-dropdown input[type="checkbox"]').forEach(checkbox => {
       checkbox.checked = false;
+    });
+    this.querySelectorAll('.filter-icon').forEach(icon => {
+      icon.setAttribute('stroke-width', '2');
     });
   
     // Apply the reset filters
