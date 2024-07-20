@@ -49,8 +49,8 @@ export class AccountV1 {
     requester.challenge = function () { return { person: person } }
 
     requester.notification.addEventListener("CONFIRMED", async (event) => {
-      let community = event.detail.data.community
-      let result = await this.repositories.people.create(new Person({FN: community.FN, PRODID: community.PRODID, UID: community.UID, XML: community.XML, CATEGORIES: 'community'}))
+      let person = event.detail.data.person
+      let result = await this.repositories.people.create(new Person(person))
       console.log("community added to contacts :", result)
     })
 
@@ -68,7 +68,7 @@ export class AccountV1 {
     this.agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
       console.log(challengeEvent.detail)
       let person = challengeEvent.detail.message.challenge.person
-      let result = await this.repositories.people.create(new Person({FN: person.FN, PRODID: person.PRODID, UID: person.UID, XML: person.XML}))
+      let result = await this.repositories.people.create(new Person(person))
       console.log("person added to contacts :", result)
 
       let self = await this.repositories.profile.contactForHandshake()

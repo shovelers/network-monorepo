@@ -103,7 +103,7 @@ if (RUN_COMMUNITY_AGENT == true) {
           var memberRepo = new MembersRepository(agent)
           await memberRepo.add(challengeEvent.detail.message.challenge.person)
           // TODO Implementing auto-confim - check challenge to implement reject
-          await challengeEvent.detail.confirm(contact)
+          await challengeEvent.detail.confirm({person: contact})
         } else {
           throw `Member Add on Join Handshake failed for ${agent.accountDID()}`
         }

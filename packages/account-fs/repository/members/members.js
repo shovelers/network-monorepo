@@ -119,12 +119,11 @@ export class MembersRepository {
     console.log("preparing community info to be shared in join handshake...")
  
     return {
-      community: {
-        FN: await this.agent.handle(),
-        UID: `DCN:${await this.agent.accountDID()}`,
-        PRODID: "DCN:rolodex",
-        XML: `members.json:${await this.agent.handle()}.${encodedMemberDirectoryAccessKey}|contacts.json:${await this.agent.handle()}.${encodedCommunityContactsAccessKey}`
-      }
+      FN: await this.agent.handle(),
+      UID: `DCN:${await this.agent.accountDID()}`,
+      PRODID: "DCN:rolodex",
+      CATEGORIES: 'community',
+      XML: `members.json:${await this.agent.handle()}.${encodedMemberDirectoryAccessKey}|contacts.json:${await this.agent.handle()}.${encodedCommunityContactsAccessKey}`
     }
   }
 }
