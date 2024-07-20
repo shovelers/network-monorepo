@@ -1,5 +1,4 @@
 import { Handshake } from './base/handshake.js';
-import { Requester } from './base/requester.js';
 import * as uint8arrays from 'uint8arrays';
 
 export class JoinHandshake extends Handshake {
@@ -20,14 +19,5 @@ export class JoinHandshake extends Handshake {
         XML: `members.json:${await this.agent.handle()}.${encodedMemberDirectoryAccessKey}|contacts.json:${await this.agent.handle()}.${encodedCommunityContactsAccessKey}`
       }
     }
-  }
-}
-
-export class JoinRequester extends Requester {
-  type() {
-    return "JOIN"
-  }
-
-  async challenge() {
   }
 }

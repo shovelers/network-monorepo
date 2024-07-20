@@ -2,10 +2,9 @@ import * as uint8arrays from 'uint8arrays';
 import axios from 'axios'
 import { RSASigner } from 'iso-signatures/signers/rsa.js'
 import localforage from "localforage";
-import { JoinRequester } from './handshakes/join.js';
-import { RelateRequester } from './handshakes/relate.js';
 import { Broker } from './handshakes/base/broker.js';
 import { Approver } from './handshakes/base/approver.js';
+import { Requester } from './handshakes/base/requester.js';
 import { Channel } from './handshakes/base/channel.js';
 import { CID } from 'multiformats/cid'
 import { DIDKey } from 'iso-did/key';
@@ -60,7 +59,7 @@ export const MessageCapability = {
   async actAsJoinRequester(address, approverHandle) {
     const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)
-    this.requester = new JoinRequester(this, channel)
+    this.requester = new Requester(this, channel, "JOIN")
     this.requester.notification.addEventListener("CONFIRMED", async (message) => {
       console.log(message.detail)
     })
@@ -76,7 +75,7 @@ export const MessageCapability = {
     return this.requester
   },
 
-  async actAsRelationshipApprover(address, brokerHandle, approverHandle, person) {
+  async actAsRelationshipApprover(address, brokerHandle, approverHandle) {
     let channelName = `${brokerHandle}-${approverHandle}-relationship`
     const channel = new Channel(this.helia, channelName)
     this.approver = new Approver(this, channel, async (message) => { })
@@ -88,13 +87,12 @@ export const MessageCapability = {
     await channel.subscribe(this.approver)
   },
 
-  async actAsRelationshipRequester(address, brokerHandle, approverHandle, person ) {
+  async actAsRelationshipRequester(address, brokerHandle, approverHandle) {
     let channelName = `${brokerHandle}-${approverHandle}-relationship`
     let forwardingChannel = `${brokerHandle}-forwarding`
     const channel = new Channel(this.helia, channelName, forwardingChannel)
     // TODO save contact that is received in message
-    this.requester = new RelateRequester(this, channel)
-    this.requester.challenge = function () { return { person: person } }
+    this.requester = new Requester(this, channel, "RELATE")
 
     await dial(this.helia, address)
     await channel.subscribe(this.requester)

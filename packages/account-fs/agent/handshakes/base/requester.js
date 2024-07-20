@@ -11,7 +11,7 @@ async function verify(message, signature){
 }
 
 export class Requester {
-  constructor(agent, channel) {
+  constructor(agent, channel, type) {
     this.agent = agent
     this.channel = channel
     this.DID = null
@@ -19,6 +19,7 @@ export class Requester {
     this.sessionKey = null
     this.state = null
     this.notification = new Notification()
+    this.type = type
   }
 
   async handler(message) {
@@ -36,16 +37,12 @@ export class Requester {
 
   async initiate() {    
     const {requestKeyPair, requestDID } = await this.requestDID()
-    const message = { id: requestDID, type: this.type() }
+    const message = { id: requestDID, type: this.type }
     this.requestKeyPair =  requestKeyPair
     this.DID = requestDID
     await this.channel.publishViaForwarder(JSON.stringify(message))
     this.state = "INITIATED"
     return requestDID
-  }
-
-  type() {
-    throw "ImplementInSpecificHandshake"
   }
 
   async challenge() {
