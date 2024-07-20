@@ -37,7 +37,6 @@
   window.addConnectionButton = async function(){
     // TODO check if valid handle to connect
     var connectHandle = document.querySelector('.connection-handle').value
-    // let person = await window.getContactForRelate()
     let person = await shovel.account.repositories.profile.contactForHandshake()
     console.log("person with XML :", person)
     // TODO Transfer profile.json in such a way, that it mimics forever contact app semantics

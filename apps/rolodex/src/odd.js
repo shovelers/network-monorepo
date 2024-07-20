@@ -107,22 +107,6 @@ async function getContacts() {
   return {contactList: list}
 }
 
-async function getContactForRelate() {
-  let profile = await getProfile()
-  //XML = {filename:handle.accesskey}
-    //handle to fetch latest forestCID from hub using the /forestCID/:handle API & load the forest
-    //access key to read the file content
-  let contactsAccessKey = await program.agent.getAccessKeyForPrivateFile(contactRepo.filename)
-  let encodedContactsAccessKey = uint8arrays.toString(contactsAccessKey.toBytes(), 'base64');
- 
-  return {
-    FN: profile.name,
-    UID: `DCN:${profile.handle}`,
-    PRODID: "DCN:rolodex", // TODO figure how to get app handle
-    XML: `${contactRepo.filename}:${profile.handle}.${encodedContactsAccessKey}`
-  }
-}
-
 async function getContactByUID(uid) {
   return await contactRepo.find(uid)
 }
@@ -360,7 +344,6 @@ export {
   importContacts,
   importGoogleContacts,
   appleCredsPresent,
-  getContactForRelate,
   downloadContactsDataLocally,
   portOldContacts,
   createSiweMessage,
