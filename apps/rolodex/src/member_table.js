@@ -165,10 +165,10 @@ export class MemberTable extends HTMLElement {
         const flexParent = span.closest('.flex');
         const filterIcon = flexParent.querySelector('.filter-icon');
         if (this.filters[column].length > 0) {
-          filterIcon.setAttribute('stroke-width', '3.5');
+          filterIcon.setAttribute('fill', 'currentColor');
         }
         else {
-          filterIcon.setAttribute('stroke-width', '2');
+          filterIcon.setAttribute('fill', 'none');
         }
       }
       });  
@@ -253,8 +253,8 @@ export class MemberTable extends HTMLElement {
       if (value.lookingFor !== undefined && value.lookingFor.length > 0) {
         let tags = Array.isArray(value.lookingFor) ? value.lookingFor : [value.lookingFor];  // Check if EMAIL is an array, if not, treat it as a single string in an array
         for (let tag of tags) {
-          const badgeClass = this.isTagHighlighted('lookingFor', tag) ? 'badge-primary' : 'badge-secondary';
-          lookingForCell.innerHTML += `<span class="badge badge-md ${badgeClass}">${tag}</span>`;
+          const badgeClass = this.isTagHighlighted('lookingFor', tag) ? 'border-1 border-white' : '';
+          lookingForCell.innerHTML += `<span class="badge badge-md badge-secondary ${badgeClass}">${tag}</span>`;
         }
       } else {
         lookingForCell.innerHTML = '';
@@ -264,8 +264,8 @@ export class MemberTable extends HTMLElement {
       if (value.canHelpWith !== undefined && value.canHelpWith.length > 0) {
         let tags = Array.isArray(value.canHelpWith) ? value.canHelpWith : [value.canHelpWith];  // Check if EMAIL is an array, if not, treat it as a single string in an array
         for (let tag of tags) {
-          const badgeClass = this.isTagHighlighted('canHelpWith', tag) ? 'badge-primary' : 'badge-secondary';
-          canHelpWithCell.innerHTML += `<span class="badge badge-md ${badgeClass}">${tag}</span>`;
+          const badgeClass = this.isTagHighlighted('canHelpWith', tag) ? 'border-1 border-white' : '';
+          canHelpWithCell.innerHTML += `<span class="badge badge-md badge-secondary ${badgeClass}">${tag}</span>`;
         }
       } else {
         canHelpWithCell.innerHTML = '';
@@ -275,8 +275,8 @@ export class MemberTable extends HTMLElement {
       if (value.expertise !== undefined && value.expertise.length > 0) {
         let tags = Array.isArray(value.expertise) ? value.expertise : [value.expertise];  // Check if EMAIL is an array, if not, treat it as a single string in an array
         for (let tag of tags) {
-          const badgeClass = this.isTagHighlighted('expertise', tag) ? 'badge-primary' : 'badge-secondary';
-          expertiseCell.innerHTML += `<span class="badge badge-md ${badgeClass}">${tag}</span>`;
+          const badgeClass = this.isTagHighlighted('expertise', tag) ? 'border-1 border-white' : '';
+          expertiseCell.innerHTML += `<span class="badge badge-md badge-secondary ${badgeClass}">${tag}</span>`;
         }
       } else {
         expertiseCell.innerHTML = '';
