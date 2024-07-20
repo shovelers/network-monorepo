@@ -31,13 +31,13 @@ const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
 const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime, "rolodex")
 Object.assign(Agent.prototype, MessageCapability);
 
-const appHandle = await agent.handle()
-const broker = await agent.handle()
 await agent.actAsRelationshipBroker()
 
 const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DNS_MULTADDR_PREFIX + await helia.libp2p.peerId.toString() : (await helia.libp2p.getMultiaddrs()[0].toString()) 
-console.log(address)
-///
+
+const brokerDID = await agent.accountDID()
+await agent.setInbox(address)
+console.log(address, await agent.DID(), brokerDID)
 
 ///
 //Agent for Community
@@ -138,15 +138,15 @@ server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')))
 
 server.get("/", (req, res) => {
-  res.render('pages/index', { address: address, appHandle: appHandle })
+  res.render('pages/index')
 });
 
 server.get("/home", (req, res) => {
-  res.render('pages/index', { address: address, appHandle: appHandle })
+  res.render('pages/index')
 });
 
 server.get("/app", (req, res) => {
-  res.render('pages/app', { broker: broker, address: address })
+  res.render('pages/app', { brokerDID: brokerDID })
 });
 
 // Community Join link: community/{accountDID}/join?name=decentralised.co

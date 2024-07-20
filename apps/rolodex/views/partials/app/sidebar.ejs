@@ -37,10 +37,12 @@
   window.addConnectionButton = async function(){
     // TODO check if valid handle to connect
     var connectHandle = document.querySelector('.connection-handle').value
-    let person = await window.getContactForRelate()
+    // let person = await window.getContactForRelate()
+    let person = await shovel.account.repositories.profile.contactForHandshake()
     console.log("person with XML :", person)
     // TODO Transfer profile.json in such a way, that it mimics forever contact app semantics
-    let requester = await window.shovel.agent.actAsRelationshipRequester("<%= address %>", "<%= broker %>", `${connectHandle}`, person)
+    let address = await shovel.agent.getInbox("<%= brokerDID %>")
+    let requester = await window.shovel.agent.actAsRelationshipRequester(address, "<%= brokerDID %>", `${connectHandle}`, person)
     requester.notification.addEventListener("CONFIRMED", async (event) => {
       console.log(event.detail)
       await window.addConnection(event.detail.data.person)
@@ -124,7 +126,7 @@
       <form id="connection-add-form"    
         onsubmit="event.preventDefault(); window.addConnectionButton(document.querySelector('.connection-handle').value); network_modal.close(); document.querySelector('.connection-handle').value = ''; return false"
         class="space-y-1 text-center">
-        <label for="connection-handle" class="label"><span class="label-text">Handle</span></label>
+        <label for="connection-handle" class="label"><span class="label-text">AccountDID</span></label>
         <input type="text" id="" class="connection-handle border border-gray-300 px-2 py-1 rounded-lg">
         <div class="flex flex-row space-x-2 pt-4 justify-center">
           <button type="submit" class="btn btn-outline btn-sm">

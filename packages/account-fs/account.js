@@ -1,4 +1,5 @@
 import { PeopleRepository } from "./repository/people/people.ts";
+import { PeopleSearch } from "./repository/people/search.js";
 import { Person } from "./repository/people/person.ts";
 import { ProfileRepository } from "./repository/profile/profile.js";
 
@@ -13,6 +14,7 @@ export class AccountV1 {
       profile: new ProfileRepository(agent),
       people: new PeopleRepository(agent)
     }
+    this.search = new PeopleSearch(agent, this.repositories.people)
   } 
 
   async create(accountDID, siweMessage, siweSignature) {
@@ -36,7 +38,7 @@ export class AccountV1 {
 
   // recovery - not needed for facaster login
 
-  async requestHandshake(accountDID) {
+  async requestHandshake(accountDID, brokerDID) {
     let person = await this.repositories.profile.contactForHandshake()
     console.log("person with XML :", person)
 
@@ -53,6 +55,27 @@ export class AccountV1 {
     })
 
     await requester.initiate()
+  }
+
+  async handshakeApprover(brokerDID) {
+    var accountDID = await this.agent.accountDID()
+
+    let address = await this.agent.getInbox(brokerDID)
+    console.log("inbox:", accountDID, brokerDID, address)
+
+    await this.agent.actAsRelationshipApprover(address, brokerDID, accountDID)
+
+    this.agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
+      console.log(challengeEvent.detail)
+      let person = challengeEvent.detail.message.challenge.person
+      let result = await this.repositories.people.create(new Person({FN: person.FN, PRODID: person.PRODID, UID: person.UID, XML: person.XML}))
+      console.log("person added to contacts :", result)
+
+      let self = await this.repositories.profile.contactForHandshake()
+      console.log("Person with XML :", self)
+      // TODO Implementing auto-confim - check challenge to implement reject
+      await challengeEvent.detail.confirm({person: self})
+    })
   }
 
   async getProfile(){

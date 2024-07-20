@@ -106,7 +106,7 @@ export const MessageCapability = {
   },
 
   async actAsRelationshipBroker() {
-    const forwardingChannel = `${await this.handle()}-forwarding`
+    const forwardingChannel = `${await this.accountDID()}-forwarding`
 
     const channel = new Channel(this.helia, forwardingChannel)
     this.broker = new Broker(this, channel)

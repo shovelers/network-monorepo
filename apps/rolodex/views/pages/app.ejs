@@ -76,21 +76,7 @@
 
       window.portOldContacts = portOldContacts
 
-      var agentHandle = await shovel.agent.handle()
-
-      // TODO - fix channel - "(broker-handle)-(approver-handle)-relationship"
-      // TODO - dial broker address 
-      const approver = await shovel.agent.actAsRelationshipApprover("<%= address %>", "<%= broker %>", `${agentHandle}`)
-  
-      shovel.agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
-        console.log(challengeEvent.detail)
-        await addConnection(challengeEvent.detail.message.challenge.person)
-
-        let self = await getContactForRelate()
-        console.log("Person with XML :", self)
-        // TODO Implementing auto-confim - check challenge to implement reject
-        await challengeEvent.detail.confirm({person: self})
-      })
+      account.handshakeApprover("<%= brokerDID %>")
     </script>
 
     <div class="container mx-auto h-screen flex flex-col justify-evenly items-center">
