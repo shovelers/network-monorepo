@@ -1,6 +1,6 @@
 import { Notification } from './common.js';
+import { Handshake } from './handshake.js';
 import { JoinHandshake } from '../join.js';
-import { RelateHandshake } from '../relate.js';
 
 export class Approver {
   constructor(agent, channel) {
@@ -26,7 +26,7 @@ export class Approver {
     case "JOIN":
       return new JoinHandshake(this.agent, this.channel, request.id, this.notification)
     case "RELATE":
-      return new RelateHandshake(this.agent, this.channel, request.id, this.notification)
+      return new Handshake(this.agent, this.channel, request.id, this.notification)
     default:
       throw "Unknown Handshake Type"
     }
