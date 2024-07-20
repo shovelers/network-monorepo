@@ -1,4 +1,4 @@
-export class MemberTable extends HTMLElement {
+ export class MemberTable extends HTMLElement {
   gridSize = 'grid-cols-8';
   constructor() {
     super();
@@ -340,7 +340,7 @@ export class MemberTable extends HTMLElement {
       checkbox.checked = false;
     });
     this.querySelectorAll('.filter-icon').forEach(icon => {
-      icon.setAttribute('stroke-width', '2');
+        icon.setAttribute('fill', 'none');
     });
   
     // Apply the reset filters
