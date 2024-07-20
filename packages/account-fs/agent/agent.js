@@ -60,9 +60,6 @@ export const MessageCapability = {
     const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)
     this.requester = new Requester(this, channel, "JOIN")
-    this.requester.notification.addEventListener("CONFIRMED", async (message) => {
-      console.log(message.detail)
-    })
 
     try {
       await dial(this.helia, address)
@@ -91,15 +88,10 @@ export const MessageCapability = {
     let channelName = `${brokerHandle}-${approverHandle}-relationship`
     let forwardingChannel = `${brokerHandle}-forwarding`
     const channel = new Channel(this.helia, channelName, forwardingChannel)
-    // TODO save contact that is received in message
     this.requester = new Requester(this, channel, "RELATE")
 
     await dial(this.helia, address)
     await channel.subscribe(this.requester)
-    const timeout = setTimeout(() => {
-      clearTimeout(timeout)
-      this.requester.initiate()
-    }, 500)
     return this.requester
   },
 

@@ -36,18 +36,8 @@
 
   window.addConnectionButton = async function(){
     // TODO check if valid handle to connect
-    var connectHandle = document.querySelector('.connection-handle').value
-    let person = await shovel.account.repositories.profile.contactForHandshake()
-    console.log("person with XML :", person)
-    // TODO Transfer profile.json in such a way, that it mimics forever contact app semantics
-    let address = await shovel.agent.getInbox("<%= brokerDID %>")
-    let requester = await window.shovel.agent.actAsRelationshipRequester(address, "<%= brokerDID %>", `${connectHandle}`)
-    requester.challenge = function () { return { person: person } }
-
-    requester.notification.addEventListener("CONFIRMED", async (event) => {
-      console.log(event.detail)
-      await window.addConnection(event.detail.data.person)
-    })
+    var accountDID = document.querySelector('.connection-handle').value
+    await shovel.account.requestHandshake(accountDID, "<%= brokerDID %>")
   }
 
   window.refreshSyncStatus = function() {

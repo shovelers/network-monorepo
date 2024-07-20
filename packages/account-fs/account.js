@@ -38,14 +38,21 @@ export class AccountV1 {
 
   // recovery - not needed for facaster login
 
-  async requestHandshake(accountDID, brokerDID) {
+  async requestHandshake(accountDID, brokerDID = null) {
     let person = await this.repositories.profile.contactForHandshake()
     console.log("person with XML :", person)
 
-    let address = await this.agent.getInbox(accountDID)
-    console.log("inbox:", accountDID, address)
-
-    let requester = await this.agent.actAsJoinRequester(address, accountDID)
+    let requester
+    if (brokerDID) {
+      let address = await this.agent.getInbox(brokerDID)
+      console.log("inbox:", accountDID, address)
+      requester = await window.shovel.agent.actAsRelationshipRequester(address, brokerDID, accountDID)
+    } else {
+      let address = await this.agent.getInbox(accountDID)
+      console.log("inbox:", accountDID, address)
+      requester = await this.agent.actAsJoinRequester(address, accountDID)
+    }
+    
     requester.challenge = function () { return { person: person } }
 
     requester.notification.addEventListener("CONFIRMED", async (event) => {
