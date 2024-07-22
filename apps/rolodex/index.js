@@ -85,8 +85,6 @@ if (RUN_COMMUNITY_AGENT == true) {
       await members.initialise()
       
       //Run Join Approver fro community agent
-      const communityHandle = config.SHOVEL_ACCOUNT_HANDLE
-      await communityAgent.actAsJoinApprover(communityHandle)
       await communityAgent.actAsJoinApprover(communityAccountDID)
       communityAgents.push(communityAgent)
     }
