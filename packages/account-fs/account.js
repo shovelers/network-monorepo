@@ -14,7 +14,7 @@ export class AccountV1 {
       profile: new ProfileRepository(agent),
       people: new PeopleRepository(agent)
     }
-    this.search = new PeopleSearch(agent, this.repositories.people)
+    this.ps = new PeopleSearch(agent, this.repositories.people)
   } 
 
   async create(accountDID, siweMessage, siweSignature) {
@@ -83,6 +83,10 @@ export class AccountV1 {
       // TODO Implementing auto-confim - check challenge to implement reject
       await challengeEvent.detail.confirm({person: self})
     })
+  }
+
+  async search(params) {
+    return await this.ps.search(params)
   }
 
   async getProfile(){

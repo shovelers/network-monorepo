@@ -3,7 +3,7 @@ import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
 import { MemberTable } from "./member_table";
-import { programInit, Person, PeopleRepository, AccountV1, MembersRepository, PeopleSearch } from 'account-fs';
+import { programInit, Person, AccountV1, MembersRepository } from 'account-fs';
 import * as uint8arrays from 'uint8arrays';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { save } from '@tauri-apps/api/dialog';
@@ -21,13 +21,11 @@ const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 const program = await programInit(NETWORK, "rolodex")
 window.shovel = program
 
-const contactRepo = new PeopleRepository(program.agent)
-const peopleSearch = new PeopleSearch(program.agent, contactRepo)
 const membersRepo = new MembersRepository(program.agent)
-const account = new AccountV1(program.agent, ["PEOPLE"])
+const account = new AccountV1(program.agent)
+const contactRepo = account.repositories.people 
 const accountv1 = account
 shovel.account = account
-shovel.peopleSearch = peopleSearch
 
 customElements.define('contact-table', ContactTable);
 customElements.define('member-table', MemberTable);
@@ -90,11 +88,11 @@ async function getMembers() {
 }
 
 async function getCommunityMembers(community) {
-  return await peopleSearch.search({personUID: community.UID})
+  return await account.search({personUID: community.UID})
 }
 
 async function filterMembers(filter, profiles, communityUID) {
-  return await peopleSearch.search({query: filter, personUID: communityUID})
+  return await account.search({query: filter, personUID: communityUID})
 }
 
 async function getProfile() {
@@ -112,7 +110,7 @@ async function getContactByUID(uid) {
 }
 
 async function filterContacts(filter) {
-  return { contactList: await peopleSearch.search({query: filter, depth: 1}) }
+  return { contactList: await account.search({query: filter, depth: 1}) }
 }
 
 
