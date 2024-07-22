@@ -2,6 +2,7 @@ import { PeopleRepository } from "./repository/people/people.ts";
 import { PeopleSearch } from "./repository/people/search.js";
 import { Person } from "./repository/people/person.ts";
 import { ProfileRepository } from "./repository/profile/profile.js";
+import { MembersRepository } from "./repository/members/members.js";
 
 //represents account on the network in the context of an application running account-fs
 //  applicationDID to be used as the application context
@@ -15,6 +16,13 @@ export class AccountV1 {
       people: new PeopleRepository(agent)
     }
     this.ps = new PeopleSearch(agent, this.repositories.people)
+  } 
+
+  async loadRepositories(){
+    let members = new MembersRepository(this.agent)
+    if (await members.isInitialised()){
+      this.repositories.members = members
+    }
   } 
 
   async create(accountDID, siweMessage, siweSignature) {

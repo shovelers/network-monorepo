@@ -3,7 +3,7 @@ import _ from 'lodash';
 import {vCardParser} from './vcard_parser.js';
 import { ContactTable } from "./contact_table";
 import { MemberTable } from "./member_table";
-import { programInit, Person, AccountV1, MembersRepository } from 'account-fs';
+import { programInit, Person, AccountV1 } from 'account-fs';
 import * as uint8arrays from 'uint8arrays';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { save } from '@tauri-apps/api/dialog';
@@ -21,8 +21,8 @@ const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 const program = await programInit(NETWORK, "rolodex")
 window.shovel = program
 
-const membersRepo = new MembersRepository(program.agent)
 const account = new AccountV1(program.agent)
+await account.loadRepositories()
 const contactRepo = account.repositories.people 
 const accountv1 = account
 shovel.account = account
@@ -82,9 +82,12 @@ async function verifySiweMessage(message,signature,nonce) {
 }
 
 async function getMembers() {
-  var list = await membersRepo.list()
-  console.log("all", list)
-  return {memberList: list}
+  if (account.repositories.members) {
+    var list = await account.repositories.members.list()
+    console.log("all", list)
+    return {memberList: list}
+  }
+  return {memberList: undefined}
 }
 
 async function getCommunityMembers(community) {

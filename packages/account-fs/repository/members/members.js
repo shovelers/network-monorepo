@@ -65,6 +65,10 @@ export class MembersRepository {
     this.agent = agent
     this.filename = "members.json" 
   }
+  
+  async isInitialised() {
+    return await this.agent.fileExists(this.filename) 
+  }
 
   async initialise(){
     const exists = await this.agent.fileExists(this.filename)
