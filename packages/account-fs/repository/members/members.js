@@ -65,7 +65,7 @@ export class MembersRepository {
     this.agent = agent
     this.filename = "members.json" 
   }
-  
+
   async isInitialised() {
     return await this.agent.fileExists(this.filename) 
   }
@@ -117,8 +117,10 @@ export class MembersRepository {
     let memberDirectoryAccessKey = await this.agent.getAccessKeyForPrivateFile('members.json')
     let encodedMemberDirectoryAccessKey = uint8arrays.toString(memberDirectoryAccessKey.toBytes(), 'base64url');
     
-    let communityContactsAccessKey = await this.agent.getAccessKeyForPrivateFile('contacts.json')
-    let encodedCommunityContactsAccessKey = uint8arrays.toString(communityContactsAccessKey.toBytes(), 'base64url');
+    // let profile = await this.get()
+    let handle = await this.agent.handle() 
+    let profileAccessKey = await this.agent.getAccessKeyForPrivateFile('profile.json')
+    let encodedProfileAccessKey = uint8arrays.toString(profileAccessKey.toBytes(), 'base64');
 
     console.log("preparing community info to be shared in join handshake...")
  
@@ -127,7 +129,7 @@ export class MembersRepository {
       UID: `DCN:${await this.agent.accountDID()}`,
       PRODID: "DCN:rolodex",
       CATEGORIES: 'community',
-      XML: `members.json:${await this.agent.handle()}.${encodedMemberDirectoryAccessKey}|contacts.json:${await this.agent.handle()}.${encodedCommunityContactsAccessKey}`
+      XML: `profile.json:${handle}.${encodedProfileAccessKey}|members.json:${handle}.${encodedMemberDirectoryAccessKey}`
     }
   }
 }
