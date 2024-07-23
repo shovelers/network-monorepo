@@ -32,12 +32,8 @@
         mixpanel.identify(await shovel.agent.accountDID())
       }
 
-      //Flips the colour of option pills and stores the resposes of respective question
-      var lookingFor = []
-      var canHelpWith = []
-      var expertise = []
-      const badges = [...document.querySelectorAll('#color-changing-badge')];
 
+      const badges = [...document.querySelectorAll('#color-changing-badge')];
       badges.forEach((badge) =>
         badge.addEventListener('click', () => {
           let isClicked = badge.getAttribute('data-is-clicked')
@@ -46,48 +42,19 @@
             badge.classList.remove('badge-outline');
             badge.classList.add('badge-secondary');
             badge.setAttribute('data-is-clicked', true)
-            switch (question){
-              case 'lookingFor':
-                lookingFor.push(badge.innerHTML)
-                break;
-              case 'canHelpWith':
-                canHelpWith.push(badge.innerHTML)
-                break;
-              case 'expertise':
-                expertise.push(badge.innerHTML)
-                break;
-              default:
-                console.log("Store for Question not defined")
-            }
-            console.log("On Add : ", "looking for :", lookingFor, "canHelpWith :", canHelpWith, "expertise :", expertise)
           } else {
             badge.classList.remove('badge-secondary');
             badge.classList.add('badge-outline');
             badge.setAttribute('data-is-clicked', false)
-            let index
-            switch (question){
-              case 'lookingFor':
-                index = lookingFor.indexOf(badge.innerHTML)
-                lookingFor.splice(index++, 1)
-                break;
-              case 'canHelpWith':
-                index = canHelpWith.indexOf(badge.innerHTML)
-                canHelpWith.splice(index++, 1)
-                break;
-              case 'expertise':
-                index = expertise.indexOf(badge.innerHTML)
-                expertise.splice(index++, 1)
-                break;
-              default:
-                console.log("Store for Question not defined")
-            }
-            console.log("On remove :", "looking for :", lookingFor, "canHelpWith :", canHelpWith, "expertise :", expertise)
           }
         })
       )
 
       // add selected tags to profile on save
       window.addSelectedTagsToProfile = async function(){
+        let lookingFor = Array.from(document.querySelectorAll('#color-changing-badge[question="lookingFor"][data-is-clicked="true"]')).map( e => e.innerHTML)
+        let canHelpWith = Array.from(document.querySelectorAll('#color-changing-badge[question="canHelpWith"][data-is-clicked="true"]')).map( e => e.innerHTML)
+        let expertise = Array.from(document.querySelectorAll('#color-changing-badge[question="expertise"][data-is-clicked="true"]')).map( e => e.innerHTML)
         await v1UpdateProfile({lookingFor: lookingFor, canHelpWith: canHelpWith, expertise: expertise})
         
         let profile = await getProfile()
