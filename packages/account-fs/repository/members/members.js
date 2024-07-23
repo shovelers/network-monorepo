@@ -1,21 +1,5 @@
 import * as uint8arrays from 'uint8arrays';
-// import { Person } from "./../people/person";
-
-//TODO fix TS import in js server
-class Person {
-  constructor(fields) {
-    this.PRODID = fields.PRODID  //required
-    this.UID = fields.UID        //required
-    this.FN = fields.FN          //required
-    this.CATEGORIES = fields.CATEGORIES || ""
-    this.URL = fields.URL || ""
-    this.NOTE = fields.NOTE || ""
-    this.TEL = fields.TEL
-    this.EMAIL = fields.EMAIL
-    this.XML = fields.XML
-    this.VERSION = "4.0"
-  }
-}
+import { Person } from "./../people/person.ts";
 
 export class MembersRepository {
   constructor(agent) {
