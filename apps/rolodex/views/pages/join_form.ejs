@@ -82,24 +82,14 @@
         <div class="divider divider-horizontal"></div>
         <%/* form half */%>
         <div class="flex flex-col justify-evenly place-content-center w-1/2 p-8">
-          <div class="space-y-2">
-            <div class="font-semibold text-md">Looking For</div>
-            <% for(var i=0; i<JSON.parse(options).lookingFor.length; i++) {%>
-              <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="lookingFor"><%= JSON.parse(options).lookingFor[i] %></div>
-            <% } %>
-          </div>
-          <div class="space-y-2">
-           <div class="font-semibold text-md">Can Help With</div>
-            <% for(var i=0; i<JSON.parse(options).canHelpWith.length; i++) {%>
-              <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="canHelpWith"><%= JSON.parse(options).canHelpWith[i] %></div>
-            <% } %>
-          </div>
-          <div class="space-y-2">
-            <div class="font-semibold text-md">Expertise</div>
-            <% for(var i=0; i<JSON.parse(options).expertise.length; i++) {%>
-              <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="expertise"><%= JSON.parse(options).expertise[i] %></div>
-            <% } %>
-          </div>
+          <% for (const key in options) {%>
+            <div class="space-y-2">
+              <div class="font-semibold text-md"></div>
+              <% for(var i=0; i<options[key].length; i++) {%>
+                <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="<%= key %>"><%= options[key][i] %></div>
+              <% } %>
+            </div> 
+          <% }%>
           
           <%/* submit button */%>
           <div class="flex justify-center">
