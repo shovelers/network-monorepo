@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDAVClient } from 'tsdav';
-import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository } from 'account-fs/app.js';
+import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository } from 'account-fs/app.js';
 import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
@@ -91,7 +91,14 @@ if (RUN_COMMUNITY_AGENT == true) {
 
     //start listeners for each agent
     communityAgents.forEach(async (agent) => {
-      const contact = await (new MembersRepository(agent)).contactForHandshake()
+      const communityRepo = new CommunityRepository(agent)
+      let contact
+      if (await communityRepo.isInitialised()) {
+        contact = await communityRepo.contactForHandshake()
+      } else {
+        contact = await (new MembersRepository(agent)).contactForHandshake()
+      }
+      
       agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
         console.log("receieved from requester :", challengeEvent.detail)
         console.log("channel from event :", challengeEvent.detail.channelName)

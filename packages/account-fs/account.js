@@ -3,11 +3,8 @@ import { PeopleSearch } from "./repository/people/search.js";
 import { Person } from "./repository/people/person.ts";
 import { ProfileRepository } from "./repository/profile/profile.js";
 import { MembersRepository } from "./repository/members/members.js";
+import { CommunityRepository } from "./repository/members/community.ts";
 
-//represents account on the network in the context of an application running account-fs
-//  applicationDID to be used as the application context
-//  `create` calls Hub with applicationDID & `signed payload` from applicationDID 
-//   to creates root fs, and get accessKey for the subfolder back & UCAN for forestCID edit// need to be implemented on Hub's Account Service
 export class AccountV1 {
   constructor(agent) {
     this.agent = agent
@@ -22,6 +19,7 @@ export class AccountV1 {
     let members = new MembersRepository(this.agent)
     if (await members.isInitialised()){
       this.repositories.members = members
+      this.repositories.community = new CommunityRepository(this.agent)
     }
   } 
 

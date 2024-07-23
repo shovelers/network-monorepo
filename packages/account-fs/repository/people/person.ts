@@ -135,7 +135,7 @@ export class Person {
   }
 }
 
-interface PersonData {
+export interface PersonData {
   PRODID: string;
   UID: string;
   FN: string;
