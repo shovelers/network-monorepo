@@ -138,6 +138,21 @@ const joinFormOptions = {
   }
 }
 
+const joinFormOptionsV1 = {
+  "lookingFor": {
+    "label": "Looking For",
+    "symbols": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"]
+  },
+  "canHelpWith": {
+    "label": "Can Help With",
+    "symbols": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"]
+  },
+  "expertise": {
+    "label": "Expertise",
+    "symbols": ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
+  }
+}
+
 server.use(express.urlencoded({ extended: true }))
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
@@ -162,7 +177,7 @@ server.get("/community/:accountDID/join", (req, res) => {
 
 // Community join form: community/{accountDID}/form?name=decentralised.co
 server.get("/community/:accountDID/form", (req, res) => {
-  res.render('pages/join_form', { communityDID: req.params.accountDID, communityName: req.query.name, options: joinFormOptions[req.params.accountDID] })
+  res.render('pages/join_form', { communityDID: req.params.accountDID, communityName: req.query.name, options: joinFormOptionsV1 })
 });
 
 server.get("/directory/:accountDID", (req, res) => {
