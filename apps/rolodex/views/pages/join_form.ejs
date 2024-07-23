@@ -52,10 +52,12 @@
 
       // add selected tags to profile on save
       window.addSelectedTagsToProfile = async function(){
-        let lookingFor = Array.from(document.querySelectorAll('#color-changing-badge[question="lookingFor"][data-is-clicked="true"]')).map( e => e.innerHTML)
-        let canHelpWith = Array.from(document.querySelectorAll('#color-changing-badge[question="canHelpWith"][data-is-clicked="true"]')).map( e => e.innerHTML)
-        let expertise = Array.from(document.querySelectorAll('#color-changing-badge[question="expertise"][data-is-clicked="true"]')).map( e => e.innerHTML)
-        await v1UpdateProfile({lookingFor: lookingFor, canHelpWith: canHelpWith, expertise: expertise})
+        var options = '<%- JSON.stringify(options) %>'
+        var param = {}
+        for (const key in JSON.parse(options)) {
+          param[key] = Array.from(document.querySelectorAll(`#color-changing-badge[question=${key}][data-is-clicked="true"]`)).map( e => e.innerHTML)
+        }
+        await v1UpdateProfile(param)
         
         let profile = await getProfile()
         console.log("Profile after save :", profile)
