@@ -48,6 +48,7 @@
     document.getElementById("name").innerHTML = "Name: " + result.name
 
     for (const key in options) {
+      if (!result[key]) continue;
       document.getElementById(key).innerHTML = '';
       for (let values of result[key]) {
         if (values == '') continue;
