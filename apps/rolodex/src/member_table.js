@@ -286,14 +286,6 @@
         break;
     }
   }
-  
-  resetSearch() {
-    const searchInput = document.querySelector('.search-form > input');
-    if (searchInput) {
-      searchInput.value = '';
-    }
-    this.members = window.memberListCache;
-  }
 
   resetFilters() {
     // Reset all filters
