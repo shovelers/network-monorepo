@@ -29,13 +29,16 @@
     document.getElementById("profile-bio").innerHTML = result.text
     
     //Set deault color & Flips the colour of option pills and stores the resposes of respective question
-    badges.forEach((badge) => {
-      if ((result.canHelpWith).includes(badge.innerHTML) || (result.lookingFor).includes(badge.innerHTML) || (result.expertise).includes(badge.innerHTML)) {
-        badge.classList.remove('badge-outline');
-        badge.classList.add('badge-secondary');
-        badge.setAttribute('data-is-clicked', true)
-      }
-    })
+    for (const key in options){
+      var badges = Array.from(document.querySelectorAll(`#edit-badge[question=${key}]`))
+      badges.forEach((badge) => {
+        if (result[key] && result[key].includes(badge.innerHTML)) {
+          badge.classList.remove('badge-outline');
+          badge.classList.add('badge-secondary');
+          badge.setAttribute('data-is-clicked', true)
+        }
+      })
+    }
   }
 
   window.refreshProfile = function(){
@@ -55,7 +58,6 @@
   })}
   refreshProfile();
   
-
   window.updateSelectedTagsToProfile = async function(){
     var params = {}
     for (const key in options) {
