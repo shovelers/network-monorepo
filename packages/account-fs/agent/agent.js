@@ -172,8 +172,8 @@ export const AccountCapability = {
 
   async activeSession() {
     // TODO when agent has storage capability check for access key
-    let keypair = await this.runtime.getItem(SHOVEL_AGENT_WRITE_KEYPAIR)
-    return (keypair != null)
+    let accessKey = await this.runtime.getItem(SHOVEL_FS_ACCESS_KEY)
+    return (accessKey != null)
   }
 }
 
