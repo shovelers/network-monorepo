@@ -119,25 +119,6 @@ if (RUN_COMMUNITY_AGENT == true) {
   }
 }
 ///
-
-const joinFormOptions = {
-  "did:pkh:eip155:8453:0x9209C02c5DaC471CB4aaE58dc4B8008662E27039": {
-    "lookingFor": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
-    "canHelpWith": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
-    "expertise": ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
-  },
-  "did:pkh:eip155:8453:0xa56C43263123D36804806A9249A062500c50058F": {
-    "lookingFor": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
-    "canHelpWith": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
-    "expertise": ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
-  },
-  "did:pkh:eip155:8453:0x4b59De6dc42e2F7f7978D6489dCfF922535c162F": {
-    "lookingFor": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"],
-    "canHelpWith": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
-    "expertise": ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
-  }
-}
-
 const joinFormOptionsV1 = {
   "lookingFor": {
     "label": "Looking For",
@@ -181,7 +162,7 @@ server.get("/community/:accountDID/form", (req, res) => {
 });
 
 server.get("/directory/:accountDID", (req, res) => {
-  res.render('pages/directory', {communityDID: req.params.accountDID, communityName: req.query.name, options: JSON.stringify(joinFormOptions[req.params.accountDID] || {}), optionsV1: joinFormOptionsV1})
+  res.render('pages/directory', {communityDID: req.params.accountDID, communityName: req.query.name, optionsV1: joinFormOptionsV1})
 })
 
 server.get('/nonce',  (req, res) => {
