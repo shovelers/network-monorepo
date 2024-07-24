@@ -181,7 +181,7 @@ server.get("/community/:accountDID/form", (req, res) => {
 });
 
 server.get("/directory/:accountDID", (req, res) => {
-  res.render('pages/directory', {communityDID: req.params.accountDID, communityName: req.query.name, options: JSON.stringify(joinFormOptions[req.params.accountDID] || {})})
+  res.render('pages/directory', {communityDID: req.params.accountDID, communityName: req.query.name, options: JSON.stringify(joinFormOptions[req.params.accountDID] || {}), optionsV1: joinFormOptionsV1})
 })
 
 server.get('/nonce',  (req, res) => {
