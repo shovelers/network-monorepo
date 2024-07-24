@@ -4,6 +4,7 @@
   }
   import { getProfile, v1UpdateProfile } from '/odd.js';
   window.v1UpdateProfile = v1UpdateProfile
+  const options = JSON.parse('<%- JSON.stringify(optionsV1) %>')
 
   const badges = [...document.querySelectorAll('#edit-badge')]
   badges.forEach((badge) => {
@@ -39,39 +40,28 @@
 
   window.refreshProfile = function(){
     window.getProfile().then((result) => {
-    console.log("result: ", result)
+    document.querySelector(".avatar > div > img").src = result.pfpUrl
     document.getElementById("handle").innerHTML = result.handle
     document.getElementById("name").innerHTML = "Name: " + result.name
-    document.getElementById("lookingFor").innerHTML = '';
-    for (let lf of result.lookingFor) {
-      if (lf == '') continue;
-      document.getElementById("lookingFor").innerHTML += `<span class="badge badge-md badge-secondary">${lf}</span>`;
-    }
-    document.getElementById("canHelpWith").innerHTML = '';
-    for (let ii of result.canHelpWith) {
-      if (ii == '') continue;
-      document.getElementById("canHelpWith").innerHTML += `<span class="badge badeg-md badge-secondary">${ii}</span>`;
-    }
-    document.getElementById("expertise").innerHTML = '';
-    for (let e of result.expertise) {
-      if (e == '') continue;
-      document.getElementById("expertise").innerHTML += `<span class="badge badge-md badge-secondary">${e}</span>`;
-    }
 
-    document.querySelector(".avatar > div > img").src = result.pfpUrl
+    for (const key in options) {
+      document.getElementById(key).innerHTML = '';
+      for (let values of result[key]) {
+        if (values == '') continue;
+        document.getElementById(key).innerHTML += `<span class="badge badge-md badge-secondary">${values}</span>`;
+      }
+    }
     updateProfileModal(result)
   })}
   refreshProfile();
   
 
   window.updateSelectedTagsToProfile = async function(){
-    var options = '<%- JSON.stringify(optionsV1) %>'
     var params = {}
-    for (const key in JSON.parse(options)) {
+    for (const key in options) {
       params[key] = Array.from(document.querySelectorAll(`#edit-badge[question=${key}][data-is-clicked="true"]`)).map( e => e.innerHTML)
     }
     await v1UpdateProfile(params)
-    console.log("Profile after update :", params, await getProfile())
   }
 </script>
 
