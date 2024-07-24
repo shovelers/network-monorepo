@@ -5,12 +5,28 @@
   import { getProfile, v1UpdateProfile } from '/odd.js';
   window.v1UpdateProfile = v1UpdateProfile
 
-  getProfile().then((result) => {
+  const badges = [...document.querySelectorAll('#edit-badge')]
+  badges.forEach((badge) => {
+    badge.addEventListener('click', () => {
+      let isClicked = badge.getAttribute('data-is-clicked')
+      let question = badge.getAttribute('question')
+      if (isClicked === "false") {
+        badge.classList.remove('badge-outline');
+        badge.classList.add('badge-secondary');
+        badge.setAttribute('data-is-clicked', true)
+      } else {
+        badge.classList.remove('badge-secondary');
+        badge.classList.add('badge-outline');
+        badge.setAttribute('data-is-clicked', false)
+      }
+    })
+  })
+
+  const updateProfileModal = function(result) {
     document.getElementById("profile-name").innerHTML = result.name
     document.getElementById("profile-handle").innerHTML = result.handle
     document.getElementById("profile-bio").innerHTML = result.text
     
-    const badges = [...document.querySelectorAll('#edit-badge')];
     //Set deault color & Flips the colour of option pills and stores the resposes of respective question
     badges.forEach((badge) => {
       if ((result.canHelpWith).includes(badge.innerHTML) || (result.lookingFor).includes(badge.innerHTML) || (result.expertise).includes(badge.innerHTML)) {
@@ -19,23 +35,34 @@
         badge.setAttribute('data-is-clicked', true)
       }
     })
+  }
 
-    badges.forEach((badge) => {
-      badge.addEventListener('click', () => {
-        let isClicked = badge.getAttribute('data-is-clicked')
-        let question = badge.getAttribute('question')
-        if (isClicked === "false") {
-          badge.classList.remove('badge-outline');
-          badge.classList.add('badge-secondary');
-          badge.setAttribute('data-is-clicked', true)
-        } else {
-          badge.classList.remove('badge-secondary');
-          badge.classList.add('badge-outline');
-          badge.setAttribute('data-is-clicked', false)
-        }
-      })
-    })
-  })
+  window.refreshProfile = function(){
+    window.getProfile().then((result) => {
+    console.log("result: ", result)
+    document.getElementById("handle").innerHTML = result.handle
+    document.getElementById("name").innerHTML = "Name: " + result.name
+    document.getElementById("lookingFor").innerHTML = '';
+    for (let lf of result.lookingFor) {
+      if (lf == '') continue;
+      document.getElementById("lookingFor").innerHTML += `<span class="badge badge-md badge-secondary">${lf}</span>`;
+    }
+    document.getElementById("canHelpWith").innerHTML = '';
+    for (let ii of result.canHelpWith) {
+      if (ii == '') continue;
+      document.getElementById("canHelpWith").innerHTML += `<span class="badge badeg-md badge-secondary">${ii}</span>`;
+    }
+    document.getElementById("expertise").innerHTML = '';
+    for (let e of result.expertise) {
+      if (e == '') continue;
+      document.getElementById("expertise").innerHTML += `<span class="badge badge-md badge-secondary">${e}</span>`;
+    }
+
+    document.querySelector(".avatar > div > img").src = result.pfpUrl
+    updateProfileModal(result)
+  })}
+  refreshProfile();
+  
 
   window.updateSelectedTagsToProfile = async function(){
     var options = '<%- JSON.stringify(optionsV1) %>'

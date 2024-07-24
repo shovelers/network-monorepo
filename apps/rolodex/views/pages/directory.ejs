@@ -45,32 +45,6 @@
         })
       }
       refreshMembers();
-    
-      //setup values for the Profile being shown
-      window.refreshProfile = function(){
-        window.getProfile().then((result) => {
-        console.log("result: ", result)
-        document.getElementById("handle").innerHTML = result.handle
-        document.getElementById("name").innerHTML = "Name: " + result.name
-        document.getElementById("lookingFor").innerHTML = '';
-        for (let lf of result.lookingFor) {
-          if (lf == '') continue;
-          document.getElementById("lookingFor").innerHTML += `<span class="badge badge-md badge-secondary">${lf}</span>`;
-        }
-        document.getElementById("canHelpWith").innerHTML = '';
-        for (let ii of result.canHelpWith) {
-          if (ii == '') continue;
-          document.getElementById("canHelpWith").innerHTML += `<span class="badge badeg-md badge-secondary">${ii}</span>`;
-        }
-        document.getElementById("expertise").innerHTML = '';
-        for (let e of result.expertise) {
-          if (e == '') continue;
-          document.getElementById("expertise").innerHTML += `<span class="badge badge-md badge-secondary">${e}</span>`;
-        }
-
-        document.querySelector(".avatar > div > img").src = result.pfpUrl
-      })}
-      refreshProfile();
     </script>
 
     <div class="container mx-auto h-screen flex flex-col justify-evenly items-center">
