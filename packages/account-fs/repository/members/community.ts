@@ -15,51 +15,109 @@ export class CommunityRepository {
 
   async initialise(): Promise<void> {}
 
-  // VCard style fields with Avro style schemas
+  // VCard style fields with JSON schemas for Profile
   sample(): any {
     return {
       FN: "Creole",
-      schemas: [
-        {
-          type: "record",
-          name: "farcasterProfile",
-          fields: [
-            { name: "fid", type: "string" },
-            { name: "username", type: "string" },
-            { name: "bio", type: "string" },
-            { name: "displayName", type: "string" },
-            { name: "pfpUrl", type: "string" },
-          ]
-        },
-        {
-          type: "enum",
-          name: "lookingForOptions",
-          symbols: ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"]
-        },
-        {
-          type: "enum",
-          name: "canHelpWithOptions",
-          symbols: ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"],
-        },
-        {
-          type: "enum",
-          name: "expertiseOptions",
-          symbols: ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
-        },
-        {
-          type: "record",
-          name: "profile",
-          fields: [
-            { name: "socials", type: { type: "map", values: ["farcasterProfile"] } },
-            { name: "files", type: { type: "array", items: "string" } },
-            { name: "lookingFor", type: { type: "array", items: "lookingForOptions" } },
-            { name: "canHelpWith", type: { type: "array", items: "canHelpWithOptions" } },
-            { name: "expertise", type: { type: "array", items: "expertiseOptions" } }
-          ]
+      profileSchema: {
+        "type": "object",
+        "required": ["name", "handle", "fields"],
+        "properties": {
+          "name": { "type": "string"},
+          "handle": { "type": "string"},
+          "bio": {"type": "string"},
+          "school": {"type": "string"},
+          "fields": {
+            "type": "object",
+            "properties": {
+              "lookingFor": {
+                "title": "Looking For",
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"]
+                }
+              },
+              "interestedIn": {
+                "title": "Interested In",
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"]
+                }
+              },
+              "expertise": {
+                "title": "Expertise",
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"]
+                }
+              }
+            }
+          },
+          "socials": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "$id": "farcaster",
+                  "properties": {
+                    "prodid": { "type": "string" },
+                    "name": { "type": "string" },
+                    "handle": { "type": "string" },
+                    "bio": { "type": "string" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "$id": "LinkedIn",
+                  "properties": {
+                    "prodid": { "type": "string" },
+                    "school": { "type": "string" } 
+                  }
+                }
+              ]
+            }
+          },
+          "version": { "type": "number" }
         }
-      ]
+      }
     };
   }
+
+  /*
+  -- uid-profile.json (content)
+  {
+    "name": socials.farcaster.name
+    "handle": socials.farcaster.handle
+    "bio": socials.farcaster.bio
+    "school": socials.linkedin.school
+    "form": {
+      "lookingFor": []
+      "interestedIn": []
+      "expertise": []
+    }
+    "socials": [
+      {
+        "$id": "farcaster"
+        "name": ""
+        "handle": ""
+        "bio": ""
+      },
+      {
+        "$id": "linkedIn"
+        "school": ""
+      }
+    ]
+    "version": int
+  }
+*/
 
   async upsert(data: any): Promise<void> {
     await this.agent.updatePrivateFile(this.filename, () => data);
