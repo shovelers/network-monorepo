@@ -1,4 +1,5 @@
 import * as uint8arrays from 'uint8arrays';
+import { SharedProfileRepository } from './shared_profile';
 
 export class ProfileRepository {
   constructor(agent) {
@@ -24,6 +25,28 @@ export class ProfileRepository {
       content = {...profile, ...params}
       return content
     })
+  }
+
+  async createCommunityProfile(communityDID, profileSchema, inputs) {
+    let profile = await this.get()
+    let sharedProfile = new SharedProfileRepository(this.agent, profileSchema, communityDID)
+
+    const sampleProfile = {
+      "inputs": inputs,
+      "socials": [
+        {
+          "prodid": "farcaster",
+          "displayName": profile.name,
+          "username": profile.handle,
+          "bio": profile.text,
+          "pfpUrl": profile.pfpUrl
+        },
+      ],
+      "version": 1
+    }
+
+    console.log("Profile after save :", profile, sampleProfile)
+    await sharedProfile.set(sampleProfile)
   }
 
   async contactForHandshake() {

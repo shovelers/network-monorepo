@@ -11,7 +11,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">      
-      import { getProfile, account ,v1UpdateProfile } from '/odd.js';
+      import { getProfile, account ,createCommunityProfile } from '/odd.js';
       var communityDID = '<%- communityDID %>'
       var communityName = '<%- communityName %>'
       
@@ -57,11 +57,11 @@
         for (const key in JSON.parse(options)) {
           param[key] = Array.from(document.querySelectorAll(`#color-changing-badge[question=${key}][data-is-clicked="true"]`)).map( e => e.innerHTML)
         }
-        await v1UpdateProfile(param)
+        let communityFile = JSON.parse('<%- communityFile %>')
+        await createCommunityProfile(param, communityDID, communityFile.profileSchema)
         
         let profile = await getProfile()
         console.log("Profile after save :", profile)
-
         window.location.href = `/directory/${communityDID}?name=${communityName}`;
       }
 

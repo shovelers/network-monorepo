@@ -126,6 +126,11 @@ async function v1UpdateProfile(params) {
   return await accountv1.repositories.profile.set(params)
 }
 
+async function createCommunityProfile(params, communityDID, profileSchema) {
+  await accountv1.repositories.profile.createCommunityProfile(communityDID, profileSchema, params)
+  return await accountv1.repositories.profile.set(params)
+}
+
 async function addContact(name, email='', tags = [], text = "", links = []) {
   
   let person = new Person({FN: name, EMAIL: convertEmailStringToEmailArray(email), CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()})
@@ -318,6 +323,7 @@ export {
   verifySiweMessage,
   ethereumSignup,
   v1UpdateProfile,
+  createCommunityProfile,
   getMembers,
   getCommunityMembers,
   filterMembers,

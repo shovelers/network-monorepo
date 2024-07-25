@@ -21,17 +21,8 @@ export class CommunityRepository {
       FN: "Creole",
       profileSchema: {
         "type": "object",
-        "required": ["inferred", "inputs", "version", "socials"],
+        "required": ["inputs", "version", "socials"],
         "properties": {
-          "inferred": {
-            "type": "object",
-            "properties": {
-              "name": { "type": "string"},
-              "handle": { "type": "string"},
-              "bio": {"type": "string"},
-              "school": {"type": "string"},
-            }
-          },
           "inputs": {
             "type": "object",
             "properties": {
@@ -74,9 +65,11 @@ export class CommunityRepository {
                   "$id": "farcaster",
                   "properties": {
                     "prodid": { "type": "string" },
-                    "name": { "type": "string" },
-                    "handle": { "type": "string" },
-                    "bio": { "type": "string" }
+                    "fid": { "type": "string" },
+                    "displayName": { "type": "string" },
+                    "username": { "type": "string" },
+                    "bio": { "type": "string" },
+                    "pfpUrl": { "type": "string" }
                   }
                 },
                 {

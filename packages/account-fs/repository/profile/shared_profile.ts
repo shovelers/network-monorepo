@@ -8,7 +8,7 @@ interface Profile {
   [key: string]: any; // Allow for additional properties
 }
 
-export class ProfileV2Repository {
+export class SharedProfileRepository {
   private agent: any;
   private filename: string;
   private schema: JSONSchemaType<Profile>;

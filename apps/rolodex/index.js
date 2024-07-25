@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDAVClient } from 'tsdav';
-import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository, ProfileV2Repository} from 'account-fs/app.js';
+import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository } from 'account-fs/app.js';
 import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
@@ -148,31 +148,6 @@ function extractInputMap(schema) {
 const communityRepo = new CommunityRepository()
 const joinFormOptionsV1 = joinFormOptionsForCommunity(communityRepo)
 
-const profilev2 = new ProfileV2Repository(agent, communityRepo.sample().profileSchema, brokerDID)
-const sampleProfile = {
-  "inferred": {
-    "name": "John Doe",
-    "handle": "test",
-    "bio": "chilling",
-    "school": "School"
-  },
-  "inputs": {
-    "lookingFor": ["Gigs"],
-    "interestedIn": ["Development"],
-    "expertise": ["Frames"]
-  },
-  "socials": [
-    {
-      "prodid": "farcaster",
-      "name": "John Doe",
-      "handle": "test",
-      "bio": "chilling"
-    },
-  ],
-  "version": 1
-}
-profilev2.set(sampleProfile)
-
 server.use(express.urlencoded({ extended: true }))
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
@@ -197,7 +172,7 @@ server.get("/community/:accountDID/join", (req, res) => {
 
 // Community join form: community/{accountDID}/form?name=decentralised.co
 server.get("/community/:accountDID/form", (req, res) => {
-  res.render('pages/join_form', { communityDID: req.params.accountDID, communityName: req.query.name, options: joinFormOptionsV1 })
+  res.render('pages/join_form', { communityDID: req.params.accountDID, communityName: req.query.name, options: joinFormOptionsV1, communityFile: JSON.stringify(communityRepo.sample()) })
 });
 
 server.get("/directory/:accountDID", (req, res) => {
