@@ -52,6 +52,9 @@
 
       // add selected tags to profile on save
       window.addSelectedTagsToProfile = async function(){
+        document.querySelector("#form-submit-btn").classList.add("hidden");
+        document.querySelector(".loading").classList.remove("hidden");
+
         var options = '<%- JSON.stringify(options) %>'
         var param = {}
         for (const key in JSON.parse(options)) {
@@ -63,7 +66,7 @@
         let profile = await getProfile()
         console.log("Profile after save :", profile)
         await account.requestHandshake(communityDID)
-        
+
         window.location.href = `/directory/${communityDID}?name=${communityName}`;
       }
 
@@ -96,12 +99,12 @@
           
           <%/* submit button */%>
           <div class="flex justify-center">
-            <button class="btn" onclick="addSelectedTagsToProfile()"> Submit </button>
+            <div class="hidden loading loading-infinity loading-lg"></div>
+            <button id="form-submit-btn" class="btn" onclick="addSelectedTagsToProfile()"> Submit </button>
           </div>
+
         </div>  
       </div>
-      
-      <div class="loading loading-infinity loading-lg hidden"></div>
       
       <%- include('../partials/shovel.ejs') %>
     </div>
