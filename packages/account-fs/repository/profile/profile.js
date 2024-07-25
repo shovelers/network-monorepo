@@ -14,7 +14,15 @@ export class ProfileRepository {
     }
   }
 
-  async get(){
+  async get(communityDID = null){
+    if (communityDID) {
+      let sharedProfile = new SharedProfileRepository(this.agent, communityDID)
+      let exists = await sharedProfile.isInitialised()
+      if (exists) {
+        return await sharedProfile.get()
+      }
+    }
+
     return await this.agent.readPrivateFile(this.filename)
   }
 

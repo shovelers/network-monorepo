@@ -98,8 +98,8 @@ async function filterMembers(filter, profiles, communityUID) {
   return await account.search({query: filter, personUID: communityUID})
 }
 
-async function getProfile() {
-  return account.getProfile()
+async function getProfile(communityDID = null) {
+  return account.getProfile(communityDID)
 }
 
 async function getContacts() {

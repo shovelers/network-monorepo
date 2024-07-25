@@ -117,8 +117,8 @@ export class AccountV1 {
     return await this.ps.search(params)
   }
 
-  async getProfile(){
-    return await this.repositories.profile.get()
+  async getProfile(communityDID = null){
+    return await this.repositories.profile.get(communityDID)
   }
 
   async editProfile(params){
