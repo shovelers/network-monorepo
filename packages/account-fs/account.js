@@ -45,7 +45,7 @@ export class AccountV1 {
   // recovery - not needed for facaster login
 
   async requestHandshake(accountDID, brokerDID = null) {
-    let person = await this.repositories.profile.contactForHandshake()
+    let person = await this.repositories.profile.contactForHandshake(accountDID)
     console.log("person with XML :", person)
 
     let requester
@@ -61,13 +61,26 @@ export class AccountV1 {
     
     requester.challenge = function () { return { person: person } }
 
+    let shouldWeWait = true
     requester.notification.addEventListener("CONFIRMED", async (event) => {
       let person = event.detail.data.person
       let result = await this.repositories.people.create(new Person(person))
       console.log("community added to contacts :", result)
+      shouldWeWait = false
     })
 
     await requester.initiate()
+
+    await new Promise((resolve) => {
+      const checkFlag = () => {
+        if (!shouldWeWait) {
+          resolve();
+        } else {
+          setTimeout(checkFlag, 100); // Check every 100ms
+        }
+      };
+      checkFlag();
+    });
   }
 
   async handshakeApprover(brokerDID) {

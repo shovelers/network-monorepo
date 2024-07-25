@@ -62,10 +62,11 @@
         
         let profile = await getProfile()
         console.log("Profile after save :", profile)
+        await account.requestHandshake(communityDID)
+        
         window.location.href = `/directory/${communityDID}?name=${communityName}`;
       }
 
-      await account.requestHandshake(communityDID)
     </script>
 
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
