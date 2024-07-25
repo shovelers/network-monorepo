@@ -122,8 +122,8 @@ async function updateProfile(handle, name, tags = [], text = '') {
 }
 
 //updates given params with new values while keeping rest of the keys in Profile Object the same
-async function v1UpdateProfile(params) {
-  return await accountv1.repositories.profile.set(params)
+async function updateCommunityProfile(inputs, communityDID, profileSchema) {
+  return await accountv1.repositories.profile.updateCommunityProfile(communityDID, profileSchema, inputs)
 }
 
 async function createCommunityProfile(params, communityDID, profileSchema) {
@@ -322,7 +322,7 @@ export {
   getNonce,
   verifySiweMessage,
   ethereumSignup,
-  v1UpdateProfile,
+  updateCommunityProfile,
   createCommunityProfile,
   getMembers,
   getCommunityMembers,

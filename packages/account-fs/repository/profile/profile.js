@@ -35,6 +35,16 @@ export class ProfileRepository {
     })
   }
 
+  async updateCommunityProfile(communityDID, profileSchema, inputs) {
+    let sharedProfile = new SharedProfileRepository(this.agent, communityDID)
+    let exists = await sharedProfile.isInitialised()
+    if (exists) {
+      return await this.createCommunityProfile(communityDID, profileSchema, inputs)
+    } else {
+      this.set(inputs)
+    }
+  }
+
   async createCommunityProfile(communityDID, profileSchema, inputs) {
     let profile = await this.get()
     let sharedProfile = new SharedProfileRepository(this.agent, communityDID)

@@ -2,10 +2,11 @@
   if (window.__TAURI__) {
     document.getElementById("google-import").style.display = "none"
   }
-  import { getProfile, v1UpdateProfile } from '/odd.js';
-  window.v1UpdateProfile = v1UpdateProfile
+  import { getProfile, updateCommunityProfile } from '/odd.js';
+  window.updateCommunityProfile = updateCommunityProfile
   const options = JSON.parse('<%- JSON.stringify(optionsV1) %>')
   const communityDID = '<%- communityDID %>'
+  const communityFile = JSON.parse('<%- communityFile %>')
 
   const badges = [...document.querySelectorAll('#edit-badge')]
   badges.forEach((badge) => {
@@ -86,7 +87,7 @@
     for (const key in options) {
       params[key] = Array.from(document.querySelectorAll(`#edit-badge[question=${key}][data-is-clicked="true"]`)).map( e => e.innerHTML)
     }
-    await v1UpdateProfile(params)
+    await updateCommunityProfile(params, communityDID, communityFile.profileSchema)
   }
 </script>
 
