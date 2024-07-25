@@ -59,13 +59,20 @@ export class AccountV1 {
       requester = await this.agent.actAsJoinRequester(address, accountDID)
     }
     
-    requester.challenge = function () { return { person: person } }
+    const head = await this.agent.head()
+    requester.challenge = function () { return { person: person, head: head } }
 
+    let handshakeSuccess = false
     let shouldWeWait = true
     requester.notification.addEventListener("CONFIRMED", async (event) => {
       let person = event.detail.data.person
       let result = await this.repositories.people.create(new Person(person))
       console.log("community added to contacts :", result)
+      shouldWeWait = false
+      handshakeSuccess = true
+    })
+
+    requester.notification.addEventListener("REJECTED", async (event) => {
       shouldWeWait = false
     })
 
@@ -81,6 +88,8 @@ export class AccountV1 {
       };
       checkFlag();
     });
+
+    return handshakeSuccess
   }
 
   async handshakeApprover(brokerDID) {

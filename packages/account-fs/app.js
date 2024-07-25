@@ -4,6 +4,7 @@ import { CommunityRepository } from './repository/members/community.ts';
 import { createNode, APP } from './agent/helia_node.js';
 import { MemoryBlockstore } from 'blockstore-core'
 import { MemoryDatastore } from 'datastore-core'
+import { Person } from "./repository/people/person.ts";
 //import { prometheusMetrics } from '@libp2p/prometheus-metrics'
 
 async function createAppNode() {
@@ -21,4 +22,4 @@ const connection = {
   "TESTNET": {network: "TESTNET", sync_host: "https://testnet.shovel.company:8001", dial_prefix: "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/"}
 }
 
-export { Agent, Runtime, connection, createAppNode, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository }
+export { Agent, Runtime, connection, createAppNode, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository, Person }

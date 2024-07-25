@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDAVClient } from 'tsdav';
-import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository } from 'account-fs/app.js';
+import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository, Person } from 'account-fs/app.js';
 import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
@@ -104,11 +104,16 @@ if (RUN_COMMUNITY_AGENT == true) {
         console.log("channel from event :", challengeEvent.detail.channelName)
         console.log("channel from agent :", agent.approver.channel.name)
         if (challengeEvent.detail.channelName == agent.approver.channel.name){
-          console.log("I am inside")
           var memberRepo = new MembersRepository(agent)
-          await memberRepo.add(challengeEvent.detail.message.challenge.person)
-          // TODO Implementing auto-confim - check challenge to implement reject
-          await challengeEvent.detail.confirm({person: contact})
+          let person = new Person(challengeEvent.detail.message.challenge.person)
+          let valid = await person.validateProfileForCommunity(agent, communityRepo.sample().profileSchema, challengeEvent.detail.message.challenge.head)
+          console.log("sending a valid profile? ", valid, challengeEvent.detail.message.challenge.person)
+          if (valid) {
+            await memberRepo.add(challengeEvent.detail.message.challenge.person)
+            await challengeEvent.detail.confirm({person: contact}) 
+          } else {
+            await challengeEvent.detail.reject()  
+          }
         } else {
           throw `Member Add on Join Handshake failed for ${agent.accountDID()}`
         }

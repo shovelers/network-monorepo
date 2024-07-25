@@ -1,3 +1,5 @@
+import Ajv, { JSONSchemaType } from 'ajv';
+
 const PRODIDs = {
   "APPLE": "APPLE",
   "GOOGLE": "GOOGLE",
@@ -66,14 +68,36 @@ export class Person {
   sharedFiles(){
     if (this.XML) {
       return Object.fromEntries(this.XML.split('|').map(pair => {
-        const [key, value] = pair.split(':');
-        return [key, value.split('.').pop() || ''];
+        const lastColonIndex = pair.lastIndexOf(':');
+        if (lastColonIndex === -1) {
+          // If there's no colon, return the whole pair as key with empty value
+          return [pair, ''];
+        }
+        const filename = pair.slice(0, lastColonIndex);
+        const value = pair.slice(lastColonIndex + 1).split('.').pop();
+        return [filename, value]
       }))
     } else { return {} }
   }
 
   isCommunity(): boolean{
     return this.sharedFiles().hasOwnProperty('members.json')
+  }
+
+  async validateProfileForCommunity(agent: any, schema: JSONSchemaType<any>, head: string): Promise<boolean>{
+    const validator = new Ajv();
+    const validate = validator.compile(schema);
+
+    const communityDID = await agent.accountDID()
+
+    if (this.sharedFiles().hasOwnProperty(`${communityDID}.json`)) {
+      const profile = await agent.readPrivateFileByPointer(head, this.sharedFiles()[`${communityDID}.json`], 'base64url')
+      const valid = validate(profile)
+      if (!valid) { console.log(validate.errors) }
+      return valid
+    }
+
+    return false
   }
 
   async getMembers(agent){

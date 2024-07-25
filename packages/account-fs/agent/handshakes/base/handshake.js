@@ -67,8 +67,9 @@ export class Handshake {
   }
 
   async reject(message) {
-    const id = JSON.parse(message).id
-    const rejectMessage = await Envelope.pack({ status: "REJECTED" }, this.sessionKey, id)
+    console.log("message in approve#reject")
+    const { id, type } = JSON.parse(message)
+    const rejectMessage = await Envelope.pack({ status: "REJECTED" }, this.sessionKey, id, type)
     
     await this.channel.publish(rejectMessage)
     this.notification.emitEvent("complete", "REJECTED")

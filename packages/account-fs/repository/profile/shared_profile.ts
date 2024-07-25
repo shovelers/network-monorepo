@@ -1,4 +1,3 @@
-import * as uint8arrays from 'uint8arrays';
 import Ajv, { JSONSchemaType } from 'ajv';
 
 // Define an interface for the profile
@@ -22,7 +21,7 @@ export class SharedProfileRepository {
   async isInitialised() {
     return await this.agent.fileExists(this.filename) 
   }
-  
+
   async initialise(): Promise<void> {}
 
   async get(): Promise<Profile> {

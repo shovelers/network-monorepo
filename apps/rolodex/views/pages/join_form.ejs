@@ -65,9 +65,13 @@
         
         let profile = await getProfile()
         console.log("Profile after save :", profile)
-        await account.requestHandshake(communityDID)
+        const success = await account.requestHandshake(communityDID)
 
-        window.location.href = `/directory/${communityDID}?name=${communityName}`;
+        if (success) {
+          window.location.href = `/directory/${communityDID}?name=${communityName}`;
+        } else {
+          alert("Handshake Rejected, refresh and try again")
+        }
       }
 
     </script>

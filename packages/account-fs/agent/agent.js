@@ -221,9 +221,7 @@ export const StorageCapability = {
     let content = {}
 
     await this.axios_client.get(`/v1/accounts/${accountDID}/head`).then(async (response) => {
-      const forestCID = CID.parse(response.data.head).bytes
-      content = await this.readPrivateFileByPointer(accessKey, forestCID, akEncoding)
-      content = JSON.parse(content);
+      content = await this.readPrivateFileByPointer(response.data.head, accessKey, akEncoding)
     }).catch((e) => {
       console.log(e);
       return e
@@ -231,17 +229,14 @@ export const StorageCapability = {
     return content
   },
 
-  async readPrivateFileByPointer(accessKey, forestCID, akEncoding='base64'){
-    //fetches the CID from the network if not available locally
-      //Primarily used for fetching data shared by other users to the client
-      
+  async readPrivateFileByPointer(forestCIDString, accessKey, akEncoding='base64'){
     var startTime = performance.now()
-    
+    const forestCID = CID.parse(forestCIDString).bytes
     let privateFile = new PrivateFile(this.helia)
     let content = await privateFile.read(uint8arrays.fromString(accessKey, akEncoding), forestCID)      
     var endTime = performance.now()  
     console.log(`Call to readPrivateFileByPointer took ${endTime - startTime} milliseconds`)
-    return content
+    return JSON.parse(content);
   },
 
   async getAccessKeyForPrivateFile(filename) {
@@ -280,6 +275,10 @@ export const StorageCapability = {
 
   async forestCID() {
     return await this.runtime.getItem(SHOVEL_FS_FOREST_CID)
+  },
+
+  async head() {
+    return CID.decode(await this.forestCID()).toString()
   },
 
   async syncStatus(){
