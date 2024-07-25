@@ -21,6 +21,7 @@
     "@libp2p/webrtc": "^4.0.16",
     "@libp2p/websockets": "^8.0.5",
     "@multiformats/multiaddr": "^12.1.11",
+    "ajv": "^8.17.1",
     "axios": "^1.5.1",
     "blockstore-core": "^4.3.7",
     "blockstore-fs": "^1.1.8",
@@ -48,7 +49,6 @@
     "sinon": "^17.0.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.16.2",
-    "typescript": "^5.4.3",
-    "ajv": "^8.17.1"
+    "typescript": "^5.4.3"
   }
 }
