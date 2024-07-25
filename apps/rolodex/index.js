@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDAVClient } from 'tsdav';
-import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository } from 'account-fs/app.js';
+import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository, ProfileV2Repository} from 'account-fs/app.js';
 import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
@@ -143,8 +143,35 @@ function extractInputMap(schema) {
 
   return inputsMap;
 }
+
 ///
-const joinFormOptionsV1 = joinFormOptionsForCommunity(new CommunityRepository())
+const communityRepo = new CommunityRepository()
+const joinFormOptionsV1 = joinFormOptionsForCommunity(communityRepo)
+
+const profilev2 = new ProfileV2Repository(agent, communityRepo.sample().profileSchema, brokerDID)
+const sampleProfile = {
+  "inferred": {
+    "name": "John Doe",
+    "handle": "test",
+    "bio": "chilling",
+    "school": "School"
+  },
+  "inputs": {
+    "lookingFor": ["Gigs"],
+    "interestedIn": ["Development"],
+    "expertise": ["Frames"]
+  },
+  "socials": [
+    {
+      "prodid": "farcaster",
+      "name": "John Doe",
+      "handle": "test",
+      "bio": "chilling"
+    },
+  ],
+  "version": 1
+}
+profilev2.set(sampleProfile)
 
 server.use(express.urlencoded({ extended: true }))
 server.set('views', path.join(__dirname, 'views'));

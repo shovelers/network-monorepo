@@ -21,7 +21,7 @@ export class CommunityRepository {
       FN: "Creole",
       profileSchema: {
         "type": "object",
-        "required": ["inferred", "input", "version", "socials"],
+        "required": ["inferred", "inputs", "version", "socials"],
         "properties": {
           "inferred": {
             "type": "object",
@@ -41,7 +41,7 @@ export class CommunityRepository {
                 "uniqueItems": true,
                 "items": {
                   "type": "string",
-                  "enum": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"]
+                  "enum": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"]
                 }
               },
               "canHelpWith": {
@@ -59,7 +59,7 @@ export class CommunityRepository {
                 "uniqueItems": true,
                 "items": {
                   "type": "string",
-                  "enum": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"]
+                  "enum": ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
                 }
               }
             }
@@ -95,34 +95,6 @@ export class CommunityRepository {
       }
     };
   }
-
-  /*
-  -- uid-profile.json (content)
-  {
-    "name": socials.farcaster.name
-    "handle": socials.farcaster.handle
-    "bio": socials.farcaster.bio
-    "school": socials.linkedin.school
-    "form": {
-      "lookingFor": []
-      "interestedIn": []
-      "expertise": []
-    }
-    "socials": [
-      {
-        "$id": "farcaster"
-        "name": ""
-        "handle": ""
-        "bio": ""
-      },
-      {
-        "$id": "linkedIn"
-        "school": ""
-      }
-    ]
-    "version": int
-  }
-*/
 
   async upsert(data: any): Promise<void> {
     await this.agent.updatePrivateFile(this.filename, () => data);
