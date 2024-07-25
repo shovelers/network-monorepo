@@ -118,21 +118,33 @@ if (RUN_COMMUNITY_AGENT == true) {
     console.log(e)
   }
 }
-///
-const joinFormOptionsV1 = {
-  "lookingFor": {
-    "label": "Looking For",
-    "symbols": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros"]
-  },
-  "canHelpWith": {
-    "label": "Can Help With",
-    "symbols": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"]
-  },
-  "expertise": {
-    "label": "Expertise",
-    "symbols": ["Frames", "Full Stack", "Backend", "Frontend", "Design", "Data Analysis", "Smart Contracts", "Community", "Consumer Tech", "Social"]
-  }
+
+function joinFormOptionsForCommunity (communityRepo) {
+  const community = communityRepo.sample()
+  const schema = community.profileSchema
+  return extractInputMap(schema) 
 }
+
+function extractInputMap(schema) {
+  const inputsMap = {};
+
+  if (schema.properties && schema.properties.inputs && schema.properties.inputs.properties) {
+    const inputs = schema.properties.inputs.properties;
+
+    for (const [key, value] of Object.entries(inputs)) {
+      if (value.items && value.items.enum) {
+        inputsMap[key] = {
+          label: value.title || key,
+          symbols: value.items.enum
+        };
+      }
+    }
+  }
+
+  return inputsMap;
+}
+///
+const joinFormOptionsV1 = joinFormOptionsForCommunity(new CommunityRepository())
 
 server.use(express.urlencoded({ extended: true }))
 server.set('views', path.join(__dirname, 'views'));

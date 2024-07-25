@@ -21,13 +21,18 @@ export class CommunityRepository {
       FN: "Creole",
       profileSchema: {
         "type": "object",
-        "required": ["name", "handle", "fields"],
+        "required": ["inferred", "input", "version", "socials"],
         "properties": {
-          "name": { "type": "string"},
-          "handle": { "type": "string"},
-          "bio": {"type": "string"},
-          "school": {"type": "string"},
-          "fields": {
+          "inferred": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string"},
+              "handle": { "type": "string"},
+              "bio": {"type": "string"},
+              "school": {"type": "string"},
+            }
+          },
+          "inputs": {
             "type": "object",
             "properties": {
               "lookingFor": {
@@ -39,8 +44,8 @@ export class CommunityRepository {
                   "enum": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"]
                 }
               },
-              "interestedIn": {
-                "title": "Interested In",
+              "canHelpWith": {
+                "title": "Can Help With",
                 "type": "array",
                 "uniqueItems": true,
                 "items": {
