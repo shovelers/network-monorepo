@@ -46,25 +46,14 @@
   window.refreshProfile = function(){
     window.getProfile(communityDID).then((profile) => {
 
-      var result
-      if (profile.socials && profile.inputs) {
-        const farcaster = profile.socials.find((p) => p.prodid == "farcaster")
-        result = {
-          pfpUrl: farcaster.pfpUrl,
-          handle: farcaster.username,
-          name: farcaster.displayName,
-          text: farcaster.bio
-        }
-        for (const key in options) { result[key] = profile.inputs[key] } 
-      } else {
-        result = {
-          pfpUrl: profile.pfpUrl,
-          handle: profile.handle,
-          name: profile.name,
-          text: profile.text
-        }
-        for (const key in options) { result[key] = profile[key] } 
+      const farcaster = profile.socials.find((p) => p.prodid == "farcaster")
+      var result = {
+        pfpUrl: farcaster.pfpUrl,
+        handle: farcaster.username,
+        name: farcaster.displayName,
+        text: farcaster.bio
       }
+      for (const key in options) { result[key] = profile.inputs[key] } 
 
     document.querySelector(".avatar > div > img").src = result.pfpUrl
     document.getElementById("handle").innerHTML = result.handle
