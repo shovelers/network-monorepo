@@ -1,5 +1,5 @@
 export class ContactTable extends HTMLElement {
-  gridSize = 'grid-cols-9';
+  gridSize = 'grid-cols-6';
   constructor() {
     super();
    
@@ -11,7 +11,7 @@ export class ContactTable extends HTMLElement {
     const thead = table.createTHead();
     const headerRow = document.createElement('tr');
     headerRow.classList.add('grid', this.gridSize); 
-    const headers = ['Name (sort)', 'Email']; // Customize as needed
+    const headers = ['Name (sort)']; // Customize as needed
     headers.forEach((headerText) => {
       const th = document.createElement('th');
       th.classList.add('cursor-pointer','col-span-2') //add value for 'col-span-X'  based on corresponding row element size
@@ -63,17 +63,7 @@ export class ContactTable extends HTMLElement {
       nameCell.classList.add('justify-self-start', 'col-span-2', 'font-medium');
       nameCell.textContent = value.FN;
 
-      const emailCell = row.insertCell(1); 
-      emailCell.classList.add('col-span-3', 'font-medium')
-      if (value.EMAIL !== undefined && value.EMAIL.length > 0) {
-        let emails = Array.isArray(value.EMAIL) ? value.EMAIL : [value.EMAIL];  // Check if EMAIL is an array, if not, treat it as a single string in an array
-        for (let email of emails) {
-          emailCell.innerHTML += `<span class="badge badge-neutral">${email}</span>`;
-        }
-      } else {
-        emailCell.innerHTML = '';
-      }
-      let tagscell = row.insertCell(2);
+      let tagscell = row.insertCell(1);
       tagscell.classList.add('place-self-center', 'space-x-1', 'space-y-1', 'col-span-3');
       if (value.CATEGORIES !== undefined && value.CATEGORIES.length > 0) {
         let tags = value.CATEGORIES.split(',')
@@ -89,7 +79,7 @@ export class ContactTable extends HTMLElement {
       } else {
         tagscell.innerHTML = '';
       }
-      let editcell = row.insertCell(3);
+      let editcell = row.insertCell(2);
       editcell.classList.add('justify-self-end', 'col-span-1');
       if (value.XML && value.XML.split(':')[0] == 'via') {
         editcell.innerHTML = `<span class="badge badge-secondary">${value.XML}</span>`
