@@ -1,6 +1,10 @@
 {
   "did:pkh:eip155:8453:0x9209C02c5DaC471CB4aaE58dc4B8008662E27039": {
     "SHOVEL_ACCOUNT_HANDLE":"FBI",
+    "SHOVEL_AGENT_SIWE": {
+      "message":"localhost:4000 wants you to sign in with your Ethereum account:\n0x9209C02c5DaC471CB4aaE58dc4B8008662E27039\n\nSign in via ethereum\n\nURI: http://localhost:4000\nVersion: 1\nChain ID: 8453\nNonce: qxSyIBXQNwwRb4kDm\nIssued At: 2024-07-26T14:36:01.427Z\nRequest ID: did:key:z4MXj1wBzi9jUstyNbAPFCAxE39vdWtYopKkfSxQh8q67Dk57WtrDNnZqc9u8aFjvAXPNp4bJtfxrDDCnSFEv3Y23Cz79cm3eyzAGZZthVQzBJQtrzgKhTEE3kgtVjf4t7ZU5Miu1xghnVJMXp4Sno7VnhPYk7WWjrCUiDTDijv8FCjUaRkDYWwwH54ko9yEpxfN3UWW2RVQCTFNA9BrU3fCzGHtppCqFVST8HVqp33Uy92SdUS9m13owY6mWoQmTYD1Pu6o5mKLeDgqxiRC7u2LtqWqki1fcTX5RsbfDuZw1xL5TgHsDdCust1XWkwjKjfkdraTfnSR7rdNxmas1MPmnUjpp9f5RTKB9LAXJ7twx699MwLmn",
+      "signature":"0x0a381ddb45caef41c8b11c65e9a5692c5af2b21931a2037e49b330bcf7d8f06a55723afefa683df02e2d3efb79e3a9c49ae264a20dd1ae9776c18de0b79dfc581c"
+    },
     "SHOVEL_AGENT_WRITE_KEYPAIR":{
       "ext":true,
       "kty":"RSA",
@@ -18,6 +22,10 @@
   },
   "did:pkh:eip155:8453:0xa56C43263123D36804806A9249A062500c50058F": {
     "SHOVEL_ACCOUNT_HANDLE": "Haberdashery",
+    "SHOVEL_AGENT_SIWE": {
+      "message":"localhost:4000 wants you to sign in with your Ethereum account:\n0xa56C43263123D36804806A9249A062500c50058F\n\nSign in via ethereum\n\nURI: http://localhost:4000\nVersion: 1\nChain ID: 8453\nNonce: cpiX7pOgjRjstqI3g\nIssued At: 2024-07-26T14:46:06.315Z\nRequest ID: did:key:z4MXj1wBzi9jUstyPFvTEBqnc44pTjLbiKn1Ai86uuJpXcbJy95toEHoM6xMJm1KuPHwjjzgwHMpVSRebYVmTFHAhm1be9TZumLMCazU6b7V22Z56nYpL2sQeH3LbSr1MgtoTqmw3m65FPzoVfVRGLxQEQWbafT7vSxa8JvcS58ce9DbWpwZrTsoo96iWw4DRzGx2qaSGruB9MF26Az3hSEjdeAVoKdX3nET7z6kMMfQurwQe8F6sdnZ8RQhE4yKda3bkz9pRe1vaEDpQBJjc92rDUAQgwLiydZQcoo8fAcaS27RdFDKACXn2TgT32yNAoDWLU993eUzNjYNohzF7CkWwkr1S4rStG5WU7iQndnDfKTjApcG8",
+      "signature":"0x0ed69e427808ec5cf1dc073afe495ce930fff18dff3485a759989381b25a8a506a8adba8cfe5900a42c28da549250e76c0dde057d3a73937408363a9d74759271b"
+    },
     "SHOVEL_AGENT_WRITE_KEYPAIR":{
       "ext":true,
       "kty":"RSA",
@@ -35,6 +43,10 @@
   },
   "did:pkh:eip155:8453:0x4b59De6dc42e2F7f7978D6489dCfF922535c162F": {
     "SHOVEL_ACCOUNT_HANDLE": "Creole",
+    "SHOVEL_AGENT_SIWE": {
+      "message":"localhost:4000 wants you to sign in with your Ethereum account:\n0x4b59De6dc42e2F7f7978D6489dCfF922535c162F\n\nSign in via ethereum\n\nURI: http://localhost:4000\nVersion: 1\nChain ID: 8453\nNonce: Zw1eDj30TgmwYeXhn\nIssued At: 2024-07-26T14:52:05.171Z\nRequest ID: did:key:z4MXj1wBzi9jUstyQHBuuTdaZKw33XPSf534ThWn3dTQQ6sk98totJYysrmnVtuNVPnB8wqR77vwi6tHP4xeANEXq3132BEBUfgwJA26GDfDBJvYZoFiyWDNAtPjGw9N1jM7yAJsCXAeKVtpvbaF2184zvdFPXmNJmwEGa8jCEvLDBpXo9hy85G4PfNWv7xKr53oxsL9PLqnpM4hYWSxQjrz2bdXHHm1vLYAp3yLChVDeR9kSpArm1yxTiGGQTJ8K9uxZoSWnDtLpHJyCAU7pZShBpXnPHUq2hjnzawKWyaq4Kk55iybDVkw47urzPqacjP7Zda6xdv4YF1dE8i1pbrymETrKH5bjzYZkvn5WiSPC2jAcgWXz",
+      "signature":"0x3b7477889e1eb29c27e0eaa89b121e94056bcb22efd68906a365f09706c183e0117d785a27e5da828465a4b8f2881bbe75dc2c214e6b50e422eb72a97e7208ad1b"
+    },
     "SHOVEL_AGENT_WRITE_KEYPAIR":{
       "ext": true,
       "kty": "RSA",
@@ -49,5 +61,26 @@
       "alg": "RS256"
     },
     "SHOVEL_ACCOUNT_DID": "did:pkh:eip155:8453:0x4b59De6dc42e2F7f7978D6489dCfF922535c162F"
+  },
+  "did:pkh:eip155:8453:0xf5a4c46FE6Cd432bb41C10827C31D32c7Ef30aC4": {
+    "SHOVEL_ACCOUNT_HANDLE": "TokyoDAO",
+    "SHOVEL_AGENT_SIWE": {
+      "message":"localhost:4000 wants you to sign in with your Ethereum account:\n0xf5a4c46FE6Cd432bb41C10827C31D32c7Ef30aC4\n\nSign in via ethereum\n\nURI: http://localhost:4000\nVersion: 1\nChain ID: 8453\nNonce: SMCgpJCI3UB9mkYZX\nIssued At: 2024-07-26T14:55:07.473Z\nRequest ID: did:key:z4MXj1wBzi9jUstyPYeHLcZ4pYDxomoTFwW4u6kb8861jDNkZGRHq6uHvsnFK3mpwJ5UtpfxYQSiMG3iecJ6RbRH93RhG1fJweq7hCRx5Wo9FdYkTA4HHwiW8hJGmZJJS3uaz21ZfL7PdE52JD1Nuj5hnjzXFEBZ7EUFocgqVWrquUuBVXSbsSpj6y3664K3cTsKSMft6mtKpvKrcGH2p7vSZ5wksUsMocBswfH3YN58VrThDCoLrvfWdHs8hkkmMbEn7Rb48UcpxKTDBBToGeytHxiQzxxmMQhbtKwxVakmY6yg3nY2F9CSSNj8WFdnQqfNTWfwFdsPN2SotqhyCYiWjPVfqvYrwZdN4cJ6LcBe7M1Q6Anet",
+      "signature":"0x6adddc4cd99ec1e6e85bdefb98aa593b5cc91cb46a032e1ac52998eeaff1c62c3f0c17211ff2feaa9e00f7aae6192bf5f2f64fbb01e0d394ad7351d0dd7f53fa1b"
+    },
+    "SHOVEL_AGENT_WRITE_KEYPAIR":{
+      "ext":true,
+      "kty":"RSA",
+      "n":"uhvh_Qg3hV4eX1Cl-PMahtozjg-ADd-DJvC5rH-G4q-iObuRxoJpX-70qAJLrGl0c7w-r1pDlo47knpHF-9FkpRIT-0W0ibToyWuReYBR7EMbIGYAl9YqUlC6PzOM0o7hxhvAvKV7PO25zABxWJ0-vZgRp8S_HMr54HvZGL362dmFqMVWexudKmdMm3EzIynBpZfte3bhpyz-AkQ3nuBI8M4Egveg90D_U3PLuFKq-sXtZAksAdDdZW2zy7g3p0o_Jj4TQTJo9aOtu4ZeCmCwFoaGzLkm7foIuXwHWbvRg-93mb47y3nMBWnYB2vxTu2n5VP98qOIsbpK8ciXadeXw",
+      "e":"AQAB",
+      "d":"BD87-lOSkMggK_n-SIJOX1SMS02gI1uTSw_Al5-WuU2UTpa--OBHNm8CcA29W3T8nKlLEVuRE7p4h8XcWlt5P9v1E2FozwWRI0P4a-m0OVRgi8I84rD5bzVQySE4NS78ChxNE1dBZ0dRZMKKXSOmDDJM6ewaDtDCBJ7lkr8b33ZuoAPsrrUHyDYMvhTOYeNhHrY806G3f0KTyIjMwDobouFdJhLGYjbmmOsykAB0jbKIUM2D_5_rthMG3wMR-Jbynjxgt1R19tVvpKCEOFTikYUjtdV5bkX95u2P2bCr_4jHpKTdhJ6gAZ-EZCaIBSWOct_BVsohWkjLisGKupfjYQ",
+      "p":"4r59Cw6nXydDp_rBFCR31cpGjrvtwhFiPAh8MXWiYpIA3HNPnYEFnjzJmsYlJeWBUzSz9JOCwHgT022QOp2BFI5FNGpnZ7Zo8hijqjBmR7oh8sFYW_HzXfYfi8WGQ5EzkkxhiueZcXz6F2H3xRBGen1cUF0JvshS29OJc1Ngr9s",
+      "q":"0h8vz5GADM64aiA0toKAe_mztWvBygSoysimq8456cE2XulhVud2Qo8jrOaBsoTWvvzH4-o-juWu1xaUXOXjT0Oq5qBg1OzFIhXH5KyuHgHu1TYL9TFIu2RAP6ZgRIKrA09d14XX_Dzjmu2_aVrDxyEVqYGCoWhjYgT6ojxrZM0",
+      "dp":"2OlQKA7JsO6X-4-Xu9QzS7NpEkzX46rLphCb9pjJUrDH4Bzz0gJGxJz0ZHsfuIQ41sd5TAT9tXBpzv5mVpysimSb8cvExmOrO8a0czA_-Ggo59ls1PC-V2oHvaeljOfQRSmKut5aXUYo3cubwsqSEcXxVPPcScXL9n4EZO4jdbc",
+      "dq":"e7wzynbzQheFz7EReZyWDuu3oRFIuC9QOsI4LBowTnAiFXg3gxagtIdYSdwf6kGBuExhZdyuZDXrZOv-CEq0NhwyCsfM3fZkDDNpWEc77Z3TyCigmA4it39Mum6-Z_nOvQ9CwsUlsHsmyThSLLdvbNcVy5DhnS08wR8PfPQ5hc0",
+      "qi":"rQHcfLqTPQcQD__TbXo4Fd9BkIQzVAQZyTYEuD4wZs1S5mj6bEufaqfbcPhyhTdBPGLtxLyCTL5niQ48HrJbsty4Rt0fyldSIrBzvA_5-AuujtdIwSI1NzycNLDAeQhkeJSB8X5Or4L2vbF9RxV0D48K2iG5ycsgIsiMUIfezhw",
+      "alg":"RS256"
+    },
+    "SHOVEL_ACCOUNT_DID": "did:pkh:eip155:8453:0xf5a4c46FE6Cd432bb41C10827C31D32c7Ef30aC4"
   }
 }

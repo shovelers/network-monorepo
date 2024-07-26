@@ -2,11 +2,10 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDAVClient } from 'tsdav';
-import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository, Person } from 'account-fs/app.js';
+import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, AccountCapability, MembersRepository, CommunityRepository, Person } from 'account-fs/app.js';
 import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
-import axios from 'axios';
 import morgan from 'morgan';
 
 const port = process.argv[2] || 3000;
@@ -17,7 +16,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const NETWORK = process.env.VITE_NETWORK || "DEVNET"
-const COMMUNITY_AGENT_ACCESS_KEY = JSON.parse(process.env.VITE_COMMUNITY_AGENT_ACCESS_KEY) || ""
 const RUN_COMMUNITY_AGENT = process.env.VITE_RUN_COMMUNITY_AGENT || true
 
 // TODO mount filesystem
@@ -30,6 +28,8 @@ const runtimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'agent_r
 const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
 const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime, "rolodex")
 Object.assign(Agent.prototype, MessageCapability);
+
+await agent.bootstrap()
 
 await agent.actAsRelationshipBroker()
 
@@ -55,28 +55,23 @@ if (RUN_COMMUNITY_AGENT == true) {
       let communityName = config.SHOVEL_ACCOUNT_HANDLE
       let communityAccountDID = config.SHOVEL_ACCOUNT_DID
 
-      config.SHOVEL_FS_ACCESS_KEY = COMMUNITY_AGENT_ACCESS_KEY[communityAccountDID]
-      console.log("accesskey picked up from env var :", communityName)
-      
-      //add forestCID from hub to runtime config
-      const axios_client  = axios.create({
-        baseURL: connection[NETWORK].sync_host,
-      })  
-      await axios_client.get(`/v1/accounts/${config.SHOVEL_ACCOUNT_DID}/head`).then(async (response) => {
-        config.SHOVEL_FS_FOREST_CID = response.data.head
-      })
       // create runtime
       const communityRuntime = new Runtime(SERVER_RUNTIME, config)
       var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime, "rolodex")
+      communityAgent = Object.assign(communityAgent, AccountCapability);
       communityAgent = Object.assign(communityAgent, MessageCapability);
       communityAgent = Object.assign(communityAgent, StorageCapability);
       
-      //load fs
-      console.log("...bootstrapping agent for :", communityName)
-      await communityAgent.bootstrap()
-      console.log(`...loading filesystem for ${communityName}`)
-      await communityAgent.load();
-      console.log(`community Agent DID for ${communityName}:`, await communityAgent.DID())
+      const success = await communityAgent.register(communityAccountDID, config.SHOVEL_AGENT_SIWE.message, config.SHOVEL_AGENT_SIWE.signature)
+      console.log("agent status", success, communityRuntime)
+
+      if (success.status) {
+        await communityAgent.load()
+        console.log(`community Agent DID for ${communityName}:`, await communityAgent.DID())
+      } else {
+        console.log("Unable to load agent for community: ", communityName)
+        continue
+      }
 
       await communityAgent.setInbox(address)
       
@@ -98,6 +93,7 @@ if (RUN_COMMUNITY_AGENT == true) {
       } else {
         contact = await (new MembersRepository(agent)).contactForHandshake()
       }
+      const communityDID = await agent.accountDID()
 
       agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
         console.log("receieved from requester :", challengeEvent.detail)
@@ -106,7 +102,7 @@ if (RUN_COMMUNITY_AGENT == true) {
         if (challengeEvent.detail.channelName == agent.approver.channel.name){
           var memberRepo = new MembersRepository(agent)
           let person = new Person(challengeEvent.detail.message.challenge.person)
-          let valid = await person.validateProfileForCommunity(agent, communityRepo.sample().profileSchema, challengeEvent.detail.message.challenge.head)
+          let valid = await person.validateProfileForCommunity(agent, communityRepo.sample(communityDID).profileSchema, challengeEvent.detail.message.challenge.head)
           console.log("sending a valid profile? ", valid, challengeEvent.detail.message.challenge.person)
           if (valid) {
             await memberRepo.add(challengeEvent.detail.message.challenge.person)
@@ -122,12 +118,6 @@ if (RUN_COMMUNITY_AGENT == true) {
   } catch (e){
     console.log(e)
   }
-}
-
-function joinFormOptionsForCommunity (communityRepo) {
-  const community = communityRepo.sample()
-  const schema = community.profileSchema
-  return extractInputMap(schema) 
 }
 
 function extractInputMap(schema) {
@@ -149,9 +139,7 @@ function extractInputMap(schema) {
   return inputsMap;
 }
 
-///
 const communityRepo = new CommunityRepository()
-const joinFormOptionsV1 = joinFormOptionsForCommunity(communityRepo)
 
 server.use(express.urlencoded({ extended: true }))
 server.set('views', path.join(__dirname, 'views'));
@@ -177,11 +165,17 @@ server.get("/community/:accountDID/join", (req, res) => {
 
 // Community join form: community/{accountDID}/form?name=decentralised.co
 server.get("/community/:accountDID/form", (req, res) => {
-  res.render('pages/join_form', { communityDID: req.params.accountDID, communityName: req.query.name, options: joinFormOptionsV1, communityFile: JSON.stringify(communityRepo.sample()) })
+  const communityDID = req.params.accountDID
+  const communityFile = communityRepo.sample(communityDID)
+  const joinFormOptionsV1 = extractInputMap(communityFile.profileSchema)
+  res.render('pages/join_form', { communityDID: communityDID, communityName: req.query.name, options: joinFormOptionsV1, communityFile: JSON.stringify(communityFile) })
 });
 
 server.get("/directory/:accountDID", (req, res) => {
-  res.render('pages/directory', {communityDID: req.params.accountDID, communityName: req.query.name, optionsV1: joinFormOptionsV1, communityFile: JSON.stringify(communityRepo.sample()) })
+  const communityDID = req.params.accountDID
+  const communityFile = communityRepo.sample(communityDID)
+  const joinFormOptionsV1 = extractInputMap(communityFile.profileSchema)
+  res.render('pages/directory', {communityDID: communityDID, communityName: req.query.name, optionsV1: joinFormOptionsV1, communityFile: JSON.stringify(communityFile) })
 })
 
 server.get('/nonce',  (req, res) => {

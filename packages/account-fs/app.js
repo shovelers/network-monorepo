@@ -1,4 +1,4 @@
-import { Agent, Runtime, SERVER_RUNTIME, MessageCapability, StorageCapability} from './agent/agent.js'
+import { Agent, Runtime, SERVER_RUNTIME, MessageCapability, StorageCapability, AccountCapability } from './agent/agent.js'
 import { MembersRepository } from './repository/members/members.js';
 import { CommunityRepository } from './repository/members/community.ts';
 import { createNode, APP } from './agent/helia_node.js';
@@ -22,4 +22,4 @@ const connection = {
   "TESTNET": {network: "TESTNET", sync_host: "https://testnet.shovel.company:8001", dial_prefix: "/dns4/testnet.shovel.company/tcp/443/tls/ws/p2p/"}
 }
 
-export { Agent, Runtime, connection, createAppNode, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository, Person }
+export { Agent, Runtime, connection, createAppNode, SERVER_RUNTIME, MessageCapability, StorageCapability, AccountCapability, MembersRepository, CommunityRepository, Person }

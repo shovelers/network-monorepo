@@ -16,8 +16,8 @@ export class CommunityRepository {
   async initialise(): Promise<void> {}
 
   // VCard style fields with JSON schemas for Profile
-  sample(): any {
-    return {
+  sample(communityDID): any {
+    var communityFile: any = {
       FN: "Creole",
       profileSchema: {
         "type": "object",
@@ -87,6 +87,45 @@ export class CommunityRepository {
         }
       }
     };
+
+    if (communityDID == "did:pkh:eip155:8453:0xf5a4c46FE6Cd432bb41C10827C31D32c7Ef30aC4") {
+      communityFile.FN = "TokyoDAO"
+      communityFile.profileSchema.properties.inputs.properties = {
+        "location": {
+          "title": "Location",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Japan", "North America", "Europe", "South America", "Africa", "Australia",
+              "India", "China", "South Korea", "Hong Kong", "Taiwan", "Malaysia", "Indonesia",
+              "Thailand", "Singapore", "Philippines", "Other Asia", "Middle East"
+            ]
+          }
+        },
+        "expertise": {
+          "title": "Expertise",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["Design", "Community Building", "Strategy", "Tokenomics", "Engineering", "Fundraising", "Admin/Operations", "GTM"]
+          },
+        },
+        "lookingFor": {
+          "title": "Looking For",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["Events (Online)", "Events (Offline)", "Networking", "Product Building", "Partnerships", "Member recruitment", "Art and Design"]
+          }
+        }
+      }
+    }
+
+    return communityFile
   }
 
   async upsert(data: any): Promise<void> {
@@ -114,10 +153,3 @@ export class CommunityRepository {
     }
   }
 }
-
-// exchange file on handshake
-// user's profile based on community schema
-  // render user profile
-// render join form
-// render directory table
-// search matchers to use schema fields
