@@ -32,7 +32,7 @@ export class PeopleSearch {
     }
 
     async function searchRecursively(node, currentDepth) {
-      if (dis.fullTextMatch(node, queryString) || dis.memberMatch(node, queryString)) {
+      if (dis.fullTextMatch(node, queryString) || dis.profileMatch(node, queryString) || dis.memberMatch(node, queryString)) {
         matches.push(node);
       }
   
@@ -87,6 +87,29 @@ export class PeopleSearch {
       return true
     }
     
+    return false
+  }
+
+  profileMatch(profile, query) {
+    if (profile.socials && profile.socials.length > 0) {
+      const farcaster = profile.socials.find((p) => p.prodid == "farcaster")
+      if ((farcaster.username && farcaster.username.toLowerCase().includes(query)) ||
+          (farcaster.displayName && farcaster.displayName.toLowerCase().includes(query)) ||
+          (farcaster.bio && farcaster.bio.toLowerCase().includes(query))) {
+            return true
+          }
+    }
+
+    if (profile.inputs) {
+      let allTags = Object.values(profile.inputs).reduce(
+        (acc, curr) => { return Array.isArray(curr) ? [...acc, ...curr] : acc }, []
+      ).filter(t => t)
+      console.log("tags value", profile.inputs, allTags)
+      if ((allTags.filter(tag => tag.toLowerCase().includes(query))).length > 0 ) {
+        return true
+      }
+    }
+
     return false
   }
 }

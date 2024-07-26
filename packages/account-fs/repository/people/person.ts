@@ -1,4 +1,5 @@
 import Ajv, { JSONSchemaType } from 'ajv';
+import internal from 'stream';
 
 const PRODIDs = {
   "APPLE": "APPLE",
@@ -153,9 +154,37 @@ export class Person {
     if (Object.keys(this.cache.profile).length == 0) {
       console.log("unable to getProfile", this)
       this.cache.profile = undefined
+      return
     }
 
+    let farcaster = {
+      prodid: "farcaster", fid: "",
+      pfpUrl: this.cache.profile.pfpUrl,
+      username: this.cache.profile.handle,
+      displayName: this.cache.profile.name,
+      bio: this.cache.profile.text,
+    }
+    // this.cache.profile = new Profile({inputs: this.cache.profile, version: 1, socials: [farcaster]})
+
     return this.cache.profile
+  }
+}
+
+interface ProfileData {
+  inputs: object
+  version: number
+  socials: Array<object>
+}
+
+class Profile {
+  inputs: object
+  version: number
+  socials: Array<object>
+
+  constructor(fields: ProfileData) {
+    this.inputs = fields.inputs
+    this.version = fields.version
+    this.socials = fields.socials
   }
 }
 
