@@ -164,7 +164,7 @@ export class Person {
       displayName: this.cache.profile.name,
       bio: this.cache.profile.text,
     }
-    // this.cache.profile = new Profile({inputs: this.cache.profile, version: 1, socials: [farcaster]})
+    this.cache.profile = new Profile({inputs: this.cache.profile, version: 1, socials: [farcaster]})
 
     return this.cache.profile
   }
