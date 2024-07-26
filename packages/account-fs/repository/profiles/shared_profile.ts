@@ -1,11 +1,5 @@
 import Ajv, { JSONSchemaType } from 'ajv';
-
-// Define an interface for the profile
-interface Profile {
-  name?: string;
-  handle?: string;
-  [key: string]: any; // Allow for additional properties
-}
+import { Profile } from './profile';
 
 export class SharedProfileRepository {
   private agent: any;
@@ -25,7 +19,8 @@ export class SharedProfileRepository {
   async initialise(): Promise<void> {}
 
   async get(): Promise<Profile> {
-    return await this.agent.readPrivateFile(this.filename);
+    const data = await this.agent.readPrivateFile(this.filename);
+    return new Profile(data)
   }
 
   async set(profile: Partial<Profile>, schema: JSONSchemaType<Profile>): Promise<void> {

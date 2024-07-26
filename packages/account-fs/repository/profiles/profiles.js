@@ -1,5 +1,6 @@
 import * as uint8arrays from 'uint8arrays';
 import { SharedProfileRepository } from './shared_profile';
+import { Profile } from './profile';
 
 export class ProfileRepository {
   constructor(agent) {
@@ -20,6 +21,9 @@ export class ProfileRepository {
       let exists = await sharedProfile.isInitialised()
       if (exists) {
         return await sharedProfile.get()
+      } else {
+        const data = await this.agent.readPrivateFile(this.filename)
+        return Profile.createFromOldProfileJson(data)
       }
     }
 
@@ -41,7 +45,7 @@ export class ProfileRepository {
     if (exists) {
       return await this.createCommunityProfile(communityDID, profileSchema, inputs)
     } else {
-      this.set(inputs)
+      return await this.set(inputs)
     }
   }
 

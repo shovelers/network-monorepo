@@ -1,5 +1,5 @@
 import Ajv, { JSONSchemaType } from 'ajv';
-import internal from 'stream';
+import { Profile } from '../profiles/profile';
 
 const PRODIDs = {
   "APPLE": "APPLE",
@@ -157,34 +157,8 @@ export class Person {
       return
     }
 
-    let farcaster = {
-      prodid: "farcaster", fid: "",
-      pfpUrl: this.cache.profile.pfpUrl,
-      username: this.cache.profile.handle,
-      displayName: this.cache.profile.name,
-      bio: this.cache.profile.text,
-    }
-    this.cache.profile = new Profile({inputs: this.cache.profile, version: 1, socials: [farcaster]})
-
+    this.cache.profile = Profile.createFromOldProfileJson(this.cache.profile)
     return this.cache.profile
-  }
-}
-
-interface ProfileData {
-  inputs: object
-  version: number
-  socials: Array<object>
-}
-
-class Profile {
-  inputs: object
-  version: number
-  socials: Array<object>
-
-  constructor(fields: ProfileData) {
-    this.inputs = fields.inputs
-    this.version = fields.version
-    this.socials = fields.socials
   }
 }
 

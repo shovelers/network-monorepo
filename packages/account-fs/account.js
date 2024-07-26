@@ -1,7 +1,7 @@
 import { PeopleRepository } from "./repository/people/people.ts";
 import { PeopleSearch } from "./repository/people/search.js";
 import { Person } from "./repository/people/person.ts";
-import { ProfileRepository } from "./repository/profile/profile.js";
+import { ProfileRepository } from "./repository/profiles/profiles.js";
 import { MembersRepository } from "./repository/members/members.js";
 import { CommunityRepository } from "./repository/members/community.ts";
 
