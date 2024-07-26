@@ -171,6 +171,16 @@ server.put("/v1/accounts/:accountDID/names", async (req, res) => {
   res.status(201).json({})
 })
 
+
+server.get("/v1/accounts/:accountDID/names", async (req, res) => {
+  const names = await accounts.getNames(req.params.accountDID)
+  if (names) {
+    res.status(200).json({names: names})
+  } else {
+    res.status(404).json({})
+  }
+});
+
 // Custody
 server.put("/v1/accounts/:accountDID/custody", async (req, res) => {
   const verified = await verify(req.body.message, req.body.signature)
