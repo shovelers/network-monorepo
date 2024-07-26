@@ -123,13 +123,14 @@ export class Person {
   async fetchProfilesWithPool(people: Person[], agent: any, poolSize: number = 10): Promise<any[]> {
     const results: any[] = [];
     let index = 0;
+    const communityDID = this.accountDID()
 
     async function fetchProfile(person: Person): Promise<any> {
       if (index >= people.length) return null;
 
       const p = people[index++];
       const result = await Promise.race([
-        p.getProfile(agent),
+        p.getProfile(agent, communityDID),
         new Promise((resolve) => setTimeout(() => resolve(undefined), 10000))
       ]);
 
@@ -143,7 +144,20 @@ export class Person {
     return results;
   }
 
-  async getProfile(agent) {
+  async getProfile(agent, communityDID) {
+    if (this.sharedFiles().hasOwnProperty(`${communityDID}.json`) == true ) {
+      if (this.cache.profile) { return this.cache.profile }
+      this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()[`${communityDID}.json`], 'base64url')
+      if (Object.keys(this.cache.profile).length == 0) {
+        console.log("unable to getProfile - ", communityDID, this)
+        this.cache.profile = undefined
+        return
+      }
+
+      this.cache.profile = new Profile(this.cache.profile)
+      return this.cache.profile
+    }
+
     if (this.sharedFiles().hasOwnProperty('profile.json') != true ) {
       console.log("skip getProfile - no profile.json", this)
       return {}
