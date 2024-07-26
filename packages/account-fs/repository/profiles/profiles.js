@@ -71,21 +71,21 @@ export class ProfileRepository {
     console.log("Profile after save :", profile, communityProfile)
   }
 
-  async contactForHandshake(communityDID) {
+  async contactForHandshake(approverDID) {
     let accountDID = await this.agent.accountDID()
     let profile = await this.get()
-    let profileAccessKey = await this.agent.getAccessKeyForPrivateFile(this.filename)
-    let encodedProfileAccessKey = uint8arrays.toString(profileAccessKey.toBytes(), 'base64');
-    let xml = `profile.json:${profile.handle}.${encodedProfileAccessKey}`
+    let xml
 
-    if (communityDID) {
-      let sharedProfile = new SharedProfileRepository(this.agent, communityDID)
-      let exists = await sharedProfile.isInitialised()
-      if (exists) {
-        let accessKey = await this.agent.getAccessKeyForPrivateFile(sharedProfile.filename)
-        let encodedAccessKey = uint8arrays.toString(accessKey.toBytes(), 'base64url');    
-        xml = `${xml}|${sharedProfile.filename}:${encodedAccessKey}`
-      }
+    let sharedProfile = new SharedProfileRepository(this.agent, approverDID)
+    let exists = await sharedProfile.isInitialised()
+    if (exists) {
+      let accessKey = await this.agent.getAccessKeyForPrivateFile(sharedProfile.filename)
+      let encodedAccessKey = uint8arrays.toString(accessKey.toBytes(), 'base64url');    
+      xml = `${sharedProfile.filename}:${encodedAccessKey}`
+    } else {
+      let profileAccessKey = await this.agent.getAccessKeyForPrivateFile(this.filename)
+      let encodedProfileAccessKey = uint8arrays.toString(profileAccessKey.toBytes(), 'base64');
+      xml = `profile.json:${encodedProfileAccessKey}`
     }
   
     return {
