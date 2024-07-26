@@ -12,6 +12,7 @@ jobs:
   deploy_rolodex:
     name: Deploy Rolodex
     runs-on: ubuntu-latest
+    needs: deploy_hub 
     environment:
       name: prod-fly-io
       url: https://app-rolodex.shovel.company
