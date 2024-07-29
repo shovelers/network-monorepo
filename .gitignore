@@ -134,6 +134,9 @@ dist
 .yarn/install-state.gz
 .pnp.*
 apps/*/public/odd.js
-apps/*/public/assets/
+apps/*/public/assets/wasm_wnfs_bg-f3b54d92.wasm
 
 *.DS_Store
+apps/auto-follow/public/assets/ccip-d495e1b0.js
+apps/rolodex/public/assets/ccip-d495e1b0.js
+apps/auto-follow/public/assets/wnfs_wasm_bg-be5c5006.wasm
