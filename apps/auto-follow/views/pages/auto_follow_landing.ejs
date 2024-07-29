@@ -74,11 +74,24 @@
       let communityCount = 0;
       var listOfAccountsUserIsFollowing = [];
       var listOfCommunityMembersNotFollowed = [];
+      var numberOfAccountsFollowed;
     
       var signerUuid = '1cbf93b0-b0ae-407b-a018-070770be285b';
-      var userFID = await window.getFidFromAccountDID()     
+      var userFID = await window.getFidFromAccountDID()  
+      if(userFID === '') {
+        const modal = document.getElementById('error_modal');
+        const successMessage = document.querySelector('#error_modal h2');
+        successMessage.innerHTML = `Issue fetching the user's FID. Please contact the Creole team.`;
+        modal.showModal();
+      }
+      
       window.getListOfAccountsUserIsFollowing = async function() {
-       listOfAccountsUserIsFollowing = await getFollowingOfAParticularUser(userFID);
+        try {
+        listOfAccountsUserIsFollowing = await getFollowingOfAParticularUser(userFID);       
+        }
+        catch(e) {
+          console.log("Error is", e)
+        }
       }
      
 
@@ -89,8 +102,9 @@
           welcomeMessage.style.display = 'block';
         });
       }
-
+      if(userFID !== '') {
       refreshProfile();   
+      }
 
       window.followRandom = async function(unfollowedMembers) {
         const targetFids = shuffleArray([...unfollowedMembers]).slice(0, 3).map(member => {
@@ -98,10 +112,20 @@
             return member[0];
           }
         });      
-        const response = await followFarcasterUsersBasedOnFID(signerUuid,targetFids)
-        community_modal.close()
-       
-
+        try {
+          const response = await followFarcasterUsersBasedOnFID(signerUuid,targetFids)
+          community_modal.close()
+          numberOfAccountsFollowed = targetFids.length
+          const successMessage = document.querySelector('#success_modal h2');
+          successMessage.innerHTML = `Successfully followed ${numberOfAccountsFollowed} accounts.`;
+           const modal = document.getElementById('success_modal');
+          modal.showModal();
+        } 
+        catch {
+          community_modal.close()
+          const modal = document.getElementById('error_modal');
+          modal.showModal();
+        }
       }
 
       window.followAll = async function(allCommunityMembers) {
@@ -110,8 +134,20 @@
             return member[0];
           }
         });        
-        const response =  await followFarcasterUsersBasedOnFID(signerUuid,targetFids)
-        community_modal.close()
+        try {
+          const response = await followFarcasterUsersBasedOnFID(signerUuid,targetFids)
+          community_modal.close()
+          numberOfAccountsFollowed = targetFids.length
+          const successMessage = document.querySelector('#success_modal h2');
+          successMessage.innerHTML = `Successfully followed ${numberOfAccountsFollowed} accounts.`;
+           const modal = document.getElementById('success_modal');
+          modal.showModal();
+        } 
+        catch {
+          community_modal.close()
+          const modal = document.getElementById('error_modal');
+          modal.showModal();
+        }
       }
 
       //random
@@ -217,8 +253,9 @@
           updateCommunityCount();
         });
       }
-      
-      await refreshContacts();
+      if(userFID !== '') {
+        await refreshContacts();
+      }
      
     </script>
     <body class="antialiased">
@@ -245,6 +282,39 @@
           </div>
         </div>
       </dialog>
+
+      <dialog id="error_modal" class="modal">
+        <div class="modal-box flex flex-col items-center">
+           <div class="flex w-full justify-end h-4">
+            <button class="btn btn-sm btn-ghost"  onclick="event.preventDefault(); error_modal.close();">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8L4.646 5.354a.5.5 0 0 1 0-.708z"/></g></svg>
+            </button>
+          </div>
+          <div class="flex-col text-center mb-4">
+            <h1 class="text-xl font-bold">Error</h2>
+          </div>
+              <div class="flex-col text-center mb-6">
+                <h2>Please try again after sometime or contact the Creole team.</h2>
+              </div>
+        </div>
+      </dialog>
+
+      <dialog id="success_modal" class="modal">
+        <div class="modal-box flex flex-col items-center">
+           <div class="flex w-full justify-end h-4">
+            <button class="btn btn-sm btn-ghost"  onclick="event.preventDefault(); success_modal.close();">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8L4.646 5.354a.5.5 0 0 1 0-.708z"/></g></svg>
+            </button>
+          </div>
+          <div class="flex-col text-center mb-4">
+            <h1 class="text-xl font-bold">Success</h2>
+          </div>
+              <div class="flex-col text-center mb-6">
+                <h2></h2>
+              </div>
+        </div>
+      </dialog>
+
         <%- include('../partials/shovel.ejs') %>
       </div>
   </body>
