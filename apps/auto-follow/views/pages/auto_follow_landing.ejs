@@ -76,8 +76,7 @@
       var listOfCommunityMembersNotFollowed = [];
     
       var signerUuid = '1cbf93b0-b0ae-407b-a018-070770be285b';
-      var userFID = await window.getFidFromAccountDID(await shovel.agent.accountDID())
-      userFID = userFID.split('@')[0];
+      var userFID = await window.getFidFromAccountDID()     
       window.getListOfAccountsUserIsFollowing = async function() {
        listOfAccountsUserIsFollowing = await getFollowingOfAParticularUser(userFID);
       }
@@ -90,16 +89,16 @@
           welcomeMessage.style.display = 'block';
         });
       }
+
       refreshProfile();   
 
       window.followRandom = async function(unfollowedMembers) {
         const targetFids = shuffleArray([...unfollowedMembers]).slice(0, 3).map(member => {
-          if (member[0] === '') {
-            return 11155; // change to continue before merge
+          if (member[0] !== '') {
+            return member[0];
           }
-          return member[0];
         });      
-        const response = await followFarcasterUsersBasedOnFID(signerUuid,[11155,3107])
+        const response = await followFarcasterUsersBasedOnFID(signerUuid,targetFids)
         community_modal.close()
        
 
@@ -107,12 +106,11 @@
 
       window.followAll = async function(allCommunityMembers) {
         const targetFids = allCommunityMembers.map(member => {
-          if (member[0] === '') {
-            return 11155; // change to continue before merge
+          if (member[0] !== '') {
+            return member[0];
           }
-          return member[0];
         });        
-        const response =  await followFarcasterUsersBasedOnFID(signerUuid,[11155,3107])
+        const response =  await followFarcasterUsersBasedOnFID(signerUuid,targetFids)
         community_modal.close()
       }
 
@@ -136,6 +134,7 @@
          var communityDID = communityContact.UID;
          let community = await getContactByUID(communityDID);
          let communityMembers = await getCommunityMembers(community);
+         console.log("community members", communityMembers);
          if (communityMembers) {
             let communityUserDataArray = [];
             for (let member of communityMembers) {

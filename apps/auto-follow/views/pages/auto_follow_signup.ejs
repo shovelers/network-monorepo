@@ -14,6 +14,14 @@
     <script type="module">
       import { account, farcasterClient, farcasterSignup } from '/odd.js';
 
+      var session = await account.activeSession();
+      if (session) {
+        window.location.href = '/auto_follow_landing';
+        if (mixpanel){ 
+          mixpanel.identify(await shovel.agent.accountDID())
+        }
+      }
+
       window.onSignInSuccess = function(data) {
          console.log(data);
       }

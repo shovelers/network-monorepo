@@ -131,24 +131,20 @@ async function getContactByUID(uid) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-async function getFidFromAccountDID(accountDID) {
-  return await accountv1.agent.getFID(accountDID);
+async function getFidFromAccountDID() {
+  
+  let namesData = await accountv1.agent.getName();
+  if (namesData && namesData.names) {
+    let namesString = namesData.names;
+    let namesArray = namesString.includes(',') ? namesString.split(',') : [namesString];
+    for (let name of namesArray) {
+      let [fid, platform] = name.split('@');
+      if (platform === 'farcaster') {
+        return fid; // Return the FID if it's a Farcaster name
+      }
+    }
+  }
+  return '';
 }
 
 export { 

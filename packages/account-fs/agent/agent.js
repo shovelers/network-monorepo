@@ -147,6 +147,19 @@ export const AccountCapability = {
     return success
   },
 
+  async getName() {
+    let accountDID = await this.accountDID() 
+    let names;
+    await this.axios_client.get(`v1/accounts/${accountDID}/names`).then( async (response)  => {
+      names = response.data;
+    }).catch(async (e) => {
+      console.log(e);
+      return e
+    })
+    return names;
+  },
+
+
   async setCustodyKey(accessKey) {
     await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
 
