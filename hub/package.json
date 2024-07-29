@@ -28,7 +28,7 @@
     "iso-did": "^1.5.0",
     "iso-signatures": "^0.3.0",
     "morgan": "^1.10.0",
-    "multiformats": "^12.1.0",
+    "multiformats": "^13.2.1",
     "prom-client": "^15.1.0",
     "redis": "^4.6.12",
     "siwe": "^2.3.2",
