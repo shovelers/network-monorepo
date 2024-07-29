@@ -140,7 +140,7 @@ async function getFidFromAccountDID() {
     for (let name of namesArray) {
       let [fid, platform] = name.split('@');
       if (platform === 'farcaster') {
-        return fid; // Return the FID if it's a Farcaster name
+        return parseInt(fid); // Return the FID if it's a Farcaster name
       }
     }
   }

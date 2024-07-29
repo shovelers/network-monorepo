@@ -87,7 +87,8 @@
       
       window.getListOfAccountsUserIsFollowing = async function() {
         try {
-        listOfAccountsUserIsFollowing = await getFollowingOfAParticularUser(userFID);       
+        listOfAccountsUserIsFollowing = await getFollowingOfAParticularUser(userFID);  
+        listOfAccountsUserIsFollowing.push(userFID);      
         }
         catch(e) {
           console.log("Error is", e)
@@ -107,11 +108,13 @@
       }
 
       window.followRandom = async function(unfollowedMembers) {
+        console.log("unfollowedMembers:followRandom",unfollowedMembers);
         const targetFids = shuffleArray([...unfollowedMembers]).slice(0, 3).map(member => {
           if (member[0] !== '') {
             return member[0];
           }
         });      
+        console.log("targetFids:followRandom",targetFids);
         try {
           const response = await followFarcasterUsersBasedOnFID(signerUuid,targetFids)
           community_modal.close()
@@ -129,11 +132,13 @@
       }
 
       window.followAll = async function(allCommunityMembers) {
+        console.log("allCommunityMembers:followAll",allCommunityMembers);
         const targetFids = allCommunityMembers.map(member => {
           if (member[0] !== '') {
             return member[0];
           }
-        });        
+        });   
+        console.log("targetFids:followAll",targetFids);     
         try {
           const response = await followFarcasterUsersBasedOnFID(signerUuid,targetFids)
           community_modal.close()
@@ -150,7 +155,6 @@
         }
       }
 
-      //random
       window.shuffleArray = function(array) {
         for (let i = array.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -201,7 +205,11 @@
               communityInfo.className = 'community-info';
 
               const communityImage = document.createElement('img');
-              communityImage.src = contact.PHOTO || 'https://via.placeholder.com/50';
+              communityImage.src = `/assets/images/${communityName}.png`;
+              communityImage.onerror = function() {
+                  this.onerror = null;
+                   this.src = 'https://via.placeholder.com/50';
+              };
               communityImage.alt = communityName;
               communityImage.className = 'community-image';
 
@@ -219,11 +227,11 @@
               await getListOfAccountsUserIsFollowing();
               const modal = document.getElementById('community_modal');
               let communityData =  communityMap.get(communityName)
-              let listOfCommunityMembersNotFollowed = communityData.allMembers.filter(member => Array.isArray(member) && !listOfAccountsUserIsFollowing.includes(member[0]) && member[0] !== userFID);
+              let listOfCommunityMembersNotFollowed = communityData.allMembers.filter(member => Array.isArray(member) && !listOfAccountsUserIsFollowing.includes(member[0]));
               communityData.notFollowedMembers = listOfCommunityMembersNotFollowed;
               communityMap.set(communityName, communityData);
+              console.log("community map", communityMap.get(communityName));
               const modalCommunityDetails = document.getElementById('modalCommunityDetails');
-             // modalCommunityDetails.textContent = `You follow ${communityData.allMembers.length-communityData.notFollowedMembers.length}  out of ${communityData.allMembers.length} members from ${communityName}`;
               notFollowedList.innerHTML = '';
     
               shuffleArray(communityData.notFollowedMembers).forEach((member) => {
