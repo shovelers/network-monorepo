@@ -10,7 +10,7 @@ The fundamental unit of the network is **Account**, whose actions are executed t
 - **Handshakes** are protocols for exchanging personal information amongst agents. Social interactions such as ‘**join** a community’, ‘**connect** with a member’, ‘**invite** a friend’ etc. are modelled as **Handshakes**, through which agents exchange personal information over an encrypted messaging layer.
 - **People Search API** is a special-purpose search engine for agents to query contacts & graphs stored in account-fs and in turn enable search, similarity, and recommendations.
 
-![Layers](./docs/public/layers.png)
+![Layers](./docs/static/img/layers.png)
 
 ## MonoRepo overview
 
