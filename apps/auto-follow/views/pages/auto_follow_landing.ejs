@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <link rel="stylesheet" href="/styles/style.css" />
+    <link rel="icon" href="/favicon.ico">
+    <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
+    <title>Rolodex App</title>
+    <style>
+     
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+        max-width: 100%;
+      }
+      #welcomeMessage {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+      #communityCountMessage {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      #communityList {
+        width: 100%;
+        max-width: 400px;
+      }
+      .list-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        background-color: #1e293b;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+    
+      .community-info {
+        display: flex;
+        align-items: center;
+      }
+      .community-image {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        margin-right: 1rem;
+        
+      }
+      .community-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+
+  <%- include('../partials/google_analytics.ejs') %>
+
+  
+
+    <script type="module">
+    import { account, getContacts, getContactByUID,getProfile, getMembers,getCommunityMembers, getFidFromAccountDID, getFollowingOfAParticularUser, followFarcasterUsersBasedOnFID} from '/odd.js';
+      window.getContacts = getContacts;
+      window.getProfile = getProfile;
+      window.getContactByUID = getContactByUID;
+      window.getFidFromAccountDID = getFidFromAccountDID;
+      var farcasterHandle;
+      let communityMap = new Map();
+      let communityCount = 0;
+      var listOfAccountsUserIsFollowing = [];
+      var listOfCommunityMembersNotFollowed = [];
+    
+      var signerUuid = '1cbf93b0-b0ae-407b-a018-070770be285b';
+      var userFID = await window.getFidFromAccountDID(await shovel.agent.accountDID())
+      userFID = userFID.split('@')[0];
+      window.getListOfAccountsUserIsFollowing = async function() {
+       listOfAccountsUserIsFollowing = await getFollowingOfAParticularUser(userFID);
+      }
+     
+
+      window.refreshProfile = function(){
+        window.getProfile().then((result) => {
+          const welcomeMessage = document.getElementById('welcomeMessage');
+          welcomeMessage.textContent = `Welcome ${result.handle}`;
+          welcomeMessage.style.display = 'block';
+        });
+      }
+      refreshProfile();   
+
+      window.followRandom = async function(unfollowedMembers) {
+        const targetFids = shuffleArray([...unfollowedMembers]).slice(0, 3).map(member => {
+          if (member[0] === '') {
+            return 11155; // change to continue before merge
+          }
+          return member[0];
+        });      
+        const response = await followFarcasterUsersBasedOnFID(signerUuid,[11155,3107])
+        community_modal.close()
+       
+
+      }
+
+      window.followAll = async function(allCommunityMembers) {
+        const targetFids = allCommunityMembers.map(member => {
+          if (member[0] === '') {
+            return 11155; // change to continue before merge
+          }
+          return member[0];
+        });        
+        const response =  await followFarcasterUsersBasedOnFID(signerUuid,[11155,3107])
+        community_modal.close()
+      }
+
+      //random
+      window.shuffleArray = function(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+
+     
+      
+      window.updateCommunityCount = function() {
+        const countMessage = document.getElementById('communityCountMessage');
+        countMessage.textContent = `You are part of ${communityCount} ${communityCount === 1 ? 'community' : 'communities'}`;
+      }
+
+      window.getListOfFidFromCommunityContact = async function(communityContact){
+         var communityDID = communityContact.UID;
+         let community = await getContactByUID(communityDID);
+         let communityMembers = await getCommunityMembers(community);
+         if (communityMembers) {
+            let communityUserDataArray = [];
+            for (let member of communityMembers) {
+             communityUserDataArray.push([member.socials[0].fid, member.socials[0].username , member.socials[0].pfpUrl]); 
+            }
+            communityMap.set(communityContact.FN, {allMembers: communityUserDataArray });
+         }
+      }
+      
+     
+
+
+      window.refreshContacts = async function(){
+        const communityList = document.getElementById('communityList');
+        const notFollowedList = document.getElementById('notFollowedList');
+        communityList.innerHTML = ''; // Clear existing content
+
+        window.getContacts().then((result) => {
+          result.contactList.forEach((contact) => {
+            if (contact.CATEGORIES === "community") {
+              communityCount++;
+              const communityName = contact.FN;
+              const communityContainer = document.createElement('div');
+              communityContainer.className = 'list-item';
+             
+
+              const communityInfo = document.createElement('div');
+              communityInfo.className = 'community-info';
+
+              const communityImage = document.createElement('img');
+              communityImage.src = contact.PHOTO || 'https://via.placeholder.com/50';
+              communityImage.alt = communityName;
+              communityImage.className = 'community-image';
+
+              const communityElement = document.createElement('span');
+              communityElement.textContent = communityName;
+              communityElement.className = 'community-name';
+
+              communityInfo.appendChild(communityImage);
+              communityInfo.appendChild(communityElement);
+              communityContainer.appendChild(communityInfo);
+              communityList.appendChild(communityContainer);
+
+              communityContainer.addEventListener('click', async () => {
+
+              await getListOfAccountsUserIsFollowing();
+              const modal = document.getElementById('community_modal');
+              let communityData =  communityMap.get(communityName)
+              let listOfCommunityMembersNotFollowed = communityData.allMembers.filter(member => Array.isArray(member) && !listOfAccountsUserIsFollowing.includes(member[0]) && member[0] !== userFID);
+              communityData.notFollowedMembers = listOfCommunityMembersNotFollowed;
+              communityMap.set(communityName, communityData);
+              const modalCommunityDetails = document.getElementById('modalCommunityDetails');
+             // modalCommunityDetails.textContent = `You follow ${communityData.allMembers.length-communityData.notFollowedMembers.length}  out of ${communityData.allMembers.length} members from ${communityName}`;
+              notFollowedList.innerHTML = '';
+    
+              shuffleArray(communityData.notFollowedMembers).forEach((member) => {
+                  const memberItem = document.createElement('div');
+                  memberItem.className = 'list-item';
+                  memberItem.innerHTML = `<div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <div class="avatar" style="margin-right: 10px;">
+                  <div class="w-8 rounded-full">
+                    <img src="${member[2]}" onerror="this.onerror=null;this.src='https://i.imgur.com/tmGAd6X.jpg';"/>
+                  </div></div> 
+                  <span class="text-center" style="margin-right: 10px;">${member[1]}</span> 
+                  <a href="https://warpcast.com/${member[1]}" target="_blank" style="margin-left: auto;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M18.24.24H5.76A5.76 5.76 0 0 0 0 6v12a5.76 5.76 0 0 0 5.76 5.76h12.48A5.76 5.76 0 0 0 24 18V6A5.76 5.76 0 0 0 18.24.24m.816 17.166v.504a.49.49 0 0 1 .543.48v.568h-5.143v-.569A.49.49 0 0 1 15 17.91v-.504c0-.22.153-.402.358-.458l-.01-4.364c-.158-1.737-1.64-3.098-3.443-3.098c-1.804 0-3.285 1.361-3.443 3.098l-.01 4.358c.228.042.532.208.54.464v.504a.49.49 0 0 1 .543.48v.568H4.392v-.569a.49.49 0 0 1 .543-.479v-.504c0-.253.201-.454.454-.472V9.039h-.49l-.61-2.031H6.93V5.042h9.95v1.966h2.822l-.61 2.03h-.49v7.896c.252.017.453.22.453.472"/></svg></a>
+                  </div>`;
+                  notFollowedList.appendChild(memberItem);
+                 });
+
+                 const followRandomButton = modal.querySelector('.modal-action button:first-child');
+                 const followAllButton = modal.querySelector('.modal-action button:last-child');
+
+                followRandomButton.onclick = () => followRandom(communityData.notFollowedMembers);
+                followAllButton.onclick = () => followAll(communityData.allMembers);
+                modal.showModal();
+            });
+            getListOfFidFromCommunityContact(contact);
+            }
+        });
+          updateCommunityCount();
+        });
+      }
+      
+      await refreshContacts();
+     
+    </script>
+    <body class="antialiased">
+      <div class="container">
+        <div id="welcomeMessage" style="display: none;">Welcome</div>
+        <div id="communityCountMessage"></div>
+        <div id="communityList"></div>
+      </div>
+      <dialog id="community_modal" class="modal">
+        <div class="modal-box flex flex-col items-center">
+          <div class="flex w-full justify-end h-4">
+            <button class="btn btn-sm btn-ghost"  onclick="event.preventDefault(); community_modal.close();">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8L4.646 5.354a.5.5 0 0 1 0-.708z"/></g></svg>
+            </button>
+            </div>
+          <div class="flex-col text-center mb-4">
+            <h2 id="modalCommunityDetails" class="text-xl font-bold"></h2>
+            <h2 class="text-xl font-bold">Here's a list of people you can follow</h2>
+          </div>
+          <div id="notFollowedList" class="w-full"></div>
+        <div class="modal-action  flex justify-between w-full mt-2">
+            <button onclick="followRandom()" class="btn btn-outline btn-sm">Follow any 3 people</button>
+            <button onclick="followAll()" class="btn btn-outline btn-sm">Follow All</button>
+          </div>
+        </div>
+      </dialog>
+        <%- include('../partials/shovel.ejs') %>
+      </div>
+  </body>
+</html>

@@ -1,0 +1,40 @@
+{
+  "name": "auto-follow",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "vite build && npx tailwindcss build -i ./public/styles/tailwind.css -o ./public/styles/style.css",
+    "build-dev": "vite build && npx tailwindcss build -i ./public/styles/tailwind.css -o ./public/styles/style.css --watch",
+    "start": "npm run build && node --import=tsx index.js",
+    "server": "node --import=tsx index.js",
+    "dev": "npm run build-dev && node --import=tsx index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@farcaster/auth-client": "^0.1.0",
+    "account-fs": "*",
+    "axios": "^1.5.1",
+    "daisyui": "^3.7.4",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "glob": "^10.3.6",
+    "interface-datastore": "^8.2.9",
+    "lodash": "^4.17.21",
+    "morgan": "^1.10.0",
+    "tailwindcss": "^3.3.3",
+    "tsdav": "^2.0.5",
+    "uint8arrays": "^5.0.0",
+    "viem": "^2.8.6",
+    "vite": "^4.4.9",
+    "vite-plugin-wasm": "^3.3.0",
+    "tsx": "^4.16.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

@@ -1,0 +1,57 @@
+# fly.toml app configuration file generated for shovel-rolodex on 2023-09-18T15:38:41+05:30
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "shovel-rolodex"
+primary_region = "sin"
+
+[[vm]]
+  size = "shared-cpu-4x"
+
+[env]
+  ROLODEX_DNS_MULTADDR_PREFIX = "/dns4/app-rolodex.shovel.company/tcp/3002/tls/ws/p2p/"
+
+[build]
+
+[[services]]
+  internal_port = 3002
+  protocol = "tcp"
+
+  [services.concurrency]
+    hard_limit = 500
+    soft_limit = 200
+    type = "connections"
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = "3002"
+
+  [[services.tcp_checks]]
+    interval = 10000
+    timeout = 2000
+
+[[services]]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+  
+  [services.concurrency]
+    hard_limit = 500
+    soft_limit = 200
+    type = "requests"
+  
+  [[services.ports]]
+    handlers = ["http"]
+    port = "80"
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = "443"
+
+  [[services.tcp_checks]]
+    interval = 10000
+    timeout = 2000
