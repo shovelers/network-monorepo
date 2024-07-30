@@ -122,21 +122,7 @@ async function getContactByUID(uid) {
 }
 
 
-async function getFidFromAccountDID() {
-  
-  let namesData = await accountv1.agent.getName();
-  if (namesData && namesData.names) {
-    let namesString = namesData.names;
-    let namesArray = namesString.includes(',') ? namesString.split(',') : [namesString];
-    for (let name of namesArray) {
-      let [fid, platform] = name.split('@');
-      if (platform === 'farcaster') {
-        return parseInt(fid); // Return the FID if it's a Farcaster name
-      }
-    }
-  }
-  return '';
-}
+
 
 export { 
   account,
@@ -151,7 +137,6 @@ export {
   ethereumSignup,
   getMembers,
   getCommunityMembers,
-  getFidFromAccountDID,
   followFarcasterUsersBasedOnFID
   
 };
