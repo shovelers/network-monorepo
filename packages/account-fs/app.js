@@ -1,4 +1,5 @@
-import { Agent, Runtime, SERVER_RUNTIME, MessageCapability, StorageCapability, AccountCapability } from './agent/agent.js'
+import { Agent, MessageCapability, StorageCapability, AccountCapability } from './agent/agent.js'
+import { Runtime, SERVER_RUNTIME } from './agent/runtime.js'
 import { MembersRepository } from './repository/members/members.js';
 import { CommunityRepository } from './repository/members/community.ts';
 import { createNode, APP } from './agent/helia_node.js';

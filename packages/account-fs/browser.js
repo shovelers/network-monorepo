@@ -1,6 +1,7 @@
 import { createNode, BROWSER } from './agent/helia_node.js';
 import { AccountV1 } from './account.js'
-import { Agent, BROWSER_RUNTIME, AccountCapability, StorageCapability, MessageCapability, Runtime  } from './agent/agent.js'
+import { Agent, AccountCapability, StorageCapability, MessageCapability } from './agent/agent.js'
+import { Runtime, BROWSER_RUNTIME } from './agent/runtime.js';
 import { PeopleSearch } from './repository/people/search.js'
 import { PeopleRepository } from "./repository/people/people.ts";
 import { Person } from "./repository/people/person.ts";
