@@ -15,8 +15,8 @@ It needs to mimic the intimacy & privacy of real life and not be a public square
 > privacy-preserving social graph publishing is to protect individual privacy while
 preserving graph utility
  
-Apps benefit from users controlling and carrying their graphs with them, as it provides day-zero personalization and a better-ux. It also reduces the effort and complexity of a social app by abstracting out the common layer between all apps as a shared infrastructure.
-With the advent of AI the cost of making such apps can be driven to almost zero and users can also choose to create their custom micro-apps o top of the shared-data substrate.
+Apps benefit from users controlling and carrying their graphs with them, as it provides day-zero personalization and a better UX. It also reduces the effort and complexity of a social app by abstracting out the common layer between all apps as a shared infrastructure.
+With the advent of AI the cost of making such apps can be driven to almost zero and users can also choose to create their custom micro-apps on top of the shared-data substrate.
 
 Some social-utilities that can be built on top of Creole Network
 
@@ -25,4 +25,4 @@ Some social-utilities that can be built on top of Creole Network
 - A [**Forever Contact App**](https://www.windley.com/liveweb/forever/forever.shtml) that auto-updates the contact details when a contact changes their profile, forever.
 - A Smart Form auto-filler which lets user auto-fill fields they have already filled elsewhere, such as their delivery address for all the e-commerce sites they purchase from.
 - A user preference store (”user-owned cookies”) which they can carry across apps to kickstart personalisation without having to build a profile from scratch. Such as, dark mode on every website by default.
-- A birthday reminder app for close friends and family
+- A birthday reminder app for close friends and family.

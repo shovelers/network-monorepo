@@ -14,6 +14,6 @@ On Creole Network every participant gets an **[Account](/accounts)** whose actio
 - **[Private Social Graph](/private_social_graph)** is the relationship and search layer. A relationship is created via handshakes between two Accounts via their Agents & stored as a graph with the user in the center. Users get to search through people and the profiles shared with them.
 - **[Handshakes](/handshakes)** is a p2p data exchange and communication protocol between Accounts. 
 A handshake establishes a relationship resulting in the mutual exchange of profiles between two accounts & giving permission to access data.
-- **[Account-fs](/account_fs)** is the user-controlled, private data storage & sync layer for storing contacts and relationships
+- **[Account-fs](/account_fs)** is the user-controlled, private data storage & sync layer for storing contacts and relationships.
 
 ![image](../static/img/layers.png)

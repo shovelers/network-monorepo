@@ -30,4 +30,4 @@ Creole Network is formed via a network of Hubs. It performs three functions:
     
     Other agents drop Handshake messages into User’s Inbox, which can be processed asynchronously by any of the User’s agent when they come live.
     
-    The agent reads the message and processes & manages the state of the respective Handshake
+    The agent reads the message and processes & manages the state of the respective Handshake.

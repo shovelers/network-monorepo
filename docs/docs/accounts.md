@@ -14,7 +14,7 @@ It is designed to store personal information such as
 
 **User-controlled** 
 
-- Each account on Creole has an associated account-fs. It acts as a personal information store, portable across apps and syncing across devices
+- Each account on Creole has an associated account-fs. It acts as a personal information store, portable across apps and syncing across devices.
 - Users can selectively provide data access to different accounts.
 
 **Local-first**
