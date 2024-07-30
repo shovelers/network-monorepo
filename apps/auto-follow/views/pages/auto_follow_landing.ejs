@@ -4,7 +4,9 @@
     <link rel="stylesheet" href="/styles/style.css" />
     <link rel="icon" href="/favicon.ico">
     <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
-    <title>Rolodex App</title>
+    <script src="https://neynarxyz.github.io/siwn/raw/1.2.0/index.js" async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <title>Auto follow App</title>
     <style>
      
       .container {
@@ -64,19 +66,29 @@
   
 
     <script type="module">
-    import { account, getContacts, getContactByUID,getProfile, getMembers,getCommunityMembers, getFidFromAccountDID, getFollowingOfAParticularUser, followFarcasterUsersBasedOnFID} from '/odd.js';
+    import { account, getContacts, getContactByUID,getProfile, getMembers,getCommunityMembers, getFidFromAccountDID, followFarcasterUsersBasedOnFID} from '/odd.js';
       window.getContacts = getContacts;
       window.getProfile = getProfile;
       window.getContactByUID = getContactByUID;
       window.getFidFromAccountDID = getFidFromAccountDID;
       var farcasterHandle;
       let communityMap = new Map();
-      let communityCount = 0;
-      var listOfAccountsUserIsFollowing = [];
-      var listOfCommunityMembersNotFollowed = [];
+      let communityCount = 0;  
+     var randomMemberList = [];
       var numberOfAccountsFollowed;
-    
-      var signerUuid = '1cbf93b0-b0ae-407b-a018-070770be285b';
+      var signerUuid = ''
+      await localforage.getItem('signerUuid').then(function(value) 
+       {  
+        if (value) 
+           { 
+            signerUuid = value;
+          }
+       }).catch(function(err) { 
+        console.error("Error retrieving signer UUID:", err); 
+      });
+
+      console.log("retrieved signer uuid", signerUuid);
+
       var userFID = await window.getFidFromAccountDID()  
       if(userFID === '') {
         const modal = document.getElementById('error_modal');
@@ -84,16 +96,7 @@
         successMessage.innerHTML = `Issue fetching the user's FID. Please contact the Creole team.`;
         modal.showModal();
       }
-      
-      window.getListOfAccountsUserIsFollowing = async function() {
-        try {
-        listOfAccountsUserIsFollowing = await getFollowingOfAParticularUser(userFID);  
-        listOfAccountsUserIsFollowing.push(userFID);      
-        }
-        catch(e) {
-          console.log("Error is", e)
-        }
-      }
+         
      
 
       window.refreshProfile = function(){
@@ -108,13 +111,17 @@
       }
 
       window.followRandom = async function(unfollowedMembers) {
+        if(signerUuid === '') {
+          document.getElementById('signer_modal').showModal();
+          return;
+        }
         console.log("unfollowedMembers:followRandom",unfollowedMembers);
         const targetFids = shuffleArray([...unfollowedMembers]).slice(0, 3).map(member => {
           if (member[0] !== '') {
             return member[0];
           }
-        });      
-        console.log("targetFids:followRandom",targetFids);
+        });  
+
         try {
           const response = await followFarcasterUsersBasedOnFID(signerUuid,targetFids)
           community_modal.close()
@@ -132,13 +139,17 @@
       }
 
       window.followAll = async function(allCommunityMembers) {
+        if(signerUuid === '') {
+          document.getElementById('signer_modal').showModal();
+          return;
+        }
         console.log("allCommunityMembers:followAll",allCommunityMembers);
         const targetFids = allCommunityMembers.map(member => {
           if (member[0] !== '') {
             return member[0];
           }
         });   
-        console.log("targetFids:followAll",targetFids);     
+
         try {
           const response = await followFarcasterUsersBasedOnFID(signerUuid,targetFids)
           community_modal.close()
@@ -224,35 +235,42 @@
 
               communityContainer.addEventListener('click', async () => {
 
-              await getListOfAccountsUserIsFollowing();
               const modal = document.getElementById('community_modal');
               let communityData =  communityMap.get(communityName)
-              let listOfCommunityMembersNotFollowed = communityData.allMembers.filter(member => Array.isArray(member) && !listOfAccountsUserIsFollowing.includes(member[0]));
-              communityData.notFollowedMembers = listOfCommunityMembersNotFollowed;
               communityMap.set(communityName, communityData);
               console.log("community map", communityMap.get(communityName));
               const modalCommunityDetails = document.getElementById('modalCommunityDetails');
-              notFollowedList.innerHTML = '';
-    
-              shuffleArray(communityData.notFollowedMembers).forEach((member) => {
-                  const memberItem = document.createElement('div');
-                  memberItem.className = 'list-item';
-                  memberItem.innerHTML = `<div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                  <div class="avatar" style="margin-right: 10px;">
-                  <div class="w-8 rounded-full">
-                    <img src="${member[2]}" onerror="this.onerror=null;this.src='https://i.imgur.com/tmGAd6X.jpg';"/>
-                  </div></div> 
-                  <span class="text-center" style="margin-right: 10px;">${member[1]}</span> 
-                  <a href="https://warpcast.com/${member[1]}" target="_blank" style="margin-left: auto;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M18.24.24H5.76A5.76 5.76 0 0 0 0 6v12a5.76 5.76 0 0 0 5.76 5.76h12.48A5.76 5.76 0 0 0 24 18V6A5.76 5.76 0 0 0 18.24.24m.816 17.166v.504a.49.49 0 0 1 .543.48v.568h-5.143v-.569A.49.49 0 0 1 15 17.91v-.504c0-.22.153-.402.358-.458l-.01-4.364c-.158-1.737-1.64-3.098-3.443-3.098c-1.804 0-3.285 1.361-3.443 3.098l-.01 4.358c.228.042.532.208.54.464v.504a.49.49 0 0 1 .543.48v.568H4.392v-.569a.49.49 0 0 1 .543-.479v-.504c0-.253.201-.454.454-.472V9.039h-.49l-.61-2.031H6.93V5.042h9.95v1.966h2.822l-.61 2.03h-.49v7.896c.252.017.453.22.453.472"/></svg></a>
-                  </div>`;
-                  notFollowedList.appendChild(memberItem);
-                 });
+              
+              const followAllCount = document.getElementById('followAllCount');
+              followAllCount.textContent = communityData.allMembers.length;
 
-                 const followRandomButton = modal.querySelector('.modal-action button:first-child');
-                 const followAllButton = modal.querySelector('.modal-action button:last-child');
+              function displayRandomMembers() {
+                  notFollowedList.innerHTML = '';
+                  randomMemberList = shuffleArray(communityData.allMembers).slice(0,3);
+                  console.log("random member list",randomMemberList);
+                  randomMemberList.forEach((member) => {
+                      const memberItem = document.createElement('div');
+                      memberItem.className = 'list-item';
+                      memberItem.innerHTML = `<div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                      <div class="avatar" style="margin-right: 10px;">
+                      <div class="w-8 rounded-full">
+                        <img src="${member[2]}" onerror="this.onerror=null;this.src='https://i.imgur.com/tmGAd6X.jpg';"/>
+                      </div></div> 
+                      <span class="text-center" style="margin-right: 10px;">${member[1]}</span> 
+                      <a href="https://warpcast.com/${member[1]}" target="_blank" style="margin-left: auto;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M18.24.24H5.76A5.76 5.76 0 0 0 0 6v12a5.76 5.76 0 0 0 5.76 5.76h12.48A5.76 5.76 0 0 0 24 18V6A5.76 5.76 0 0 0 18.24.24m.816 17.166v.504a.49.49 0 0 1 .543.48v.568h-5.143v-.569A.49.49 0 0 1 15 17.91v-.504c0-.22.153-.402.358-.458l-.01-4.364c-.158-1.737-1.64-3.098-3.443-3.098c-1.804 0-3.285 1.361-3.443 3.098l-.01 4.358c.228.042.532.208.54.464v.504a.49.49 0 0 1 .543.48v.568H4.392v-.569a.49.49 0 0 1 .543-.479v-.504c0-.253.201-.454.454-.472V9.039h-.49l-.61-2.031H6.93V5.042h9.95v1.966h2.822l-.61 2.03h-.49v7.896c.252.017.453.22.453.472"/></svg></a>
+                      </div>`;
+                      notFollowedList.appendChild(memberItem);
+                    });
+                  } 
+              displayRandomMembers();
 
-                followRandomButton.onclick = () => followRandom(communityData.notFollowedMembers);
+                 const followRandomButton = modal.querySelector('.modal-action button:nth-child(1)');
+                 const followAllButton = modal.querySelector('.modal-action button:nth-child(3)');
+                 const shuffleButton = modal.querySelector('.modal-action button:nth-child(2)');
+
+                followRandomButton.onclick = () => followRandom(randomMemberList);
                 followAllButton.onclick = () => followAll(communityData.allMembers);
+                shuffleButton.onclick = () => displayRandomMembers();
                 modal.showModal();
             });
             getListOfFidFromCommunityContact(contact);
@@ -264,14 +282,25 @@
       if(userFID !== '') {
         await refreshContacts();
       }
+
+      window.onSignInSuccess = function(data) {
+          document.getElementById('signer_modal').close();
+          localforage.setItem('signerUuid', data.signer_uuid)
+                .then(function() {
+                    console.log("signer uuid stored successfully");
+                    signerUuid = data.signer_uuid;
+                }) .catch(function(err) {
+                    console.error("Error storing signer UUID:", err);
+                });
+      }
      
     </script>
     <body class="antialiased">
-      <div class="container">
+      <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
         <div id="welcomeMessage" style="display: none;">Welcome</div>
         <div id="communityCountMessage"></div>
         <div id="communityList"></div>
-      </div>
+     
       <dialog id="community_modal" class="modal">
         <div class="modal-box flex flex-col items-center">
           <div class="flex w-full justify-end h-4">
@@ -285,8 +314,9 @@
           </div>
           <div id="notFollowedList" class="w-full"></div>
         <div class="modal-action  flex justify-between w-full mt-2">
-            <button onclick="followRandom()" class="btn btn-outline btn-sm">Follow any 3 people</button>
-            <button onclick="followAll()" class="btn btn-outline btn-sm">Follow All</button>
+            <button onclick="followRandom()" class="btn btn-outline btn-sm">Follow 3</button>
+            <button class="btn btn-outline btn-sm">Shuffle</button>
+            <button onclick="followAll()" class="btn btn-outline btn-sm">Follow All<span id="followAllCount"></span></button>
           </div>
         </div>
       </dialog>
@@ -320,6 +350,28 @@
               <div class="flex-col text-center mb-6">
                 <h2></h2>
               </div>
+        </div>
+      </dialog>
+
+      <dialog id="signer_modal" class="modal">
+        <div class="modal-box flex flex-col items-center">
+          <div class="flex w-full justify-end h-4">
+            <button class="btn btn-sm btn-ghost" onclick="event.preventDefault(); signer_modal.close();">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g fill="currentColor"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8L4.646 5.354a.5.5 0 0 1 0-.708z"/></g></svg>
+            </button>
+          </div>
+          <div class="flex-col text-center mb-4">
+            <h2 class="text-xl font-bold">Sign In Required</h2>
+          </div>
+          <div class="flex-col text-center mb-6">
+            <p>Sign in to follow people from your rolodex.</p>
+          </div>
+          <div class="neynar_signin"
+               data-client_id="e468cfeb-fb3b-41b2-b1c4-c778d78f1e73"
+               data-variant="farcaster"
+               data-success-callback="onSignInSuccess"
+               data-theme="dark">
+          </div>
         </div>
       </dialog>
 

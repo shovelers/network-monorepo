@@ -68,16 +68,6 @@ server.get('/nonce',  (req, res) => {
   res.status(200).json(nonce);
 });
 
-server.get("/farcaster-following/:fid", async (req,res)  => {
-  try {
-    const response = await client.fetchUserFollowing(req.params.fid, {limit:50});
-    const fidArray = response.result.users.map(user => user.fid);
-    res.json(fidArray);
-  } catch (error) {
-    console.error("Error fetching followers:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
 
 server.post("/farcaster-follow-users/",express.json(),  async (req, res) => {
   try {

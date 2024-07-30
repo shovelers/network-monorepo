@@ -40,15 +40,6 @@ async function ethereumSignup(accountDID,siweMessage, siweSignature, profileData
   await accountv1.agent.appendName(fid, 'ethereum')
 }
 
-async function getFollowingOfAParticularUser(userFid) {
-  try {
-    const response = await axios_client.get(`/farcaster-following/${userFid}`);
-     return response.data;
-  } catch (error) {
-    console.error('Error fetching followers:', error);
-    throw error;
-  }
-}
 
 async function followFarcasterUsersBasedOnFID(signerUuid, targetFids) {
   try {
@@ -161,7 +152,6 @@ export {
   getMembers,
   getCommunityMembers,
   getFidFromAccountDID,
-  getFollowingOfAParticularUser,
   followFarcasterUsersBasedOnFID
   
 };
