@@ -127,8 +127,7 @@ async function updateCommunityProfile(inputs, communityDID, profileSchema) {
 }
 
 async function createCommunityProfile(params, communityDID, profileSchema) {
-  await accountv1.repositories.profile.createCommunityProfile(communityDID, profileSchema, params)
-  return await accountv1.repositories.profile.set(params)
+  return await accountv1.repositories.profile.createCommunityProfile(communityDID, profileSchema, params)
 }
 
 async function addContact(name, email='', tags = [], text = "", links = []) {
