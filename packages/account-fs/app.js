@@ -2,14 +2,14 @@ import { Agent, Runtime, SERVER_RUNTIME, MessageCapability, StorageCapability, A
 import { MembersRepository } from './repository/members/members.js';
 import { CommunityRepository } from './repository/members/community.ts';
 import { createNode, APP } from './agent/helia_node.js';
-import { MemoryBlockstore } from 'blockstore-core'
-import { MemoryDatastore } from 'datastore-core'
+import { FsBlockstore } from 'blockstore-fs'
+import { FsDatastore } from 'datastore-fs'
 import { Person } from "./repository/people/person.ts";
 //import { prometheusMetrics } from '@libp2p/prometheus-metrics'
 
-async function createAppNode() {
-  const blockstore = new MemoryBlockstore()
-  const datastore = new MemoryDatastore()
+async function createAppNode(blockPath, filePath) {
+  const blockstore = new FsBlockstore(blockPath)
+  const datastore = new FsDatastore(filePath)
 
   // const config = {metrics: prometheusMetrics()}
   const config = {}

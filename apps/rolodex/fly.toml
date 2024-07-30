@@ -11,6 +11,7 @@ primary_region = "sin"
 
 [env]
   ROLODEX_DNS_MULTADDR_PREFIX = "/dns4/app-rolodex.shovel.company/tcp/3002/tls/ws/p2p/"
+  PROTOCOL_DB_HOME = "/app/protocol_db"
 
 [build]
 
@@ -55,3 +56,7 @@ primary_region = "sin"
   [[services.tcp_checks]]
     interval = 10000
     timeout = 2000
+
+[mounts]
+  source="rolodex_protocol_data"
+  destination="/app/protocol_db"

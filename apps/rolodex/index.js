@@ -18,8 +18,10 @@ const __dirname = path.dirname(__filename);
 const NETWORK = process.env.VITE_NETWORK || "DEVNET"
 const RUN_COMMUNITY_AGENT = process.env.VITE_RUN_COMMUNITY_AGENT || true
 
-// TODO mount filesystem
-const helia = await createAppNode()
+const homeDir = process.env.PROTOCOL_DB_HOME || path.join(__dirname, 'protocol_db')
+await fs.mkdir(path.join(homeDir, 'blocks'), { recursive: true })
+await fs.mkdir(path.join(homeDir, 'data'), { recursive: true })
+const helia = await createAppNode(path.join(homeDir, 'blocks'), path.join(homeDir, 'data'))
 
 ///
 //Agent of Rolodex
