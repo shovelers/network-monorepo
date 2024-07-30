@@ -119,7 +119,7 @@ export class CommunityRepository {
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "enum": ["Events (Online)", "Events (Offline)", "Networking", "Product Building", "Partnerships", "Member recruitment", "Art and Design"]
+            "enum": ["Events (Online)", "Events (Offline)", "Hiring Talent", "Friendly Builders", "Capital", "Japan GTM Support", "Global GTM Support", "Partnerships", "New Friends"]
           }
         }
       }
