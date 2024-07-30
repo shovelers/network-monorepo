@@ -236,6 +236,16 @@
                     console.error("Error storing signer UUID:", err);
                 });
       }
+
+      const shuffleButton = document.getElementById('shuffleButton');
+        const diceIcon = document.getElementById('diceIcon');
+
+        shuffleButton.addEventListener('click', () => {
+            diceIcon.classList.add('animate');
+            setTimeout(() => {
+                diceIcon.classList.remove('animate');
+            }, 500);
+        });
      
     </script>
     <body class="antialiased">
@@ -259,7 +269,13 @@
           <div id="notFollowedList" class="w-full"></div>
         <div class="modal-action  flex justify-between w-full mt-2">
             <button onclick="followRandom()" class="btn btn-outline btn-sm">Follow 3</button>
-            <button class="btn btn-outline btn-sm">Shuffle</button>
+            <button id="shuffleButton" class="btn btn-outline btn-sm">Shuffle<svg class="dice-icon" id="diceIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <circle cx="15.5" cy="8.5" r="1.5"></circle>
+                    <circle cx="15.5" cy="15.5" r="1.5"></circle>
+                    <circle cx="8.5" cy="15.5" r="1.5"></circle>
+                </svg></button>
             <button onclick="followAll()" class="btn btn-outline btn-sm">Follow All<span id="followAllCount"></span></button>
           </div>
         </div>

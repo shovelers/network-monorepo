@@ -42,3 +42,24 @@
     font-size: 1.25rem;
     font-weight: 600;
   }
+
+  .dice-icon {
+    width: 24px;
+    height: 24px;
+    margin-left: 10px;
+    transition: transform 0.5s;
+}
+.animate {
+    animation: moveUpAndRotate 0.5s ease;
+}
+@keyframes moveUpAndRotate {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(180deg);
+    }
+    100% {
+        transform: translateY(0) rotate(360deg);
+    }
+}
