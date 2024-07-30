@@ -11,6 +11,7 @@ import { DIDKey } from 'iso-did/key';
 import { spki } from 'iso-signatures/spki'
 import { dial } from './helia_node.js'
 import { PrivateFS, PrivateFile } from "./fs/private_fs.js"
+import { HubConnection } from './hub_connection.js';
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
@@ -338,6 +339,7 @@ export class Agent {
     this.prefix = dialPrefix
     this.syncServer = null
     this.fs = new PrivateFS(helia, appHandle)
+    this.hubConnection = new HubConnection(this.helia, this.axios_client, this.prefix)
   }
 
   async DID(){
@@ -367,16 +369,9 @@ export class Agent {
   }
   
   async bootstrap(){
-    await this.axios_client.get('/bootstrap').then(async (response) => {
-      this.syncServer = this.prefix + response.data.peerId
-      await dial(this.helia, this.syncServer)
-    }).catch((e) => {
-      console.log(e);
-      return e
-    })
+    return await this.hubConnection.bootstrap()
   }
 }
-
 
 /*
 Agent
