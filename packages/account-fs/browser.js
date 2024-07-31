@@ -25,13 +25,13 @@ async function createBrowserNode() {
   return await createNode(BROWSER, blockstore, datastore)
 }
 
-async function programInit(network, appHandle) {
+async function programInit(network) {
   //TODO check for network to be present in connection keys
 
   const helia = await createBrowserNode()
 
   const runtime = new Runtime(BROWSER_RUNTIME, {})
-  const agent =  new Agent(helia, connection[network].sync_host, connection[network].dial_prefix, runtime, appHandle)
+  const agent =  new Agent(helia, connection[network].sync_host, connection[network].dial_prefix, runtime)
   Object.assign(Agent.prototype, AccountCapability);
   Object.assign(Agent.prototype, MessageCapability);
   Object.assign(Agent.prototype, StorageCapability);

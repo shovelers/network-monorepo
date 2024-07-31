@@ -328,14 +328,12 @@ export const StorageCapability = {
 }
 
 export class Agent {
-  constructor(helia, accountHost, dialPrefix, runtime, appHandle) {
+  constructor(helia, accountHost, dialPrefix, runtime) {
     this.helia = helia
     this.axios_client  = axios.create({baseURL: accountHost})
     this.runtime = runtime
-    this.prefix = dialPrefix
-    this.syncServer = null
-    this.fs = new PrivateFS(helia, appHandle)
-    this.hubConnection = new HubConnection(this.helia, this.axios_client, this.prefix)
+    this.fs = new PrivateFS(helia)
+    this.hubConnection = new HubConnection(this.helia, this.axios_client, dialPrefix)
   }
 
   async DID(){

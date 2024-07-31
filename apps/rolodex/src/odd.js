@@ -17,8 +17,7 @@ const farcasterClient = createAppClient({
 
 const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 
-// TODO - remove passing of App handle, instead infer from IndexDB after join handshake from app agent
-const program = await programInit(NETWORK, "rolodex")
+const program = await programInit(NETWORK)
 window.shovel = program
 
 const account = new AccountV1(program.agent)

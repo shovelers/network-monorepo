@@ -28,7 +28,7 @@ const helia = await createAppNode(path.join(homeDir, 'blocks'), path.join(homeDi
 // TODO - remove from git and generate for deployment
 const runtimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'agent_runtime_config.json'), 'utf8'))
 const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
-const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime, "rolodex")
+const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime)
 Object.assign(Agent.prototype, MessageCapability);
 
 await agent.bootstrap()
@@ -59,7 +59,7 @@ if (RUN_COMMUNITY_AGENT == true) {
 
       // create runtime
       const communityRuntime = new Runtime(SERVER_RUNTIME, config)
-      var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime, "rolodex")
+      var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime)
       communityAgent = Object.assign(communityAgent, AccountCapability);
       communityAgent = Object.assign(communityAgent, MessageCapability);
       communityAgent = Object.assign(communityAgent, StorageCapability);

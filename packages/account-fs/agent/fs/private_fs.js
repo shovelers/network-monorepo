@@ -2,9 +2,8 @@ import { WnfsBlockstore, Rng } from './helia_wnfs_blockstore_adaptor.js'
 import { PrivateDirectory, PrivateForest, PrivateNode, AccessKey } from "wnfs";
 
 export class PrivateFS {
-  constructor(helia, appHandle) {
+  constructor(helia) {
     this.store = new WnfsBlockstore(helia)
-    // this.path = [appHandle]
     this.path = ["private"]
     this.rng = new Rng()
   }
