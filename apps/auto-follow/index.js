@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import morgan from 'morgan';
 import { NeynarAPIClient } from "@neynar/nodejs-sdk";
 
-const port = process.argv[2] || 5000;
+const port = process.argv[2] || 3500;
 const server = express();
 server.use(morgan('tiny'))
 

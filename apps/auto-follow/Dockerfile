@@ -23,15 +23,11 @@ RUN apt-get update -qq && \
 COPY --link . .
 
 # Install node modules
-RUN npm install --include=dev -w rolodex
+RUN npm install --include=dev -w auto-follow 
 
 # Build application
 RUN --mount=type=secret,id=VITE_NETWORK \
-    --mount=type=secret,id=VITE_GOOGLE_CLIENT_ID \
-    --mount=type=secret,id=VITE_COMMUNITY_AGENT_ACCESS_KEY \
-    VITE_NETWORK="$(cat /run/secrets/VITE_NETWORK)" \
-    VITE_COMMUNITY_AGENT_ACCESS_KEY="$(cat /run/secrets/VITE_COMMUNITY_AGENT_ACCESS_KEY)" \
-    VITE_GOOGLE_CLIENT_ID="$(cat /run/secrets/VITE_GOOGLE_CLIENT_ID)" npm run build -w rolodex
+    VITE_NETWORK="$(cat /run/secrets/VITE_NETWORK)" npm run build -w auto-follow
 
 # Remove development dependencies
 RUN npm prune --omit=dev
@@ -43,6 +39,5 @@ FROM base
 COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
-EXPOSE 3002
-CMD [ "npm", "run", "server", "-w", "rolodex" ]
+EXPOSE 3500
+CMD [ "npm", "run", "server", "-w", "auto-follow" ]
