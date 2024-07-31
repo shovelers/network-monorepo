@@ -1,9 +1,7 @@
 import axios from 'axios';
 import _ from 'lodash';
-import { programInit, Person, AccountV1 } from 'account-fs';
+import { programInit, AccountV1 } from 'account-fs';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
-import { SiweMessage } from 'siwe';
-
 
 const farcasterClient = createAppClient({
   relay: 'https://relay.farcaster.xyz',
@@ -12,34 +10,23 @@ const farcasterClient = createAppClient({
 
 const NETWORK = import.meta.env.VITE_NETWORK || "DEVNET"
 
-// TODO - remove passing of App handle, instead infer from IndexDB after join handshake from app agent
-const program = await programInit(NETWORK, "auto-follow")
+const program = await programInit(NETWORK)
 window.shovel = program
 
 const account = new AccountV1(program.agent)
 await account.loadRepositories()
-const contactRepo = account.repositories.people 
-const accountv1 = account
+
 shovel.account = account
-
-
 
 const axios_client  = axios.create({
   baseURL: `${window.location.origin}`,
 })
 
 async function farcasterSignup(accountDID, siweMessage, siweSignature, profileData, fid) {
-  await accountv1.create(accountDID, siweMessage, siweSignature)
-  await accountv1.repositories.profile.set(profileData)
-  await accountv1.agent.appendName(fid, 'farcaster')
+  await account.create(accountDID, siweMessage, siweSignature)
+  await account.repositories.profile.set(profileData)
+  await account.agent.appendName(fid, 'farcaster')
 }
-
-async function ethereumSignup(accountDID,siweMessage, siweSignature, profileData,fid) {
-  await accountv1.create(accountDID, siweMessage, siweSignature)
-  await accountv1.repositories.profile.set(profileData)
-  await accountv1.agent.appendName(fid, 'ethereum')
-}
-
 
 async function followFarcasterUsersBasedOnFID(signerUuid, targetFids) {
   try {
@@ -55,74 +42,23 @@ async function followFarcasterUsersBasedOnFID(signerUuid, targetFids) {
   }
 }
 
-
-
-
-async function getNonce() {
-  try {
-    const response = await axios_client.get('/nonce');
-    return response.data;  
-  } catch (error) {
-    console.error('Error fetching nonce:', error);
-    throw error;  
-  }
-}
-
-async function createSiweMessage(address, nonce, requestId, chainId) {
-  const message = new SiweMessage({
-      domain: window.location.host,
-      address: address,
-      statement : 'Sign in via ethereum',
-      uri: window.location.origin,
-      version: '1',
-      chainId: chainId,
-      nonce: nonce,
-      requestId: requestId
-  });
-  return message.prepareMessage();
-}
-
-async function verifySiweMessage(message,signature,nonce) {
-  let SiweObject = new SiweMessage(message)
-  try {
-    var publicKey, result = await SiweObject.verify({signature: signature, nonce: nonce});
-    return result.success;
-  }
-  catch(e) {
-    console.error("SIWE Message verfication failed", e);
-  }
-}
-
-async function getMembers() {
-  if (account.repositories.members) {
-    var list = await account.repositories.members.list()
-    console.log("all", list)
-    return {memberList: list}
-  }
-  return {memberList: undefined}
-}
-
 async function getCommunityMembers(community) {
   return await account.search({personUID: community.UID})
 }
-
 
 async function getProfile(communityDID = null) {
   return account.getProfile(communityDID)
 }
 
 async function getContacts() {
-  var list = await contactRepo.list()
+  var list = await account.repositories.people.list()
   console.log("all", list)
   return {contactList: list}
 }
 
 async function getContactByUID(uid) {
-  return await contactRepo.find(uid)
+  return await account.repositories.people.find(uid)
 }
-
-
-
 
 export { 
   account,
@@ -131,12 +67,6 @@ export {
   getProfile, 
   getContacts, 
   getContactByUID,
-  createSiweMessage,
-  getNonce,
-  verifySiweMessage,
-  ethereumSignup,
-  getMembers,
   getCommunityMembers,
   followFarcasterUsersBasedOnFID
-  
 };

@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "@farcaster/auth-client": "^0.1.0",
+    "@neynar/nodejs-sdk": "^1.40.0",
     "account-fs": "*",
     "axios": "^1.5.1",
     "daisyui": "^3.7.4",
