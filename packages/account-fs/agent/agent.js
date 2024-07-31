@@ -144,6 +144,9 @@ export const AccountCapability = {
     return success
   },
 
+
+
+
   async setCustodyKey(accessKey) {
     await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
 
