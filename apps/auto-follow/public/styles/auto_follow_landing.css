@@ -63,3 +63,9 @@
         transform: translateY(0) rotate(360deg);
     }
 }
+
+.signout-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;  /* Changed from right to left */
+}

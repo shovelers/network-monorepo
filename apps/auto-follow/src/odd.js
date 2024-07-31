@@ -60,6 +60,10 @@ async function getContactByUID(uid) {
   return await account.repositories.people.find(uid)
 }
 
+async function signout() {
+  await account.signout()
+}
+
 export { 
   account,
   farcasterClient,
@@ -68,5 +72,6 @@ export {
   getContacts, 
   getContactByUID,
   getCommunityMembers,
-  followFarcasterUsersBasedOnFID
+  followFarcasterUsersBasedOnFID,
+  signout
 };
