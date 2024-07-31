@@ -25,4 +25,4 @@ User and Community negotiate a profile schema, based on which the User submits a
 
 ### Transport & Channel
 
-Handshake requires a WebSocket or WebRTC based transport channel. Either requestor & approver can create a direct p2p channel by discovering each other’s inbox via the hub Or the messages can be transported by another account acting as a broker.
+Handshake requires a WebSocket or WebRTC based transport channel. Either requestor & approver can create a direct p2p channel by discovering each other’s inbox via the hub OR the messages can be transported by another account acting as a broker.
