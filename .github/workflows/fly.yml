@@ -24,7 +24,6 @@ jobs:
           flyctl deploy --remote-only --ha=false \
           --build-secret VITE_NETWORK=${{ secrets.VITE_NETWORK }} \
           --build-secret VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} \
-          --build-secret VITE_COMMUNITY_AGENT_ACCESS_KEY=${{ secrets.VITE_COMMUNITY_AGENT_ACCESS_KEY }} \
           --config apps/rolodex/fly.toml --dockerfile apps/rolodex/Dockerfile
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
