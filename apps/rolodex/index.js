@@ -7,6 +7,15 @@ import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
 import morgan from 'morgan';
+import * as Sentry from "@sentry/node";
+
+if (process.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.VITE_SENTRY_DSN,
+  });
+} else {
+  console.log("Skipping Sentry Initialization due to missing environment variable")
+}
 
 const port = process.argv[2] || 3000;
 const server = express();
