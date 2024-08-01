@@ -44,7 +44,7 @@ export const MessageCapability = {
   async actAsJoinApprover(approverHandle) {
     const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)
-    this.approver = new Approver(this, channel, async (message) => { })
+    this.approver.register("JOIN", channel)
 
     await channel.subscribe(this.approver)
   },
@@ -67,7 +67,7 @@ export const MessageCapability = {
   async actAsRelationshipApprover(address, brokerHandle, approverHandle) {
     let channelName = `${brokerHandle}-${approverHandle}-relationship`
     const channel = new Channel(this.helia, channelName)
-    this.approver = new Approver(this, channel, async (message) => { })
+    this.approver.register("RELATE", channel)
 
     await dial(this.helia, address)
     await channel.subscribe(this.approver)
@@ -135,9 +135,6 @@ export const AccountCapability = {
 
     return success
   },
-
-
-
 
   async setCustodyKey(accessKey) {
     await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
@@ -329,6 +326,7 @@ export class Agent {
     this.runtime = runtime
     this.fs = new PrivateFS(helia)
     this.hubConnection = new HubConnection(this.helia, this.axios_client, dialPrefix)
+    this.approver = new Approver(this)
   }
 
   async DID(){

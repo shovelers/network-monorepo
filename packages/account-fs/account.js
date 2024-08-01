@@ -13,7 +13,7 @@ export class AccountV1 {
       people: new PeopleRepository(agent)
     }
     this.ps = new PeopleSearch(agent, this.repositories.people)
-  } 
+  }
 
   async loadRepositories(){
     let members = new MembersRepository(this.agent)
@@ -42,8 +42,6 @@ export class AccountV1 {
     return success
   }
 
-  // recovery - not needed for facaster login
-
   async requestHandshake(accountDID, brokerDID = null) {
     let person = await this.repositories.profile.contactForHandshake(accountDID)
     console.log("person with XML :", person)
@@ -52,7 +50,7 @@ export class AccountV1 {
     if (brokerDID) {
       let address = await this.agent.getInbox(brokerDID)
       console.log("inbox:", accountDID, address)
-      requester = await window.shovel.agent.actAsRelationshipRequester(address, brokerDID, accountDID)
+      requester = await this.agent.actAsRelationshipRequester(address, brokerDID, accountDID)
     } else {
       let address = await this.agent.getInbox(accountDID)
       console.log("inbox:", accountDID, address)
@@ -76,7 +74,7 @@ export class AccountV1 {
       shouldWeWait = false
     })
 
-    await requester.initiate()
+    setTimeout(() => { requester.initiate() }, 5)
 
     await new Promise((resolve) => {
       const checkFlag = () => {

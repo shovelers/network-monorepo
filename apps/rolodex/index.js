@@ -109,9 +109,7 @@ if (RUN_COMMUNITY_AGENT == true) {
 
       agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
         console.log("receieved from requester :", challengeEvent.detail)
-        console.log("channel from event :", challengeEvent.detail.channelName)
-        console.log("channel from agent :", agent.approver.channel.name)
-        if (challengeEvent.detail.channelName == agent.approver.channel.name){
+        if (challengeEvent.detail.channelName == agent.approver.channels["JOIN"].name){
           var memberRepo = new MembersRepository(agent)
           let person = new Person(challengeEvent.detail.message.challenge.person)
           let valid = await person.validateProfileForCommunity(agent, communityRepo.sample(communityDID).profileSchema, challengeEvent.detail.message.challenge.head)

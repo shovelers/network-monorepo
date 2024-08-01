@@ -2,11 +2,15 @@ import { Notification } from './common.js';
 import { Handshake } from './handshake.js';
 
 export class Approver {
-  constructor(agent, channel) {
+  constructor(agent) {
     this.agent = agent
-    this.channel = channel
     this.notification = new Notification()
     this.handshakes = []
+    this.channels = {}
+  }
+
+  register(type, channel) {
+    this.channels[type] = channel
   }
 
   async handler(message) {
@@ -21,12 +25,11 @@ export class Approver {
   }
 
   newHandshake(request) {
-    switch (request.type) {
-    case "JOIN":
-    case "RELATE":
-      return new Handshake(this.agent, this.channel, request.id, this.notification)
-    default:
-      throw "Unknown Handshake Type"
+    if (this.channels[request.type]) {
+      console.log("receive handshake")
+      return new Handshake(this.agent, this.channels[request.type], request.id, this.notification)
+    } else {
+      throw `Unregistered Handshake Type: ${request.type}`
     }
   }
 }
