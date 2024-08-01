@@ -45,12 +45,8 @@ export const MessageCapability = {
     const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)
     this.approver = new Approver(this, channel, async (message) => { })
-    this.approver.notification.addEventListener("CONFIRMED", async (message) => {
-      console.log(message.detail)
-    })
 
     await channel.subscribe(this.approver)
-    console.log("Subscribing to :", channelName)
   },
 
   async actAsJoinRequester(address, approverHandle) {
@@ -65,7 +61,6 @@ export const MessageCapability = {
     }
 
     await channel.subscribe(this.requester)
-    console.log("Subscribing to :", channelName)
     return this.requester
   },
 
@@ -73,9 +68,6 @@ export const MessageCapability = {
     let channelName = `${brokerHandle}-${approverHandle}-relationship`
     const channel = new Channel(this.helia, channelName)
     this.approver = new Approver(this, channel, async (message) => { })
-    this.approver.notification.addEventListener("CONFIRMED", async (message) => {
-      console.log(message.detail)
-    })
 
     await dial(this.helia, address)
     await channel.subscribe(this.approver)
