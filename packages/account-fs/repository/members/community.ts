@@ -125,6 +125,39 @@ export class CommunityRepository {
       }
     }
 
+    if (communityDID == "did:pkh:eip155:8453:0x1Dbc304222E62771eB9AbBA6d5Aa495C195644be") {
+      communityFile.FN = "DecentralisedCo"
+      communityFile.profileSchema.properties.inputs.properties = {
+        "lookingFor": {
+          "title": "Looking For",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["Gigs", "Job", "Partnerships", "Talent", "Warm Intros", "Fundraise", "Founders"]
+          }
+        },
+        "canHelpWith": {
+          "title": "Can Help With",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"]
+          }
+        },
+        "expertise": {
+          "title": "Expertise",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["Data Science", "Market Research", "DeFi", "Design", "Community Building", "Strategy", "Economics", "Engineering", "Fundraising", "Admin/Operations"]
+          },
+        },
+      }
+    }
+
     return communityFile
   }
 

@@ -1,6 +1,6 @@
 /*
 Sample
-  node scripts/agent_create.js rolodex > apps/rolodex/agent_runtime_config.json
+  node scripts/agent_create.js <name> <ethWallet> <chainId> | jq -r . > <filename>.json
 
 Steps for Messaging Agent
   Get user handle for which to create agent as user input - SHOVEL_ACCOUNT_HANDLE
@@ -25,6 +25,8 @@ import { spki } from 'iso-signatures/spki'
 import { DIDKey } from 'iso-did/key'
 
 const handle = process.argv[2]
+const ethWallet = process.argv [3]
+const chainId = process.argv[4] || '8453'
 
 async function generate() {
   const cryptoKeyPair = await crypto.subtle.generateKey(
@@ -57,7 +59,13 @@ delete jwk.key_ops
 
 var configFile = {
   "SHOVEL_ACCOUNT_HANDLE": handle,
-  "SHOVEL_AGENT_WRITE_KEYPAIR": jwk
+  "SHOVEL_AGENT_WRITE_KEYPAIR": jwk,
+  "SHOVEL_AGENT_DID": signer.did,
+  "SHOVEL_ACCOUNT_DID": `did:pkh:eip155:${chainId}:${ethWallet}`,
+  "SHOVEL_AGENT_SIWE": {
+    message: "",
+    signature: ""
+  }
 }
 
 // Print agent_runtime_config.json
