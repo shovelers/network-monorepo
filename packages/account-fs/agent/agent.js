@@ -41,6 +41,20 @@ export const MessageCapability = {
     return inbox
   },
 
+  async establishConnection(accountDID) {
+    let address = await this.getInbox(accountDID)
+   
+    try {
+      await dial(this.helia, address)
+      return true
+    } catch (e) {
+      console.log("Connection Failed while dialing:", address)
+      alert('Connection with Hub Failed. Please Relaod the Page.')
+    }
+
+    return false
+  },
+
   async actAsJoinApprover(approverHandle) {
     const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)
@@ -49,37 +63,29 @@ export const MessageCapability = {
     await channel.subscribe(this.approver)
   },
 
-  async actAsJoinRequester(address, approverHandle) {
+  async actAsJoinRequester(approverHandle) {
     const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)
     this.requester = new Requester(this, channel, "JOIN")
-
-    try {
-      await dial(this.helia, address)
-    } catch (e) {
-      alert('Connection with Hub Failed. Please Relaod the Page.')
-    }
 
     await channel.subscribe(this.requester)
     return this.requester
   },
 
-  async actAsRelationshipApprover(address, brokerHandle, approverHandle) {
+  async actAsRelationshipApprover(brokerHandle, approverHandle) {
     let channelName = `${brokerHandle}-${approverHandle}-relationship`
     const channel = new Channel(this.helia, channelName)
     this.approver.register("RELATE", channel)
 
-    await dial(this.helia, address)
     await channel.subscribe(this.approver)
   },
 
-  async actAsRelationshipRequester(address, brokerHandle, approverHandle) {
+  async actAsRelationshipRequester(brokerHandle, approverHandle) {
     let channelName = `${brokerHandle}-${approverHandle}-relationship`
     let forwardingChannel = `${brokerHandle}-forwarding`
     const channel = new Channel(this.helia, channelName, forwardingChannel)
     this.requester = new Requester(this, channel, "RELATE")
 
-    await dial(this.helia, address)
     await channel.subscribe(this.requester)
     return this.requester
   },

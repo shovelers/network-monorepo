@@ -48,13 +48,13 @@ export class AccountV1 {
 
     let requester
     if (brokerDID) {
-      let address = await this.agent.getInbox(brokerDID)
-      console.log("inbox:", accountDID, address)
-      requester = await this.agent.actAsRelationshipRequester(address, brokerDID, accountDID)
+      let status = await this.agent.establishConnection(brokerDID)
+      console.log("inbox:", accountDID, status)
+      requester = await this.agent.actAsRelationshipRequester(brokerDID, accountDID)
     } else {
-      let address = await this.agent.getInbox(accountDID)
-      console.log("inbox:", accountDID, address)
-      requester = await this.agent.actAsJoinRequester(address, accountDID)
+      let status = await this.agent.establishConnection(accountDID)
+      console.log("inbox:", accountDID, status)
+      requester = await this.agent.actAsJoinRequester(accountDID)
     }
     
     const head = await this.agent.head()
@@ -93,10 +93,10 @@ export class AccountV1 {
   async handshakeApprover(brokerDID) {
     var accountDID = await this.agent.accountDID()
 
-    let address = await this.agent.getInbox(brokerDID)
-    console.log("inbox:", accountDID, brokerDID, address)
+    let status = await this.agent.establishConnection(brokerDID)
+    console.log("inbox:", accountDID, brokerDID, status)
 
-    await this.agent.actAsRelationshipApprover(address, brokerDID, accountDID)
+    await this.agent.actAsRelationshipApprover(brokerDID, accountDID)
 
     this.agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
       console.log(challengeEvent.detail)
