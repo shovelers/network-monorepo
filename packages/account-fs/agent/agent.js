@@ -357,6 +357,7 @@ export class Agent {
     return { message: message, signature: encodedSignature }
   }
 
+  // TODO - remove - members repo is using it.
   async handle() {
     return await this.runtime.getItem(SHOVEL_ACCOUNT_HANDLE)
   }

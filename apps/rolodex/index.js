@@ -18,6 +18,7 @@ const __dirname = path.dirname(__filename);
 const NETWORK = process.env.VITE_NETWORK || "DEVNET"
 const RUN_COMMUNITY_AGENT = process.env.VITE_RUN_COMMUNITY_AGENT || true
 
+const configDir = process.env.CONFIG_HOME || __dirname
 const homeDir = process.env.PROTOCOL_DB_HOME || path.join(__dirname, 'protocol_db')
 await fs.mkdir(path.join(homeDir, 'blocks'), { recursive: true })
 await fs.mkdir(path.join(homeDir, 'data'), { recursive: true })
@@ -26,7 +27,7 @@ const helia = await createAppNode(path.join(homeDir, 'blocks'), path.join(homeDi
 ///
 //Agent of Rolodex
 // TODO - remove from git and generate for deployment
-const runtimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'agent_runtime_config.json'), 'utf8'))
+const runtimeConfig = JSON.parse(await fs.readFile(path.join(configDir, 'agent_runtime_config.json'), 'utf8'))
 const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
 const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime)
 Object.assign(Agent.prototype, MessageCapability);
@@ -48,9 +49,9 @@ var communityAgents = []
 if (RUN_COMMUNITY_AGENT == true) {
   try {
     //check if config file exists
-    await access(path.join(__dirname, "community_agent_runtime_config.json"), constants.R_OK | constants.W_OK);
+    await access(path.join(configDir, "community_agent_runtime_config.json"), constants.R_OK | constants.W_OK);
     
-    var communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, "community_agent_runtime_config.json"), 'utf8'))
+    var communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(configDir, "community_agent_runtime_config.json"), 'utf8'))
     //instantiate agent for each community in config file
     for (const [key, config] of Object.entries(communityRuntimeConfig)) {
       //add accessKey from envVar to runtime config
