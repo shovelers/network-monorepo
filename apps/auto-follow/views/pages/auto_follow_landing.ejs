@@ -159,8 +159,10 @@
         const loader = document.getElementById('loader');
         loader.classList.remove('hidden');
         const communityList = document.getElementById('communityList');
+        communityList.style.display = 'none'; 
         const notFollowedList = document.getElementById('notFollowedList');
         communityList.innerHTML = ''; // Clear existing content
+        const communityPromises = [];
 
         window.getContacts().then( async (result) => {
           result.contactList.forEach(async (contact) => {
@@ -232,12 +234,14 @@
                 shuffleButton.onclick = () => displayRandomMembers();
                 modal.showModal();
             });
-            await getListOfFidFromCommunityContact(contact);
+            communityPromises.push(getListOfFidFromCommunityContact(contact));
             }
         });
+          await Promise.all(communityPromises);
           updateCommunityCount();
         })
         .finally(()=> {
+          communityList.style.display = 'block';
           loader.classList.add('hidden');
         });
       }
