@@ -19,15 +19,28 @@
 
   
   <script type="module">
-    import { account, getContacts, getProfile, getCommunityMembers, followFarcasterUsersBasedOnFID, didsToFids } from '/odd.js';
+    import { account, getContacts, getProfile, getCommunityMembers, followFarcasterUsersBasedOnFID, didsToFids, signout } from '/odd.js';
       window.getContacts = getContacts;
       window.getProfile = getProfile;
+      window.signout = signout;
       var farcasterHandle;
       let communityMap = new Map();
       let communityCount = 0;  
-     var randomMemberList = [];
+      var randomMemberList = [];
       var numberOfAccountsFollowed;
       var signerUuid = ''
+      let postSignInAction = null;
+
+      var session = await account.activeSession();
+      if (session) {
+        if (mixpanel){ 
+          mixpanel.identify(await shovel.agent.accountDID())
+        }
+      }
+      else {
+        window.location.href = '/auto_follow_signup';
+      }
+
       await localforage.getItem('signerUuid').then(function(value) 
        {  
         if (value) 
@@ -53,6 +66,7 @@
 
       window.followRandom = async function(unfollowedMembers) {
         if(signerUuid === '') {
+          postSignInAction = () => followRandom(unfollowedMembers);
           document.getElementById('signer_modal').showModal();
           return;
         }
@@ -81,6 +95,7 @@
 
       window.followAll = async function(allCommunityMembers) {
         if(signerUuid === '') {
+          postSignInAction = () => followAll(allCommunityMembers);
           document.getElementById('signer_modal').showModal();
           return;
         }
@@ -144,12 +159,16 @@
 
 
       window.refreshContacts = async function(){
+        const loader = document.getElementById('loader');
+        loader.classList.remove('hidden');
         const communityList = document.getElementById('communityList');
+        communityList.style.display = 'none'; 
         const notFollowedList = document.getElementById('notFollowedList');
         communityList.innerHTML = ''; // Clear existing content
+        const communityPromises = [];
 
-        window.getContacts().then((result) => {
-          result.contactList.forEach((contact) => {
+        window.getContacts().then( async (result) => {
+          result.contactList.forEach(async (contact) => {
             if (contact.CATEGORIES === "community") {
               communityCount++;
               const communityName = contact.FN;
@@ -218,10 +237,15 @@
                 shuffleButton.onclick = () => displayRandomMembers();
                 modal.showModal();
             });
-            getListOfFidFromCommunityContact(contact);
+            communityPromises.push(getListOfFidFromCommunityContact(contact));
             }
         });
+          await Promise.all(communityPromises);
           updateCommunityCount();
+        })
+        .finally(()=> {
+          communityList.style.display = 'block';
+          loader.classList.add('hidden');
         });
       }
      
@@ -234,6 +258,10 @@
                 .then(function() {
                     console.log("signer uuid stored successfully");
                     signerUuid = data.signer_uuid;
+                    if (postSignInAction) {
+                      postSignInAction();
+                      postSignInAction = null;
+                    }
                 }) .catch(function(err) {
                     console.error("Error storing signer UUID:", err);
                 });
@@ -251,9 +279,20 @@
      
     </script>
     <body class="antialiased">
+        <button onclick="event.preventDefault(); signout().then(function(){window.location.href='/auto_follow_signup'}) " class="btn btn-ghost btn-circle signout-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+          <line x1="12" y1="2" x2="12" y2="12"></line>
+        </svg>
+      </button>
       <div class="container mx-auto px-4 h-screen flex flex-col justify-center items-center">
 
         <div id="welcomeMessage" style="display: none;">Welcome</div>
+
+        <div id="loader" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  text-center flex flex-col items-center justify-center">
+          <div class="loading loading-infinity"></div>
+          <p id="loaderText" class="mt-2">Scanning your rolodex</p>
+        </div>
         <div id="communityCountMessage"></div>
         <div id="communityList"></div>
      

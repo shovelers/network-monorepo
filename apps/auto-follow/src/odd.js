@@ -178,6 +178,10 @@ const didsToFids = {
   'did:pkh:eip155:10:0xffE946D9C24ca4D6F785447A923C9e812E4e7B95': 9856
 }
 
+async function signout() {
+  await account.signout()
+}
+
 export { 
   account,
   farcasterClient,
@@ -186,5 +190,6 @@ export {
   getProfile, 
   getContacts, 
   getCommunityMembers,
-  followFarcasterUsersBasedOnFID
+  followFarcasterUsersBasedOnFID,
+  signout
 };
