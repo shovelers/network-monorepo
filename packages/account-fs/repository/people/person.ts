@@ -113,22 +113,21 @@ export class Person {
 
   async getMembers(agent): Promise<Person[]> {
     if (this.isCommunity() != true ) { return [] }
+    if (this.cache.people) { return this.cache.people.filter(p => p.readFetchedProfile() instanceof Profile) }
 
-    if (!(this.cache.people)) {
-      const data = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['members.json'], 'base64url')
-      console.log("members.json", data)
+    const data = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['members.json'], 'base64url')
+    console.log("members.json", data)
 
-      this.cache.people = Object.entries(data.memberList).map(([key, value]) => {
-        const v = value as PersonData
-        return new Person({PRODID: v.PRODID, UID: v.UID, FN: v.FN, XML: v.XML, parents: [this]})
-      })
-    }
+    this.cache.people = Object.entries(data.memberList).map(([key, value]) => {
+      const v = value as PersonData
+      return new Person({PRODID: v.PRODID, UID: v.UID, FN: v.FN, XML: v.XML, parents: [this]})
+    })
 
     let results = await this.fetchProfilesWithPool(this.cache.people, agent);
     results = results.flat().filter(i => i)
     console.log(`fetching ${this.cache.people.length} members, got ${results.length}`, this)
-    this.cache.people.filter(p => p.readFetchedProfile() instanceof Profile)
-    return this.cache.people
+
+    return this.cache.people.filter(p => p.readFetchedProfile() instanceof Profile)
   }
 
   async fetchProfilesWithPool(people: Person[], agent: any, poolSize: number = 10): Promise<any[]> {
@@ -158,12 +157,13 @@ export class Person {
   readFetchedProfile() { return (this.cache.profile || {}) }
 
   async getProfile(agent, communityDID): Promise<Profile | undefined> {
+    if (this.cache.profile) { return this.cache.profile }
+
     if (this.sharedFiles().hasOwnProperty(`${communityDID}.json`) == true ) {
-      if (this.cache.profile) { return this.cache.profile }
       this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()[`${communityDID}.json`], 'base64url')
       if (Object.keys(this.cache.profile).length == 0) {
         console.log("unable to getProfile - ", communityDID, this)
-        this.cache.profile = undefined
+        this.cache.profile = {}
         return
       }
 
@@ -173,14 +173,14 @@ export class Person {
 
     if (this.sharedFiles().hasOwnProperty('profile.json') != true ) {
       console.log("skip getProfile - no profile.json", this)
+      this.cache.profile = {}
       return
     }
 
-    if (this.cache.profile) { return this.cache.profile }
     this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['profile.json'], 'base64')
     if (Object.keys(this.cache.profile).length == 0) {
       console.log("unable to getProfile", this)
-      this.cache.profile = undefined
+      this.cache.profile = {}
       return
     }
 

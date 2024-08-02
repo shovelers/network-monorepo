@@ -111,7 +111,6 @@ export class PeopleSearch {
       let allTags = Object.values(profile.inputs).reduce(
         (acc, curr) => { return Array.isArray(curr) ? [...acc, ...curr] : acc }, []
       ).filter(t => t)
-      console.log("tags value", profile.inputs, allTags)
       if ((allTags.filter(tag => tag.toLowerCase().includes(query))).length > 0 ) {
         return true
       }
