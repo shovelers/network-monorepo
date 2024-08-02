@@ -30,6 +30,11 @@ async function programInit(network) {
 
   const helia = await createBrowserNode()
 
+  const peers = await helia.libp2p.peerStore.all()
+  for (let peer of peers) {
+    await helia.libp2p.peerStore.delete(peer.id)
+  }
+
   const runtime = new Runtime(BROWSER_RUNTIME, {})
   const agent =  new Agent(helia, connection[network].sync_host, connection[network].dial_prefix, runtime)
   Object.assign(Agent.prototype, AccountCapability);

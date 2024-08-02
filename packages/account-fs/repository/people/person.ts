@@ -32,6 +32,7 @@ export class Person {
   XML: string;
   VERSION: string;
   private cache: any;
+  private parents: Person[];
 
   constructor(fields: PersonData) {
     this.PRODID = fields.PRODID; //required
@@ -46,6 +47,7 @@ export class Person {
      // TODO: Define how to use XML for profile
     this.VERSION = "4.0";
     this.cache = {}
+    this.parents = fields.parents || []
   }
 
   asJSON() {
@@ -60,6 +62,14 @@ export class Person {
       NOTE: this.NOTE,
       XML: this.XML,
     };
+  }
+
+  getParents() {
+    return this.parents
+  }
+
+  mergeParents(otherPerson: Person): void {
+    this.parents = [...new Set([...this.parents, ...otherPerson.parents])];
   }
 
   accountDID(){
@@ -101,23 +111,23 @@ export class Person {
     return false
   }
 
-  async getMembers(agent){
+  async getMembers(agent): Promise<Person[]> {
     if (this.isCommunity() != true ) { return [] }
+    if (this.cache.people) { return this.cache.people.filter(p => p.readFetchedProfile() instanceof Profile) }
 
-    if (!(this.cache.people)) {
-      const data = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['members.json'], 'base64url')
-      console.log("members.json", data)
+    const data = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['members.json'], 'base64url')
+    console.log("members.json", data)
 
-      this.cache.people = Object.entries(data.memberList).map(([key, value]) => {
-        const v = value as PersonData
-        return new Person({PRODID: v.PRODID, UID: v.UID, FN: v.FN, XML: v.XML})
-      })
-    }
+    this.cache.people = Object.entries(data.memberList).map(([key, value]) => {
+      const v = value as PersonData
+      return new Person({PRODID: v.PRODID, UID: v.UID, FN: v.FN, XML: v.XML, parents: [this]})
+    })
 
     let results = await this.fetchProfilesWithPool(this.cache.people, agent);
     results = results.flat().filter(i => i)
     console.log(`fetching ${this.cache.people.length} members, got ${results.length}`, this)
-    return results
+
+    return this.cache.people.filter(p => p.readFetchedProfile() instanceof Profile)
   }
 
   async fetchProfilesWithPool(people: Person[], agent: any, poolSize: number = 10): Promise<any[]> {
@@ -144,13 +154,16 @@ export class Person {
     return results;
   }
 
-  async getProfile(agent, communityDID) {
+  readFetchedProfile() { return (this.cache.profile || {}) }
+
+  async getProfile(agent, communityDID): Promise<Profile | undefined> {
+    if (this.cache.profile) { return this.cache.profile }
+
     if (this.sharedFiles().hasOwnProperty(`${communityDID}.json`) == true ) {
-      if (this.cache.profile) { return this.cache.profile }
       this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()[`${communityDID}.json`], 'base64url')
       if (Object.keys(this.cache.profile).length == 0) {
         console.log("unable to getProfile - ", communityDID, this)
-        this.cache.profile = undefined
+        this.cache.profile = {}
         return
       }
 
@@ -160,14 +173,14 @@ export class Person {
 
     if (this.sharedFiles().hasOwnProperty('profile.json') != true ) {
       console.log("skip getProfile - no profile.json", this)
-      return {}
+      this.cache.profile = {}
+      return
     }
 
-    if (this.cache.profile) { return this.cache.profile }
     this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()['profile.json'], 'base64')
     if (Object.keys(this.cache.profile).length == 0) {
       console.log("unable to getProfile", this)
-      this.cache.profile = undefined
+      this.cache.profile = {}
       return
     }
 
@@ -186,4 +199,5 @@ export interface PersonData {
   TEL?: string[];
   EMAIL?: string[];
   XML?: string;
+  parents?: Person[]
 }

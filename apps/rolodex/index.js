@@ -7,6 +7,15 @@ import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
 import morgan from 'morgan';
+import * as Sentry from "@sentry/node";
+
+if (process.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.VITE_SENTRY_DSN,
+  });
+} else {
+  console.log("Skipping Sentry Initialization due to missing environment variable")
+}
 
 const port = process.argv[2] || 3000;
 const server = express();
@@ -18,6 +27,7 @@ const __dirname = path.dirname(__filename);
 const NETWORK = process.env.VITE_NETWORK || "DEVNET"
 const RUN_COMMUNITY_AGENT = process.env.VITE_RUN_COMMUNITY_AGENT || true
 
+const configDir = process.env.CONFIG_HOME || __dirname
 const homeDir = process.env.PROTOCOL_DB_HOME || path.join(__dirname, 'protocol_db')
 await fs.mkdir(path.join(homeDir, 'blocks'), { recursive: true })
 await fs.mkdir(path.join(homeDir, 'data'), { recursive: true })
@@ -26,7 +36,7 @@ const helia = await createAppNode(path.join(homeDir, 'blocks'), path.join(homeDi
 ///
 //Agent of Rolodex
 // TODO - remove from git and generate for deployment
-const runtimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, 'agent_runtime_config.json'), 'utf8'))
+const runtimeConfig = JSON.parse(await fs.readFile(path.join(configDir, 'agent_runtime_config.json'), 'utf8'))
 const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
 const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime)
 Object.assign(Agent.prototype, MessageCapability);
@@ -48,9 +58,9 @@ var communityAgents = []
 if (RUN_COMMUNITY_AGENT == true) {
   try {
     //check if config file exists
-    await access(path.join(__dirname, "community_agent_runtime_config.json"), constants.R_OK | constants.W_OK);
+    await access(path.join(configDir, "community_agent_runtime_config.json"), constants.R_OK | constants.W_OK);
     
-    var communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(__dirname, "community_agent_runtime_config.json"), 'utf8'))
+    var communityRuntimeConfig = JSON.parse(await fs.readFile(path.join(configDir, "community_agent_runtime_config.json"), 'utf8'))
     //instantiate agent for each community in config file
     for (const [key, config] of Object.entries(communityRuntimeConfig)) {
       //add accessKey from envVar to runtime config
@@ -99,9 +109,7 @@ if (RUN_COMMUNITY_AGENT == true) {
 
       agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
         console.log("receieved from requester :", challengeEvent.detail)
-        console.log("channel from event :", challengeEvent.detail.channelName)
-        console.log("channel from agent :", agent.approver.channel.name)
-        if (challengeEvent.detail.channelName == agent.approver.channel.name){
+        if (challengeEvent.detail.channelName == agent.approver.channels["JOIN"].name){
           var memberRepo = new MembersRepository(agent)
           let person = new Person(challengeEvent.detail.message.challenge.person)
           let valid = await person.validateProfileForCommunity(agent, communityRepo.sample(communityDID).profileSchema, challengeEvent.detail.message.challenge.head)

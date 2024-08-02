@@ -76,6 +76,10 @@ export class ContactTable extends HTMLElement {
             tagscell.innerHTML += `<span class="badge badge-neutral">${tag}</span>`;
           }
         }
+      } else if (value.getParents() && value.getParents().length > 0) {
+        for (let parent of value.getParents()) {
+          tagscell.innerHTML += `<button class="badge badge-neutral" onclick="window.location.href = '/directory/${parent.UID.split(':').splice(1).join(':')}?name=${parent.FN}'">${parent.FN.toLowerCase()}</button>`;
+        }
       } else {
         tagscell.innerHTML = '';
       }

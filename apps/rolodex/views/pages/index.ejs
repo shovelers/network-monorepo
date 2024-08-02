@@ -11,7 +11,6 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">
-      
       import { account, farcasterClient, farcasterSignup, createSiweMessage, getNonce, verifySiweMessage, ethereumSignup } from '/odd.js';
       import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.12.1/ethers.min.js";
 
@@ -61,7 +60,6 @@
       } else {
         alert('Singup failed! Error :', verified)
       }
-      
      }
 
      window.startFarcasterSignup = async function(){
@@ -94,7 +92,7 @@
          if (response.success) {
            console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username, agentDID, status.data.message, status.data.signature)
            let accountDID = `did:pkh:eip155:${response.data.chainId}:${response.data.address}`
-           let profileData = { handle: status.data.username, name: status.data.displayName, text: status.data.bio, tags: [], pfpUrl: status.data.pfpUrl}
+           let profileData = { fid: status.data.fid, handle: status.data.username, name: status.data.displayName, text: status.data.bio, tags: [], pfpUrl: status.data.pfpUrl}
            console.log("farcaster message", status.data.message);
            await farcasterSignup(accountDID, status.data.message, status.data.signature, profileData, status.data.fid)
            window.location.href = "/app"

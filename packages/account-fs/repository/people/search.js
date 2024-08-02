@@ -1,11 +1,4 @@
 export class PeopleSearch {
-  // build a list of people
-    // get local contacts
-    // get shared contacts via users and community
-  // design caching and update of list of people
-  // provide fast query layer
-  // Alow providing context of community to query
-
   constructor(agent, peopleRepo) {
     this.agent = agent
     this.peopleRepo = peopleRepo
@@ -32,7 +25,8 @@ export class PeopleSearch {
     }
 
     async function searchRecursively(node, currentDepth) {
-      if (dis.fullTextMatch(node, queryString) || dis.profileMatch(node, queryString) || dis.memberMatch(node, queryString)) {
+      if (dis.personMatch(node, queryString) ||
+          dis.profileMatch(node.readFetchedProfile(), queryString)) {
         matches.push(node);
       }
   
@@ -48,11 +42,26 @@ export class PeopleSearch {
       await searchRecursively(person, 1);
     }
 
+    if (depth > 1) {
+      const uniqueMatches = new Map();
+    
+      for (const person of matches) {
+        if (uniqueMatches.has(person.UID)) {
+          const existingPerson = uniqueMatches.get(person.UID);
+          existingPerson.mergeParents(person);
+        } else {
+          uniqueMatches.set(person.UID, person);
+        }
+      }
+
+      matches = Array.from(uniqueMatches.values());
+    }
+
     return matches
   }
 
   //private
-  fullTextMatch(person, query) {
+  personMatch(person, query) {
     if ((person.FN && person.FN.toLowerCase().includes(query)) ||
         (person.NOTE && person.NOTE.toLowerCase().includes(query)) ||
         (person.URL && (person.URL.split(',').filter(link => link.toLowerCase().includes(query)).length > 0)) ||
@@ -75,21 +84,6 @@ export class PeopleSearch {
     return false
   }
 
-  memberMatch(person, query){
-    if ((person.name && person.name.toLowerCase().includes(query)) ||
-        (person.handle && person.handle.toLowerCase().includes(query)) ||
-        (person.text && person.text.toLowerCase().includes(query))) {
-      return true
-    }
-
-    let allTags = [].concat(person.lookingFor, person.canHelpWith, person.expertise).filter(t => t)
-    if ((allTags.filter(tag => tag.toLowerCase().includes(query))).length > 0 ) {
-      return true
-    }
-    
-    return false
-  }
-
   profileMatch(profile, query) {
     if (profile.socials && profile.socials.length > 0) {
       const farcaster = profile.socials.find((p) => p.prodid == "farcaster")
@@ -104,7 +98,6 @@ export class PeopleSearch {
       let allTags = Object.values(profile.inputs).reduce(
         (acc, curr) => { return Array.isArray(curr) ? [...acc, ...curr] : acc }, []
       ).filter(t => t)
-      console.log("tags value", profile.inputs, allTags)
       if ((allTags.filter(tag => tag.toLowerCase().includes(query))).length > 0 ) {
         return true
       }

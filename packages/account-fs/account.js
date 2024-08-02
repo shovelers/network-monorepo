@@ -13,7 +13,7 @@ export class AccountV1 {
       people: new PeopleRepository(agent)
     }
     this.ps = new PeopleSearch(agent, this.repositories.people)
-  } 
+  }
 
   async loadRepositories(){
     let members = new MembersRepository(this.agent)
@@ -42,21 +42,19 @@ export class AccountV1 {
     return success
   }
 
-  // recovery - not needed for facaster login
-
   async requestHandshake(accountDID, brokerDID = null) {
     let person = await this.repositories.profile.contactForHandshake(accountDID)
     console.log("person with XML :", person)
 
     let requester
     if (brokerDID) {
-      let address = await this.agent.getInbox(brokerDID)
-      console.log("inbox:", accountDID, address)
-      requester = await window.shovel.agent.actAsRelationshipRequester(address, brokerDID, accountDID)
+      let status = await this.agent.establishConnection(brokerDID)
+      console.log("inbox:", accountDID, status)
+      requester = await this.agent.actAsRelationshipRequester(brokerDID, accountDID)
     } else {
-      let address = await this.agent.getInbox(accountDID)
-      console.log("inbox:", accountDID, address)
-      requester = await this.agent.actAsJoinRequester(address, accountDID)
+      let status = await this.agent.establishConnection(accountDID)
+      console.log("inbox:", accountDID, status)
+      requester = await this.agent.actAsJoinRequester(accountDID)
     }
     
     const head = await this.agent.head()
@@ -76,7 +74,7 @@ export class AccountV1 {
       shouldWeWait = false
     })
 
-    await requester.initiate()
+    setTimeout(() => { requester.initiate() }, 5)
 
     await new Promise((resolve) => {
       const checkFlag = () => {
@@ -95,10 +93,10 @@ export class AccountV1 {
   async handshakeApprover(brokerDID) {
     var accountDID = await this.agent.accountDID()
 
-    let address = await this.agent.getInbox(brokerDID)
-    console.log("inbox:", accountDID, brokerDID, address)
+    let status = await this.agent.establishConnection(brokerDID)
+    console.log("inbox:", accountDID, brokerDID, status)
 
-    await this.agent.actAsRelationshipApprover(address, brokerDID, accountDID)
+    await this.agent.actAsRelationshipApprover(brokerDID, accountDID)
 
     this.agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
       console.log(challengeEvent.detail)

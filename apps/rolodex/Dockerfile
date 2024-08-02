@@ -29,8 +29,10 @@ RUN npm install --include=dev -w rolodex
 RUN --mount=type=secret,id=VITE_NETWORK \
     --mount=type=secret,id=VITE_GOOGLE_CLIENT_ID \
     --mount=type=secret,id=VITE_COMMUNITY_AGENT_ACCESS_KEY \
+    --mount=type=secret,id=VITE_SENTRY_DSN \
     VITE_NETWORK="$(cat /run/secrets/VITE_NETWORK)" \
     VITE_COMMUNITY_AGENT_ACCESS_KEY="$(cat /run/secrets/VITE_COMMUNITY_AGENT_ACCESS_KEY)" \
+    VITE_SENTRY_DSN="$(cat /run/secrets/VITE_SENTRY_DSN)" \
     VITE_GOOGLE_CLIENT_ID="$(cat /run/secrets/VITE_GOOGLE_CLIENT_ID)" npm run build -w rolodex
 
 # Remove development dependencies

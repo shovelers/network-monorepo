@@ -9,6 +9,23 @@ import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { save } from '@tauri-apps/api/dialog';
 import { writeTextFile } from '@tauri-apps/api/fs';
 import { SiweMessage } from 'siwe';
+import * as Sentry from "@sentry/browser";
+
+if (import.meta.env.VITE_SENTRY_DSN){
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+
+    integrations: [
+      Sentry.replayIntegration()
+    ],
+    // Capture Replay for 10% of all sessions,
+    // plus for 100% of sessions with an error
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+  });
+} else {
+  console.log("skipping sentry init due to missing dsn")
+}
 
 const farcasterClient = createAppClient({
   relay: 'https://relay.farcaster.xyz',
@@ -90,11 +107,11 @@ async function getMembers() {
 }
 
 async function getCommunityMembers(community) {
-  return await account.search({personUID: community.UID})
+  return (await account.search({personUID: community.UID})).map(i => i.readFetchedProfile())
 }
 
 async function filterMembers(filter, profiles, communityUID) {
-  return await account.search({query: filter, personUID: communityUID})
+  return (await account.search({query: filter, personUID: communityUID})).map(i => i.readFetchedProfile())
 }
 
 async function getProfile(communityDID = null) {
@@ -111,8 +128,9 @@ async function getContactByUID(uid) {
   return await contactRepo.find(uid)
 }
 
-async function filterContacts(filter) {
-  return { contactList: await account.search({query: filter, depth: 1}) }
+async function filterContacts(filter, all) {
+  var depth = (all == true) ? 2 : 1
+  return { contactList: await account.search({query: filter, depth: depth}) }
 }
 
 

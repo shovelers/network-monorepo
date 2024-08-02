@@ -61,7 +61,7 @@
          if (response.success) {
            console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username, agentDID, status.data.message, status.data.signature)
            let accountDID = `did:pkh:eip155:${response.data.chainId}:${response.data.address}`
-           let profileData = { handle: status.data.username, name: status.data.displayName, text: status.data.bio, tags: [], pfpUrl: status.data.pfpUrl}
+           let profileData = { fid: status.data.fid, handle: status.data.username, name: status.data.displayName, text: status.data.bio, tags: [], pfpUrl: status.data.pfpUrl}
            console.log("farcaster message", status.data.message);
            await farcasterSignup(accountDID, status.data.message, status.data.signature, profileData, status.data.fid)
            window.location.href = `/auto_follow_landing`

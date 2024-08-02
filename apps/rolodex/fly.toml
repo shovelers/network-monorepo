@@ -12,6 +12,7 @@ primary_region = "sin"
 [env]
   ROLODEX_DNS_MULTADDR_PREFIX = "/dns4/app-rolodex.shovel.company/tcp/3002/tls/ws/p2p/"
   PROTOCOL_DB_HOME = "/app/protocol_db"
+  CONFIG_HOME = "/app/protocol_db"
 
 [build]
 
