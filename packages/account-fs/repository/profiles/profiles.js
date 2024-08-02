@@ -58,6 +58,7 @@ export class ProfileRepository {
       "socials": [
         {
           "prodid": "farcaster",
+          "fid": profile.fid,
           "displayName": profile.name,
           "username": profile.handle,
           "bio": profile.text,
