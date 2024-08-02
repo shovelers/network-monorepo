@@ -64,6 +64,10 @@ export class Person {
     };
   }
 
+  getParents() {
+    return this.parents
+  }
+
   mergeParents(otherPerson: Person): void {
     this.parents = [...new Set([...this.parents, ...otherPerson.parents])];
   }
