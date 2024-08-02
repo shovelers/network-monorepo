@@ -42,8 +42,8 @@ async function followFarcasterUsersBasedOnFID(signerUuid, targetFids) {
   }
 }
 
-async function getCommunityMembers(community) {
-  return await account.search({personUID: community.UID})
+async function getCommunityMembers(communityUID) {
+  return await account.search({personUID: communityUID})
 }
 
 async function getProfile(communityDID = null) {
@@ -54,10 +54,6 @@ async function getContacts() {
   var list = await account.repositories.people.list()
   console.log("all", list)
   return {contactList: list}
-}
-
-async function getContactByUID(uid) {
-  return await account.repositories.people.find(uid)
 }
 
 const didsToFids = {
@@ -189,7 +185,6 @@ export {
   farcasterSignup,
   getProfile, 
   getContacts, 
-  getContactByUID,
   getCommunityMembers,
   followFarcasterUsersBasedOnFID
 };

@@ -19,10 +19,9 @@
 
   
   <script type="module">
-    import { account, getContacts, getContactByUID, getProfile, getCommunityMembers, followFarcasterUsersBasedOnFID, didsToFids } from '/odd.js';
+    import { account, getContacts, getProfile, getCommunityMembers, followFarcasterUsersBasedOnFID, didsToFids } from '/odd.js';
       window.getContacts = getContacts;
       window.getProfile = getProfile;
-      window.getContactByUID = getContactByUID;
       var farcasterHandle;
       let communityMap = new Map();
       let communityCount = 0;  
@@ -125,8 +124,7 @@
 
       window.getListOfFidFromCommunityContact = async function(communityContact){
          var communityDID = communityContact.UID;
-         let community = await getContactByUID(communityDID);
-         let communityMembers = await getCommunityMembers(community);
+         let communityMembers = await getCommunityMembers(communityDID);
          console.log("community members", communityMembers);
          if (communityMembers) {
             let communityUserDataArray = [];
