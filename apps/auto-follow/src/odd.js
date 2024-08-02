@@ -185,6 +185,7 @@ const didsToFids = {
 export { 
   account,
   farcasterClient,
+  didsToFids,
   farcasterSignup,
   getProfile, 
   getContacts, 

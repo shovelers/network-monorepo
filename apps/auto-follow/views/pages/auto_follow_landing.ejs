@@ -19,7 +19,7 @@
 
   
   <script type="module">
-    import { account, getContacts, getContactByUID, getProfile, getCommunityMembers, followFarcasterUsersBasedOnFID } from '/odd.js';
+    import { account, getContacts, getContactByUID, getProfile, getCommunityMembers, followFarcasterUsersBasedOnFID, didsToFids } from '/odd.js';
       window.getContacts = getContacts;
       window.getProfile = getProfile;
       window.getContactByUID = getContactByUID;
@@ -131,7 +131,12 @@
          if (communityMembers) {
             let communityUserDataArray = [];
             for (let member of communityMembers) {
-             communityUserDataArray.push([member.socials[0].fid, member.socials[0].username , member.socials[0].pfpUrl]); 
+              let memberDID = member.accountDID()
+              member = member.readFetchedProfile()
+              let fid = member.socials[0].fid || didsToFids[memberDID]
+              if (fid) {
+                communityUserDataArray.push([fid, member.socials[0].username , member.socials[0].pfpUrl]); 
+              }
             }
             communityMap.set(communityContact.FN, {allMembers: communityUserDataArray });
          }

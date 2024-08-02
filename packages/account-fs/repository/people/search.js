@@ -1,11 +1,4 @@
 export class PeopleSearch {
-  // build a list of people
-    // get local contacts
-    // get shared contacts via users and community
-  // design caching and update of list of people
-  // provide fast query layer
-  // Alow providing context of community to query
-
   constructor(agent, peopleRepo) {
     this.agent = agent
     this.peopleRepo = peopleRepo
@@ -49,12 +42,6 @@ export class PeopleSearch {
       await searchRecursively(person, 1);
     }
 
-    // HACK - For backward compatibility, keep returning profiles for community search
-    if (depth == 1 && personUID != null) {
-      return matches.map(i => i.readFetchedProfile())
-    }
-
-    // DeDup matches
     if (depth > 1) {
       const uniqueMatches = new Map();
     

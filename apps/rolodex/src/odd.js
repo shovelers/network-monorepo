@@ -107,11 +107,11 @@ async function getMembers() {
 }
 
 async function getCommunityMembers(community) {
-  return await account.search({personUID: community.UID})
+  return (await account.search({personUID: community.UID})).map(i => i.readFetchedProfile())
 }
 
 async function filterMembers(filter, profiles, communityUID) {
-  return await account.search({query: filter, personUID: communityUID})
+  return (await account.search({query: filter, personUID: communityUID})).map(i => i.readFetchedProfile())
 }
 
 async function getProfile(communityDID = null) {
