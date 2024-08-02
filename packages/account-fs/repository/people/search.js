@@ -32,7 +32,8 @@ export class PeopleSearch {
     }
 
     async function searchRecursively(node, currentDepth) {
-      if (dis.fullTextMatch(node, queryString) || dis.profileMatch(node, queryString) || dis.memberMatch(node, queryString)) {
+      if (dis.personMatch(node, queryString) ||
+          dis.profileMatch(node.readFetchedProfile(), queryString)) {
         matches.push(node);
       }
   
@@ -48,11 +49,16 @@ export class PeopleSearch {
       await searchRecursively(person, 1);
     }
 
+    // HACK - For backward compatibility, keep returning profiles for community search
+    if (depth == 1 && personUID != null) {
+      return matches.map(i => i.readFetchedProfile())
+    }
+
     return matches
   }
 
   //private
-  fullTextMatch(person, query) {
+  personMatch(person, query) {
     if ((person.FN && person.FN.toLowerCase().includes(query)) ||
         (person.NOTE && person.NOTE.toLowerCase().includes(query)) ||
         (person.URL && (person.URL.split(',').filter(link => link.toLowerCase().includes(query)).length > 0)) ||
@@ -72,21 +78,6 @@ export class PeopleSearch {
       }
     }
 
-    return false
-  }
-
-  memberMatch(person, query){
-    if ((person.name && person.name.toLowerCase().includes(query)) ||
-        (person.handle && person.handle.toLowerCase().includes(query)) ||
-        (person.text && person.text.toLowerCase().includes(query))) {
-      return true
-    }
-
-    let allTags = [].concat(person.lookingFor, person.canHelpWith, person.expertise).filter(t => t)
-    if ((allTags.filter(tag => tag.toLowerCase().includes(query))).length > 0 ) {
-      return true
-    }
-    
     return false
   }
 

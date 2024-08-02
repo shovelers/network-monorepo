@@ -128,8 +128,9 @@ async function getContactByUID(uid) {
   return await contactRepo.find(uid)
 }
 
-async function filterContacts(filter) {
-  return { contactList: await account.search({query: filter, depth: 1}) }
+async function filterContacts(filter, all) {
+  var depth = (all == true) ? 2 : 1
+  return { contactList: await account.search({query: filter, depth: depth}) }
 }
 
 

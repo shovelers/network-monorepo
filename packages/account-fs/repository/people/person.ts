@@ -101,7 +101,7 @@ export class Person {
     return false
   }
 
-  async getMembers(agent){
+  async getMembers(agent): Promise<Person[]> {
     if (this.isCommunity() != true ) { return [] }
 
     if (!(this.cache.people)) {
@@ -117,7 +117,8 @@ export class Person {
     let results = await this.fetchProfilesWithPool(this.cache.people, agent);
     results = results.flat().filter(i => i)
     console.log(`fetching ${this.cache.people.length} members, got ${results.length}`, this)
-    return results
+    this.cache.people.filter(p => p.readFetchedProfile() instanceof Profile)
+    return this.cache.people
   }
 
   async fetchProfilesWithPool(people: Person[], agent: any, poolSize: number = 10): Promise<any[]> {
@@ -144,7 +145,9 @@ export class Person {
     return results;
   }
 
-  async getProfile(agent, communityDID) {
+  readFetchedProfile() { return (this.cache.profile || {}) }
+
+  async getProfile(agent, communityDID): Promise<Profile | undefined> {
     if (this.sharedFiles().hasOwnProperty(`${communityDID}.json`) == true ) {
       if (this.cache.profile) { return this.cache.profile }
       this.cache.profile = await agent.readSharedFile(this.accountDID(), this.sharedFiles()[`${communityDID}.json`], 'base64url')
@@ -160,7 +163,7 @@ export class Person {
 
     if (this.sharedFiles().hasOwnProperty('profile.json') != true ) {
       console.log("skip getProfile - no profile.json", this)
-      return {}
+      return
     }
 
     if (this.cache.profile) { return this.cache.profile }
