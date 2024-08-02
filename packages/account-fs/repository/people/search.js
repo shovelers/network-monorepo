@@ -54,6 +54,22 @@ export class PeopleSearch {
       return matches.map(i => i.readFetchedProfile())
     }
 
+    // DeDup matches
+    if (depth > 1) {
+      const uniqueMatches = new Map();
+    
+      for (const person of matches) {
+        if (uniqueMatches.has(person.UID)) {
+          const existingPerson = uniqueMatches.get(person.UID);
+          existingPerson.mergeParents(person);
+        } else {
+          uniqueMatches.set(person.UID, person);
+        }
+      }
+
+      matches = Array.from(uniqueMatches.values());
+    }
+
     return matches
   }
 

@@ -32,6 +32,7 @@ export class Person {
   XML: string;
   VERSION: string;
   private cache: any;
+  private parents: Person[];
 
   constructor(fields: PersonData) {
     this.PRODID = fields.PRODID; //required
@@ -46,6 +47,7 @@ export class Person {
      // TODO: Define how to use XML for profile
     this.VERSION = "4.0";
     this.cache = {}
+    this.parents = fields.parents || []
   }
 
   asJSON() {
@@ -60,6 +62,10 @@ export class Person {
       NOTE: this.NOTE,
       XML: this.XML,
     };
+  }
+
+  mergeParents(otherPerson: Person): void {
+    this.parents = [...new Set([...this.parents, ...otherPerson.parents])];
   }
 
   accountDID(){
@@ -110,7 +116,7 @@ export class Person {
 
       this.cache.people = Object.entries(data.memberList).map(([key, value]) => {
         const v = value as PersonData
-        return new Person({PRODID: v.PRODID, UID: v.UID, FN: v.FN, XML: v.XML})
+        return new Person({PRODID: v.PRODID, UID: v.UID, FN: v.FN, XML: v.XML, parents: [this]})
       })
     }
 
@@ -189,4 +195,5 @@ export interface PersonData {
   TEL?: string[];
   EMAIL?: string[];
   XML?: string;
+  parents?: Person[]
 }
