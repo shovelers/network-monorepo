@@ -47,15 +47,10 @@ const config = {
         theme: {
           customCss: './src/css/custom.css',
         },
-      }),
-    ],
-    [
-      '@docusaurus/preset-classic',
-      {
         gtag: {
           trackingID: 'G-H9K0YV6H99',
         },
-      },
+      }),
     ],
   ],
 
