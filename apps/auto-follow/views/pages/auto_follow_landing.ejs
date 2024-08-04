@@ -132,9 +132,13 @@
 
      
       
-      window.updateCommunityCount = function() {
+       window.updateCommunityCount = function() {
         const countMessage = document.getElementById('communityCountMessage');
-        countMessage.textContent = `You are part of ${communityCount} ${communityCount === 1 ? 'community' : 'communities'}`;
+        if (communityCount === 0) {
+          countMessage.textContent = "Join a community on rolodex to discover members.";
+        } else {
+          countMessage.textContent = `You are part of ${communityCount} ${communityCount === 1 ? 'community' : 'communities'}`;
+        }      
       }
 
       window.getListOfFidFromCommunityContact = async function(communityContact){
