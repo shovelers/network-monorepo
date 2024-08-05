@@ -45,12 +45,9 @@
       if (md.mobile()) {
         window.location.href = url;
       } 
-      else {
-        var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
-        document.querySelector("#signup_by_farcaster > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
-        signup_by_farcaster.showModal()
-      }
-
+      var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
+      document.querySelector("#signup_by_farcaster > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
+      signup_by_farcaster.showModal()
       farcasterClient.watchStatus({
         channelToken: channel.data.channelToken,
       }).then((status) => {
