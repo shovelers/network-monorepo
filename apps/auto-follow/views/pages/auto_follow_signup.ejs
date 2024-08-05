@@ -40,7 +40,6 @@
       });
 
       const url = channel.data.url    
-      const md = new MobileDetect(window.navigator.userAgent);
      
       var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
       document.querySelector("#signup_by_farcaster > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
