@@ -39,6 +39,8 @@ window.shovel = program
 
 const account = new AccountV1(program.agent)
 await account.loadRepositories()
+account.setBrokerDID("did:pkh:eip155:8453:0xb423B0cce60c98213512349cAB69F0050903EA9")
+
 const contactRepo = account.repositories.people 
 const accountv1 = account
 shovel.account = account

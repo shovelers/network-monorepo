@@ -48,7 +48,7 @@ export const MessageCapability = {
       await dial(this.helia, address)
       return true
     } catch (e) {
-      console.log("Connection Failed while dialing:", address)
+      console.log("Connection Failed while dialing:", address, e)
       alert('Connection with Hub Failed. Please Relaod the Page.')
     }
 
@@ -58,9 +58,7 @@ export const MessageCapability = {
   async actAsJoinApprover(approverHandle) {
     const channelName = `${approverHandle}-membership`
     const channel = new Channel(this.helia, channelName)
-    this.approver.register("JOIN", channel)
-
-    await channel.subscribe(this.approver)
+    await this.approver.register("JOIN", channel)
   },
 
   async actAsJoinRequester(approverHandle) {
@@ -75,9 +73,7 @@ export const MessageCapability = {
   async actAsRelationshipApprover(brokerHandle, approverHandle) {
     let channelName = `${brokerHandle}-${approverHandle}-relationship`
     const channel = new Channel(this.helia, channelName)
-    this.approver.register("RELATE", channel)
-
-    await channel.subscribe(this.approver)
+    await this.approver.register("RELATE", channel)
   },
 
   async actAsRelationshipRequester(brokerHandle, approverHandle) {

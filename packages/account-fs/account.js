@@ -13,6 +13,24 @@ export class AccountV1 {
       people: new PeopleRepository(agent)
     }
     this.ps = new PeopleSearch(agent, this.repositories.people)
+    this.brokerDID = null
+  }
+
+  setBrokerDID(brokerDID) {
+    this.brokerDID = brokerDID
+  }
+
+  start(){
+    this.router = {
+      requester: {
+        "JOIN": { channel: "DIRECT", controller: "TBD", suffix: "membership" },
+        "RELATE": { channel: "BROKERED", controller: "TBD", suffix: "relationship" }
+      },
+      approver: {
+        "RELATE": { channel: "BROKERED", controller: "TBD", suffix: "relationship" }
+      },
+      broker: false
+    }
   }
 
   async loadRepositories(){

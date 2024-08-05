@@ -9,8 +9,10 @@ export class Approver {
     this.channels = {}
   }
 
-  register(type, channel) {
+  async register(type, channel) {
     this.channels[type] = channel
+    //TODO remove circular dependency, rather take the handler function or controller 
+    await this.channels[type].subscribe(this)
   }
 
   async handler(message) {
