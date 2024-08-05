@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="/styles/style.css" />
     <link rel="icon" href="/favicon.ico">
     <script src="https://cdn.jsdelivr.net/gh/papnkukn/qrcode-svg/dist/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mobile-detect@1.4.5/mobile-detect.min.js"></script>
     <title>Auto follow App</title>
   </head>
 
@@ -39,11 +40,16 @@
         requestId: agentDID
       });
 
-      const url = channel.data.url
-      var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
-      document.querySelector("#signup_by_farcaster > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
-
-      signup_by_farcaster.showModal()
+      const url = channel.data.url    
+      const md = new MobileDetect(window.navigator.userAgent);
+      if (md.mobile()) {
+        window.location.href = url;
+      } 
+      else {
+        var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
+        document.querySelector("#signup_by_farcaster > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
+        signup_by_farcaster.showModal()
+      }
 
       farcasterClient.watchStatus({
         channelToken: channel.data.channelToken,
