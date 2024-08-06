@@ -39,12 +39,12 @@
         requestId: agentDID
       });
 
-      const url = channel.data.url
+      const url = channel.data.url    
+     
       var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
       document.querySelector("#signup_by_farcaster > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
-
+      document.getElementById('openWarpcastLink').href = url;
       signup_by_farcaster.showModal()
-
       farcasterClient.watchStatus({
         channelToken: channel.data.channelToken,
       }).then((status) => {
@@ -94,9 +94,13 @@
       <dialog id="signup_by_farcaster" class="modal">
         <div class="modal-box">
           <div class="text-center font-lg">Sign in with Farcaster</div>
-          <div class="text-center text-sm">Scan with your phone's camera to </br>continue.</div>
-          <div class="modal-action flex flex-col justify-center items-center space-y-2">
+          <div class="text-center text-sm">Scan with your phone's camera or tap the button below to continue.</div>
+          <div class="modal-action flex flex-col justify-center items-center space-y-4">
             <div class="qr w-64 h-64"></div>
+            <a id="openWarpcastLink" class="btn btn-primary btn-sm">
+              Open in Warpcast
+            </a>
+            <div class="text-center text-sm">Tap the button above to open Warpcast and complete the sign-in process.</div>
           </div>
         </div>
       </dialog>
