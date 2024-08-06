@@ -26,7 +26,7 @@
     "daisyui": "^3.7.4",
     "ejs": "^3.1.8",
     "express": "^4.18.2",
-    "glob": "^10.3.6",
+    "glob": "^11.0.0",
     "interface-datastore": "^8.2.9",
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
