@@ -8,6 +8,7 @@ import { CID } from 'multiformats/cid'
 import { dial } from './helia_node.js'
 import { PrivateFS, PrivateFile } from "./fs/private_fs.js"
 import { HubConnection } from './hub_connection.js';
+import { SERVER_RUNTIME } from './runtime.js';
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
@@ -183,9 +184,11 @@ export const StorageCapability = {
       await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
       success = true
     }).catch(async (e) => {
-      console.log(e);
-      await this.runtime.removeItem(SHOVEL_FS_ACCESS_KEY)
-      await this.runtime.removeItem(SHOVEL_FS_FOREST_CID)
+      console.log(e.message);
+      if (this.runtime.type != SERVER_RUNTIME) {
+        await this.runtime.removeItem(SHOVEL_FS_ACCESS_KEY)
+        await this.runtime.removeItem(SHOVEL_FS_FOREST_CID)
+      }
       return e
     })
 

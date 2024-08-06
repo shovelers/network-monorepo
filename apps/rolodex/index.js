@@ -39,7 +39,8 @@ const helia = await createAppNode(path.join(homeDir, 'blocks'), path.join(homeDi
 const runtimeConfig = JSON.parse(await fs.readFile(path.join(configDir, 'agent_runtime_config.json'), 'utf8'))
 const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
 const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime)
-Object.assign(Agent.prototype, MessageCapability);
+Object.assign(agent, MessageCapability);
+Object.assign(agent, StorageCapability);
 
 await agent.bootstrap()
 
@@ -50,6 +51,30 @@ const address = process.env.ROLODEX_DNS_MULTADDR_PREFIX ? process.env.ROLODEX_DN
 const brokerDID = await agent.accountDID()
 await agent.setInbox(address)
 console.log(address, await agent.DID(), brokerDID)
+
+const success = await agent.registerAgent(brokerDID, runtimeConfig.SHOVEL_AGENT_SIWE.message, runtimeConfig.SHOVEL_AGENT_SIWE.signature)
+console.log("agent status", success)
+
+if (success) {
+  await agent.load()
+  console.log(`Agent DID for rolodex:`, brokerDID)
+} else {
+  throw "Failed to register rolodex agent"
+}
+
+await agent.actAsJoinApprover(brokerDID)
+
+agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
+  console.log("receieved from requester :", challengeEvent.detail)
+  let person = challengeEvent.detail.message.challenge.person
+  // let result = await this.repositories.people.create(new Person(person))
+  // console.log("person added to contacts :", result)
+
+  // let self = await this.repositories.profile.contactForHandshake()
+  // console.log("Person with XML :", self)
+  // TODO Implementing auto-confim - check challenge to implement reject
+  // await challengeEvent.detail.confirm({person: self})
+})
 
 ///
 //Agent for Community
