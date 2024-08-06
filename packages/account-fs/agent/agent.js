@@ -169,6 +169,29 @@ export const AccountCapability = {
 }
 
 export const StorageCapability = {
+  async registerAgent(accountDID, siweMessage, siweSignature) {
+    await this.runtime.setItem(SHOVEL_ACCOUNT_DID, accountDID)
+
+    let success = false 
+    const envelope = await this.envelop({accountDID: accountDID, siweMessage: siweMessage, siweSignature: siweSignature})
+    await this.axios_client.post(`/v1/accounts/${accountDID}/agents`, envelope).then(async (response) => {
+      console.log("agent registration status", response.status)
+      const accessKey = uint8arrays.fromString(response.data.accessKey, 'base64url');
+      await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
+
+      const forestCID = CID.parse(response.data.forestCID).bytes
+      await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
+      success = true
+    }).catch(async (e) => {
+      console.log(e);
+      await this.runtime.removeItem(SHOVEL_FS_ACCESS_KEY)
+      await this.runtime.removeItem(SHOVEL_FS_FOREST_CID)
+      return e
+    })
+
+    return success
+  },
+
   async load(){
     try {
       let accessKey = await this.accessKey()

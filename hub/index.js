@@ -67,6 +67,10 @@ class Accounts {
     }
   }
 
+  async exists(accountDID) {
+    return await this.redis.exists(`agents:${accountDID}`)
+  }
+
   async validAgentV1(accountDID, agentDID) {
     return await this.redis.sIsMember(`agents:${accountDID}`, agentDID)
   }
@@ -141,6 +145,37 @@ server.post("/v1/accounts", async (req, res) => {
         const accessKey = await accounts.getAccessKey(accountDID) 
         const cid = await accounts.getHead(accountDID)
         res.status(200).json({ created: response, accessKey: accessKey, forestCID: cid })
+      }
+    } else {
+      res.status(400).json({ created: false, msg: "SiweSignatureCheckFailed" })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ created: false, msg: "ExceptionOnSIWE" })
+  }
+})
+
+server.post("/v1/accounts/:accountDID/agents", async (req, res) => {
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({})
+    return
+  }
+
+  try {
+    const siweMessage = new SiweMessage(req.body.message.siweMessage);
+    const value = await siweMessage.verify({ signature: req.body.message.siweSignature });
+    if (value.success && siweMessage.requestId == req.body.message.signer) {
+      const accountDID = req.body.message.accountDID
+      const agentDID = req.body.message.signer
+      const exists = await accounts.exists(accountDID)
+      if (exists) {
+        const response = await accounts.createOrAdd(accountDID, agentDID)
+        const accessKey = await accounts.getAccessKey(accountDID) 
+        const cid = await accounts.getHead(accountDID)
+        res.status(200).json({ accessKey: accessKey, forestCID: cid })
+      } else {
+        res.status(404).json({ msg: "AccountMissing" })
       }
     } else {
       res.status(400).json({ created: false, msg: "SiweSignatureCheckFailed" })
