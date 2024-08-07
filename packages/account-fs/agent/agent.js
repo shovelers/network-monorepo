@@ -176,7 +176,7 @@ export const StorageCapability = {
     let success = false 
     const envelope = await this.envelop({accountDID: accountDID, siweMessage: siweMessage, siweSignature: siweSignature})
     await this.axios_client.post(`/v1/accounts/${accountDID}/agents`, envelope).then(async (response) => {
-      console.log("agent registration status", response.status)
+      console.log("agent registration status", response.status, response.data)
       const accessKey = uint8arrays.fromString(response.data.accessKey, 'base64url');
       await this.runtime.setItem(SHOVEL_FS_ACCESS_KEY, accessKey)
 
@@ -184,7 +184,7 @@ export const StorageCapability = {
       await this.runtime.setItem(SHOVEL_FS_FOREST_CID, forestCID)
       success = true
     }).catch(async (e) => {
-      console.log(e.message);
+      console.log(e);
       if (this.runtime.type != SERVER_RUNTIME) {
         await this.runtime.removeItem(SHOVEL_FS_ACCESS_KEY)
         await this.runtime.removeItem(SHOVEL_FS_FOREST_CID)

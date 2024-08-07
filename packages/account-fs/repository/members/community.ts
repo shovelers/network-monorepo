@@ -158,6 +158,47 @@ export class CommunityRepository {
       }
     }
 
+    if (communityDID == "did:pkh:eip155:8453:0x87c64C159E90A9414614Eb2E44f413E41317e416") {
+      communityFile.FN = "TheSuccessSyndicate"
+      communityFile.profileSchema.properties.inputs.properties = {
+        "location": {
+          "title": "Location",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "USA/Canada", "Brazil/Argentina", "UK", "Japan", "Nigeria", "Australia/NZ", "India", "China", "South Korea",
+              "Taiwan", "Singapore", "South East Asia", "Middle East", "Other NA", "Other SA", "Other Europe", "Other Africa", "Other Asia"
+            ]
+          }
+        },
+        "expertise": {
+          "title": "Expertise",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Design", "Community Building", "Strategy", "Tokenomics", "Engineering", "Fundraising", "Admin/Operations", "GTM", "Founder", 
+              "Investor", "Product", "Building", "Selling"
+            ]
+          },
+        },
+        "lookingFor": {
+          "title": "Looking For",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Events (Online)", "Events (Offline)", "Hiring Talent", "Friendly Builders", "Capital", "Jobs/Gigs", "New Friends", "Partnerships"
+            ]
+          }
+        }
+      }
+    }
+
     return communityFile
   }
 
