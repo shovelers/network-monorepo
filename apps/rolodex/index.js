@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDAVClient } from 'tsdav';
-import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository, Person } from 'account-fs/app.js';
+import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository, Person, AccountV1 } from 'account-fs/app.js';
 import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
@@ -62,18 +62,24 @@ if (success) {
   throw "Failed to register rolodex agent"
 }
 
+await agent.setInbox(address)
 await agent.actAsJoinApprover(brokerDID)
+
+const account = new AccountV1(agent)
+await account.loadRepositories()
 
 agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
   console.log("receieved from requester :", challengeEvent.detail)
   let person = challengeEvent.detail.message.challenge.person
-  // let result = await this.repositories.people.create(new Person(person))
-  // console.log("person added to contacts :", result)
+  let result = await account.repositories.people.create(new Person(person))
+  console.log("person added to contacts :", result)
 
-  // let self = await this.repositories.profile.contactForHandshake()
-  // console.log("Person with XML :", self)
+  let self = await account.repositories.profile.contactForHandshake()
+  self.FN = "Rolodex"
+  self.CATEGORIES = "app"
+  console.log("Person with XML :", self)
   // TODO Implementing auto-confim - check challenge to implement reject
-  // await challengeEvent.detail.confirm({person: self})
+  await challengeEvent.detail.confirm({person: self})
 })
 
 ///

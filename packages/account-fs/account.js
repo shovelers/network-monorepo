@@ -56,6 +56,11 @@ export class AccountV1 {
       for (const [key, value] of Object.entries(this.repositories)) {
         await value.initialise()
       }
+
+      if (this.brokerDID) {
+        const handshake = await this.requestHandshake(this.brokerDID)
+        console.log("Handhshake with broker:", this.brokerDID, handshake)
+      }
     }
     return success
   }
