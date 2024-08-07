@@ -174,15 +174,14 @@ async function deleteContact(id) {
 
 async function signout() {
   if(window.ethereum) {
-    await window.ethereum.request({
-          method: "wallet_revokePermissions",
-          params: [
-            {
-              eth_accounts: {},
-            },
-          ],
-        });
-
+    try {
+      await window.ethereum.request({
+            method: "wallet_revokePermissions",
+            params: [{eth_accounts: {}}],
+          });
+    } catch (e) {
+      console.log("metamask logout failed:", e)
+    }
   }
   await account.signout()
 
