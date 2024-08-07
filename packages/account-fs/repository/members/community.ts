@@ -181,7 +181,7 @@ export class CommunityRepository {
             "type": "string",
             "enum": [
               "Design", "Community Building", "Strategy", "Tokenomics", "Engineering", "Fundraising", "Admin/Operations", "GTM", "Founder", 
-              "Investor", "Product", "Building", "Selling"
+              "Investor", "Product", "Building", "Selling", "Marketing"
             ]
           },
         },
