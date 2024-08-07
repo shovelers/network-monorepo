@@ -175,7 +175,7 @@ async function deleteContact(id) {
 async function signout() {
   if(window.ethereum) {
     try {
-      await window.ethereum.request({
+      window.ethereum.request({
             method: "wallet_revokePermissions",
             params: [{eth_accounts: {}}],
           });
