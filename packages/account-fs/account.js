@@ -58,11 +58,19 @@ export class AccountV1 {
       }
 
       if (this.brokerDID) {
-        const handshake = await this.requestHandshake(this.brokerDID)
-        console.log("Handhshake with broker:", this.brokerDID, handshake)
+        try {
+          const handshake = await this.requestHandshake(this.brokerDID)
+          console.log("Handhshake with broker:", this.brokerDID, handshake)
+        } catch (e) {
+          console.log("Handshake Failed. Nuke. And Retry.", e)
+          await this.agent.destroy()
+          return false
+        }
       }
+
+      return true
     }
-    return success
+    return false
   }
 
   async requestHandshake(accountDID, brokerDID = null) {
@@ -97,7 +105,7 @@ export class AccountV1 {
       shouldWeWait = false
     })
 
-    setTimeout(() => { requester.initiate() }, 5)
+    await requester.initiate()
 
     await new Promise((resolve) => {
       const checkFlag = () => {
