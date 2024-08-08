@@ -53,14 +53,7 @@ export class HubConnection {
         this.updateEventListeners(newPeerId);
       }
 
-      const connections = this.helia.libp2p.getConnections(this.peerId)
-      if (connections.length > 0) {
-        console.log("Already connected with Hub: ", this.peerId)
-        return
-      }
-
-      this.syncServer = this.prefix + this.peerId
-      const connection = await dial(this.helia, this.syncServer)
+      const connection = await dial(this.helia, this.prefix + this.peerId)
       console.log("connection status with hub: ", response.data.peerId, connection.status)
     }).catch((e) => {
       console.log("/bootsrap API call failed, retrying in 10 seconds.", e.name)

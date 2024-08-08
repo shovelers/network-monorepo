@@ -75,10 +75,19 @@ export async function createNode(type, blockstore, datastore, config) {
   })
 }
 
-export async function dial(node, peer) {
-  console.log("dialing", peer)
-  const connection = await node.libp2p.dial(multiaddr(peer));
-  const latency = await node.libp2p.services.ping.ping(multiaddr(peer))
-  console.log("latency:", latency)
+export async function dial(helia, addressStr) {
+  const address = multiaddr(addressStr)
+  const peerId = address.getPeerId()
+
+  let connection = helia.libp2p.getConnections(peerId)[0]
+  if (connection) {
+    console.log("already connected with Peer: ", peerId, connection)
+  } else {
+    console.log("dialing", addressStr)
+    connection = await helia.libp2p.dial(address);
+  }
+
+  const latency = await helia.libp2p.services.ping.ping(address)
+  console.log(`latency with Peer ${peerId}: `, latency)
   return connection
 };
