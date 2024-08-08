@@ -53,7 +53,7 @@ export async function createNode(type, blockstore, datastore, config) {
     libp2pconfig.addresses = { listen: ['/webrtc']}
     libp2pconfig.transports.push(webRTC())
     libp2pconfig.transports.push(circuitRelayTransport({discoverRelays: 1}))
-    libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: true })
+    libp2pconfig.services.pubsub = gossipsub({ allowPublishToZeroPeers: false })
     libp2pconfig.services.dcutr = dcutr()
   }
 
