@@ -159,7 +159,7 @@ async function createCommunityProfile(params, communityDID, profileSchema) {
 }
 
 async function updateTelegramInfoInCommunityProfile(telegramData, communityDID, profileSchema) {
-  return await accountv1.repositories.profile.updateTelegramInCommunityProfile(communityDID, profileSchema, telegramData)
+  return await account.repositories.profile.updateTelegramInCommunityProfile(communityDID, profileSchema, telegramData)
 }
 
 async function addContact(name, email='', tags = [], text = "", links = []) {
