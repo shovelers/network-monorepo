@@ -46,7 +46,7 @@ export class ProfileRepository {
     let sharedProfile = new SharedProfileRepository(this.agent, communityDID)
     let exists = await sharedProfile.isInitialised()
     if (exists) {
-      return await this.updateTelegramInfoinSocials(sharedProfile, profileSchema, telegramProfile)
+      return await this.updateTelegramInfoInSocials(sharedProfile, profileSchema, telegramProfile)
     } else {
       return this.set(telegramProfile)
     }
