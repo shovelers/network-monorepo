@@ -158,6 +158,10 @@ async function createCommunityProfile(params, communityDID, profileSchema) {
   return await account.repositories.profile.createCommunityProfile(communityDID, profileSchema, params)
 }
 
+async function updateTelegramInfoInCommunityProfile(telegramData, communityDID, profileSchema) {
+  return await accountv1.repositories.profile.updateTelegramInCommunityProfile(communityDID, profileSchema, telegramData)
+}
+
 async function addContact(name, email='', tags = [], text = "", links = []) {
   
   let person = new Person({FN: name, EMAIL: convertEmailStringToEmailArray(email), CATEGORIES: tags.join(), NOTE: text, URL: links.join(), PRODID: "DCN:rolodex", UID: crypto.randomUUID()})
@@ -353,5 +357,6 @@ export {
   getMembers,
   getCommunityMembers,
   filterMembers,
-  uint8arrays
+  uint8arrays,
+  updateTelegramInfoInCommunityProfile
 };

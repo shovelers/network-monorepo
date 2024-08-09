@@ -39,6 +39,60 @@ export class ProfileRepository {
     })
   }
 
+  async updateTelegramInCommunityProfile(communityDID, profileSchema, telegramProfile){
+    //TODO: set value in telegram.json
+    //await TelegramProfile.set(telegramProfile) 
+    
+    let sharedProfile = new SharedProfileRepository(this.agent, communityDID)
+    let exists = await sharedProfile.isInitialised()
+    if (exists) {
+      return await this.updateTelegramInfoinSocials(sharedProfile, profileSchema, telegramProfile)
+    } else {
+      return this.set(telegramProfile)
+    }
+  }
+
+  async updateTelegramInfoInSocials(sharedProfile, profileSchema, telegramProfile) {
+    let sharedProfileData = await sharedProfile.get()
+    
+    //find telegram in socials and update it
+    const telegramIndex = sharedProfileData.socials.findIndex(social => social.prodid === "telegram");
+
+    if (telegramIndex != -1) {
+      sharedProfileData.socials[telegramIndex] = {
+        ...sharedProfileData.socials[telegramIndex],
+        prodid: "telegram",
+        id: telegramProfile.id,
+        first_name: telegramProfile.first_name,
+        last_name: telegramProfile.last_name,
+        username: telegramProfile.username,
+        photo_url: telegramProfile.photo_url,
+        auth_date: telegramProfile.auth_date,
+        hash: telegramProfile.hash
+      };
+    } else {
+      sharedProfileData.socials.push({
+        prodid: "telegram",
+        id: telegramProfile.id,
+        first_name: telegramProfile.first_name,
+        last_name: telegramProfile.last_name,
+        username: telegramProfile.username,
+        photo_url: telegramProfile.photo_url,
+        auth_date: telegramProfile.auth_date,
+        hash: telegramProfile.hash
+      });
+    }
+
+    const communityProfile = {
+      "inputs": sharedProfileData.inputs,
+      "socials": sharedProfileData.socials,
+      "version": sharedProfileData.version
+    }
+
+    await sharedProfile.set(communityProfile, profileSchema)
+    console.log("Profile after save :", communityProfile)
+  }
+
   async updateCommunityProfile(communityDID, profileSchema, inputs) {
     let sharedProfile = new SharedProfileRepository(this.agent, communityDID)
     let exists = await sharedProfile.isInitialised()
@@ -70,7 +124,7 @@ export class ProfileRepository {
 
     await sharedProfile.set(communityProfile, profileSchema)
     console.log("Profile after save :", profile, communityProfile)
-  }
+  }  
 
   async contactForHandshake(approverDID) {
     let accountDID = await this.agent.accountDID()

@@ -27,87 +27,88 @@
         document.querySelector("#input-forms").classList.add("hidden");
       }
 
-     window.ethereumSignUp = async function() {
-      let provider;
-      if(window.ethereum) {
-          try {
-            provider = new ethers.BrowserProvider(window.ethereum); 
-          }
-          catch (error) {
-            console.log("Issue with initialising ethereum provider");
-          }
+      window.ethereumSignUp = async function() {
+       let provider;
+       if(window.ethereum) {
+           try {
+             provider = new ethers.BrowserProvider(window.ethereum); 
+           }
+           catch (error) {
+             console.log("Issue with initialising ethereum provider");
+           }
+       }
+       else {
+         console.error("Ethereum provider not found");
+       }
+       const connected = await provider.send('eth_requestAccounts', []).catch(() => console.log('User rejected request'));
+       const agentDID = await account.agent.DID()
+       const nonce = await getNonce();
+       const signer = await provider.getSigner();
+       const address = await signer.getAddress();
+       const chainId =  await window.ethereum.request({method:"eth_chainId"});
+       const integerChainId = parseInt(chainId,16)
+       const message =  await createSiweMessage(address,nonce,agentDID,integerChainId);
+       const signature = await signer.signMessage(message)
+       
+       let accountDID = `did:pkh:eip155:${integerChainId}:${address}`
+       let profileData = { handle: address, name: "", text:"", tags: [] }
+       
+       const verified = await verifySiweMessage(message,signature,nonce);
+       if(verified) {
+         await ethereumSignup(accountDID, message, signature, profileData, address)
+         window.location.href = "/app";
+       } else {
+         alert('Singup failed! Error :', verified)
+       }
       }
-      else {
-        console.error("Ethereum provider not found");
-      }
-      const connected = await provider.send('eth_requestAccounts', []).catch(() => console.log('User rejected request'));
-      const agentDID = await account.agent.DID()
-      const nonce = await getNonce();
-      const signer = await provider.getSigner();
-      const address = await signer.getAddress();
-      const chainId =  await window.ethereum.request({method:"eth_chainId"});
-      const integerChainId = parseInt(chainId,16)
-      const message =  await createSiweMessage(address,nonce,agentDID,integerChainId);
-      const signature = await signer.signMessage(message)
-      
-      let accountDID = `did:pkh:eip155:${integerChainId}:${address}`
-      let profileData = { handle: address, name: "", text:"", tags: [] }
-      
-      const verified = await verifySiweMessage(message,signature,nonce);
-      if(verified) {
-        await ethereumSignup(accountDID, message, signature, profileData, address)
-        window.location.href = "/app";
-      } else {
-        alert('Singup failed! Error :', verified)
-      }
-     }
 
-     window.startFarcasterSignup = async function(){
-      const agentDID = await account.agent.DID()
-      const channel = await farcasterClient.createChannel({
-        siweUri: window.location.origin,
-        domain: window.location.host,
-        requestId: agentDID
-      });
-
-      const url = channel.data.url
-      var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
-      document.querySelector("#signup_by_farcaster > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
-
-      signup_by_farcaster.showModal()
-
-      farcasterClient.watchStatus({
-        channelToken: channel.data.channelToken,
-      }).then((status) => {
-        console.log(status)
-        signup_by_farcaster.close()
-        window.showLoading()
-        farcasterClient.verifySignInMessage({
-         nonce: status.data.nonce,
+      window.startFarcasterSignup = async function(){
+       const agentDID = await account.agent.DID()
+       const channel = await farcasterClient.createChannel({
+         siweUri: window.location.origin,
          domain: window.location.host,
-         message: status.data.message,
-         signature: status.data.signature
-        }).then(async (response) => {
-         console.log(response)
-         if (response.success) {
-           console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username, agentDID, status.data.message, status.data.signature)
-           let accountDID = `did:pkh:eip155:${response.data.chainId}:${response.data.address}`
-           let profileData = { fid: status.data.fid, handle: status.data.username, name: status.data.displayName, text: status.data.bio, tags: [], pfpUrl: status.data.pfpUrl}
-           console.log("farcaster message", status.data.message);
-           await farcasterSignup(accountDID, status.data.message, status.data.signature, profileData, status.data.fid)
-           window.location.href = "/app"
-         }
-        })
-      })
+         requestId: agentDID
+       });
 
-       window.farcasterClient = farcasterClient
-       window.channel = channel
-     }
+       const url = channel.data.url
+       var qrcode = new QRCode({content: url, container: "svg-viewbox", join: true});
+       document.querySelector("#signup_by_farcaster > .modal-box > .modal-action > .qr").innerHTML = qrcode.svg();
+
+       signup_by_farcaster.showModal()
+
+       farcasterClient.watchStatus({
+         channelToken: channel.data.channelToken,
+       }).then((status) => {
+         console.log(status)
+         signup_by_farcaster.close()
+         window.showLoading()
+         farcasterClient.verifySignInMessage({
+          nonce: status.data.nonce,
+          domain: window.location.host,
+          message: status.data.message,
+          signature: status.data.signature
+         }).then(async (response) => {
+          console.log(response)
+          if (response.success) {
+            console.log(`did:pkh:eip155:${response.data.chainId}:${response.data.address}`, status.data.username, agentDID, status.data.message, status.data.signature)
+            let accountDID = `did:pkh:eip155:${response.data.chainId}:${response.data.address}`
+            let profileData = { fid: status.data.fid, handle: status.data.username, name: status.data.displayName, text: status.data.bio, tags: [], pfpUrl: status.data.pfpUrl}
+            console.log("farcaster message", status.data.message);
+            await farcasterSignup(accountDID, status.data.message, status.data.signature, profileData, status.data.fid)
+            window.location.href = "/app"
+          }
+         })
+       })
+
+        window.farcasterClient = farcasterClient
+        window.channel = channel
+      }
 
       if (window.ethereum) {
         document.getElementById('ethereum-signup-button').classList.remove('hidden');
       }
     </script>
+    
     <div class="container mx-auto px-4 h-screen flex flex-col justify-evenly items-center">
       <div class="p-4 text-center">
         <div class="text-7xl font-bold tracking-tight leading-normal underline decoration-red-500 decoration-8">Rolodex</div>

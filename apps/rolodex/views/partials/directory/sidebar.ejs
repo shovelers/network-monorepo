@@ -101,6 +101,13 @@
       }
     })
   }
+
+  window.onTelegramAuth = async function (user) {
+    //TODO: verify user.hash against the payload using VITE_TELEGRAM_BOT_TOKEN to verify the data is recieved from telegram
+
+    console.log(JSON.stringify(user))
+    await updateTelegramInfoInCommunityProfile(user, communityDID, communityFile.profileSchema)
+  }
 </script>
 
 <div  id="avatar" class="max-md:flex max-md:justify-center max-md:items-center avatar online placeholder max-md:mx-20">    
@@ -124,6 +131,10 @@
   <button id="profile-edit-btn" class="btn max-md:my-1 btn-outline max-md:w-5/6 md:btn-sm md:w-2/3" onclick="profile_edit_modal.showModal()">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"> <path fill="currentColor" d="m13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057l3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z" /></svg>
     Edit Profile
+  </button>
+  <button id="connect-socials-btn" class="hidden btn max-md:my-1 btn-outline max-md:w-5/6 md:btn-sm md:w-2/3" onclick="connect_socials_modal.showModal()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"> <path fill="currentColor" d="m13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057l3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z" /></svg>
+    Connect Socials
   </button>
   <button id="sync-btn" class="btn max-md:my-1 btn-outline max-md:w-5/6 md:btn-sm md:w-2/3" onclick="syncButton()">
     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M4 20v-2h2.75l-.4-.35q-1.225-1.225-1.787-2.662T4 12.05q0-2.775 1.663-4.937T10 4.25v2.1Q8.2 7 7.1 8.563T6 12.05q0 1.125.425 2.188T7.75 16.2l.25.25V14h2v6zm10-.25v-2.1q1.8-.65 2.9-2.212T18 11.95q0-1.125-.425-2.187T16.25 7.8L16 7.55V10h-2V4h6v2h-2.75l.4.35q1.225 1.225 1.788 2.663T20 11.95q0 2.775-1.662 4.938T14 19.75"/></svg>
@@ -170,6 +181,20 @@
     </div>
   </div>
 </dialog>
+
+<dialog id="connect_socials_modal" class="modal">
+  <div class="modal-box">
+   <div id="telegram-login">
+     <script 
+       async src="https://telegram.org/js/telegram-widget.js?22" 
+       data-telegram-login="rolodexsocialbot" 
+       data-size="large" 
+       data-onauth="await onTelegramAuth(user)">
+     </script>
+   </div>
+  </div>
+</dialog>
+
 <dialog id="logout_modal" class="modal">
   <div class="modal-box">
     <p class="text-lg font-bold">Note</p>

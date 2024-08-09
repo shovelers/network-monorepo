@@ -56,7 +56,7 @@ export class HubConnection {
       const connection = await dial(this.helia, this.prefix + this.peerId)
       console.log("connection status with hub: ", response.data.peerId, connection.status)
     }).catch((e) => {
-      console.log("/bootsrap API call failed, retrying in 10 seconds.", e.name)
+      console.log("/bootsrap API call failed, retrying in 10 seconds.", e)
       setTimeout(() => {
         this.bootstrap()
       }, 10000)

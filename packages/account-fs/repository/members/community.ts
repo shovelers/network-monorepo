@@ -74,11 +74,25 @@ export class CommunityRepository {
                 },
                 {
                   "type": "object",
-                  "$id": "LinkedIn",
+                  "$id": "linkedIn",
                   "properties": {
                     "prodid": { "type": "string" },
                     "school": { "type": "string" } 
                   }
+                },
+                {
+                  "type": "object",
+                  "$id": "telegram",
+                  "properties": {
+                    "prodid": { "type": "string" },
+                    "id":{ "type": "string" },
+                    "first_name":{ "type": "string" },
+                    "last_name": { "type": "string" },
+                    "username": { "type": "string" },
+                    "photo_url": { "type": "string" },
+                    "auth_date": { "type": "string" },
+                    "hash": { "type": "string" }
+                  } 
                 }
               ]
             }
