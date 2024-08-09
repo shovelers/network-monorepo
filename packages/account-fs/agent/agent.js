@@ -56,14 +56,8 @@ export const MessageCapability = {
     return false
   },
 
-  async actAsJoinApprover(approverHandle) {
-    const channelName = `${approverHandle}-membership`
-    const channel = new Channel(this.helia, channelName)
-    await this.approver.register("JOIN", channel)
-  },
-
   async actAsJoinRequester(approverHandle) {
-    const channelName = `${approverHandle}-membership`
+    const channelName = `${approverHandle}-approver`
     const channel = new Channel(this.helia, channelName)
     this.requester = new Requester(this, channel, "JOIN")
 
@@ -71,29 +65,15 @@ export const MessageCapability = {
     return this.requester
   },
 
-  async actAsRelationshipApprover(brokerHandle, approverHandle) {
-    let channelName = `${brokerHandle}-${approverHandle}-relationship`
-    const channel = new Channel(this.helia, channelName)
-    await this.approver.register("RELATE", channel)
-  },
-
   async actAsRelationshipRequester(brokerHandle, approverHandle) {
-    let channelName = `${brokerHandle}-${approverHandle}-relationship`
+    const channelName = `${approverHandle}-approver`
     let forwardingChannel = `${brokerHandle}-forwarding`
     const channel = new Channel(this.helia, channelName, forwardingChannel)
     this.requester = new Requester(this, channel, "RELATE")
+    console.log(this.requester)
 
     await channel.subscribe(this.requester)
     return this.requester
-  },
-
-  async actAsRelationshipBroker() {
-    const forwardingChannel = `${await this.accountDID()}-forwarding`
-
-    const channel = new Channel(this.helia, forwardingChannel)
-    this.broker = new Broker(this, channel)
-
-    await channel.subscribe(this.broker)
   }
 }
 
@@ -355,6 +335,7 @@ export class Agent {
     this.fs = new PrivateFS(helia)
     this.hubConnection = new HubConnection(this.helia, this.axios_client, dialPrefix)
     this.approver = new Approver(this)
+    this.broker = new Broker(this)
   }
 
   async DID(){

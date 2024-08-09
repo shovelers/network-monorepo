@@ -1,5 +1,5 @@
 import { Channel } from './channel.js';
-import { Envelope, DIDKey, Notification } from './common.js';
+import { Envelope, DIDKey } from './common.js';
 import { DIDKey as ISODIDKey } from 'iso-did/key'
 import * as verifiers from 'iso-signatures/verifiers/rsa.js'
 import * as uint8arrays from 'uint8arrays';
@@ -129,12 +129,17 @@ class BrokerHandshake {
 }
 
 export class Broker {
-  constructor(agent, channel, onComplete) {
+  constructor(agent) {
     this.agent = agent
-    this.channel = channel
-    this.notification = new Notification()
-    this.onComplete = onComplete
+    this.channel = null
     this.handshakes = []
+  }
+
+  async start() {
+    const forwardingChannel = `${await this.agent.accountDID()}-forwarding`
+    this.channel = new Channel(this.agent.helia, forwardingChannel)
+    //TODO remove circular dependency
+    await this.channel.subscribe(this)
   }
 
   async handler(message) {

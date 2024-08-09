@@ -4,6 +4,7 @@ import { Person } from "./repository/people/person.ts";
 import { ProfileRepository } from "./repository/profiles/profiles.js";
 import { MembersRepository } from "./repository/members/members.js";
 import { CommunityRepository } from "./repository/members/community.ts";
+import { Notification } from "./agent/handshakes/base/common.js";
 
 export class AccountV1 {
   constructor(agent) {
@@ -127,9 +128,9 @@ export class AccountV1 {
     let status = await this.agent.establishConnection(brokerDID)
     console.log("inbox:", accountDID, brokerDID, status)
 
-    await this.agent.actAsRelationshipApprover(brokerDID, accountDID)
+    let notification =  new Notification()
 
-    this.agent.approver.notification.addEventListener("challengeRecieved", async (challengeEvent) => {
+    notification.addEventListener("challengeRecieved", async (challengeEvent) => {
       console.log(challengeEvent.detail)
       let person = challengeEvent.detail.message.challenge.person
       let result = await this.repositories.people.create(new Person(person))
@@ -140,6 +141,9 @@ export class AccountV1 {
       // TODO Implementing auto-confim - check challenge to implement reject
       await challengeEvent.detail.confirm({person: self})
     })
+
+    this.agent.approver.register("RELATE", notification)
+    this.agent.approver.start()
   }
 
   async search(params) {

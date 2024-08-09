@@ -1,18 +1,23 @@
-import { Notification } from './common.js';
 import { Handshake } from './handshake.js';
+import { Channel } from './channel.js';
 
 export class Approver {
   constructor(agent) {
     this.agent = agent
-    this.notification = new Notification()
     this.handshakes = []
-    this.channels = {}
+    this.channel = null
+    this.router = {}
   }
 
-  async register(type, channel) {
-    this.channels[type] = channel
-    //TODO remove circular dependency, rather take the handler function or controller 
-    await this.channels[type].subscribe(this)
+  async start() {
+    const channelName = `${await this.agent.accountDID()}-approver`
+    this.channel = new Channel(this.agent.helia, channelName)
+    //TODO remove circular dependency
+    await this.channel.subscribe(this)
+  }
+
+  async register(type, notification){
+    this.router[type] = notification
   }
 
   async handler(message) {
@@ -27,9 +32,9 @@ export class Approver {
   }
 
   newHandshake(request) {
-    if (this.channels[request.type]) {
+    if (this.router[request.type]) {
       console.log("receive handshake")
-      return new Handshake(this.agent, this.channels[request.type], request.id, this.notification)
+      return new Handshake(this.agent, this.channel, request.id, this.router[request.type])
     } else {
       throw `Unregistered Handshake Type: ${request.type}`
     }
