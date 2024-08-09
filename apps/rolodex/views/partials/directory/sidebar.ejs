@@ -106,7 +106,13 @@
     //TODO: verify user.hash against the payload using VITE_TELEGRAM_BOT_TOKEN to verify the data is recieved from telegram
 
     console.log(JSON.stringify(user))
-    await updateTelegramInfoInCommunityProfile(user, communityDID, communityFile.profileSchema)
+    updateTelegramInfoInCommunityProfile(user, communityDID, communityFile.profileSchema).then((result) => {
+      //change colour of indicator
+      console.log("on telegram connect :", result)
+      var indicator = document.querySelector('#telegram-connection-status')
+      indicator.classList.remove('badge-neutral')
+      indicator.classList.add('badge-success')
+    })
   }
 </script>
 
@@ -184,14 +190,16 @@
 
 <dialog id="connect_socials_modal" class="modal">
   <div class="modal-box">
-   <div id="telegram-login">
-     <script 
-       async src="https://telegram.org/js/telegram-widget.js?22" 
-       data-telegram-login="rolodexsocialbot" 
-       data-size="large" 
-       data-onauth="await onTelegramAuth(user)">
-     </script>
-   </div>
+    <div class="modal-action flex justify-center items-center">
+      <div id="telegram-login" class="indicator">
+        <span id="telegram-connection-status" class="indicator-item indicator-bottom badge badge-neutral"></span>
+        <script async src="https://telegram.org/js/telegram-widget.js?22" 
+         data-telegram-login="rolodexsocialbot" 
+         data-size="large" 
+         data-onauth="onTelegramAuth(user)">
+        </script>
+      </div>
+    </div>
   </div>
 </dialog>
 
