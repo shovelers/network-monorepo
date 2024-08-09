@@ -2,7 +2,7 @@
   if (window.__TAURI__) {
     document.getElementById("google-import").style.display = "none"
   }
-  import { getProfile, updateCommunityProfile } from '/odd.js';
+  import { getProfile, updateCommunityProfile, updateTelegramInfoInCommunityProfile } from '/odd.js';
   window.updateCommunityProfile = updateCommunityProfile
   const options = JSON.parse('<%- JSON.stringify(optionsV1) %>')
   const communityDID = '<%- communityDID %>'
