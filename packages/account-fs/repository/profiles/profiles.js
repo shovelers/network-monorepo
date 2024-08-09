@@ -40,9 +40,13 @@ export class ProfileRepository {
   }
 
   async updateTelegramInCommunityProfile(communityDID, profileSchema, telegramProfile){
-    //TODO: set value in telegram.json
-    //await TelegramProfile.set(telegramProfile) 
-    
+    //sets value in telegram.json
+    await this.agent.updatePrivateFile('telegram.json', (content) => {
+      content = {...content, ...telegramProfile}
+      return content
+    })
+
+    //updates socials value in communityDID.json through sharedProfile
     let sharedProfile = new SharedProfileRepository(this.agent, communityDID)
     let exists = await sharedProfile.isInitialised()
     if (exists) {
