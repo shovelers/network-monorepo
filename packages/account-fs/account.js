@@ -82,11 +82,11 @@ export class AccountV1 {
     if (brokerDID) {
       let status = await this.agent.establishConnection(brokerDID)
       console.log("inbox:", accountDID, status)
-      requester = await this.agent.actAsRelationshipRequester(brokerDID, accountDID)
+      requester = await this.agent.requester.create(accountDID, "RELATE", brokerDID)
     } else {
       let status = await this.agent.establishConnection(accountDID)
       console.log("inbox:", accountDID, status)
-      requester = await this.agent.actAsJoinRequester(accountDID)
+      requester = await this.agent.requester.create(accountDID, "JOIN")
     }
     
     const head = await this.agent.head()

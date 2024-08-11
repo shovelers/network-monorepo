@@ -2,6 +2,7 @@ import * as uint8arrays from 'uint8arrays';
 import { DIDKey as ISODIDKey } from 'iso-did/key'
 import * as verifiers from 'iso-signatures/verifiers/rsa.js'
 import { Envelope, DIDKey, Notification } from './common.js';
+import { Channel } from './channel.js';
 
 async function verify(message, signature){
   const pubKey = ISODIDKey.fromString(message.signer).publicKey
@@ -10,7 +11,7 @@ async function verify(message, signature){
   return await verifiers.verify({message: binMessage, signature: binSignature, publicKey: pubKey})
 }
 
-export class Requester {
+class RequesterHandshake {
   constructor(agent, channel, type) {
     this.agent = agent
     this.channel = channel
@@ -152,5 +153,23 @@ export class Requester {
     const requestDID = await DIDKey.publicKeytoDID(publicKey)
 
     return {requestKeyPair: keyPair, requestDID: requestDID}
+  }
+}
+
+export class Requester {
+  constructor(agent) {
+    this.agent = agent
+    this.handshakes = []
+  }
+
+  async create(approverDID, handshakeType, brokerDID=null) {
+    let forwardingChannel = (brokerDID) ? `${brokerHandle}-forwarding` : null
+    const channel = new Channel(this.agent.helia, `${approverDID}-approver`, forwardingChannel)
+
+    let handshake = new RequesterHandshake(this.agent, channel, handshakeType)
+    await channel.subscribe(handshake)
+
+    this.handshakes.push(handshake)
+    return handshake
   }
 }

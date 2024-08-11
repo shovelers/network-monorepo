@@ -3,7 +3,6 @@ import axios from 'axios'
 import { Broker } from './handshakes/base/broker.js';
 import { Approver } from './handshakes/base/approver.js';
 import { Requester } from './handshakes/base/requester.js';
-import { Channel } from './handshakes/base/channel.js';
 import { CID } from 'multiformats/cid'
 import { dial } from './helia_node.js'
 import { PrivateFS, PrivateFile } from "./fs/private_fs.js"
@@ -54,26 +53,6 @@ export const MessageCapability = {
     }
 
     return false
-  },
-
-  async actAsJoinRequester(approverHandle) {
-    const channelName = `${approverHandle}-approver`
-    const channel = new Channel(this.helia, channelName)
-    this.requester = new Requester(this, channel, "JOIN")
-
-    await channel.subscribe(this.requester)
-    return this.requester
-  },
-
-  async actAsRelationshipRequester(brokerHandle, approverHandle) {
-    const channelName = `${approverHandle}-approver`
-    let forwardingChannel = `${brokerHandle}-forwarding`
-    const channel = new Channel(this.helia, channelName, forwardingChannel)
-    this.requester = new Requester(this, channel, "RELATE")
-    console.log(this.requester)
-
-    await channel.subscribe(this.requester)
-    return this.requester
   }
 }
 
@@ -336,6 +315,7 @@ export class Agent {
     this.hubConnection = new HubConnection(this.helia, this.axios_client, dialPrefix)
     this.approver = new Approver(this)
     this.broker = new Broker(this)
+    this.requester = new Requester(this)
   }
 
   async DID(){
