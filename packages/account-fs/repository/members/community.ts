@@ -213,6 +213,39 @@ export class CommunityRepository {
       }
     }
 
+    if (communityDID == "did:pkh:eip155:8453:0x8152124614EF975adD93349a57aDbB563333d77c") {
+      communityFile.FN = "TerminallyOnchain"
+      communityFile.profileSchema.properties.inputs.properties = {
+        "lookingFor": {
+          "title": "Looking For",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["Crypto Discussions", "New Friends", "NFT Projects", "Gigs", "Job", "Partnerships", "Talent", "Warm Intros", "Fundraise", "Founders"]
+          }
+        },
+        "canHelpWith": {
+          "title": "Can Help With",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["Development", "Tokenomics", "Design", "Ideation", "Job/Gig Opportunities", "GTM", "Testing", "Mentorship", "Fundraise", "Introductions"]
+          }
+        },
+        "expertise": {
+          "title": "Expertise",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["Data Science", "Market Research", "DeFi", "Design", "Community Building", "Strategy", "Economics", "Engineering", "Fundraising", "Admin/Operations"]
+          },
+        },
+      }
+    }
+
     return communityFile
   }
 
