@@ -1,11 +1,8 @@
 import { createNode, BROWSER } from './agent/helia_node.js';
-import { AccountV1 } from './account.js'
+import { AccountV1 } from './graph/account.js'
 import { Agent, AccountCapability, StorageCapability, MessageCapability } from './agent/agent.js'
 import { Runtime, BROWSER_RUNTIME } from './agent/runtime.js';
-import { PeopleSearch } from './repository/people/search.js'
-import { PeopleRepository } from "./repository/people/people.ts";
-import { Person } from "./repository/people/person.ts";
-import { MembersRepository } from './repository/members/members.js';
+import { Person } from "./graph/repository/people/person.ts";
 import { IDBBlockstore } from 'blockstore-idb'
 import { IDBDatastore } from 'datastore-idb'
 
@@ -49,4 +46,4 @@ async function programInit(network) {
   }
 }
 
-export { programInit, Person, PeopleRepository, AccountV1, MembersRepository, PeopleSearch }
+export { programInit, Person, AccountV1 }
