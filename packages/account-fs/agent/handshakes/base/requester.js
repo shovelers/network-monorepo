@@ -163,7 +163,7 @@ export class Requester {
   }
 
   async create(approverDID, handshakeType, brokerDID=null) {
-    let forwardingChannel = (brokerDID) ? `${brokerHandle}-forwarding` : null
+    let forwardingChannel = (brokerDID) ? `${brokerDID}-forwarding` : null
     const channel = new Channel(this.agent.helia, `${approverDID}-approver`, forwardingChannel)
 
     let handshake = new RequesterHandshake(this.agent, channel, handshakeType)

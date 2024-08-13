@@ -1,10 +1,9 @@
-import { PeopleRepository } from "./repository/people/people.ts";
+import { PeopleRepository, PeopleHandshakeApprover } from "./repository/people/people.ts";
 import { PeopleSearch } from "./repository/people/search.js";
 import { Person } from "./repository/people/person.ts";
 import { ProfileRepository } from "./repository/profiles/profiles.js";
 import { MembersRepository } from "./repository/members/members.js";
 import { CommunityRepository } from "./repository/members/community.ts";
-import { Notification } from "./agent/handshakes/base/common.js";
 
 export class AccountV1 {
   constructor(agent) {
@@ -122,27 +121,9 @@ export class AccountV1 {
     return handshakeSuccess
   }
 
-  async handshakeApprover(brokerDID) {
-    var accountDID = await this.agent.accountDID()
-
-    let status = await this.agent.establishConnection(brokerDID)
-    console.log("inbox:", accountDID, brokerDID, status)
-
-    let notification =  new Notification()
-
-    notification.addEventListener("challengeRecieved", async (challengeEvent) => {
-      console.log(challengeEvent.detail)
-      let person = challengeEvent.detail.message.challenge.person
-      let result = await this.repositories.people.create(new Person(person))
-      console.log("person added to contacts :", result)
-
-      let self = await this.repositories.profile.contactForHandshake()
-      console.log("Person with XML :", self)
-      // TODO Implementing auto-confim - check challenge to implement reject
-      await challengeEvent.detail.confirm({person: self})
-    })
-
-    this.agent.approver.register("RELATE", notification)
+  async handshakeApprover() {
+    await this.agent.establishConnection(this.brokerDID)
+    this.agent.approver.registerV2("RELATE", new PeopleHandshakeApprover(this.repositories))
     this.agent.approver.start()
   }
 

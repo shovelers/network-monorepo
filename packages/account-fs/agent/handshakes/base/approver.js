@@ -1,5 +1,6 @@
 import { Handshake } from './handshake.js';
 import { Channel } from './channel.js';
+import { Notification } from './common.js';
 
 export class Approver {
   constructor(agent) {
@@ -17,6 +18,12 @@ export class Approver {
   }
 
   async register(type, notification){
+    this.router[type] = notification
+  }
+
+  registerV2(type, handshakeApprover){
+    let notification = new Notification()
+    notification.addEventListener("challengeRecieved", async (challengeEvent) => { await handshakeApprover.handleChallenge(challengeEvent) })
     this.router[type] = notification
   }
 
