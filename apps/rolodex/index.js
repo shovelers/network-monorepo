@@ -66,12 +66,11 @@ await account.loadRepositories()
 await agent.approver.start()
 await agent.broker.start()
 
-agent.approver.registerV2("JOIN", new AppHandshakeApprover(account.repositories))
+agent.approver.register("JOIN", new AppHandshakeApprover(account.repositories))
 
 ///
 //Agent for Community
 // set VITE_RUN_COMMUNITY_AGENT as false if you don't want this flow locally
-var communityAgents = []
 if (RUN_COMMUNITY_AGENT == true) {
   try {
     //check if config file exists
@@ -107,18 +106,11 @@ if (RUN_COMMUNITY_AGENT == true) {
       var members = new MembersRepository(communityAgent)
       await members.initialise()
       
-      //Run Join Approver fro community agent
+      const community = new CommunityRepository(communityAgent)
+
+      communityAgent.approver.register("JOIN", new CommunityHandshakeApprover({community: community, members: members}, communityAgent))
       communityAgent.approver.start()
-      communityAgents.push(communityAgent)
     }
-
-    //start listeners for each agent
-    communityAgents.forEach(async (agent) => {
-      const communityRepo = new CommunityRepository(agent)
-      const memberRepo = new MembersRepository(agent)
-
-      agent.approver.registerV2("JOIN", new CommunityHandshakeApprover({community: communityRepo, members: memberRepo}, agent))
-    })
   } catch (e){
     console.log(e)
   }

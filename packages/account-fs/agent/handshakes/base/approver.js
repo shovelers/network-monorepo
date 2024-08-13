@@ -17,11 +17,7 @@ export class Approver {
     await this.channel.subscribe(this)
   }
 
-  async register(type, notification){
-    this.router[type] = notification
-  }
-
-  registerV2(type, handshakeApprover){
+  register(type, handshakeApprover){
     let notification = new Notification()
     notification.addEventListener("challengeRecieved", async (challengeEvent) => { await handshakeApprover.handleChallenge(challengeEvent) })
     this.router[type] = notification

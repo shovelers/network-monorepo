@@ -124,7 +124,7 @@ export class AccountV1 {
 
   async handshakeApprover() {
     await this.agent.establishConnection(this.brokerDID)
-    this.agent.approver.registerV2("RELATE", new PeopleHandshakeApprover(this.repositories))
+    this.agent.approver.register("RELATE", new PeopleHandshakeApprover(this.repositories))
     this.agent.approver.start()
   }
 
