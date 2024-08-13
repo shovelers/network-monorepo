@@ -104,23 +104,3 @@ export class PeopleRepository {
     this.cache.people = undefined
   }
 }
-
-export class PeopleHandshakeApprover {
-  private repositories: any;
-
-  constructor(repositories: any) {
-    this.repositories = repositories
-  }
-
-  async handleChallenge(challengeEvent) {
-    console.log(challengeEvent.detail)
-    let person = challengeEvent.detail.message.challenge.person
-    let result = await this.repositories.people.create(new Person(person))
-    console.log("person added to contacts :", result)
-
-    let self = await this.repositories.profile.contactForHandshake()
-    console.log("Person with XML :", self)
-    // TODO Implementing auto-confim - check challenge to implement reject
-    await challengeEvent.detail.confirm({person: self})
-  }
-}

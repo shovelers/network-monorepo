@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createDAVClient } from 'tsdav';
-import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository, Person, AccountV1, Notification } from 'account-fs/app.js';
+import { createAppNode, Agent, Runtime, connection, SERVER_RUNTIME, MessageCapability, StorageCapability, MembersRepository, CommunityRepository, AccountV1, AppHandshakeApprover, CommunityHandshakeApprover } from 'account-fs/app.js';
 import { generateNonce } from 'siwe';
 import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
@@ -66,23 +66,7 @@ await account.loadRepositories()
 await agent.approver.start()
 await agent.broker.start()
 
-let notification = new Notification()
-
-notification.addEventListener("challengeRecieved", async (challengeEvent) => {
-  console.log("receieved from requester :", challengeEvent.detail)
-  let person = challengeEvent.detail.message.challenge.person
-  let result = await account.repositories.people.create(new Person(person))
-  console.log("person added to contacts :", result)
-
-  let self = await account.repositories.profile.contactForHandshake()
-  self.FN = "Rolodex"
-  self.CATEGORIES = "app"
-  console.log("Person with XML :", self)
-  // TODO Implementing auto-confim - check challenge to implement reject
-  await challengeEvent.detail.confirm({person: self})
-})
-
-agent.approver.register("JOIN", notification)
+agent.approver.registerV2("JOIN", new AppHandshakeApprover(account.repositories))
 
 ///
 //Agent for Community
@@ -132,27 +116,8 @@ if (RUN_COMMUNITY_AGENT == true) {
     communityAgents.forEach(async (agent) => {
       const communityRepo = new CommunityRepository(agent)
       const memberRepo = new MembersRepository(agent)
-      const contact = await memberRepo.contactForHandshake()
-      const communityDID = await agent.accountDID()
-      let notification = new Notification()
 
-      notification.addEventListener("challengeRecieved", async (challengeEvent) => {
-        console.log("receieved from requester :", challengeEvent.detail)
-        if (challengeEvent.detail.channelName == agent.approver.channel.name){
-          let person = new Person(challengeEvent.detail.message.challenge.person)
-          let valid = await person.validateProfileForCommunity(agent, communityRepo.sample(communityDID).profileSchema, challengeEvent.detail.message.challenge.head)
-          console.log("sending a valid profile? ", valid, challengeEvent.detail.message.challenge.person)
-          if (valid) {
-            await memberRepo.add(challengeEvent.detail.message.challenge.person)
-            await challengeEvent.detail.confirm({person: contact}) 
-          } else {
-            await challengeEvent.detail.reject()  
-          }
-        } else {
-          throw `Member Add on Join Handshake failed for ${agent.accountDID()}`
-        }
-      })
-      agent.approver.register("JOIN", notification)
+      agent.approver.registerV2("JOIN", new CommunityHandshakeApprover({community: communityRepo, members: memberRepo}, agent))
     })
   } catch (e){
     console.log(e)

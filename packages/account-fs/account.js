@@ -1,4 +1,5 @@
-import { PeopleRepository, PeopleHandshakeApprover } from "./repository/people/people.ts";
+import { PeopleRepository } from "./repository/people/people.ts";
+import { PeopleHandshakeApprover } from "./approvers/index.ts";
 import { PeopleSearch } from "./repository/people/search.js";
 import { Person } from "./repository/people/person.ts";
 import { ProfileRepository } from "./repository/profiles/profiles.js";
