@@ -246,6 +246,89 @@ export class CommunityRepository {
       }
     }
 
+    if (communityDID == "did:pkh:eip155:8453:0x68a976F97F1dec621BdAC78Fc931268EB50777a4") {
+      communityFile.FN = "Rebase"
+      communityFile.profileSchema.properties.inputs.properties = {
+        "location": {
+          "title": "Location",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "USA/Canada", "Brazil/Argentina", "UK", "Japan", "Nigeria", "Australia/NZ", "India", "China", "South Korea",
+              "Taiwan", "Singapore", "South East Asia", "Middle East", "Other NA", "Other SA", "Other Europe", "Other Africa", "Other Asia"
+            ]
+          }
+        },
+        "expertise": {
+          "title": "Expertise",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Design", "Community Building", "Strategy", "Tokenomics", "Engineering", "Fundraising", "Admin/Operations", "GTM", "Founder", 
+              "Investor", "Product", "Building", "Selling", "Marketing"
+            ]
+          },
+        },
+        "lookingFor": {
+          "title": "Looking For",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Events (Online)", "Events (Offline)", "Hiring Talent", "Friendly Builders", "Capital", "Jobs/Gigs", "New Friends", "Partnerships"
+            ]
+          }
+        }
+      }
+    }
+
+    if (communityDID == "did:pkh:eip155:8453:0xBEb2f178d748f233f315578f4Cc4D3CfA95A0bb1") {
+      communityFile.FN = "ProxyStudio"
+      communityFile.profileSchema.properties.inputs.properties = {
+        "roles": {
+          "title": "Roles",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Founder", "Product", "Designer", "Developer", "Freelancer", "Investor", "Artist", "Manager", "Writer"
+            ]
+          }
+        },
+        "expertise": {
+          "title": "Expertise",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Product", "Engineering", "Finance", "Community Building", "Tokenomics", "Economics", "Fundraising", "Farcaster Development", "Marketing",
+              "Research", "Strategy", "Web and Mobile Design", "Project Management", "Operations / Admin", "Deep Technical", "Sales and Partnerships",
+              "Communication and storytelling"
+            ]
+          },
+        },
+        "location": {
+          "title": "Location",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "USA/Canada", "Brazil/Argentina", "UK", "Japan", "Nigeria", "Australia/NZ", "India", "China", "South Korea",
+              "Taiwan", "Singapore", "South East Asia", "Middle East", "Other NA", "Other SA", "Other Europe", "Other Africa", "Other Asia"
+            ]
+          }
+        }
+      }
+    }
+
     return communityFile
   }
 

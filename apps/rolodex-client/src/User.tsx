@@ -10,7 +10,7 @@ export function User() {
   }
 
   return (
-    <Box>
+    <Box className='max-w-screen-sm'>
       <Text as="div" size="4" weight="medium" align="center" mb="4"> User Details </Text>
       <DataList.Root>
         <DataList.Item align="center">
@@ -34,8 +34,16 @@ export function User() {
           <DataList.Value>{user.wallet ? user.wallet.address : 'None'}</DataList.Value>
         </DataList.Item>
         <DataList.Item>
+          <DataList.Label minWidth="88px">AccountDID</DataList.Label>
+          <DataList.Value>{user.wallet ? `DID:pkh:${user.wallet.chainId}:${user.wallet.address}` : 'None'}</DataList.Value>
+        </DataList.Item>
+        <DataList.Item>
           <DataList.Label minWidth="88px">Email</DataList.Label>
           <DataList.Value>{user.email ? user.email.address : 'None'}</DataList.Value>
+        </DataList.Item>
+        <DataList.Item>
+          <DataList.Label minWidth="88px">Linked Accounts</DataList.Label>
+          <DataList.Value>{user.linkedAccounts ? (user.linkedAccounts).map((account) => {return JSON.stringify(account)}) : 'None'}</DataList.Value>
         </DataList.Item>
       </DataList.Root>
     </Box>
