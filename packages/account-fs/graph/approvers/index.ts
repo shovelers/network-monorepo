@@ -9,6 +9,12 @@ export class CommunityHandshakeApprover {
     this.agent = agent
   }
 
+  async createChallenge(event) {
+    const communityDID = await this.agent.accountDID()
+    const communityFile = this.repositories.community.sample(communityDID)
+    await event.detail.challenge({challenge: communityFile})
+  }
+
   async handleChallenge(challengeEvent) {
     console.log("receieved from requester :", challengeEvent.detail)
     const communityDID = await this.agent.accountDID()
@@ -32,6 +38,10 @@ export class AppHandshakeApprover {
     this.repositories = repositories
   }
 
+  async createChallenge(event) {
+    await event.detail.challenge({})
+  }
+
   async handleChallenge(challengeEvent) {
     console.log("receieved from requester :", challengeEvent.detail)
     let person = challengeEvent.detail.message.challenge.person
@@ -52,6 +62,10 @@ export class PeopleHandshakeApprover {
 
   constructor(repositories: any) {
     this.repositories = repositories
+  }
+
+  async createChallenge(event) {
+    await event.detail.challenge({})
   }
 
   async handleChallenge(challengeEvent) {

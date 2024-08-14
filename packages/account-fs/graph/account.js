@@ -92,6 +92,10 @@ export class AccountV1 {
     const head = await this.agent.head()
     requester.challenge = function () { return { person: person, head: head } }
 
+    requester.notification.addEventListener("challengeIntiated", async (event) => {
+      console.log("Challenge received:", event.detail)
+    })
+
     let handshakeSuccess = false
     let shouldWeWait = true
     requester.notification.addEventListener("CONFIRMED", async (event) => {

@@ -31,7 +31,16 @@ export class Handshake {
     const request = JSON.parse(message)
     const {sessionKey, sessionKeyMessage} = await this.generateSessionKey(request)
     this.sessionKey = sessionKey
-    await this.channel.publish(sessionKeyMessage)
+
+    let approver = this
+    this.notification.emitEvent("challengeIntiated", {
+      challenge: async (data) => { 
+        const message = JSON.parse(sessionKeyMessage)
+        message.challenge = await Envelope.pack(data, approver.sessionKey, message.id, message.type)
+        return await approver.channel.publish(JSON.stringify(message))
+      },
+      channelName: this.channel.name
+    })  
     this.state = "INITIATED"
   }
 

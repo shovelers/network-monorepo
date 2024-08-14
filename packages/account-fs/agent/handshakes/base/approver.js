@@ -19,6 +19,7 @@ export class Approver {
 
   register(type, handshakeApprover){
     let notification = new Notification()
+    notification.addEventListener("challengeIntiated", async (challengeEvent) => { await handshakeApprover.createChallenge(challengeEvent) })
     notification.addEventListener("challengeRecieved", async (challengeEvent) => { await handshakeApprover.handleChallenge(challengeEvent) })
     this.router[type] = notification
   }
