@@ -9,6 +9,14 @@ import { access, constants } from 'node:fs/promises';
 import morgan from 'morgan';
 import * as Sentry from "@sentry/node";
 
+import nodeFs from 'node:fs'
+import { car } from '@helia/car'
+import { CarWriter } from '@ipld/car'
+import { CID } from 'multiformats/cid'
+
+
+import { Readable } from 'stream'
+
 if (process.env.VITE_SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.VITE_SENTRY_DSN,
@@ -135,6 +143,17 @@ function extractInputMap(schema) {
   return inputsMap;
 }
 
+async function writeToCar(cid) {
+
+  const c = car(account.agent.helia)
+  c.components.dagWalkers = helia.pins.dagWalkers
+  let parsedCid = CID.parse(cid)  
+  const { writer, out } = await CarWriter.create(parsedCid)
+  const readableStream = Readable.from(out);
+  readableStream.pipe(nodeFs.createWriteStream('example.car'));
+  await c.export(parsedCid,writer)
+}
+
 const communityRepo = new CommunityRepository()
 
 server.use(express.urlencoded({ extended: true }))
@@ -177,6 +196,13 @@ server.get("/directory/:accountDID", (req, res) => {
 server.get('/nonce',  (req, res) => {
   const nonce = generateNonce();
   res.status(200).json(nonce);
+});
+
+server.get('/cid', async (req,res) =>{
+  const cid = await agent.head();
+  console.log("index.js: cid is",cid);
+  writeToCar(cid);
+
 });
 
 server.get("/apple_contacts", async (req, res) => {
