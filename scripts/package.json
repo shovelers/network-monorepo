@@ -9,6 +9,7 @@
   },
   "author": "",
   "dependencies": {
+    "@helia/car": "^3.2.0",
     "iso-did": "^1.5.0",
     "iso-signatures": "^0.3.0"
   },
