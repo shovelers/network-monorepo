@@ -16,7 +16,7 @@ function App() {
         Login
       </Button>
       <Card size="3">
-        <Flex gap="4" align="center">
+        <Flex gap="3" align="center">
           {User()}
         </Flex>
       </Card>

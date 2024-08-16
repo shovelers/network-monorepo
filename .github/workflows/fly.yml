@@ -29,8 +29,9 @@ jobs:
         run: npm install -w rolodex-client
 
       - name: Build client
-        run: npm run build -w rolodex-client \
-             --build-secret VITE_PRIVY_APP_ID=${{ secrets.VITE_PRIVY_APP_ID }}
+        run: npm run build -w rolodex-client
+        env:
+          VITE_PRIVY_APP_ID: ${{ secrets.VITE_PRIVY_APP_ID }}
 
       - name: Copy client build to server public folder
         run: |
