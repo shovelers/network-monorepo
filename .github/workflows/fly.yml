@@ -17,10 +17,29 @@ jobs:
       name: prod-fly-io
       url: https://app-rolodex.shovel.company
     steps:
-      - uses: actions/checkout@v3
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: Deploy Rolodex
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'  # or your preferred Node.js version
+
+      - name: Install dependencies for client
+        run: npm install -w rolodex-client
+
+      - name: Build client
+        run: npm run build -w rolodex-client \
+             --build-secret VITE_PRIVY_APP_ID=${{ secrets.VITE_PRIVY_APP_ID }}
+
+      - name: Copy client build to server public folder
         run: |
+          mkdir -p ./apps/rolodex/public/dist
+          cp -r ./apps/rolodex-client/dist/* ./apps/rolodex/public/dist/
+
+      - name: Deploy Rolodex
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: |
           flyctl deploy --remote-only --ha=false \
           --build-secret VITE_NETWORK=${{ secrets.VITE_NETWORK }} \
           --build-secret VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} \
