@@ -15,7 +15,7 @@ function App() {
         <Icon icon="bi:search" width="16" height="16"  style={{color: "white"}} />
         Login
       </Button>
-      <Card size="3">
+      <Card size="4">
         <Flex gap="3" align="center">
           {User()}
         </Flex>
