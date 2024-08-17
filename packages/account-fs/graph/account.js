@@ -60,8 +60,9 @@ export class AccountV1 {
 
       if (this.brokerDID) {
         try {
-          const handshake = await this.requestHandshake(this.brokerDID)
-          console.log("Handhshake with broker:", this.brokerDID, handshake)
+          const { submit } = await this.requestChallenge(this.brokerDID)
+          await submit()
+          console.log(`Handhshake with broker: ${this.brokerDID} complete`)
         } catch (e) {
           console.log("Handshake Failed. Nuke. And Retry.", e)
           await this.agent.destroy()
@@ -74,10 +75,7 @@ export class AccountV1 {
     return false
   }
 
-  async requestHandshake(accountDID, brokerDID = null) {
-    let person = await this.repositories.profile.contactForHandshake(accountDID)
-    console.log("person with XML :", person)
-
+  async requestChallenge(accountDID, brokerDID = null) {
     let requester
     if (brokerDID) {
       let status = await this.agent.establishConnection(brokerDID)
@@ -89,24 +87,12 @@ export class AccountV1 {
       requester = await this.agent.requester.create(accountDID, "JOIN")
     }
     
-    const head = await this.agent.head()
-    requester.challenge = function () { return { person: person, head: head } }
-
-    requester.notification.addEventListener("challengeIntiated", async (event) => {
-      console.log("Challenge received:", event.detail)
-    })
-
-    let handshakeSuccess = false
+    let challenge, submit;
     let shouldWeWait = true
-    requester.notification.addEventListener("CONFIRMED", async (event) => {
-      let person = event.detail.data.person
-      let result = await this.repositories.people.create(new Person(person))
-      console.log("community added to contacts :", result)
-      shouldWeWait = false
-      handshakeSuccess = true
-    })
-
-    requester.notification.addEventListener("REJECTED", async (event) => {
+    requester.notification.addEventListener("challengeIntiated", async (event) => {
+      console.log("Challenge received:", event.detail.challenge)
+      challenge = event.detail.challenge
+      submit = event.detail.submit
       shouldWeWait = false
     })
 
@@ -117,13 +103,57 @@ export class AccountV1 {
         if (!shouldWeWait) {
           resolve();
         } else {
-          setTimeout(checkFlag, 100); // Check every 100ms
+          setTimeout(checkFlag, 10); // Check every 10ms
         }
       };
       checkFlag();
     });
 
-    return handshakeSuccess
+    return { challenge, submit: this.createSubmitWrapper(accountDID, requester, submit) }
+  }
+
+  createSubmitWrapper(accountDID, requester, submit){
+    let context = this
+    return async function() {    
+      let handshakeSuccess = false
+      let shouldWeWait = true
+
+      requester.challenge = async function () {
+        let person = await context.repositories.profile.contactForHandshake(accountDID)
+        console.log("person with XML :", person)
+  
+        const head = await context.agent.head()
+  
+        return { person: person, head: head }
+      }
+  
+      requester.notification.addEventListener("CONFIRMED", async (event) => {
+        let person = event.detail.data.person
+        let result = await context.repositories.people.create(new Person(person))
+        console.log("community added to contacts :", result)
+        shouldWeWait = false
+        handshakeSuccess = true
+      })
+  
+      requester.notification.addEventListener("REJECTED", async (event) => {
+        shouldWeWait = false
+      })
+  
+      await submit()
+  
+      await new Promise((resolve) => {
+        const checkFlag = () => {
+          if (!shouldWeWait) {
+            resolve();
+          } else {
+            setTimeout(checkFlag, 10); // Check every 10ms
+          }
+        };
+        checkFlag();
+      });
+  
+      return handshakeSuccess
+    }
   }
 
   async handshakeApprover() {

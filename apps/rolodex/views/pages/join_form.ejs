@@ -32,40 +32,82 @@
         mixpanel.identify(await shovel.agent.accountDID())
       }
 
+      function extractInputMap(schema) {
+        const inputsMap = {};
 
-      const badges = [...document.querySelectorAll('#color-changing-badge')];
-      badges.forEach((badge) =>
-        badge.addEventListener('click', () => {
-          let isClicked = badge.getAttribute('data-is-clicked')
-          let question = badge.getAttribute('question')
-          if (isClicked === "false") {
-            badge.classList.remove('badge-outline');
-            badge.classList.add('badge-secondary');
-            badge.setAttribute('data-is-clicked', true)
-          } else {
-            badge.classList.remove('badge-secondary');
-            badge.classList.add('badge-outline');
-            badge.setAttribute('data-is-clicked', false)
+        if (schema.properties && schema.properties.inputs && schema.properties.inputs.properties) {
+          const inputs = schema.properties.inputs.properties;
+
+          for (const [key, value] of Object.entries(inputs)) {
+            if (value.items && value.items.enum) {
+              inputsMap[key] = {
+                label: value.title || key,
+                symbols: value.items.enum
+              };
+            }
           }
-        })
-      )
+        }
+
+        return inputsMap;
+      }
+      let options, schema, submit;
+
+      account.requestChallenge(communityDID).then((data) => {
+        console.log("Challenge data:", data)
+        schema = data.challenge.challenge.profileSchema
+        submit = data.submit
+        options = extractInputMap(schema)
+        window.data = data
+
+        let html = ""
+        for (const key in options) {
+          html = html + `<div class="space-y-2">
+                        <div class="font-semibold text-md">${options[key]["label"]}</div>`
+          for(var i=0; i<options[key]["symbols"].length; i++) {
+            html = html + `<div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="${key}">${options[key]["symbols"][i]}</div>`
+          }
+          html = html + `</div>`
+        }
+
+        html = html + `<div class="flex justify-center">
+            <div class="hidden loading loading-infinity loading-lg"></div>
+            <button id="form-submit-btn" class="btn" onclick="addSelectedTagsToProfile()"> Submit </button>
+          </div>`
+
+        document.getElementById("community-form").innerHTML = html
+
+        const badges = [...document.querySelectorAll('#color-changing-badge')];
+        badges.forEach((badge) =>
+          badge.addEventListener('click', () => {
+            let isClicked = badge.getAttribute('data-is-clicked')
+            let question = badge.getAttribute('question')
+            if (isClicked === "false") {
+              badge.classList.remove('badge-outline');
+              badge.classList.add('badge-secondary');
+              badge.setAttribute('data-is-clicked', true)
+            } else {
+              badge.classList.remove('badge-secondary');
+              badge.classList.add('badge-outline');
+              badge.setAttribute('data-is-clicked', false)
+            }
+          })
+        )
+      })
 
       // add selected tags to profile on save
       window.addSelectedTagsToProfile = async function(){
         document.querySelector("#form-submit-btn").classList.add("hidden");
         document.querySelector(".loading").classList.remove("hidden");
 
-        var options = '<%- JSON.stringify(options) %>'
         var param = {}
-        for (const key in JSON.parse(options)) {
+        for (const key in options) {
           param[key] = Array.from(document.querySelectorAll(`#color-changing-badge[question=${key}][data-is-clicked="true"]`)).map( e => e.innerHTML)
         }
-        let communityFile = JSON.parse('<%- communityFile %>')
-        await createCommunityProfile(param, communityDID, communityFile.profileSchema)
+        await createCommunityProfile(param, communityDID, schema)
         
         let profile = await getProfile()
         console.log("Profile after save :", profile)
-        const success = await account.requestHandshake(communityDID)
+        const success = await submit() 
 
         if (success) {
           window.location.href = `/directory/${communityDID}?name=${communityName}`;
@@ -91,22 +133,8 @@
         <%/* divider */%>
         <div class="divider divider-horizontal"></div>
         <%/* form half */%>
-        <div class="flex flex-col justify-evenly place-content-center w-1/2 p-8">
-          <% for (const key in options) {%>
-            <div class="space-y-2">
-              <div class="font-semibold text-md"><%= options[key]["label"] %></div>
-              <% for(var i=0; i<options[key]["symbols"].length; i++) {%>
-                <div id="color-changing-badge" class="badge badge-lg badge-outline cursor-pointer" data-is-clicked="false" question="<%= key %>"><%= options[key]["symbols"][i] %></div>
-              <% } %>
-            </div> 
-          <% }%>
-          
-          <%/* submit button */%>
-          <div class="flex justify-center">
-            <div class="hidden loading loading-infinity loading-lg"></div>
-            <button id="form-submit-btn" class="btn" onclick="addSelectedTagsToProfile()"> Submit </button>
-          </div>
-
+        <div id="community-form" class="flex flex-col justify-evenly place-content-center w-1/2 p-8">
+          <div class="loading loading-infinity loading-lg"></div>
         </div>  
       </div>
       

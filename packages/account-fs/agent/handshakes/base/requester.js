@@ -58,19 +58,25 @@ class RequesterHandshake {
     }
 
     this.sessionKey = await this.parseSessionKey(iv, msg, sessionKey)    
-    const challengeSubmission = await this.challenge()
-
     const challengeData = await Envelope.open(challenge, this.sessionKey)
-    this.notification.emitEvent("challengeIntiated", challengeData)
+    
+    let requester = this
+    this.notification.emitEvent("challengeIntiated", {
+      challenge: challengeData,
+      submit: async (data) => { 
+        const challengeSubmission = await requester.challenge()
+        const response = await Envelope.pack({
+          did: await this.agent.DID(),
+          challenge: challengeSubmission
+        }, this.sessionKey, id, type)
+    
+        requester.notification.emitEvent("challengeGenerated", challengeSubmission)
+        return await requester.channel.publish(response)
+      },
+      channelName: this.channel.name
+    })  
 
     // TODO - add signature of DID to prove ownership
-    const response = await Envelope.pack({
-      did: await this.agent.DID(),
-      challenge: challengeSubmission
-    }, this.sessionKey, id, type)
-
-    this.notification.emitEvent("challengeGenerated", challengeSubmission)
-    this.channel.publish(response)
     this.state = "NEGOTIATED"
   }
 

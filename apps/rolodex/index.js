@@ -162,9 +162,7 @@ server.get("/community/:accountDID/join", (req, res) => {
 // Community join form: community/{accountDID}/form?name=decentralised.co
 server.get("/community/:accountDID/form", (req, res) => {
   const communityDID = req.params.accountDID
-  const communityFile = communityRepo.sample(communityDID)
-  const joinFormOptionsV1 = extractInputMap(communityFile.profileSchema)
-  res.render('pages/join_form', { communityDID: communityDID, communityName: req.query.name, options: joinFormOptionsV1, communityFile: JSON.stringify(communityFile) })
+  res.render('pages/join_form', { communityDID: communityDID, communityName: req.query.name })
 });
 
 server.get("/directory/:accountDID", (req, res) => {
