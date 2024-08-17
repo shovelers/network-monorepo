@@ -8,6 +8,7 @@ import { dial } from './helia_node.js'
 import { PrivateFS, PrivateFile } from "./fs/private_fs.js"
 import { HubConnection } from './hub_connection.js';
 import { SERVER_RUNTIME } from './runtime.js';
+import { env } from 'process';
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
@@ -227,6 +228,17 @@ export const StorageCapability = {
     await this.pin(forestCID)
     console.log("pinning content")
     return newContent
+  },
+
+  async syncCarFileWithHub(cid, carBuffer) {
+    let accountDID = await this.accountDID()
+    const envelope = await this.envelop({cid: cid, carBuffer: carBuffer})
+    await this.axios_client.post(`/v1/accounts/${accountDID}/sync-car-file`, envelope).then(async (response) => {
+      console.log(response.status)
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
   },
 
   async pin(cid) {

@@ -10,7 +10,6 @@ import { save } from '@tauri-apps/api/dialog';
 import { writeTextFile } from '@tauri-apps/api/fs';
 import { SiweMessage } from 'siwe';
 import * as Sentry from "@sentry/browser";
-import { CID } from 'multiformats/cid'
 
 if (import.meta.env.VITE_SENTRY_DSN){
   Sentry.init({
@@ -74,12 +73,8 @@ async function ethereumSignup(accountDID,siweMessage, siweSignature, profileData
   }
 }
 
-async function writeToCar() {
-  let cid = await account.agent.head();
-  console.log("the cid is", cid);
-  let parsedCid = CID.parse(cid);
-  console.log(parsedCid);
-  await axios_client.get('/cid');
+async function syncHubWithCarFile() {
+  await axios_client.get('/sync-hub');
 }
 
 async function getNonce() {
@@ -368,5 +363,5 @@ export {
   filterMembers,
   uint8arrays,
   updateTelegramInfoInCommunityProfile,
-  writeToCar
+  syncHubWithCarFile
 };

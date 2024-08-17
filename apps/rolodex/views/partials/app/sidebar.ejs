@@ -1,5 +1,5 @@
 <script type="module">
-  import { account, farcasterClient, farcasterSignup, writeToCar } from '/odd.js';
+  import { account, farcasterClient, farcasterSignup, syncHubWithCarFile } from '/odd.js';
 
   if (window.__TAURI__) {
     document.getElementById("google-import").style.display = "none"
@@ -58,14 +58,9 @@
 
   window.syncButton = async function() {
  
-    await writeToCar();
-
-
+    await syncHubWithCarFile();
+    
     window.shovel.agent.syncStatus().then((s) => {
-
-      //on click of sync button
-      //log the head cid
-      // call the function to read the car file 
      
 
       console.log("sync status", s)
