@@ -46,10 +46,6 @@ class RequesterHandshake {
     return requestDID
   }
 
-  async challenge() {
-    throw "ImplementInSpecificHandshake"
-  }
-
   async negotiate(message) {
     const { id, type, iv, msg, sessionKey, challenge } = JSON.parse(message)
     if (!id || !type || !iv || !sessionKey) {
@@ -63,8 +59,7 @@ class RequesterHandshake {
     let requester = this
     this.notification.emitEvent("challengeIntiated", {
       challenge: challengeData,
-      submit: async (data) => { 
-        const challengeSubmission = await requester.challenge()
+      submit: async (challengeSubmission) => { 
         const response = await Envelope.pack({
           did: await this.agent.DID(),
           challenge: challengeSubmission

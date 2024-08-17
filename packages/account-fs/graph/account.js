@@ -118,14 +118,11 @@ export class AccountV1 {
       let handshakeSuccess = false
       let shouldWeWait = true
 
-      requester.challenge = async function () {
-        let person = await context.repositories.profile.contactForHandshake(accountDID)
-        console.log("person with XML :", person)
-  
-        const head = await context.agent.head()
-  
-        return { person: person, head: head }
-      }
+      let person = await context.repositories.profile.contactForHandshake(accountDID)
+      console.log("person with XML :", person)
+
+      const head = await context.agent.head()
+      const submissionData = { person, head }
   
       requester.notification.addEventListener("CONFIRMED", async (event) => {
         let person = event.detail.data.person
@@ -139,7 +136,7 @@ export class AccountV1 {
         shouldWeWait = false
       })
   
-      await submit()
+      await submit(submissionData)
   
       await new Promise((resolve) => {
         const checkFlag = () => {
