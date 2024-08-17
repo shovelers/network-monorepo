@@ -7,7 +7,7 @@ import { FsBlockstore } from 'blockstore-fs'
 import { FsDatastore } from 'datastore-fs'
 import { Person } from "./graph/repository/people/person.ts";
 import { AccountV1 } from './graph/account.js'
-import { AppHandshakeApprover, CommunityHandshakeApprover } from './graph/approvers/index.ts';
+import { AppHandshakeApprover, CommunityHandshakeApprover } from './graph/handshakes/approvers.ts';
 //import { prometheusMetrics } from '@libp2p/prometheus-metrics'
 
 async function createAppNode(blockPath, filePath) {

@@ -1,7 +1,7 @@
 import { PeopleRepository } from "./repository/people/people.ts";
-import { PeopleHandshakeApprover } from "./approvers/index.ts";
+import { PeopleHandshakeApprover } from "./handshakes/approvers.ts";
+import { HandshakeRequester } from "./handshakes/requesters.ts";
 import { PeopleSearch } from "./repository/people/search.js";
-import { Person } from "./repository/people/person.ts";
 import { ProfileRepository } from "./repository/profiles/profiles.js";
 import { MembersRepository } from "./repository/members/members.js";
 import { CommunityRepository } from "./repository/members/community.ts";
@@ -115,81 +115,5 @@ export class AccountV1 {
 
   async activeSession() {
     return this.agent.activeSession()
-  }
-}
-
-class HandshakeRequester {
-  constructor(repositories, agent, requester, accountDID){
-    this.repositories = repositories
-    this.agent = agent
-    this.requester = requester
-    this.accountDID = accountDID
-  }
-
-  async requestChallenge() {
-    let challenge, submit;
-    let shouldWeWait = true
-    this.requester.notification.addEventListener("challengeIntiated", async (event) => {
-      console.log("Challenge received:", event.detail.challenge)
-      challenge = event.detail.challenge
-      submit = event.detail.submit
-      shouldWeWait = false
-    })
-
-    await this.requester.initiate()
-
-    await new Promise((resolve) => {
-      const checkFlag = () => {
-        if (!shouldWeWait) {
-          resolve();
-        } else {
-          setTimeout(checkFlag, 10); // Check every 10ms
-        }
-      };
-      checkFlag();
-    });
-
-    return { challenge, submit: this.createSubmitWrapper(submit) }
-  }
-
-  createSubmitWrapper(submit){
-    let context = this
-    return async function() {    
-      let handshakeSuccess = false
-      let shouldWeWait = true
-
-      let person = await context.repositories.profile.contactForHandshake(context.accountDID)
-      console.log("person with XML :", person)
-
-      const head = await context.agent.head()
-      const submissionData = { person, head }
-  
-      context.requester.notification.addEventListener("CONFIRMED", async (event) => {
-        let person = event.detail.data.person
-        let result = await context.repositories.people.create(new Person(person))
-        console.log("community added to contacts :", result)
-        shouldWeWait = false
-        handshakeSuccess = true
-      })
-  
-      context.requester.notification.addEventListener("REJECTED", async (event) => {
-        shouldWeWait = false
-      })
-  
-      await submit(submissionData)
-  
-      await new Promise((resolve) => {
-        const checkFlag = () => {
-          if (!shouldWeWait) {
-            resolve();
-          } else {
-            setTimeout(checkFlag, 10); // Check every 10ms
-          }
-        };
-        checkFlag();
-      });
-  
-      return handshakeSuccess
-    }
   }
 }
