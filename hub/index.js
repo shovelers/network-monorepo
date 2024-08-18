@@ -12,6 +12,10 @@ import * as uint8arrays from 'uint8arrays';
 import * as verifiers from 'iso-signatures/verifiers/rsa.js'
 import { DIDKey } from 'iso-did/key'
 import { SiweMessage } from 'siwe';
+import { car } from '@helia/car'
+import { CarReader } from '@ipld/car'
+import { Readable } from 'stream'
+
 
 const redisURL = process.env.REDIS_URL || "redis://localhost:6379"
 const redisClient =  createClient({ url: redisURL });
@@ -23,10 +27,10 @@ const server = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-server.use(express.json());
+server.use(express.json({limit: '50mb'}));
 server.use(cors());
 
-server.use(express.urlencoded({ extended: true }));
+server.use(express.urlencoded({ limit: '50mb',extended: true }));
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
@@ -36,6 +40,9 @@ const homeDir = process.env.PROTOCOL_DB_HOME || path.join(__dirname, 'protocol_d
 await fs.mkdir(path.join(homeDir, 'blocks'), { recursive: true })
 await fs.mkdir(path.join(homeDir, 'data'), { recursive: true })
 const node = await createStandaloneNode(path.join(homeDir, 'blocks'), path.join(homeDir, 'data'))
+
+const heliaCar = car(node)
+heliaCar.components.dagWalkers = node.pins.dagWalkers
 
 const multiaddrs = node.libp2p.getMultiaddrs()
 const peers = await node.libp2p.peerStore.all()
@@ -108,6 +115,12 @@ class Accounts {
 
   async getNames(accountDID) {
     return await this.redis.hGet(`account:${accountDID}`, 'names')
+  }
+  async readCarFileAndUpdateBlockstore (carBuffer) {
+    let buffer = Buffer.from(carBuffer, 'base64');
+    const inStream = Readable.from(buffer);
+    const reader = await CarReader.fromIterable(inStream);
+    await heliaCar.import(reader);
   }
 }
 const accounts = new Accounts(redisClient)
@@ -251,6 +264,26 @@ server.post('/v1/accounts/:accountDID/inbox', async (req, res) => {
 
   await accounts.setInbox(req.params.accountDID, req.body.message.inbox)
   
+  res.status(201).json({})
+});
+
+server.post('/v1/accounts/:accountDID/sync-car-file', async (req, res) => { 
+  const verified = await verify(req.body.message, req.body.signature)
+  if (!verified) {
+    res.status(401).json({error: "InvalidSignature"})
+    return
+  }
+
+  const can = await accounts.validAgentV1(req.params.accountDID, req.body.message.signer)
+  if (!can) {
+    res.status(401).json({error: "InvalidAgent"})
+    return
+  }
+
+  await accounts.readCarFileAndUpdateBlockstore(req.body.message.carBuffer)
+  accounts.setHead(req.params.accountDID, req.body.message.cid).then(() => {
+    console.log("head updated after reading from car file")
+  })
   res.status(201).json({})
 });
 

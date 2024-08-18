@@ -329,6 +329,9 @@ async function portOldContacts(contacts){
   )
   await contactRepo.bulkCreate(list)
 }
+async function syncHubWithCarFile() {
+  await axios_client.get('/sync-hub');
+}
 
 export { 
   account,
@@ -358,5 +361,6 @@ export {
   getCommunityMembers,
   filterMembers,
   uint8arrays,
-  updateTelegramInfoInCommunityProfile
+  updateTelegramInfoInCommunityProfile,
+  syncHubWithCarFile
 };

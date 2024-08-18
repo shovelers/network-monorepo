@@ -29,9 +29,13 @@
     "ipfs-bitswap": "19.0.0"
   },
   "dependencies": {
+    "@helia/car": "^3.2.0",
     "@libp2p/prometheus-metrics": "^3.0.8",
     "ethers": "^6.12.1",
     "morgan": "^1.10.0",
+    "node-stream": "^1.7.0",
+    "p-event": "^6.0.1",
+    "stream-browserify": "^3.0.0",
     "vite-plugin-wasm": "^3.3.0"
   }
 }

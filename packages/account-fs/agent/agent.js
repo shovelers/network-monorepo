@@ -229,6 +229,17 @@ export const StorageCapability = {
     return newContent
   },
 
+  async syncCarFileWithHub(cid, carBuffer) {
+    let accountDID = await this.accountDID()
+    const envelope = await this.envelop({cid: cid, carBuffer: carBuffer})
+    await this.axios_client.post(`/v1/accounts/${accountDID}/sync-car-file`, envelope).then(async (response) => {
+      console.log(response.status)
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
+  },
+
   async pin(cid) {
     let accountDID = await this.accountDID()
     

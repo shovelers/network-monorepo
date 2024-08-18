@@ -8,6 +8,12 @@ import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
 import morgan from 'morgan';
 import * as Sentry from "@sentry/node";
+import { car } from '@helia/car'
+import { CarWriter } from '@ipld/car'
+import { CID } from 'multiformats/cid'
+
+
+import { Readable } from 'stream'
 
 if (process.env.VITE_SENTRY_DSN) {
   Sentry.init({
@@ -67,6 +73,8 @@ await agent.approver.start()
 await agent.broker.start()
 
 agent.approver.register("JOIN", new AppHandshakeApprover(account.repositories))
+const heliaCar = car(account.agent.helia)
+heliaCar.components.dagWalkers = helia.pins.dagWalkers
 
 ///
 //Agent for Community
@@ -135,6 +143,20 @@ function extractInputMap(schema) {
   return inputsMap;
 }
 
+async function generateCarFile(cid) {
+
+  let parsedCid = CID.parse(cid)  
+  const { writer, out } = await CarWriter.create(parsedCid)
+  const chunks = []
+  const readableStream = Readable.from(out)
+  readableStream.on('data', chunk => chunks.push(chunk))
+  const streamFinished = new Promise(resolve => readableStream.on('end', resolve))
+  await heliaCar.export(parsedCid, writer)
+  await streamFinished
+
+  return Buffer.concat(chunks)
+}
+
 const communityRepo = new CommunityRepository()
 
 server.use(express.urlencoded({ extended: true }))
@@ -175,6 +197,12 @@ server.get("/directory/:accountDID", (req, res) => {
 server.get('/nonce',  (req, res) => {
   const nonce = generateNonce();
   res.status(200).json(nonce);
+});
+
+server.get('/sync-hub', async (req,res) =>{
+  const cid = await agent.head();
+  const carBuffer = await generateCarFile(cid)
+  await agent.syncCarFileWithHub(cid, carBuffer);
 });
 
 server.get("/apple_contacts", async (req, res) => {
