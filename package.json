@@ -23,7 +23,10 @@
   },
   "homepage": "https://github.com/shovelers/protocol#readme",
   "devDependencies": {
-    "lerna": "^6.6.2"
+    "buffer": "^6.0.3",
+    "lerna": "^6.6.2",
+    "stream-browserify": "^3.0.0",
+    "vite-plugin-node-polyfills": "^0.22.0"
   },
   "overrides": {
     "ipfs-bitswap": "19.0.0"
@@ -35,7 +38,7 @@
     "morgan": "^1.10.0",
     "node-stream": "^1.7.0",
     "p-event": "^6.0.1",
-    "stream-browserify": "^3.0.0",
+    "readable-stream": "^4.5.2",
     "vite-plugin-wasm": "^3.3.0"
   }
 }
