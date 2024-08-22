@@ -330,7 +330,7 @@ async function portOldContacts(contacts){
   await contactRepo.bulkCreate(list)
 }
 async function syncHubWithCarFile() {
-  await axios_client.get('/sync-hub');
+  await account.agent.syncCarFileWithHub()	
 }
 
 export { 

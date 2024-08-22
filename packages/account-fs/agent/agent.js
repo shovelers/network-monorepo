@@ -8,6 +8,10 @@ import { dial } from './helia_node.js'
 import { PrivateFS, PrivateFile } from "./fs/private_fs.js"
 import { HubConnection } from './hub_connection.js';
 import { SERVER_RUNTIME } from './runtime.js';
+import { car } from '@helia/car'
+import { CarWriter } from '@ipld/car'
+import { Readable } from 'readable-stream';
+import { Buffer } from 'buffer';
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_ACCOUNT_HANDLE = "SHOVEL_ACCOUNT_HANDLE"
@@ -229,9 +233,26 @@ export const StorageCapability = {
     return newContent
   },
 
-  async syncCarFileWithHub(cid, carBuffer) {
+  async syncCarFileWithHub() {
+
+    const generateCarFile = async (cid) => {
+      const heliaCar = car(this.helia)
+      heliaCar.components.dagWalkers = this.helia.pins.dagWalkers
+      let parsedCid = CID.parse(cid)  
+      const { writer, out } = await CarWriter.create(parsedCid)
+      const chunks = []
+      const readableStream = Readable.from(out)
+      readableStream.on('data', chunk => chunks.push(chunk))
+      const streamFinished = new Promise(resolve => readableStream.on('end', resolve))
+      await heliaCar.export(parsedCid, writer)
+      await streamFinished
+      return Buffer.concat(chunks)
+  }
+
     let accountDID = await this.accountDID()
-    const envelope = await this.envelop({cid: cid, carBuffer: carBuffer})
+    const headCID = await this.head()
+    const carBuffer = await generateCarFile(headCID)
+    const envelope = await this.envelop({cid: headCID, carBuffer: carBuffer})
     await this.axios_client.post(`/v1/accounts/${accountDID}/sync-car-file`, envelope).then(async (response) => {
       console.log(response.status)
     }).catch((e) => {
