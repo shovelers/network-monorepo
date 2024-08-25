@@ -16,7 +16,6 @@ import { car } from '@helia/car'
 import { CarReader } from '@ipld/car'
 import { Readable } from 'stream'
 
-
 const redisURL = process.env.REDIS_URL || "redis://localhost:6379"
 const redisClient =  createClient({ url: redisURL });
 await redisClient.connect()
@@ -43,7 +42,6 @@ const node = await createStandaloneNode(path.join(homeDir, 'blocks'), path.join(
 
 const heliaCar = car(node)
 heliaCar.components.dagWalkers = node.pins.dagWalkers
-
 const multiaddrs = node.libp2p.getMultiaddrs()
 const peers = await node.libp2p.peerStore.all()
 console.log("node address:", multiaddrs);

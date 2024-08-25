@@ -1,0 +1,36 @@
+diff --git a/node_modules/@helia/car/src/index.ts b/node_modules/@helia/car/src/index.ts
+index 23b247b..91a933c 100644
+--- a/node_modules/@helia/car/src/index.ts
++++ b/node_modules/@helia/car/src/index.ts
+@@ -81,7 +81,8 @@ interface ExportCarOptions extends AbortOptions, ProgressOptions<GetBlockProgres
+   /**
+    * If a filter is passed it will be used to deduplicate blocks exported in the car file
+    */
+-  blockFilter?: Filter
++  blockFilter?: Filter,
++  endCid?: CID;
+ }
+ 
+ /**
+@@ -182,6 +183,8 @@ class DefaultCar implements Car {
+     const deferred = defer<Error | undefined>()
+     const roots = Array.isArray(root) ? root : [root]
+ 
++    const endCid = options?.endCid;
++    console.log("end cid is", endCid);
+     // use a queue to walk the DAG instead of recursion so we can traverse very large DAGs
+     const queue = new PQueue({
+       concurrency: DAG_WALK_QUEUE_CONCURRENCY
+@@ -197,6 +200,12 @@ class DefaultCar implements Car {
+     for (const root of roots) {
+       void queue.add(async () => {
+         await this.#walkDag(root, queue, async (cid, bytes) => {
++          // Stop processing if the current CID matches the end CID
++          if (endCid && cid.equals(endCid)) {
++            console.log("endCid", endCid)
++            console.log("cid", cid)
++            return; 
++          }
+           // if a filter has been passed, skip blocks that have already been written
+           if (options?.blockFilter?.has(cid.multihash.bytes) === true) {
+             return

@@ -9,8 +9,6 @@ import { access, constants } from 'node:fs/promises';
 import morgan from 'morgan';
 import * as Sentry from "@sentry/node";
 
-
-
 if (process.env.VITE_SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.VITE_SENTRY_DSN,
@@ -137,7 +135,6 @@ function extractInputMap(schema) {
   return inputsMap;
 }
 
-
 const communityRepo = new CommunityRepository()
 
 server.use(express.urlencoded({ extended: true }))
@@ -179,7 +176,6 @@ server.get('/nonce',  (req, res) => {
   const nonce = generateNonce();
   res.status(200).json(nonce);
 });
-
 
 server.get("/apple_contacts", async (req, res) => {
   try {

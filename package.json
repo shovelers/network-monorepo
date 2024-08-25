@@ -10,7 +10,8 @@
     "./apps/*"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
   "devDependencies": {
     "buffer": "^6.0.3",
     "lerna": "^6.6.2",
+    "patch-package": "^8.0.0",
     "stream-browserify": "^3.0.0",
     "vite-plugin-node-polyfills": "^0.22.0"
   },
@@ -34,6 +36,7 @@
   "dependencies": {
     "@helia/car": "^3.2.0",
     "@libp2p/prometheus-metrics": "^3.0.8",
+    "esbuild": "^0.23.1",
     "ethers": "^6.12.1",
     "morgan": "^1.10.0",
     "node-stream": "^1.7.0",
