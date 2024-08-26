@@ -11,7 +11,7 @@
 
   <body class="antialiased bg-base-100">
     <script type="module">      
-      import { getProfile, account ,createCommunityProfile } from '/odd.js';
+      import { getProfile, account } from '/odd.js';
       var communityDID = '<%- communityDID %>'
       var communityName = '<%- communityName %>'
       
@@ -50,13 +50,12 @@
 
         return inputsMap;
       }
-      let options, schema, submit;
+      let options, submit;
 
       account.requestChallenge(communityDID).then((data) => {
         console.log("Challenge data:", data)
-        schema = data.challenge.challenge.profileSchema
         submit = data.submit
-        options = extractInputMap(schema)
+        options = extractInputMap(data.challenge.challenge.profileSchema)
         window.data = data
 
         let html = ""
@@ -103,12 +102,8 @@
         for (const key in options) {
           param[key] = Array.from(document.querySelectorAll(`#color-changing-badge[question=${key}][data-is-clicked="true"]`)).map( e => e.innerHTML)
         }
-        await createCommunityProfile(param, communityDID, schema)
         
-        let profile = await getProfile()
-        console.log("Profile after save :", profile)
-        const success = await submit() 
-
+        const success = await submit(param) 
         if (success) {
           window.location.href = `/directory/${communityDID}?name=${communityName}`;
         } else {

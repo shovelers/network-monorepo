@@ -6,6 +6,7 @@ export class HandshakeRequester {
   private requester: any;
   private accountDID: string;
   private eventTimeout: number;
+  private challenge: any;
 
   constructor(repositories: any, agent: any, requester: any, accountDID: string) {
     this.repositories = repositories;
@@ -16,7 +17,6 @@ export class HandshakeRequester {
   }
 
   async requestChallenge(): Promise<{ challenge: any; submit: () => Promise<boolean> }> {
-    let challenge: any;
     let submit: (data: any) => Promise<void>;
 
     const challengePromise = new Promise<void>((resolve, reject) => {
@@ -25,7 +25,7 @@ export class HandshakeRequester {
       this.requester.notification.addEventListener("challengeIntiated", (event: CustomEvent) => {
         clearTimeout(timeoutId);
         console.log("Challenge received:", event.detail.challenge);
-        challenge = event.detail.challenge;
+        this.challenge = event.detail.challenge;
         submit = event.detail.submit;
         resolve();
       }, { once: true });
@@ -40,12 +40,19 @@ export class HandshakeRequester {
       throw error;
     }
 
-    return { challenge, submit: this.createSubmitWrapper(submit) };
+    return { challenge: this.challenge, submit: this.createSubmitWrapper(submit) };
   }
 
-  private createSubmitWrapper(submit: (data: any) => Promise<void>): () => Promise<boolean> {
+  private createSubmitWrapper(submit: (data: any) => Promise<void>): (params: any) => Promise<boolean> {
     const context = this;
-    return async function(): Promise<boolean> {
+    return async function(params: any): Promise<boolean> {
+      // Hack for optional profile creation
+      if (params) {
+        console.log(params, context.challenge.challenge.profileSchema, context.challenge)
+        await context.repositories.profile.createCommunityProfile(context.accountDID, context.challenge.challenge.profileSchema, params)
+        // handle profile creation failure
+      }
+
       let handshakeSuccess = false;
   
       const person = await context.repositories.profile.contactForHandshake(context.accountDID);

@@ -154,10 +154,6 @@ async function updateCommunityProfile(inputs, communityDID, profileSchema) {
   return await account.repositories.profile.updateCommunityProfile(communityDID, profileSchema, inputs)
 }
 
-async function createCommunityProfile(params, communityDID, profileSchema) {
-  return await account.repositories.profile.createCommunityProfile(communityDID, profileSchema, params)
-}
-
 async function updateTelegramInfoInCommunityProfile(telegramData, communityDID, profileSchema) {
   return await account.repositories.profile.updateTelegramInCommunityProfile(communityDID, profileSchema, telegramData)
 }
@@ -353,7 +349,6 @@ export {
   verifySiweMessage,
   ethereumSignup,
   updateCommunityProfile,
-  createCommunityProfile,
   getMembers,
   getCommunityMembers,
   filterMembers,
