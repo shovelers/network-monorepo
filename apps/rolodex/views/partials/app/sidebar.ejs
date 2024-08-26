@@ -37,7 +37,8 @@
   window.addConnectionButton = async function(){
     // TODO check if valid handle to connect
     var accountDID = document.querySelector('.connection-handle').value
-    await shovel.account.requestHandshake(accountDID, "<%= brokerDID %>")
+    const {challenge, submit} = await shovel.account.requestChallenge(accountDID, "<%= brokerDID %>")
+    await submit()
   }
 
   window.refreshSyncStatus = function() {

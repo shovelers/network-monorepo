@@ -21,19 +21,6 @@ export class AccountV1 {
     this.brokerDID = brokerDID
   }
 
-  start(){
-    this.router = {
-      requester: {
-        "JOIN": { channel: "DIRECT", controller: "TBD", suffix: "membership" },
-        "RELATE": { channel: "BROKERED", controller: "TBD", suffix: "relationship" }
-      },
-      approver: {
-        "RELATE": { channel: "BROKERED", controller: "TBD", suffix: "relationship" }
-      },
-      broker: false
-    }
-  }
-
   async loadRepositories(){
     let members = new MembersRepository(this.agent)
     if (await members.isInitialised()){
