@@ -10,6 +10,7 @@ export class Handshake {
     this.notification = notification
     this.sessionKey = undefined
     this.brokerDID = undefined
+    this.incoming = {}
   }
 
   async handle(message) {
@@ -42,46 +43,42 @@ export class Handshake {
       channelName: this.channel.name
     })  
     this.state = "INITIATED"
+    this.incoming[this.state] = message
   }
 
   async negotiate(message) {
     const challengeMessage = await Envelope.open(message, this.sessionKey)
+    this.state = "NEGOTIATED"
+    this.incoming[this.state] = message
 
-    let approver = this
+    let context = this
     this.notification.emitEvent("challengeRecieved", {
-      confirm: async (confirmData) => { return await approver.confirm(message, challengeMessage, confirmData) },
-      reject: async () => { return await approver.reject(message) },
+      confirm: async (data) => { return await context.confirm(data) },
+      reject: async () => { return await context.reject() },
       message: challengeMessage,
       channelName: this.channel.name
     })
-    this.state = "NEGOTIATED"
   }
 
-  async confirm(message, challenge, confirmData) {
+  async confirm(data) {
+    const message = this.incoming[this.state]
+    const challenge = await Envelope.open(message, this.sessionKey)
     console.log("message in approve#confirm", challenge)
-    // TODO remove one of the following method of getting confirm data
-    const data = confirmData || await this.confirmData()
 
     const { id, type } = JSON.parse(message)
     const confirmMessage = await Envelope.pack({data: data, status: "CONFIRMED"}, this.sessionKey, id, type)
     
     await this.channel.publish(confirmMessage)
-    this.notification.emitEvent("CONFIRMED", challenge)
-    this.notification.emitEvent("complete", "CONFIRMED")
     this.state = "TERMINATED"
   }
 
-  async confirmData() {
-    throw "ImplementInSpecificHandshake"
-  }
-
-  async reject(message) {
+  async reject() {
+    const message = this.incoming[this.state]
     console.log("message in approve#reject")
     const { id, type } = JSON.parse(message)
     const rejectMessage = await Envelope.pack({ status: "REJECTED" }, this.sessionKey, id, type)
     
     await this.channel.publish(rejectMessage)
-    this.notification.emitEvent("complete", "REJECTED")
     this.state = "TERMINATED"
   }
 
