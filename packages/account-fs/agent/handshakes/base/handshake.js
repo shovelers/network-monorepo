@@ -29,21 +29,27 @@ export class Handshake {
   }
 
   async initiate(message) {
+    this.state = "INITIATED"
+    this.incoming[this.state] = message
+
+    let approver = this
+    this.notification.emitEvent("challengeIntiated", {
+      challenge: async (data) => { return await approver.challenge(data) },
+      channelName: this.channel.name
+    })  
+  }
+
+  async challenge(data) {
+    const message = this.incoming[this.state]
+
     const request = JSON.parse(message)
     const {sessionKey, sessionKeyMessage} = await this.generateSessionKey(request)
     this.sessionKey = sessionKey
 
-    let approver = this
-    this.notification.emitEvent("challengeIntiated", {
-      challenge: async (data) => { 
-        const message = JSON.parse(sessionKeyMessage)
-        message.challenge = await Envelope.pack(data, approver.sessionKey, message.id, message.type)
-        return await approver.channel.publish(JSON.stringify(message))
-      },
-      channelName: this.channel.name
-    })  
-    this.state = "INITIATED"
-    this.incoming[this.state] = message
+    // TODO: create package once, hack to stick in one more field
+    const outgoing = JSON.parse(sessionKeyMessage)
+    outgoing.challenge = await Envelope.pack(data, this.sessionKey, outgoing.id, outgoing.type)
+    await this.channel.publish(JSON.stringify(outgoing))
   }
 
   async negotiate(message) {

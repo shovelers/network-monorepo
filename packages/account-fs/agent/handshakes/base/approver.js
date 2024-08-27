@@ -16,16 +16,13 @@ export class Approver {
     //TODO remove circular dependency
     await this.channel.subscribe(this)
   }
-  
+
   ongoing() {
     return this.handshakes.filter(handshake => handshake.state === "NEGOTIATED");
   }
 
   register(type, handshakeApprover){
-    let notification = new Notification()
-    notification.addEventListener("challengeIntiated", async (challengeEvent) => { await handshakeApprover.createChallenge(challengeEvent) })
-    notification.addEventListener("challengeRecieved", async (challengeEvent) => { await handshakeApprover.handleChallenge(challengeEvent) })
-    this.router[type] = notification
+    this.router[type] = handshakeApprover
   }
 
   async handler(message) {
@@ -35,14 +32,20 @@ export class Approver {
     if (!handshake) {
       handshake = this.newHandshake(request)
       this.handshakes.push(handshake)
-    } 
+    }
     await handshake.handle(message)
+    
+    if (handshake.state === "INITIATED") {
+      await this.router[request.type].challenge(handshake)
+    } else if (handshake.state === "NEGOTIATED") {
+      await this.router[request.type].approve(handshake)
+    }
   }
 
   newHandshake(request) {
     if (this.router[request.type]) {
       console.log("receive handshake")
-      return new Handshake(this.agent, this.channel, request.id, this.router[request.type])
+      return new Handshake(this.agent, this.channel, request.id, new Notification())
     } else {
       throw `Unregistered Handshake Type: ${request.type}`
     }

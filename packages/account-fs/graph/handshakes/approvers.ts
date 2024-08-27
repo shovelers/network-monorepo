@@ -9,24 +9,25 @@ export class CommunityHandshakeApprover {
     this.agent = agent
   }
 
-  async createChallenge(event) {
+  async challenge(handshake){
     const communityDID = await this.agent.accountDID()
     const communityFile = this.repositories.community.sample(communityDID)
-    await event.detail.challenge({challenge: communityFile})
+    await handshake.challenge({challenge: communityFile})
   }
 
-  async handleChallenge(challengeEvent) {
-    console.log("receieved from requester :", challengeEvent.detail)
+  async approve(handshake){
+    const challenge = await handshake.challengeSubmission()
+    console.log("challenge received:", challenge)
     const communityDID = await this.agent.accountDID()
     const contact = await this.repositories.members.contactForHandshake()
-    let person = new Person(challengeEvent.detail.message.challenge.person)
-    let valid = await person.validateProfileForCommunity(this.agent, this.repositories.community.sample(communityDID).profileSchema, challengeEvent.detail.message.challenge.head)
-    console.log("sending a valid profile? ", valid, challengeEvent.detail.message.challenge.person)
+    let person = new Person(challenge.person)
+    let valid = await person.validateProfileForCommunity(this.agent, this.repositories.community.sample(communityDID).profileSchema, challenge.head)
+    console.log("sending a valid profile? ", valid, challenge.person)
     if (valid) {
-      await this.repositories.members.add(challengeEvent.detail.message.challenge.person)
-      await challengeEvent.detail.confirm({person: contact}) 
+      await this.repositories.members.add(challenge.person)
+      await handshake.confirm({person: contact}) 
     } else {
-      await challengeEvent.detail.reject()  
+      await handshake.reject()  
     }
   }
 }
@@ -38,22 +39,24 @@ export class AppHandshakeApprover {
     this.repositories = repositories
   }
 
-  async createChallenge(event) {
-    await event.detail.challenge({})
+  async challenge(handshake){
+    await handshake.challenge({})
   }
 
-  async handleChallenge(challengeEvent) {
-    console.log("receieved from requester :", challengeEvent.detail)
-    let person = challengeEvent.detail.message.challenge.person
-    let result = await this.repositories.people.create(new Person(person))
+  async approve(handshake){
+    const challenge = await handshake.challengeSubmission()
+    console.log("challenge received:", challenge)
+
+    let result = await this.repositories.people.create(new Person(challenge.person))
     console.log("person added to contacts :", result)
   
     let self = await this.repositories.profile.contactForHandshake()
+    // TODO remove hardcoding for rolodex
     self.FN = "Rolodex"
     self.CATEGORIES = "app"
     console.log("Person with XML :", self)
     // TODO Implementing auto-confim - check challenge to implement reject
-    await challengeEvent.detail.confirm({person: self})
+    await handshake.confirm({person: self})
   }
 }
 
@@ -64,12 +67,12 @@ export class PeopleHandshakeApprover {
     this.repositories = repositories
   }
 
-  async createChallenge(event) {
-    await event.detail.challenge({})
+  async challenge(handshake){
+    await handshake.challenge({})
   }
 
-  async handleChallenge(challengeEvent) {
-    console.log("received challenge from:", challengeEvent.detail.message.challenge.person)
+  async approve(handshake){
+    console.log("challenge received:", await handshake.challengeSubmission())
   }
 
   async confirm(handshake){
