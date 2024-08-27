@@ -1,6 +1,5 @@
 import { Handshake } from './handshake.js';
 import { Channel } from './channel.js';
-import { Notification } from './common.js';
 
 export class Approver {
   constructor(agent) {
@@ -45,7 +44,7 @@ export class Approver {
   newHandshake(request) {
     if (this.router[request.type]) {
       console.log("receive handshake")
-      return new Handshake(this.agent, this.channel, request.id, new Notification())
+      return new Handshake(this.agent, this.channel, request.id)
     } else {
       throw `Unregistered Handshake Type: ${request.type}`
     }

@@ -2,12 +2,11 @@ import * as uint8arrays from 'uint8arrays';
 import { Envelope, DIDKey } from './common.js';
 
 export class Handshake {
-  constructor(agent, channel, id, notification) {
+  constructor(agent, channel, id) {
     this.agent = agent
     this.channel = channel
     this.id = id
     this.state = "CREATED"
-    this.notification = notification
     this.sessionKey = undefined
     this.brokerDID = undefined
     this.incoming = {}
@@ -31,12 +30,6 @@ export class Handshake {
   async initiate(message) {
     this.state = "INITIATED"
     this.incoming[this.state] = message
-
-    let approver = this
-    this.notification.emitEvent("challengeIntiated", {
-      challenge: async (data) => { return await approver.challenge(data) },
-      channelName: this.channel.name
-    })  
   }
 
   async challenge(data) {
@@ -53,17 +46,8 @@ export class Handshake {
   }
 
   async negotiate(message) {
-    const challengeMessage = await Envelope.open(message, this.sessionKey)
     this.state = "NEGOTIATED"
     this.incoming[this.state] = message
-
-    let context = this
-    this.notification.emitEvent("challengeRecieved", {
-      confirm: async (data) => { return await context.confirm(data) },
-      reject: async () => { return await context.reject() },
-      message: challengeMessage,
-      channelName: this.channel.name
-    })
   }
 
   async challengeSubmission(){
