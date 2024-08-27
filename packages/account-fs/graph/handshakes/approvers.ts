@@ -69,24 +69,22 @@ export class PeopleHandshakeApprover {
   }
 
   async handleChallenge(challengeEvent) {
-    console.log(challengeEvent.detail)
-    let person = challengeEvent.detail.message.challenge.person
-    
-    const context = this
-    const confirm = async function() {
-      let result = await context.repositories.people.create(new Person(person))
-      console.log("person added to contacts :", result)
-  
-      let self = await context.repositories.profile.contactForHandshake()
-      console.log("Person with XML :", self)
-      // TODO Implementing auto-confim - check challenge to implement reject
-      await challengeEvent.detail.confirm({person: self}) 
-    }
+    console.log("received challenge from:", challengeEvent.detail.message.challenge.person)
+  }
 
-    const reject = async function() {      
-      await challengeEvent.detail.reject()
-    }
+  async confirm(handshake){
+    let challenge = await handshake.challengeSubmission()
+    console.log("challenge submission", challenge)
 
-    await confirm()
+    let result = await this.repositories.people.create(new Person(challenge.person))
+    console.log("person added to contacts :", result)
+
+    let self = await this.repositories.profile.contactForHandshake()
+    console.log("Person with XML :", self)
+    await handshake.confirm({person: self}) 
+  }
+
+  async reject(handshake){
+    await handshake.reject()
   }
 }

@@ -60,11 +60,15 @@ export class Handshake {
     })
   }
 
-  async confirm(data) {
-    const message = this.incoming[this.state]
-    const challenge = await Envelope.open(message, this.sessionKey)
-    console.log("message in approve#confirm", challenge)
+  async challengeSubmission(){
+    const message = await Envelope.open(this.incoming["NEGOTIATED"], this.sessionKey)
+    return message.challenge
+  }
 
+  async confirm(data) {
+    console.log("message in approve#confirm")
+
+    const message = this.incoming[this.state]
     const { id, type } = JSON.parse(message)
     const confirmMessage = await Envelope.pack({data: data, status: "CONFIRMED"}, this.sessionKey, id, type)
     
@@ -73,8 +77,9 @@ export class Handshake {
   }
 
   async reject() {
-    const message = this.incoming[this.state]
     console.log("message in approve#reject")
+
+    const message = this.incoming[this.state]
     const { id, type } = JSON.parse(message)
     const rejectMessage = await Envelope.pack({ status: "REJECTED" }, this.sessionKey, id, type)
     

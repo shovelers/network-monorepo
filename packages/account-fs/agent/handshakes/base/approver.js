@@ -16,6 +16,10 @@ export class Approver {
     //TODO remove circular dependency
     await this.channel.subscribe(this)
   }
+  
+  ongoing() {
+    return this.handshakes.filter(handshake => handshake.state === "NEGOTIATED");
+  }
 
   register(type, handshakeApprover){
     let notification = new Notification()
