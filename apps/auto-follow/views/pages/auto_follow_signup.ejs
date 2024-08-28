@@ -64,6 +64,7 @@
            let accountDID = `did:pkh:eip155:${response.data.chainId}:${response.data.address}`
            let profileData = { fid: status.data.fid, handle: status.data.username, name: status.data.displayName, text: status.data.bio, tags: [], pfpUrl: status.data.pfpUrl}
            console.log("farcaster message", status.data.message);
+           if (mixpanel) { mixpanel.people.set({'$name': status.data.displayName, '$email': accountDID, 'fid': status.data.fid}); }
            await farcasterSignup(accountDID, status.data.message, status.data.signature, profileData, status.data.fid)
            window.location.href = `/auto_follow_landing`
          }
