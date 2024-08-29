@@ -34,7 +34,7 @@ server.use((req, res, next) => {
 });
 server.use(cors());
 
-server.use(express.urlencoded({extended: true }));
+server.use(express.urlencoded({ extended: true }));
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
@@ -118,7 +118,6 @@ class Accounts {
   async getNames(accountDID) {
     return await this.redis.hGet(`account:${accountDID}`, 'names')
   }
-
 }
 const accounts = new Accounts(redisClient)
 

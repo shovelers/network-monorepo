@@ -330,7 +330,6 @@ async function portOldContacts(contacts){
   await contactRepo.bulkCreate(list)
 }
 
-
 export { 
   account,
   farcasterClient,
