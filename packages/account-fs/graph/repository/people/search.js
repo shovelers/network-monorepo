@@ -10,6 +10,7 @@ export class PeopleSearch {
   // depth - direct connections (1 degree) or shared connections via directs (2nd degree)
   // personUID - default root node or UID of direct connection
   async search({ query = "", depth = 1, personUID = null } = {}){
+    var startTime = performance.now()
     const queryString = query.toLowerCase()
     let matches = []
     let dis = this
@@ -57,6 +58,9 @@ export class PeopleSearch {
 
       matches = Array.from(uniqueMatches.values());
     }
+
+    var endTime = performance.now()
+    console.log(`people search took ${endTime - startTime} milliseconds`)
 
     return matches
   }
