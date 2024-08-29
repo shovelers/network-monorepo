@@ -2,6 +2,7 @@ export class PeopleSearch {
   constructor(agent, peopleRepo) {
     this.agent = agent
     this.peopleRepo = peopleRepo
+    this.concurrency = 10
   }
 
   // params -> query, depth and root
@@ -19,7 +20,7 @@ export class PeopleSearch {
     async function peopleList(personUID) {
       if (personUID) {
         const rootPerson = await dis.peopleRepo.find(personUID)
-        return await rootPerson.getMembers(dis.agent)
+        return await rootPerson.getMembers(dis.agent, dis.concurrency)
       }
       return await dis.peopleRepo.list();
     }
@@ -31,7 +32,7 @@ export class PeopleSearch {
       }
   
       if (currentDepth >= depth) return;
-      let connections = await node.getMembers(dis.agent)
+      let connections = await node.getMembers(dis.agent, dis.concurrency)
       for (let connection of connections) {
         await searchRecursively(connection, currentDepth + 1);
       }

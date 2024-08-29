@@ -111,7 +111,7 @@ export class Person {
     return false
   }
 
-  async getMembers(agent): Promise<Person[]> {
+  async getMembers(agent, poolSize): Promise<Person[]> {
     if (this.isCommunity() != true ) { return [] }
     if (this.cache.people) { return this.cache.people.filter(p => p.readFetchedProfile() instanceof Profile) }
 
@@ -123,7 +123,7 @@ export class Person {
       return new Person({PRODID: v.PRODID, UID: v.UID, FN: v.FN, XML: v.XML, parents: [this]})
     })
 
-    let results = await this.fetchProfilesWithPool(this.cache.people, agent);
+    let results = await this.fetchProfilesWithPool(this.cache.people, agent, poolSize);
     results = results.flat().filter(i => i)
     console.log(`fetching ${this.cache.people.length} members, got ${results.length}`, this)
 
