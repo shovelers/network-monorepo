@@ -329,9 +329,7 @@ async function portOldContacts(contacts){
   )
   await contactRepo.bulkCreate(list)
 }
-async function syncHubWithCarFile() {
-  await account.agent.syncCarFileWithHub()	
-}
+
 
 export { 
   account,
@@ -361,6 +359,5 @@ export {
   getCommunityMembers,
   filterMembers,
   uint8arrays,
-  updateTelegramInfoInCommunityProfile,
-  syncHubWithCarFile
+  updateTelegramInfoInCommunityProfile
 };

@@ -1,5 +1,4 @@
 <script type="module">
-  import { syncHubWithCarFile } from '/odd.js';
   if (window.__TAURI__) {
     document.getElementById("google-import").style.display = "none"
   }
@@ -56,7 +55,6 @@
   setTimeout(refreshSyncStatus, 3000);
 
   window.syncButton = async function() {
-    await syncHubWithCarFile();
     window.shovel.agent.syncStatus().then((s) => {
       console.log("sync status", s)
       if (s == false) {

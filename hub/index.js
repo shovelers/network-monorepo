@@ -26,10 +26,15 @@ const server = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-server.use(express.json({limit: '50mb'}));
+server.use((req, res, next) => {
+  if (req.path.includes('/sync-car-file') && req.method === 'POST') {
+    return next();
+  }
+  express.json()(req, res, next);
+});
 server.use(cors());
 
-server.use(express.urlencoded({ limit: '50mb',extended: true }));
+server.use(express.urlencoded({extended: true }));
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
 server.use(express.static(path.join(__dirname, 'public')));
@@ -40,8 +45,7 @@ await fs.mkdir(path.join(homeDir, 'blocks'), { recursive: true })
 await fs.mkdir(path.join(homeDir, 'data'), { recursive: true })
 const node = await createStandaloneNode(path.join(homeDir, 'blocks'), path.join(homeDir, 'data'))
 
-const heliaCar = car(node)
-heliaCar.components.dagWalkers = node.pins.dagWalkers
+const heliaCar = car({blockstore: node.blockstore, dagWalkers: node.pins.dagWalkers})
 const multiaddrs = node.libp2p.getMultiaddrs()
 const peers = await node.libp2p.peerStore.all()
 console.log("node address:", multiaddrs);
@@ -114,12 +118,7 @@ class Accounts {
   async getNames(accountDID) {
     return await this.redis.hGet(`account:${accountDID}`, 'names')
   }
-  async readCarFileAndUpdateBlockstore (carBuffer) {
-    let buffer = Buffer.from(carBuffer, 'base64');
-    const inStream = Readable.from(buffer);
-    const reader = await CarReader.fromIterable(inStream);
-    await heliaCar.import(reader);
-  }
+
 }
 const accounts = new Accounts(redisClient)
 
@@ -265,7 +264,7 @@ server.post('/v1/accounts/:accountDID/inbox', async (req, res) => {
   res.status(201).json({})
 });
 
-server.post('/v1/accounts/:accountDID/sync-car-file', async (req, res) => { 
+server.post('/v1/accounts/:accountDID/sync-car-file', express.json({ limit: '50mb'}), async (req, res) => {
   const verified = await verify(req.body.message, req.body.signature)
   if (!verified) {
     res.status(401).json({error: "InvalidSignature"})
@@ -278,7 +277,13 @@ server.post('/v1/accounts/:accountDID/sync-car-file', async (req, res) => {
     return
   }
 
-  await accounts.readCarFileAndUpdateBlockstore(req.body.message.carBuffer)
+  const readCarFileAndUpdateBlockstore = async (carBuffer) => {
+    let buffer = Buffer.from(carBuffer, 'base64');
+    const inStream = Readable.from(buffer);
+    const reader = await CarReader.fromIterable(inStream);
+    await heliaCar.import(reader);
+  }
+  await readCarFileAndUpdateBlockstore(req.body.message.carBuffer)
   accounts.setHead(req.params.accountDID, req.body.message.cid).then(() => {
     console.log("head updated after reading from car file")
   })

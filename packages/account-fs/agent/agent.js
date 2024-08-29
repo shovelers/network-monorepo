@@ -233,44 +233,6 @@ export const StorageCapability = {
     return newContent
   },
 
-  async syncCarFileWithHub() {
-    let headCID
-    const generateCarFile = async (localCID) => {
-      await this.axios_client.get(`/v1/accounts/${accountDID}/head`).then(async (response) => {
-        const headCID = CID.parse(response.data.head)
-      }).catch((e) => {
-        console.log(e);
-        return e
-      })   
-      const heliaCar = car(this.helia)
-      heliaCar.components.dagWalkers = this.helia.pins.dagWalkers
-      const options = {
-        blockFilter: new Set(), 
-        endCid: headCID // Specify the end CID
-      };
-      let parsedLocalCID = CID.parse(localCID)        
-      const { writer, out } = await CarWriter.create(parsedLocalCID)
-      const chunks = []
-      const readableStream = Readable.from(out)
-      readableStream.on('data', chunk => chunks.push(chunk))
-      const streamFinished = new Promise(resolve => readableStream.on('end', resolve))
-      await heliaCar.export(parsedLocalCID, writer, options)
-      await streamFinished
-      return Buffer.concat(chunks)
-  }
-
-    let accountDID = await this.accountDID()
-    const localCID = await this.head()
-    const carBuffer = await generateCarFile(localCID)
-    const envelope = await this.envelop({cid: localCID, carBuffer: carBuffer})
-    await this.axios_client.post(`/v1/accounts/${accountDID}/sync-car-file`, envelope).then(async (response) => {
-      console.log(response.status)
-    }).catch((e) => {
-      console.log(e);
-      return e
-    })
-  },
-
   async pin(cid) {
     let accountDID = await this.accountDID()
     
@@ -316,12 +278,29 @@ export const StorageCapability = {
   },
 
   async push(){
-    let localCID = await this.forestCID()
-    let status = await this.syncStatus()
-
-    if (status == false) {
-      this.pin(localCID)
+    const generateCarFile = async (cid) => {
+      const heliaCar = car(this.helia)
+      heliaCar.components.dagWalkers = this.helia.pins.dagWalkers
+      let parsedCid = CID.parse(cid)
+      const { writer, out } = await CarWriter.create(parsedCid)
+      const chunks = []
+      const readableStream = Readable.from(out)
+      readableStream.on('data', chunk => chunks.push(chunk))
+      const streamFinished = new Promise(resolve => readableStream.on('end', resolve))
+      await heliaCar.export(parsedCid, writer)
+      await streamFinished
+      return Buffer.concat(chunks)
     }
+    let accountDID = await this.accountDID()
+    const headCID = await this.head()
+    const carBuffer = await generateCarFile(headCID)
+    const envelope = await this.envelop({cid: headCID, carBuffer: carBuffer})
+    await this.axios_client.post(`/v1/accounts/${accountDID}/sync-car-file`, envelope).then(async (response) => {
+      console.log(response.status)
+    }).catch((e) => {
+      console.log(e);
+      return e
+    })
   },
 
   async pullAndMergeOnLocal(accountDID, cid) {
