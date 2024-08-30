@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.5.11",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "vite-plugin-node-polyfills": "^0.22.0"
   }
 }
