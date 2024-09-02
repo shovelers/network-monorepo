@@ -4,19 +4,26 @@ import { spki } from 'iso-signatures/spki'
 import { CID } from 'multiformats/cid'
 import * as uint8arrays from 'uint8arrays';
 import localforage from "localforage";
+import { createClient } from 'redis';
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
+const SHOVEL_AGENT_DID = "SHOVEL_AGENT_DID"
 
 export const BROWSER_RUNTIME=1
 export const SERVER_RUNTIME=2
 // localforage vs config json, Unknown device-linking/Agent add - assuming config file as given
 
 export class Runtime {
-  constructor(type, config) {
+  constructor(type, config, redisUrl = null) {
     this.type = type
     this.config = config
+    if(this.type === SERVER_RUNTIME && this.redisUrl) {
+      this.redisUrl = redisUrl
+      this.redisClient = createClient({ url: this.redisUrl });
+      this.redisClient.connect(); 
+    }
   }
 
   // Read config from file
@@ -65,15 +72,31 @@ export class Runtime {
       case BROWSER_RUNTIME:
         return await localforage.getItem(key)
       case SERVER_RUNTIME:
-        if (key == SHOVEL_FS_ACCESS_KEY) {
-          // convert string to Uint8array
-          return uint8arrays.fromString(this.config[key], 'base64url')
-        } else if (key == SHOVEL_FS_FOREST_CID) {
-          //convert string to Uinst8array
-          return CID.parse(this.config[key]).bytes
+        if(this.redisUrl) {
+          const fullKey = `agent:${this.config[SHOVEL_AGENT_DID]}:${key}`
+          let value = await this.redisClient.get(fullKey);
+          if (key == SHOVEL_FS_ACCESS_KEY) {
+            // convert string to Uint8array
+            return uint8arrays.fromString(value, 'base64url')
+          } else if (key == SHOVEL_FS_FOREST_CID) {
+            //convert string to Uinst8array
+            return CID.parse(value).bytes
+          }
+          else {
+            return value
+          }
         }
         else {
-          return this.config[key]
+          if (key == SHOVEL_FS_ACCESS_KEY) {
+            // convert string to Uint8array
+            return uint8arrays.fromString(this.config[key], 'base64url')
+          } else if (key == SHOVEL_FS_FOREST_CID) {
+            //convert string to Uinst8array
+            return CID.parse(this.config[key]).bytes
+          }
+          else {
+            return this.config[key]
+          }  
         }
       default:
         throw "InvalidRuntime from getItem"
@@ -85,17 +108,31 @@ export class Runtime {
       case BROWSER_RUNTIME:
         return await localforage.setItem(key, value)
       case SERVER_RUNTIME:
-        //convert uint8arrays to string before save to file
-        //TODO: Make the config persist on the config file 
-        if (key == SHOVEL_FS_ACCESS_KEY) {
-          var valueString = uint8arrays.toString(value, 'base64url')
-          return this.config[key] = valueString
-        } else if (key == SHOVEL_FS_FOREST_CID) {
-          var valueString = CID.decode(value).toString()
-          return this.config[key] = valueString
+        if(this.redisUrl) {
+          const fullKey = `agent:${this.config[SHOVEL_AGENT_DID]}:${key}`
+          //convert uint8arrays to string before save to file
+          let valueString;
+          if (key == SHOVEL_FS_ACCESS_KEY) {
+            valueString = uint8arrays.toString(value, 'base64url')
+          } else if (key == SHOVEL_FS_FOREST_CID) {
+            valueString = CID.decode(value).toString()
+          }
+          else {
+            valueString = value
+          }
+          return await this.redisClient.set(fullKey, valueString); 
         }
         else {
-          return this.config[key] = value
+          if (key == SHOVEL_FS_ACCESS_KEY) {
+            var valueString = uint8arrays.toString(value, 'base64url')
+            return this.config[key] = valueString
+          } else if (key == SHOVEL_FS_FOREST_CID) {
+            var valueString = CID.decode(value).toString()
+            return this.config[key] = valueString
+          }
+          else {
+            return this.config[key] = value
+          }
         }
       default:
         throw "InvalidRuntime from setItem"

@@ -26,6 +26,7 @@ const __dirname = path.dirname(__filename);
 
 const NETWORK = process.env.VITE_NETWORK || "DEVNET"
 const RUN_COMMUNITY_AGENT = process.env.VITE_RUN_COMMUNITY_AGENT || true
+const redisURL = process.env.REDIS_URL || "redis://localhost:6379"
 
 const configDir = process.env.CONFIG_HOME || __dirname
 const homeDir = process.env.PROTOCOL_DB_HOME || path.join(__dirname, 'protocol_db')
@@ -84,7 +85,7 @@ if (RUN_COMMUNITY_AGENT == true) {
       let communityAccountDID = config.SHOVEL_ACCOUNT_DID
 
       // create runtime
-      const communityRuntime = new Runtime(SERVER_RUNTIME, config)
+      const communityRuntime = new Runtime(SERVER_RUNTIME, config,redisURL)
       var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime)
       communityAgent = Object.assign(communityAgent, MessageCapability);
       communityAgent = Object.assign(communityAgent, StorageCapability);
