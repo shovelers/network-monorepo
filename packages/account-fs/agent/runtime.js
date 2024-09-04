@@ -16,13 +16,11 @@ export const SERVER_RUNTIME=2
 // localforage vs config json, Unknown device-linking/Agent add - assuming config file as given
 
 export class Runtime {
-  constructor(type, config, redisUrl = null) {
+  constructor(type, config, redisClient = null) {
     this.type = type
     this.config = config
-    if(this.type === SERVER_RUNTIME && this.redisUrl) {
-      this.redisUrl = redisUrl
-      this.redisClient = createClient({ url: this.redisUrl });
-      this.redisClient.connect(); 
+    if(this.type === SERVER_RUNTIME) {
+      this.redisClient = redisClient
     }
   }
 
@@ -72,7 +70,7 @@ export class Runtime {
       case BROWSER_RUNTIME:
         return await localforage.getItem(key)
       case SERVER_RUNTIME:
-        if(this.redisUrl) {
+        if(this.redisClient) {
           const fullKey = `agent:${this.config[SHOVEL_AGENT_DID]}:${key}`
           let value = await this.redisClient.get(fullKey);
           if (key == SHOVEL_FS_ACCESS_KEY) {
@@ -108,7 +106,7 @@ export class Runtime {
       case BROWSER_RUNTIME:
         return await localforage.setItem(key, value)
       case SERVER_RUNTIME:
-        if(this.redisUrl) {
+        if(this.redisClient) {
           const fullKey = `agent:${this.config[SHOVEL_AGENT_DID]}:${key}`
           //convert uint8arrays to string before save to file
           let valueString;
