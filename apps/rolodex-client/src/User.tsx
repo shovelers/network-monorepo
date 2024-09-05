@@ -55,7 +55,7 @@ export function User() {
           //register account on hub
           var accountDID = `did:pkh:${embeddedWallet.chainId}:${embeddedWallet.address}`
           const success = await account.create(accountDID, message, signature)
-          if(success) {
+          if(success && user) {
             await account.repositories.profile.set({})
             await account.agent.appendName(user.id, 'google')
           } else {
