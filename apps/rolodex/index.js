@@ -41,7 +41,7 @@ const helia = await createAppNode(path.join(homeDir, 'blocks'), path.join(homeDi
 //Agent of Rolodex
 // TODO - remove from git and generate for deployment
 const runtimeConfig = JSON.parse(await fs.readFile(path.join(configDir, 'agent_runtime_config.json'), 'utf8'))
-const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
+const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig,redisClient)
 const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime)
 Object.assign(agent, MessageCapability);
 Object.assign(agent, StorageCapability);

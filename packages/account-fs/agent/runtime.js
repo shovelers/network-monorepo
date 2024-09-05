@@ -4,12 +4,10 @@ import { spki } from 'iso-signatures/spki'
 import { CID } from 'multiformats/cid'
 import * as uint8arrays from 'uint8arrays';
 import localforage from "localforage";
-import { createClient } from 'redis';
 
 const SHOVEL_FS_ACCESS_KEY = "SHOVEL_FS_ACCESS_KEY"
 const SHOVEL_FS_FOREST_CID = "SHOVEL_FS_FOREST_CID"
 const SHOVEL_AGENT_WRITE_KEYPAIR = "SHOVEL_AGENT_WRITE_KEYPAIR"
-const SHOVEL_AGENT_DID = "SHOVEL_AGENT_DID"
 
 export const BROWSER_RUNTIME=1
 export const SERVER_RUNTIME=2
@@ -70,9 +68,17 @@ export class Runtime {
       case BROWSER_RUNTIME:
         return await localforage.getItem(key)
       case SERVER_RUNTIME:
-        if(this.redisClient) {
-          const fullKey = `agent:${this.config[SHOVEL_AGENT_DID]}:${key}`
+          if (key == SHOVEL_AGENT_WRITE_KEYPAIR) {
+            return this.config[SHOVEL_AGENT_WRITE_KEYPAIR]
+          }
+          const signer = await this.signer();
+          const fullKey = `agent:${signer.did}:${key}`
           let value = await this.redisClient.get(fullKey);
+          if(!value) {
+              //return value from config if absent in redis to avoid issues
+              value = this.config[key];
+              await this.redisClient.set(fullKey, value);
+          }
           if (key == SHOVEL_FS_ACCESS_KEY) {
             // convert string to Uint8array
             return uint8arrays.fromString(value, 'base64url')
@@ -83,19 +89,6 @@ export class Runtime {
           else {
             return value
           }
-        }
-        else {
-          if (key == SHOVEL_FS_ACCESS_KEY) {
-            // convert string to Uint8array
-            return uint8arrays.fromString(this.config[key], 'base64url')
-          } else if (key == SHOVEL_FS_FOREST_CID) {
-            //convert string to Uinst8array
-            return CID.parse(this.config[key]).bytes
-          }
-          else {
-            return this.config[key]
-          }  
-        }
       default:
         throw "InvalidRuntime from getItem"
     }
@@ -106,8 +99,11 @@ export class Runtime {
       case BROWSER_RUNTIME:
         return await localforage.setItem(key, value)
       case SERVER_RUNTIME:
-        if(this.redisClient) {
-          const fullKey = `agent:${this.config[SHOVEL_AGENT_DID]}:${key}`
+          if (key == SHOVEL_AGENT_WRITE_KEYPAIR) {
+            return this.config[key] = value
+          }
+          const signer = await this.signer();
+          const fullKey = `agent:${signer.did}:${key}`
           //convert uint8arrays to string before save to file
           let valueString;
           if (key == SHOVEL_FS_ACCESS_KEY) {
@@ -118,20 +114,7 @@ export class Runtime {
           else {
             valueString = value
           }
-          return await this.redisClient.set(fullKey, valueString); 
-        }
-        else {
-          if (key == SHOVEL_FS_ACCESS_KEY) {
-            var valueString = uint8arrays.toString(value, 'base64url')
-            return this.config[key] = valueString
-          } else if (key == SHOVEL_FS_FOREST_CID) {
-            var valueString = CID.decode(value).toString()
-            return this.config[key] = valueString
-          }
-          else {
-            return this.config[key] = value
-          }
-        }
+          return await this.redisClient.set(fullKey, valueString);
       default:
         throw "InvalidRuntime from setItem"
     }
