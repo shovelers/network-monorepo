@@ -8,6 +8,7 @@ import fs from 'node:fs/promises';
 import { access, constants } from 'node:fs/promises';
 import morgan from 'morgan';
 import * as Sentry from "@sentry/node";
+import { createClient } from 'redis';
 
 if (process.env.VITE_SENTRY_DSN) {
   Sentry.init({
@@ -26,6 +27,9 @@ const __dirname = path.dirname(__filename);
 
 const NETWORK = process.env.VITE_NETWORK || "DEVNET"
 const RUN_COMMUNITY_AGENT = process.env.VITE_RUN_COMMUNITY_AGENT || true
+const redisURL = process.env.REDIS_URL || "redis://localhost:6379"
+const redisClient = createClient({ url: redisURL });
+await redisClient.connect();
 
 const configDir = process.env.CONFIG_HOME || __dirname
 const homeDir = process.env.PROTOCOL_DB_HOME || path.join(__dirname, 'protocol_db')
@@ -37,7 +41,7 @@ const helia = await createAppNode(path.join(homeDir, 'blocks'), path.join(homeDi
 //Agent of Rolodex
 // TODO - remove from git and generate for deployment
 const runtimeConfig = JSON.parse(await fs.readFile(path.join(configDir, 'agent_runtime_config.json'), 'utf8'))
-const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig)
+const runtime = new Runtime(SERVER_RUNTIME, runtimeConfig,redisClient)
 const agent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, runtime)
 Object.assign(agent, MessageCapability);
 Object.assign(agent, StorageCapability);
@@ -84,7 +88,7 @@ if (RUN_COMMUNITY_AGENT == true) {
       let communityAccountDID = config.SHOVEL_ACCOUNT_DID
 
       // create runtime
-      const communityRuntime = new Runtime(SERVER_RUNTIME, config)
+      const communityRuntime = new Runtime(SERVER_RUNTIME, config,redisClient)
       var communityAgent = new Agent(helia, connection[NETWORK].sync_host, connection[NETWORK].dial_prefix, communityRuntime)
       communityAgent = Object.assign(communityAgent, MessageCapability);
       communityAgent = Object.assign(communityAgent, StorageCapability);

@@ -14,9 +14,12 @@ export const SERVER_RUNTIME=2
 // localforage vs config json, Unknown device-linking/Agent add - assuming config file as given
 
 export class Runtime {
-  constructor(type, config) {
+  constructor(type, config, redisClient = null) {
     this.type = type
     this.config = config
+    if(this.type === SERVER_RUNTIME) {
+      this.redisClient = redisClient
+    }
   }
 
   // Read config from file
@@ -65,16 +68,27 @@ export class Runtime {
       case BROWSER_RUNTIME:
         return await localforage.getItem(key)
       case SERVER_RUNTIME:
-        if (key == SHOVEL_FS_ACCESS_KEY) {
-          // convert string to Uint8array
-          return uint8arrays.fromString(this.config[key], 'base64url')
-        } else if (key == SHOVEL_FS_FOREST_CID) {
-          //convert string to Uinst8array
-          return CID.parse(this.config[key]).bytes
-        }
-        else {
-          return this.config[key]
-        }
+          if (key == SHOVEL_AGENT_WRITE_KEYPAIR) {
+            return this.config[SHOVEL_AGENT_WRITE_KEYPAIR]
+          }
+          const signer = await this.signer();
+          const fullKey = `agent:${signer.did}:${key}`
+          let value = await this.redisClient.get(fullKey);
+          if(!value) {
+              //return value from config if absent in redis to avoid issues
+              value = this.config[key];
+              await this.redisClient.set(fullKey, value);
+          }
+          if (key == SHOVEL_FS_ACCESS_KEY) {
+            // convert string to Uint8array
+            return uint8arrays.fromString(value, 'base64url')
+          } else if (key == SHOVEL_FS_FOREST_CID) {
+            //convert string to Uinst8array
+            return CID.parse(value).bytes
+          }
+          else {
+            return value
+          }
       default:
         throw "InvalidRuntime from getItem"
     }
@@ -85,18 +99,22 @@ export class Runtime {
       case BROWSER_RUNTIME:
         return await localforage.setItem(key, value)
       case SERVER_RUNTIME:
-        //convert uint8arrays to string before save to file
-        //TODO: Make the config persist on the config file 
-        if (key == SHOVEL_FS_ACCESS_KEY) {
-          var valueString = uint8arrays.toString(value, 'base64url')
-          return this.config[key] = valueString
-        } else if (key == SHOVEL_FS_FOREST_CID) {
-          var valueString = CID.decode(value).toString()
-          return this.config[key] = valueString
-        }
-        else {
-          return this.config[key] = value
-        }
+          if (key == SHOVEL_AGENT_WRITE_KEYPAIR) {
+            return this.config[key] = value
+          }
+          const signer = await this.signer();
+          const fullKey = `agent:${signer.did}:${key}`
+          //convert uint8arrays to string before save to file
+          let valueString;
+          if (key == SHOVEL_FS_ACCESS_KEY) {
+            valueString = uint8arrays.toString(value, 'base64url')
+          } else if (key == SHOVEL_FS_FOREST_CID) {
+            valueString = CID.decode(value).toString()
+          }
+          else {
+            valueString = value
+          }
+          return await this.redisClient.set(fullKey, valueString);
       default:
         throw "InvalidRuntime from setItem"
     }
