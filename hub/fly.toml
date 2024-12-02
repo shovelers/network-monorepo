@@ -7,7 +7,7 @@ app = "dcn"
 primary_region = "sin"
 
 [[vm]]
-  size = "shared-cpu-4x"
+  size = "shared-cpu-1x"
 
 [build]
 

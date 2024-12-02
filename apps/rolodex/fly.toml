@@ -7,7 +7,7 @@ app = "shovel-rolodex"
 primary_region = "sin"
 
 [[vm]]
-  size = "shared-cpu-4x"
+  size = "shared-cpu-1x"
 
 [env]
   ROLODEX_DNS_MULTADDR_PREFIX = "/dns4/app-rolodex.shovel.company/tcp/3002/tls/ws/p2p/"
