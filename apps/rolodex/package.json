@@ -37,7 +37,8 @@
     "viem": "^2.8.6",
     "vite": "^4.4.9",
     "vite-plugin-wasm": "^3.3.0",
-    "buffer": "^6.0.3"
+    "buffer": "^6.0.3",
+    "redis": "^4.6.12"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.5.11",
